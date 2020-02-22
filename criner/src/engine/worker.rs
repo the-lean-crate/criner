@@ -70,7 +70,7 @@ pub async fn download(
     db: Db,
     mut progress: prodash::tree::Item,
     r: Receiver<DownloadTask>,
-    download_dir: Option<PathBuf>,
+    assets_dir: PathBuf,
 ) -> Result<()> {
     let mut dummy = default_download_task();
 
@@ -134,13 +134,7 @@ pub async fn download(
                         },
                     );
                     TaskResultTree::key_to_buf(&insert_item, &mut key);
-                    store_data(
-                        db.results(),
-                        &key,
-                        insert_item,
-                        download_dir.as_ref().map(|p| p.as_path()),
-                    )
-                    .await?;
+                    store_data(&key, insert_item, assets_dir.as_path()).await?;
                 }
                 Ok(())
             }
@@ -173,21 +167,16 @@ fn default_download_task() -> Task<'static> {
 }
 
 async fn store_data(
-    tree: TaskResultTree<'_>,
     key: &[u8],
     res: (&str, &str, &Task<'_>, TaskResult<'_>),
-    download_dir: Option<&Path>,
+    assets_dir: &Path,
 ) -> Result<()> {
-    tree.insert(&res)?;
     let key_str = String::from_utf8(key.to_owned())?;
     // For now, we store a backup and to make manual inspection easier…
-    Ok(match (res.3, download_dir) {
-        (
-            TaskResult::Download {
-                data: Some(data), ..
-            },
-            Some(path),
-        ) => tokio::fs::write(path.join(&key_str), data).await?,
+    Ok(match res.3 {
+        TaskResult::Download {
+            data: Some(data), ..
+        } => tokio::fs::write(assets_dir.join(&key_str), data).await?,
         _ => (),
     })
 }

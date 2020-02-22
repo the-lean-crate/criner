@@ -12,7 +12,6 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
         progress_message_scrollback_buffer_size: 100,
         concurrent_downloads: 5,
         repository: None,
-        downloads_directory: None,
         time_limit: None,
         db_path: PathBuf::from("criner.db"),
     }) {
@@ -23,7 +22,6 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             time_limit,
             concurrent_downloads,
             no_gui,
-            downloads_directory,
             progress_message_scrollback_buffer_size,
         } => criner::run_blocking(
             db_path,
@@ -31,7 +29,6 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
                 .unwrap_or_else(|| std::env::temp_dir().join("criner-crates-io-bare-index.git")),
             time_limit.map(|d| std::time::SystemTime::now().add(*d)),
             concurrent_downloads,
-            downloads_directory,
             criner::prodash::TreeOptions {
                 message_buffer_capacity: progress_message_scrollback_buffer_size,
                 ..criner::prodash::TreeOptions::default()

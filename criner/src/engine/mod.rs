@@ -34,7 +34,7 @@ pub async fn run(
     deadline: Option<SystemTime>,
     progress: prodash::Tree,
     num_workers: u32,
-    downloads_dir: Option<PathBuf>,
+    assets_dir: PathBuf,
     pool: impl Spawn + Clone,
     tokio: tokio::runtime::Handle,
 ) -> Result<()> {
@@ -50,7 +50,7 @@ pub async fn run(
                 db.clone(),
                 downloaders.add_child(format!("DL {} - idle", idx + 1)),
                 rx.clone(),
-                downloads_dir.clone(),
+                assets_dir.clone(),
             )
             .map(|_| ()),
         );
@@ -109,7 +109,6 @@ pub fn run_blocking(
     crates_io_path: impl AsRef<Path>,
     deadline: Option<SystemTime>,
     num_workers: u32,
-    downloads_dir: Option<PathBuf>,
     root: prodash::Tree,
     gui: Option<prodash::tui::TuiOptions>,
 ) -> Result<()> {
@@ -129,10 +128,9 @@ pub fn run_blocking(
     let task_pool = futures::executor::ThreadPool::builder()
         .pool_size(pool_size)
         .create()?;
+    let assets_dir = db.as_ref().join("assets");
     let db = Db::open(db)?;
-    if let Some(path) = downloads_dir.as_ref() {
-        std::fs::create_dir_all(path)?;
-    }
+    std::fs::create_dir_all(&assets_dir)?;
 
     // dropping the work handle will stop (non-blocking) futures
     let work_handle = task_pool.spawn_with_handle(run(
@@ -141,7 +139,7 @@ pub fn run_blocking(
         deadline,
         root.clone(),
         num_workers,
-        downloads_dir,
+        assets_dir,
         task_pool.clone(),
         tokio_rt.handle().clone(),
     ))?;

@@ -21,6 +21,3 @@ criner/Cargo.lock
 
 # the database with 'the world' in it
 /criner.db
-
-# everything we don't want to store in the db to prevent unnecessary bloat
-/assets/
