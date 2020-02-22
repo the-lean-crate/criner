@@ -15,6 +15,10 @@ name = "criner"
 path = "src/main.rs"
 doctest = false
 
+[features]
+default = []
+migration = ["criner/migration"]
+
 [lib]
 doctest = false
 

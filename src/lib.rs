@@ -17,7 +17,7 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
     });
     match cmd {
         #[cfg(feature = "migration")]
-        Migrate => unimplemented!(),
+        Migrate => criner::migration::migrate("./criner.db"),
         Mine {
             repository,
             db_path,
