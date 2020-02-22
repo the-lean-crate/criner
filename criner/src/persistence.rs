@@ -347,12 +347,13 @@ impl<'a> TreeAccess for CratesTree<'a> {
     ) -> Option<Crate<'a>> {
         Some(match existing_item {
             Some(mut c) => {
-                // NOTE: We assume that a version can only be added once! They are immutable.
-                // However, idempotence is more important
-                if !c
+                if let Some(existing_version) = c
                     .versions
-                    .contains(&std::borrow::Cow::from(&new_item.version))
+                    .iter_mut()
+                    .find(|other| *other == &std::borrow::Cow::from(&new_item.version))
                 {
+                    *existing_version = new_item.version.to_owned().into();
+                } else {
                     c.versions.push(new_item.version.to_owned().into());
                 }
                 c.versions.sort();
