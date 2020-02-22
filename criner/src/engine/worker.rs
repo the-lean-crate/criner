@@ -148,6 +148,8 @@ pub async fn download(
         };
         kt.2 = task;
         tasks.upsert(&kt)?;
+        progress.set_name("↓ idle");
+        progress.init(None, None);
     }
     progress.done("Shutting down…");
     Ok(())
