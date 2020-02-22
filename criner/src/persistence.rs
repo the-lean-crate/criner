@@ -62,7 +62,7 @@ impl Db {
     }
 }
 
-const KEY_SEP: u8 = b':';
+pub const KEY_SEP: u8 = b':';
 
 pub trait Keyed {
     fn key_bytes_buf(&self, buf: &mut Vec<u8>);

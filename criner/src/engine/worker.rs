@@ -167,7 +167,28 @@ fn default_download_task() -> Task<'static> {
 
 async fn store_data(key: &[u8], data: &[u8], assets_dir: &Path) -> Result<()> {
     let key_str = String::from_utf8(key.to_owned())?;
-    tokio::fs::write(assets_dir.join(&key_str), data)
-        .await
-        .map_err(Into::into)
+
+    let mut tokens = key_str.split(':');
+    assert_eq!(tokens.by_ref().count(), 5);
+    let (name, version) = (tokens.next().unwrap(), tokens.next().unwrap());
+    let (process, process_version, kind) = (
+        tokens.next().unwrap(),
+        tokens.next().unwrap(),
+        tokens.next().unwrap(),
+    );
+
+    let base_dir = assets_dir.join(name).join(version);
+    tokio::fs::create_dir_all(&base_dir).await?;
+    tokio::fs::write(
+        base_dir.join(format!(
+            "{process}{sep}{version}.{kind}",
+            process = process,
+            sep = crate::persistence::KEY_SEP,
+            version = process_version,
+            kind = kind
+        )),
+        data,
+    )
+    .await
+    .map_err(Into::into)
 }
