@@ -3,6 +3,9 @@
 #[macro_use]
 extern crate quick_error;
 
+#[cfg(feature = "migration")]
+pub mod migration;
+
 pub mod error;
 pub(crate) mod model;
 pub(crate) mod persistence;

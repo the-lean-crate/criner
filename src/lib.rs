@@ -6,7 +6,7 @@ pub use args::*;
 
 pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
     use SubCommands::*;
-    match args.sub.unwrap_or_else(|| SubCommands::Mine {
+    let cmd = args.sub.unwrap_or_else(|| SubCommands::Mine {
         no_gui: false,
         fps: 3.0,
         progress_message_scrollback_buffer_size: 100,
@@ -14,7 +14,10 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
         repository: None,
         time_limit: None,
         db_path: PathBuf::from("criner.db"),
-    }) {
+    });
+    match cmd {
+        #[cfg(feature = "migration")]
+        Migrate => unimplemented!(),
         Mine {
             repository,
             db_path,

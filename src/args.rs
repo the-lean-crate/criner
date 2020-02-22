@@ -12,7 +12,7 @@ pub struct Parsed {
 #[derive(Debug, StructOpt)]
 pub enum SubCommands {
     /// Mine crates.io in an incorruptible and resumable fashion
-    #[structopt(display_order = 2)]
+    #[structopt(display_order = 0)]
     Mine {
         /// If set, no gui will be presented. Best with RUST_LOG=info to see basic information.
         #[structopt(long)]
@@ -41,4 +41,8 @@ pub enum SubCommands {
         /// Path to the possibly existing database. It's used to persist all mining results.
         db_path: PathBuf,
     },
+    #[cfg(feature = "migration")]
+    /// A special purpose command only to be executed in special circumstances
+    #[structopt(display_order = 1)]
+    Migrate,
 }
