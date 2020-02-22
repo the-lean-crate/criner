@@ -130,11 +130,10 @@ pub async fn download(
                                 .get(http::header::CONTENT_TYPE)
                                 .and_then(|t| t.to_str().ok())
                                 .map(Into::into),
-                            data: Some(body_buf.as_slice().into()),
                         },
                     );
                     TaskResultTree::key_to_buf(&insert_item, &mut key);
-                    store_data(&key, insert_item, assets_dir.as_path()).await?;
+                    store_data(&key, &body_buf, assets_dir.as_path()).await?;
                 }
                 Ok(())
             }
@@ -166,17 +165,9 @@ fn default_download_task() -> Task<'static> {
     }
 }
 
-async fn store_data(
-    key: &[u8],
-    res: (&str, &str, &Task<'_>, TaskResult<'_>),
-    assets_dir: &Path,
-) -> Result<()> {
+async fn store_data(key: &[u8], data: &[u8], assets_dir: &Path) -> Result<()> {
     let key_str = String::from_utf8(key.to_owned())?;
-    // For now, we store a backup and to make manual inspection easier…
-    Ok(match res.3 {
-        TaskResult::Download {
-            data: Some(data), ..
-        } => tokio::fs::write(assets_dir.join(&key_str), data).await?,
-        _ => (),
-    })
+    tokio::fs::write(assets_dir.join(&key_str), data)
+        .await
+        .map_err(Into::into)
 }

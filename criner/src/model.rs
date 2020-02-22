@@ -189,8 +189,8 @@ pub enum TaskResult<'a> {
         kind: Cow<'a, str>,
         url: Cow<'a, str>,
         content_length: u32,
+        /// The content type, it's optional because it might not be set (even though it should)
         content_type: Option<Cow<'a, str>>,
-        data: Option<Cow<'a, [u8]>>,
     },
 }
 
