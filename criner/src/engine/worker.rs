@@ -2,7 +2,6 @@ use crate::error::{Error, Result};
 use crate::model;
 use crate::model::{Task, TaskResult, TaskState};
 use crate::persistence::{Db, TaskResultTree, TasksTree, TreeAccess};
-use async_std::sync::Receiver;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
@@ -36,7 +35,7 @@ pub async fn schedule_tasks(
     );
     let task = tasks.get(TasksTree::key(&key))?.map_or(key.2, |v| v);
     match task.state {
-        TaskState::NotStarted | TaskState::AttemptsWithFailure(_) => {
+        TaskState::NotStarted => {
             progress.init(Some(1), Some("task"));
             progress.set(1);
             progress.blocked(None);
@@ -53,6 +52,7 @@ pub async fn schedule_tasks(
                 })
                 .await;
         }
+        TaskState::AttemptsWithFailure(_) => {}
         TaskState::Complete => {}
     };
     Ok(AsyncResult::Done)
@@ -68,7 +68,7 @@ pub struct DownloadTask {
 pub async fn download(
     db: Db,
     mut progress: prodash::tree::Item,
-    r: Receiver<DownloadTask>,
+    r: async_std::sync::Receiver<DownloadTask>,
     assets_dir: PathBuf,
 ) -> Result<()> {
     let mut dummy = default_download_task();
