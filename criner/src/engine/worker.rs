@@ -36,7 +36,7 @@ pub async fn schedule_tasks(
     );
     let task = tasks.get(TasksTree::key(&key))?.map_or(key.2, |v| v);
     match task.state {
-        TaskState::NotStarted => {
+        TaskState::NotStarted | TaskState::AttemptsWithFailure(_) => {
             progress.init(Some(1), Some("task"));
             progress.set(1);
             progress.blocked(None);
@@ -53,7 +53,6 @@ pub async fn schedule_tasks(
                 })
                 .await;
         }
-        TaskState::AttemptsWithFailure(_) => {}
         TaskState::Complete => {}
     };
     Ok(AsyncResult::Done)
@@ -168,8 +167,9 @@ fn default_download_task() -> Task<'static> {
 async fn store_data(key: &[u8], data: &[u8], assets_dir: &Path) -> Result<()> {
     let key_str = String::from_utf8(key.to_owned())?;
 
+    let tokens = key_str.split(':');
+    assert_eq!(tokens.count(), 5);
     let mut tokens = key_str.split(':');
-    assert_eq!(tokens.by_ref().count(), 5);
     let (name, version) = (tokens.next().unwrap(), tokens.next().unwrap());
     let (process, process_version, kind) = (
         tokens.next().unwrap(),
