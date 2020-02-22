@@ -15,3 +15,12 @@ criner/Cargo.lock
 **/*.rs.bk
 
 # End of https://www.gitignore.io/api/rust
+
+# A bare index that is cloned on demand
+/tests/fixtures/index-bare/
+
+# the database with 'the world' in it
+/criner.db
+
+# everything we don't want to store in the db to prevent unnecessary bloat
+/assets/
