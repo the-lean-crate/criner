@@ -1,31 +1,23 @@
 [package]
-name = "criner"
+name = "criner-cli"
 version = "0.1.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 edition = "2018"
-description = "a platform for resumable mining of crates.io for knowledge and information"
+description = "A command-line interface for the 'Criner' crates mining platform"
 publish = false
 include = ["src/**/*", "Cargo.*", "README.md", "LICENSE.md"]
 license = "MIT"
 repository = "https://github.com/crates-io/criner"
 readme = "README.md"
 
+[[bin]]
+name = "criner"
+path = "src/main.rs"
+doctest = false
+
 [lib]
 doctest = false
 
-[dependencies]
-quick-error = "1.2.3"
-futures = { version = "0.3.4", features = ["thread-pool"]}
-futures-timer = "3.0.1"
-sled = { version = "0.31.0", default-features = false }
-crates-index-diff = "5.0.4"
-prodash = { version = "1.1", default-features = false, features = ["tui-renderer", "log-renderer"] }
-rmp-serde = "0.14.0"
-serde_derive = "1.0.104"
-serde = "1.0.104"
-humantime = "2.0.0"
-log = "0.4.8"
-async-std = { version = "1.5.0", default-features = false, features = ["unstable"] }
-reqwest = "0.10.1"
-http = { version = "0.2.0", default-features = false }
-tokio = { version = "0.2", default-features = false, features = ["fs", "rt-threaded"]}
+[workspace]
+members = ["criner"]
+
