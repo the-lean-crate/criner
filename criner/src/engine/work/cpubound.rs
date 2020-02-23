@@ -38,8 +38,7 @@ pub async fn processor(
         crate_version,
     }) = r.recv().await
     {
-        let name_base = format!("🏋️ 🦖 ‍{}:{}", crate_name, crate_version);
-        progress.set_name(&name_base);
+        progress.set_name(format!("🏋️ 🦖 ‍{}:{}", crate_name, crate_version));
         progress.init(None, Some("files extracted"));
 
         let mut kt = (crate_name.as_str(), crate_version.as_str(), dummy);
@@ -81,13 +80,6 @@ pub async fn processor(
                 progress.set(count);
                 let mut e: tar::Entry<_> = e?;
                 let path = e.path().ok();
-                if let Some(file_name) = path
-                    .as_ref()
-                    .and_then(|p| p.file_name())
-                    .and_then(|f| f.to_str())
-                {
-                    progress.set_name(format!("{} → {}", name_base, file_name));
-                }
                 meta_data.push(model::TarHeader {
                     path: e.path_bytes().to_vec().into(),
                     size: e.header().size()?,
