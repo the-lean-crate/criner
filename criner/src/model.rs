@@ -200,7 +200,7 @@ impl<'a> Default for Task<'a> {
 
 /// An entry in a tar archive, including the most important meta-data
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct TarEntry<'a> {
+pub struct TarHeader<'a> {
     /// The normalized path of the entry. May not be unicode encoded.
     pub path: Cow<'a, [u8]>,
     /// The size of the file in bytes
@@ -215,7 +215,13 @@ pub enum TaskResult<'a> {
     /// A dummy value just so that we can have a default value
     None,
     /// Most interesting information about an unpacked crate
-    ExplodedCrate { entries: Cow<'a, [TarEntry<'a>]> },
+    ExplodedCrate {
+        /// Meta data of all entries in the crate
+        entries_meta_data: Cow<'a, [TarHeader<'a>]>,
+        /// The actual content of selected files, usually README, License and Cargo.* files
+        /// Note that these are also present in entries_meta_data.
+        selected_entries: Cow<'a, [(TarHeader<'a>, Cow<'a, [u8]>)]>,
+    },
     /// A download with meta data and the downloaded blob itself
     Download {
         kind: Cow<'a, str>,
