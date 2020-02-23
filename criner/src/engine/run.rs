@@ -41,37 +41,6 @@ pub async fn non_blocking(
             interval_s,
             {
                 let p = progress.clone();
-                move || p.add_child("Processing Timer")
-            },
-            deadline,
-            {
-                let progress = progress.clone();
-                let db = db.clone();
-                let assets_dir = assets_dir.clone();
-                let pool = pool.clone();
-                move || {
-                    stage::tasks::process(
-                        db.clone(),
-                        progress.add_child("Process Crate Versions"),
-                        io_bound_processors,
-                        cpu_bound_processors,
-                        progress.add_child("Downloads"),
-                        tokio.clone(),
-                        pool.clone(),
-                        assets_dir.clone(),
-                    )
-                }
-            },
-        )
-        .map(|_| ()),
-    )?;
-
-    let interval_s = 60;
-    pool.spawn(
-        repeat_every_s(
-            interval_s,
-            {
-                let p = progress.clone();
                 move || p.add_child("Fetch Timer")
             },
             deadline,
@@ -93,8 +62,36 @@ pub async fn non_blocking(
         .map(|_| ()),
     )?;
 
+    let interval_s = 20;
+    let processing_with_iteration = repeat_every_s(
+        interval_s,
+        {
+            let p = progress.clone();
+            move || p.add_child("Processing Timer")
+        },
+        deadline,
+        {
+            let progress = progress.clone();
+            let db = db.clone();
+            let assets_dir = assets_dir.clone();
+            let pool = pool.clone();
+            move || {
+                stage::tasks::process(
+                    db.clone(),
+                    progress.add_child("Process Crate Versions"),
+                    io_bound_processors,
+                    cpu_bound_processors,
+                    progress.add_child("Downloads"),
+                    tokio.clone(),
+                    pool.clone(),
+                    assets_dir.clone(),
+                )
+            }
+        },
+    );
+
     let interval_s = 10;
-    repeat_every_s(
+    let report_with_iteration = repeat_every_s(
         interval_s,
         {
             let p = progress.clone();
@@ -109,8 +106,10 @@ pub async fn non_blocking(
                 deadline,
             )
         },
-    )
-    .await
+    );
+    let (res1, res2) =
+        futures::future::join(processing_with_iteration, report_with_iteration).await;
+    res1.and(res2)
 }
 
 /// For convenience, run the engine and block until done.
@@ -144,7 +143,7 @@ pub fn blocking(
     std::fs::create_dir_all(&assets_dir)?;
 
     // dropping the work handle will stop (non-blocking) futures
-    let work_handle = task_pool.spawn_with_handle(non_blocking(
+    let work_handle = non_blocking(
         db.clone(),
         crates_io_path.as_ref().into(),
         deadline,
@@ -154,7 +153,7 @@ pub fn blocking(
         assets_dir,
         task_pool.clone(),
         tokio_rt.handle().clone(),
-    ))?;
+    );
 
     match gui {
         Some(gui_options) => {
@@ -163,9 +162,10 @@ pub fn blocking(
                 gui_options,
                 context_stream(&db, start_of_computation),
             )?);
+            let gui = task_pool.spawn_with_handle(gui)?;
 
             let either = futures::executor::block_on(futures::future::select(
-                work_handle,
+                work_handle.boxed_local(),
                 gui.boxed_local(),
             ));
             match either {
@@ -176,7 +176,7 @@ pub fn blocking(
                         warn!("{}", e);
                     }
                 }
-                Either::Right((_, work_handle)) => work_handle.forget(),
+                Either::Right((_, _work_handle)) => {}
             }
 
             // Make sure the terminal can reset when the gui is done.
