@@ -62,8 +62,7 @@ pub async fn non_blocking(
         .map(|_| ()),
     )?;
 
-    let interval_s = 20;
-    let processing_with_iteration = repeat_every_s(
+    repeat_every_s(
         interval_s,
         {
             let p = progress.clone();
@@ -71,45 +70,36 @@ pub async fn non_blocking(
         },
         deadline,
         {
-            let progress = progress.clone();
-            let db = db.clone();
-            let assets_dir = assets_dir.clone();
-            let pool = pool.clone();
             move || {
-                stage::tasks::process(
-                    db.clone(),
-                    progress.add_child("Process Crate Versions"),
-                    io_bound_processors,
-                    cpu_bound_processors,
-                    progress.add_child("Downloads"),
-                    tokio.clone(),
-                    pool.clone(),
-                    assets_dir.clone(),
-                )
+                let progress = progress.clone();
+                let db = db.clone();
+                let assets_dir = assets_dir.clone();
+                let pool = pool.clone();
+                let tokio = tokio.clone();
+                async move {
+                    stage::tasks::process(
+                        db.clone(),
+                        progress.add_child("Process Crate Versions"),
+                        io_bound_processors,
+                        cpu_bound_processors,
+                        progress.add_child("Downloads"),
+                        tokio.clone(),
+                        pool.clone(),
+                        assets_dir.clone(),
+                    )
+                    .await?;
+                    stage::report::generate(
+                        db.clone(),
+                        progress.add_child("Reports"),
+                        assets_dir.clone(),
+                        deadline,
+                    )
+                    .await
+                }
             }
         },
-    );
-
-    let interval_s = 10;
-    let report_with_iteration = repeat_every_s(
-        interval_s,
-        {
-            let p = progress.clone();
-            move || p.add_child("Report Timer")
-        },
-        deadline,
-        move || {
-            stage::report::generate(
-                db.clone(),
-                progress.add_child("Reports"),
-                assets_dir.clone(),
-                deadline,
-            )
-        },
-    );
-    let (res1, res2) =
-        futures::future::join(processing_with_iteration, report_with_iteration).await;
-    res1.and(res2)
+    )
+    .await
 }
 
 /// For convenience, run the engine and block until done.
