@@ -95,7 +95,7 @@ pub async fn non_blocking(
                         assets_dir.clone(),
                         deadline,
                         cpu_o_bound_processors,
-                        pool.clone(),
+                        tokio.clone(),
                     )
                     .await
                 }
