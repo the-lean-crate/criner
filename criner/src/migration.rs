@@ -1,7 +1,31 @@
 use crate::persistence::TreeAccess;
 use std::path::Path;
 
-pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
+pub fn migrate(_db_path: impl AsRef<Path>) -> crate::error::Result<()> {
+    Ok(())
+}
+
+#[allow(dead_code)]
+fn migrate_transform_tree_data_that_was_not_necessary_actually(
+    db_path: impl AsRef<Path>,
+) -> crate::error::Result<()> {
+    let db = crate::persistence::Db::open(&db_path)?;
+    for (k, v) in db.tasks().tree().iter().filter_map(Result::ok) {
+        let ks = String::from_utf8(k.to_vec()).unwrap();
+        let t: crate::model::Task = v.into();
+        assert_eq!(t.version, "1.0.0");
+        if ks.ends_with("download") {
+            continue;
+        }
+        if !ks.ends_with("extract_crate") {
+            panic!("got one");
+        }
+    }
+    Ok(())
+}
+
+#[allow(dead_code)]
+fn migrate_iterate_assets_and_update_db(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
     let assets_dir = db_path.as_ref().join("assets");
     let db = crate::persistence::Db::open(&db_path)?;
     let results = db.results();
@@ -10,7 +34,7 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
     for entry in jwalk::WalkDir::new(assets_dir)
         .preload_metadata(true)
         .into_iter()
-        .flat_map(Result::ok)
+        .filter_map(Result::ok)
     {
         let entry: jwalk::DirEntry = entry;
         if entry.file_type.as_ref().ok().map_or(true, |d| d.is_dir()) {

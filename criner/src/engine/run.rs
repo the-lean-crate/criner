@@ -111,7 +111,7 @@ pub fn blocking(
     // additional non-blocking tasks.
     // The main thread is expected to pool non-blocking tasks.
     // I admit I don't fully understand why multi-pool setups aren't making progress… . So just one pool for now.
-    let pool_size = 1 + 1;
+    let pool_size = 1usize + cpu_bound_processors as usize;
     let task_pool = futures::executor::ThreadPool::builder()
         .pool_size(pool_size)
         .create()?;

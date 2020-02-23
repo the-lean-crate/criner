@@ -94,9 +94,10 @@ pub async fn processor(
                     entry_type: e.header().entry_type().as_byte(),
                 });
 
-                if let Some(stem_lowercase) =
-                    path.and_then(|stem| stem.to_str().map(|s| s.to_lowercase()))
-                {
+                if let Some(stem_lowercase) = path.and_then(|p| {
+                    p.file_stem()
+                        .and_then(|stem| stem.to_str().map(str::to_lowercase))
+                }) {
                     let interesting_files = ["cargo", "cargo", "readme", "license"];
                     if interesting_files.contains(&stem_lowercase.as_str()) {
                         file_count += 1;

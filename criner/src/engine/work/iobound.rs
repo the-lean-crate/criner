@@ -134,7 +134,7 @@ pub fn download_file_path(process: &str, version: &str, kind: &str, base_dir: &P
     base_dir.join(format!(
         "{process}{sep}{version}.{kind}",
         process = process,
-        sep = crate::persistence::KEY_SEP,
+        sep = crate::persistence::KEY_SEP_CHAR,
         version = version,
         kind = kind
     ))
