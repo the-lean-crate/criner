@@ -26,9 +26,14 @@ pub enum SubCommands {
         #[structopt(long, default_value = "100")]
         progress_message_scrollback_buffer_size: usize,
 
-        /// The amount of downloads to run concurrently
+        /// The amount of IO-bound processors to run concurrently.
+        ///
+        /// A way to choose a value is to see which part of the I/O is actually the bottle neck.
+        /// Depending on that number, one should experiment with an amount of processors that saturate
+        /// either input or output.
+        /// Most commonly, these are bound to the input, as it is the network.
         #[structopt(short = "d", long, name = "COUNT", default_value = "10")]
-        concurrent_downloads: u32,
+        io_processors: u32,
 
         /// Path to the possibly existing crates.io repository clone. If unset, it will be cloned to a temporary spot.
         #[structopt(short = "r", long, name = "REPO")]

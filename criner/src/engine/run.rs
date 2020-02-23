@@ -1,10 +1,4 @@
-use crate::{
-    engine::{stage, work},
-    error::Result,
-    model,
-    persistence::Db,
-    utils::*,
-};
+use crate::{engine::stage, error::Result, model, persistence::Db, utils::*};
 use futures::{
     future::{Either, FutureExt},
     stream::StreamExt,
@@ -33,28 +27,12 @@ pub async fn non_blocking(
     crates_io_path: PathBuf,
     deadline: Option<SystemTime>,
     progress: prodash::Tree,
-    num_workers: u32,
+    num_io_processors: u32,
     assets_dir: PathBuf,
     pool: impl Spawn + Clone,
     tokio: tokio::runtime::Handle,
 ) -> Result<()> {
     check(deadline)?;
-
-    let mut downloaders = progress.add_child("Downloads");
-    let (tx, rx) = async_std::sync::channel(1);
-    for idx in 0..num_workers {
-        // Can only use the pool if the downloader uses a futures-compatible runtime
-        // Tokio is its very own thing, and futures requiring it need to run there.
-        tokio.spawn(
-            work::iobound::processor(
-                db.clone(),
-                downloaders.add_child(format!("DL {} - idle", idx + 1)),
-                rx.clone(),
-                assets_dir.clone(),
-            )
-            .map(|_| ()),
-        );
-    }
 
     let interval_s = 5;
     pool.spawn(
@@ -68,11 +46,15 @@ pub async fn non_blocking(
             {
                 let progress = progress.clone();
                 let db = db.clone();
+                let assets_dir = assets_dir.clone();
                 move || {
                     stage::tasks::process(
                         db.clone(),
                         progress.add_child("Process Crate Versions"),
-                        tx.clone(),
+                        num_io_processors,
+                        progress.add_child("Downloads"),
+                        tokio.clone(),
+                        assets_dir.clone(),
                     )
                 }
             },
@@ -108,7 +90,7 @@ pub fn blocking(
     db: impl AsRef<Path>,
     crates_io_path: impl AsRef<Path>,
     deadline: Option<SystemTime>,
-    num_workers: u32,
+    num_io_processors: u32,
     root: prodash::Tree,
     gui: Option<prodash::tui::TuiOptions>,
 ) -> Result<()> {
@@ -138,7 +120,7 @@ pub fn blocking(
         crates_io_path.as_ref().into(),
         deadline,
         root.clone(),
-        num_workers,
+        num_io_processors,
         assets_dir,
         task_pool.clone(),
         tokio_rt.handle().clone(),

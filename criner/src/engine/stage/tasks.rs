@@ -4,12 +4,32 @@ use crate::{
     model,
     persistence::{Db, Keyed, TreeAccess},
 };
+use futures::FutureExt;
+use std::path::PathBuf;
 
 pub async fn process(
     db: Db,
     mut progress: prodash::tree::Item,
-    tx: async_std::sync::Sender<work::iobound::DownloadRequest>,
+    num_io_processors: u32,
+    mut download_progress: prodash::tree::Item,
+    tokio: tokio::runtime::Handle,
+    assets_dir: PathBuf,
 ) -> Result<()> {
+    let (tx, rx) = async_std::sync::channel(1);
+    for idx in 0..num_io_processors {
+        // Can only use the pool if the downloader uses a futures-compatible runtime
+        // Tokio is its very own thing, and futures requiring it need to run there.
+        tokio.spawn(
+            work::iobound::processor(
+                db.clone(),
+                download_progress.add_child(format!("DL {} - idle", idx + 1)),
+                rx.clone(),
+                assets_dir.clone(),
+            )
+            .map(|_| ()),
+        );
+    }
+
     let versions = db.crate_versions();
     let mut ofs = 0;
     loop {
