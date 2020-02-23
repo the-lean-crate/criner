@@ -12,6 +12,7 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
         progress_message_scrollback_buffer_size: 100,
         io_bound_processors: 5,
         cpu_bound_processors: 2,
+        cpu_o_bound_processors: 10,
         repository: None,
         time_limit: None,
         db_path: PathBuf::from("criner.db"),
@@ -26,6 +27,7 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             time_limit,
             io_bound_processors,
             cpu_bound_processors,
+            cpu_o_bound_processors,
             no_gui,
             progress_message_scrollback_buffer_size,
         } => criner::run::blocking(
@@ -35,6 +37,7 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             time_limit.map(|d| std::time::SystemTime::now().add(*d)),
             io_bound_processors,
             cpu_bound_processors,
+            cpu_o_bound_processors,
             criner::prodash::TreeOptions {
                 message_buffer_capacity: progress_message_scrollback_buffer_size,
                 ..criner::prodash::TreeOptions::default()

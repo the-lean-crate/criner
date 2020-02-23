@@ -1,9 +1,14 @@
+use crate::engine::work;
 use crate::{
     engine::report,
     error::Result,
     model,
     persistence::{self, TreeAccess},
     utils::check,
+};
+use futures::{
+    task::{Spawn, SpawnExt},
+    FutureExt,
 };
 use itertools::Itertools;
 use std::{path::PathBuf, time::SystemTime};
@@ -13,6 +18,8 @@ pub async fn generate(
     mut progress: prodash::tree::Item,
     assets_dir: PathBuf,
     deadline: Option<SystemTime>,
+    cpu_o_bound_processors: u32,
+    pool: impl Spawn + Clone + Send + 'static + Sync,
 ) -> Result<()> {
     let krates = db.crates();
     let chunk_size = 500;
@@ -26,6 +33,19 @@ pub async fn generate(
     std::fs::create_dir_all(&waste_report_dir)?;
     let num_crates = krates.tree().len() as u32;
     progress.init(Some(num_crates), Some("crates"));
+
+    let (_tx, rx) = async_std::sync::channel(1);
+    for idx in 0..cpu_o_bound_processors {
+        pool.spawn(
+            work::cpubound::processor(
+                db.clone(),
+                progress.add_child(format!("🏋 - {} idle", idx + 1)),
+                rx.clone(),
+                assets_dir.clone(),
+            )
+            .map(|_| ()),
+        )?;
+    }
 
     for (cid, chunk) in krates
         .tree()

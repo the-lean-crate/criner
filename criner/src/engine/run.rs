@@ -29,6 +29,7 @@ pub async fn non_blocking(
     progress: prodash::Tree,
     io_bound_processors: u32,
     cpu_bound_processors: u32,
+    cpu_o_bound_processors: u32,
     assets_dir: PathBuf,
     pool: impl Spawn + Clone + Send + 'static + Sync,
     tokio: tokio::runtime::Handle,
@@ -62,6 +63,7 @@ pub async fn non_blocking(
         .map(|_| ()),
     )?;
 
+    let interval_s = 10;
     repeat_every_s(
         interval_s,
         {
@@ -93,6 +95,8 @@ pub async fn non_blocking(
                         progress.add_child("Reports"),
                         assets_dir.clone(),
                         deadline,
+                        cpu_o_bound_processors,
+                        pool.clone(),
                     )
                     .await
                 }
@@ -109,6 +113,7 @@ pub fn blocking(
     deadline: Option<SystemTime>,
     io_bound_processors: u32,
     cpu_bound_processors: u32,
+    cpu_o_bound_processors: u32,
     root: prodash::Tree,
     gui: Option<prodash::tui::TuiOptions>,
 ) -> Result<()> {
@@ -124,7 +129,11 @@ pub fn blocking(
     // additional non-blocking tasks.
     // The main thread is expected to pool non-blocking tasks.
     // I admit I don't fully understand why multi-pool setups aren't making progress… . So just one pool for now.
-    let pool_size = 1usize + cpu_bound_processors as usize;
+    let how_much_slower_writes_are_compared_to_computation = 4;
+    let pool_size = 1usize
+        + cpu_bound_processors
+            .max(cpu_o_bound_processors / how_much_slower_writes_are_compared_to_computation)
+            as usize;
     let task_pool = futures::executor::ThreadPool::builder()
         .pool_size(pool_size)
         .create()?;
@@ -140,6 +149,7 @@ pub fn blocking(
         root.clone(),
         io_bound_processors,
         cpu_bound_processors,
+        cpu_o_bound_processors,
         assets_dir,
         task_pool.clone(),
         tokio_rt.handle().clone(),
