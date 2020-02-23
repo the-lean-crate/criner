@@ -3,6 +3,7 @@ use crate::{
     model, persistence,
     persistence::TreeAccess,
 };
+use std::path::Path;
 use std::{path::PathBuf, time::SystemTime};
 use tokio::io::AsyncWriteExt;
 
@@ -36,23 +37,26 @@ pub async fn processor(
     let results = db.results();
 
     while let Some(DownloadRequest {
-        crate_name: name,
-        crate_version: semver,
+        crate_name,
+        crate_version,
         kind,
         url,
     }) = r.recv().await
     {
-        progress.set_name(format!("↓ {}:{}", name, semver));
+        progress.set_name(format!("↓ {}:{}", crate_name, crate_version));
         progress.init(None, None);
-        let mut kt = (name.as_str(), semver.as_str(), dummy);
+        let mut kt = (crate_name.as_str(), crate_version.as_str(), dummy);
         key.clear();
 
         persistence::TasksTree::key_to_buf(&kt, &mut key);
         dummy = kt.2;
 
-        let mut task = tasks.update(&key, |_| ())?;
-        task.process = dummy.process.clone();
-        task.version = dummy.version.clone();
+        let mut task = tasks.update(&key, |t| {
+            ({
+                t.process = dummy.process.clone();
+                t.version = dummy.version.clone()
+            })
+        })?;
 
         progress.blocked(None);
         let res: Result<()> = async {
@@ -66,15 +70,14 @@ pub async fn processor(
                 progress.blocked(None);
                 progress.done(format!("HEAD:{}: content-size = {}", url, size));
                 let mut bytes_received = 0;
-                let base_dir = assets_dir.join(&name).join(&semver);
+                let base_dir = crate_version_dir(&assets_dir, &crate_name, &crate_version);
                 tokio::fs::create_dir_all(&base_dir).await?;
-                let out_file = base_dir.join(format!(
-                    "{process}{sep}{version}.{kind}",
-                    process = dummy.process,
-                    sep = crate::persistence::KEY_SEP,
-                    version = dummy.version,
-                    kind = kind
-                ));
+                let out_file = download_file_path(
+                    dummy.process.as_ref(),
+                    dummy.version.as_ref(),
+                    kind,
+                    &base_dir,
+                );
                 let mut out = tokio::fs::OpenOptions::new()
                     .create(true)
                     .truncate(true)
@@ -91,8 +94,8 @@ pub async fn processor(
 
                 {
                     let insert_item = (
-                        name.as_str(),
-                        semver.as_str(),
+                        crate_name.as_str(),
+                        crate_version.as_str(),
                         &task,
                         model::TaskResult::Download {
                             kind: kind.into(),
@@ -125,4 +128,18 @@ pub async fn processor(
         progress.init(None, None);
     }
     Ok(())
+}
+
+pub fn download_file_path(process: &str, version: &str, kind: &str, base_dir: &Path) -> PathBuf {
+    base_dir.join(format!(
+        "{process}{sep}{version}.{kind}",
+        process = process,
+        sep = crate::persistence::KEY_SEP,
+        version = version,
+        kind = kind
+    ))
+}
+
+pub fn crate_version_dir(assets_dir: &Path, crate_name: &str, crate_version: &str) -> PathBuf {
+    assets_dir.join(crate_name).join(crate_version)
 }
