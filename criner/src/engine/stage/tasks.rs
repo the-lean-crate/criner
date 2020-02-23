@@ -54,9 +54,11 @@ pub async fn process(
         .iter()
         .filter_map(|r| r.ok())
         .map(|(_k, v)| CrateVersion::from(v));
-    let chunk_size = 1_000;
     progress.init(Some(num_versions as u32), Some("crate version"));
+    let mut count = 0;
     while let Some(version) = tree_iter.next() {
+        count += 1;
+        progress.set(count);
         progress.blocked(None);
         work::schedule::tasks(
             db.tasks(),
