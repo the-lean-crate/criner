@@ -3,10 +3,8 @@ use crate::{
     model, persistence,
     persistence::TreeAccess,
 };
-use std::{
-    path::{Path, PathBuf},
-    time::SystemTime,
-};
+use std::{path::PathBuf, time::SystemTime};
+use tokio::io::AsyncWriteExt;
 
 pub struct DownloadRequest {
     pub name: String,
@@ -33,10 +31,8 @@ pub async fn processor(
     assets_dir: PathBuf,
 ) -> Result<()> {
     let mut dummy = default_persisted_download_task();
-
     let mut key = Vec::with_capacity(32);
     let tasks = db.tasks();
-    let mut body_buf = Vec::new();
 
     while let Some(DownloadRequest {
         name,
@@ -68,12 +64,29 @@ pub async fn processor(
                 progress.init(Some(size / 1024), Some("Kb"));
                 progress.blocked(None);
                 progress.done(format!("HEAD:{}: content-size = {}", url, size));
-                body_buf.clear();
+                let mut bytes_received = 0;
+                let base_dir = assets_dir.join(&name).join(&semver);
+                tokio::fs::create_dir_all(&base_dir).await?;
+                let out_file = base_dir.join(format!(
+                    "{process}{sep}{version}.{kind}",
+                    process = dummy.process,
+                    sep = crate::persistence::KEY_SEP,
+                    version = dummy.version,
+                    kind = kind
+                ));
+                let mut out = tokio::fs::OpenOptions::new()
+                    .create(true)
+                    .truncate(true)
+                    .write(true)
+                    .open(out_file)
+                    .await?;
                 while let Some(chunk) = res.chunk().await? {
-                    body_buf.extend(chunk);
-                    progress.set((body_buf.len() / 1024) as u32);
+                    out.write(&chunk).await?;
+                    // body_buf.extend(chunk);
+                    bytes_received += chunk.len();
+                    progress.set((bytes_received / 1024) as u32);
                 }
-                progress.done(format!("GET:{}: body-size = {}", url, body_buf.len()));
+                progress.done(format!("GET:{}: body-size = {}", url, bytes_received));
 
                 {
                     key.clear();
@@ -93,7 +106,6 @@ pub async fn processor(
                         },
                     );
                     persistence::TaskResultTree::key_to_buf(&insert_item, &mut key);
-                    store_data(&key, &body_buf, assets_dir.as_path()).await?;
                 }
                 Ok(())
             }
@@ -114,33 +126,4 @@ pub async fn processor(
     }
     progress.done("Shutting down…");
     Ok(())
-}
-
-async fn store_data(key: &[u8], data: &[u8], assets_dir: &Path) -> Result<()> {
-    let key_str = String::from_utf8(key.to_owned())?;
-
-    let tokens = key_str.split(':');
-    assert_eq!(tokens.count(), 5);
-    let mut tokens = key_str.split(':');
-    let (name, version) = (tokens.next().unwrap(), tokens.next().unwrap());
-    let (process, process_version, kind) = (
-        tokens.next().unwrap(),
-        tokens.next().unwrap(),
-        tokens.next().unwrap(),
-    );
-
-    let base_dir = assets_dir.join(name).join(version);
-    tokio::fs::create_dir_all(&base_dir).await?;
-    tokio::fs::write(
-        base_dir.join(format!(
-            "{process}{sep}{version}.{kind}",
-            process = process,
-            sep = crate::persistence::KEY_SEP,
-            version = process_version,
-            kind = kind
-        )),
-        data,
-    )
-    .await
-    .map_err(Into::into)
 }
