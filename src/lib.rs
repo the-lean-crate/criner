@@ -26,7 +26,7 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             concurrent_downloads,
             no_gui,
             progress_message_scrollback_buffer_size,
-        } => criner::run_blocking(
+        } => criner::run::blocking(
             db_path,
             repository
                 .unwrap_or_else(|| std::env::temp_dir().join("criner-crates-io-bare-index.git")),

@@ -13,6 +13,6 @@ pub(crate) mod utils;
 
 mod engine;
 
-pub use engine::*;
+pub use engine::run;
 
 pub use prodash;

@@ -1,8 +1,8 @@
 use crate::{
     error::{Error, Result},
     persistence::TreeAccess,
+    run,
     utils::*,
-    Context,
 };
 use crates_index_diff::Index;
 use futures::task::Spawn;
@@ -14,11 +14,11 @@ use std::{
 pub async fn process(
     crates_io_path: impl AsRef<Path>,
     pool: impl Spawn,
-    Context {
+    run::Context {
         db,
         mut progress,
         deadline,
-    }: Context,
+    }: run::Context,
 ) -> Result<()> {
     let start = SystemTime::now();
     let mut subprogress =
