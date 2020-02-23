@@ -124,6 +124,5 @@ pub async fn processor(
         progress.set_name("↓ idle");
         progress.init(None, None);
     }
-    progress.done("Shutting down…");
     Ok(())
 }

@@ -34,7 +34,7 @@ pub async fn non_blocking(
 ) -> Result<()> {
     check(deadline)?;
 
-    let interval_s = 5;
+    let interval_s = 60;
     pool.spawn(
         repeat_every_s(
             interval_s,
