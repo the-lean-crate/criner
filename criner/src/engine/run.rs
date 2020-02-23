@@ -62,8 +62,8 @@ pub async fn non_blocking(
         .map(|_| ()),
     )?;
 
-    let interval_s = 60;
-    let processing = repeat_every_s(
+    let interval_s = 20;
+    let processing_with_iteration = repeat_every_s(
         interval_s,
         {
             let p = progress.clone();
@@ -91,7 +91,7 @@ pub async fn non_blocking(
     );
 
     let interval_s = 10;
-    let report = repeat_every_s(
+    let report_with_iteration = repeat_every_s(
         interval_s,
         {
             let p = progress.clone();
@@ -107,7 +107,8 @@ pub async fn non_blocking(
             )
         },
     );
-    let (res1, res2) = futures::future::join(processing, report).await;
+    let (res1, res2) =
+        futures::future::join(processing_with_iteration, report_with_iteration).await;
     res1.and(res2)
 }
 
@@ -175,7 +176,7 @@ pub fn blocking(
                         warn!("{}", e);
                     }
                 }
-                Either::Right((_, work_handle)) => {}
+                Either::Right((_, _work_handle)) => {}
             }
 
             // Make sure the terminal can reset when the gui is done.

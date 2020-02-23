@@ -1,7 +1,7 @@
-use crate::model::CrateVersion;
 use crate::{
     engine::work,
     error::Result,
+    model::CrateVersion,
     persistence::{Db, Keyed, TreeAccess},
 };
 use futures::{
@@ -49,16 +49,15 @@ pub async fn process(
 
     let versions = db.crate_versions();
     let num_versions = versions.tree().len();
-    let mut tree_iter = versions
+    progress.init(Some(num_versions as u32), Some("crate version"));
+    for (vid, version) in versions
         .tree()
         .iter()
         .filter_map(|r| r.ok())
-        .map(|(_k, v)| CrateVersion::from(v));
-    progress.init(Some(num_versions as u32), Some("crate version"));
-    let mut count = 0;
-    while let Some(version) = tree_iter.next() {
-        count += 1;
-        progress.set(count);
+        .map(|(_k, v)| CrateVersion::from(v))
+        .enumerate()
+    {
+        progress.set((vid + 1) as u32);
         progress.blocked(None);
         work::schedule::tasks(
             db.tasks(),
