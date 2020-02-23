@@ -4,8 +4,10 @@ use crate::{
     model,
     persistence::{Db, Keyed, TreeAccess},
 };
-use futures::task::{Spawn, SpawnExt};
-use futures::FutureExt;
+use futures::{
+    task::{Spawn, SpawnExt},
+    FutureExt,
+};
 use std::path::PathBuf;
 
 pub async fn process(
@@ -15,7 +17,7 @@ pub async fn process(
     cpu_bound_processors: u32,
     mut download_progress: prodash::tree::Item,
     tokio: tokio::runtime::Handle,
-    pool: impl Spawn,
+    pool: impl Spawn + Clone + Send + 'static + Sync,
     assets_dir: PathBuf,
 ) -> Result<()> {
     let (tx_io, rx) = async_std::sync::channel(1);
@@ -37,7 +39,7 @@ pub async fn process(
         pool.spawn(
             work::cpubound::processor(
                 db.clone(),
-                download_progress.add_child(format!("🏋️‍ {} - idle", idx + 1)),
+                download_progress.add_child(format!("TAR {} - idle", idx + 1)),
                 rx.clone(),
                 assets_dir.clone(),
             )

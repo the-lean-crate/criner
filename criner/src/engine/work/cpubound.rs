@@ -38,7 +38,7 @@ pub async fn processor(
         crate_version,
     }) = r.recv().await
     {
-        progress.set_name(format!("TAR ‍{}:{}", crate_name, crate_version));
+        progress.set_name(format!("TAR {}:{}", crate_name, crate_version));
         progress.init(None, Some("files extracted"));
 
         let mut kt = (crate_name.as_str(), crate_version.as_str(), dummy);
@@ -135,7 +135,7 @@ pub async fn processor(
         };
         kt.2 = task;
         tasks.upsert(&kt)?;
-        progress.set_name("TAR️‍ idle");
+        progress.set_name("TAR IDLE");
         progress.init(None, None);
     }
 

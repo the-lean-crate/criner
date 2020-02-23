@@ -30,7 +30,7 @@ pub async fn non_blocking(
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     assets_dir: PathBuf,
-    pool: impl Spawn + Clone + Send + 'static,
+    pool: impl Spawn + Clone + Send + 'static + Sync,
     tokio: tokio::runtime::Handle,
 ) -> Result<()> {
     check(deadline)?;
@@ -67,22 +67,46 @@ pub async fn non_blocking(
     )?;
 
     let interval_s = 60;
+    pool.spawn(
+        repeat_every_s(
+            interval_s,
+            {
+                let p = progress.clone();
+                move || p.add_child("Fetch Timer")
+            },
+            deadline,
+            {
+                let db = db.clone();
+                let progress = progress.clone();
+                let pool = pool.clone();
+                move || {
+                    stage::changes::fetch(
+                        crates_io_path.clone(),
+                        pool.clone(),
+                        db.clone(),
+                        progress.add_child("crates.io refresh"),
+                        deadline,
+                    )
+                }
+            },
+        )
+        .map(|_| ()),
+    )?;
+
+    let interval_s = 10;
     repeat_every_s(
         interval_s,
         {
             let p = progress.clone();
-            move || p.add_child("Fetch Timer")
+            move || p.add_child("Report Timer")
         },
         deadline,
         move || {
-            stage::changes::fetch(
-                crates_io_path.clone(),
-                pool.clone(),
-                Context {
-                    db: db.clone(),
-                    progress: progress.add_child("crates.io refresh"),
-                    deadline,
-                },
+            stage::report::generate(
+                db.clone(),
+                progress.add_child("Report"),
+                assets_dir.clone(),
+                deadline,
             )
         },
     )

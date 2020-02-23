@@ -1,7 +1,7 @@
 use crate::{
     error::{Error, Result},
+    persistence,
     persistence::TreeAccess,
-    run,
     utils::*,
 };
 use crates_index_diff::Index;
@@ -14,11 +14,9 @@ use std::{
 pub async fn fetch(
     crates_io_path: impl AsRef<Path>,
     pool: impl Spawn,
-    run::Context {
-        db,
-        mut progress,
-        deadline,
-    }: run::Context,
+    db: persistence::Db,
+    mut progress: prodash::tree::Item,
+    deadline: Option<SystemTime>,
 ) -> Result<()> {
     let start = SystemTime::now();
     let mut subprogress =
