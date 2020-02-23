@@ -39,7 +39,7 @@ pub async fn process(
         pool.spawn(
             work::cpubound::processor(
                 db.clone(),
-                download_progress.add_child(format!("🏋 {} - idle", idx + 1)),
+                download_progress.add_child(format!("{}:🏋 🔆", idx + 1)),
                 rx.clone(),
                 assets_dir.clone(),
             )

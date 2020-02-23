@@ -7,7 +7,6 @@ use futures::{
 use log::{info, warn};
 use prodash::tui::{Event, Line};
 use std::{
-    io::Write,
     path::{Path, PathBuf},
     time::{Duration, SystemTime},
 };
@@ -178,9 +177,6 @@ pub fn blocking(
                 }
                 Either::Right((_, _work_handle)) => {}
             }
-
-            // Make sure the terminal can reset when the gui is done.
-            std::io::stdout().flush()?;
         }
         None => {
             let work_result = futures::executor::block_on(work_handle);

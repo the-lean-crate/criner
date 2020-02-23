@@ -27,26 +27,29 @@ pub async fn generate(
         .parent()
         .expect("assets directory to be in criner.db")
         .join("reports");
-    let mut waste_aggregator = report::waste::Generator { db: db.clone() };
     let waste_report_dir = output_dir.join("waste");
-
     std::fs::create_dir_all(&waste_report_dir)?;
     let num_crates = krates.tree().len() as u32;
     progress.init(Some(num_crates), Some("crates"));
 
-    let (_tx, rx) = async_std::sync::channel(1);
+    let (tx, rx) = async_std::sync::channel(1);
+    let (tx_result, rx_result) = async_std::sync::channel((cpu_o_bound_processors * 2) as usize);
     for idx in 0..cpu_o_bound_processors {
         pool.spawn(
-            work::cpubound::processor(
-                db.clone(),
-                progress.add_child(format!("🏋 - {} idle", idx + 1)),
+            work::outputbound::processor::<()>(
+                progress.add_child(format!("{}: 🏋 → 🔆", idx + 1)),
                 rx.clone(),
-                assets_dir.clone(),
+                tx_result.clone(),
             )
             .map(|_| ()),
         )?;
     }
 
+    let merge_reports = pool.spawn_with_handle(
+        report::waste::Generator::merge_reports(rx_result)
+            .map(|_| ())
+            .boxed(),
+    )?;
     for (cid, chunk) in krates
         .tree()
         .iter()
@@ -59,12 +62,21 @@ pub async fn generate(
         check(deadline.clone())?;
         progress.set(((cid + 1) * chunk_size) as u32);
         progress.blocked(None);
-        waste_aggregator.write_files(
-            &waste_report_dir,
-            chunk,
-            progress.add_child("waste report"),
-        )?;
+        tx.send(
+            report::waste::Generator::write_files(
+                db.clone(),
+                waste_report_dir.clone(),
+                chunk.collect(),
+                progress.add_child("waste report"),
+            )
+            .map(|_| ())
+            .boxed(),
+        )
+        .await;
     }
     progress.set(num_crates);
+    // TODO: Call function to generate top-level report
+    let _report = merge_reports.await;
+    progress.done("Generating and merging waste report done");
     Ok(())
 }
