@@ -16,7 +16,10 @@ pub async fn generate(
 ) -> Result<()> {
     let krates = db.crates();
     let chunk_size = 500;
-    let output_dir = assets_dir.join("reports");
+    let output_dir = assets_dir
+        .parent()
+        .expect("assets directory to be in criner.db")
+        .join("reports");
     let mut waste_aggregator = report::waste::Generator { db: db.clone() };
     let waste_report_dir = output_dir.join("waste");
 
