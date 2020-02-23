@@ -32,8 +32,15 @@ pub enum SubCommands {
         /// Depending on that number, one should experiment with an amount of processors that saturate
         /// either input or output.
         /// Most commonly, these are bound to the input, as it is the network.
-        #[structopt(short = "d", long, name = "COUNT", default_value = "10")]
-        io_processors: u32,
+        #[structopt(long, name = "COUNT", default_value = "10")]
+        io_bound_processors: u32,
+
+        /// The amount of CPU-bound processors to run concurrently.
+        ///
+        /// One can assume that one of these can occupy one core of a CPU.
+        /// However, they will not use a lot of IO, nor will they use much memory.
+        #[structopt(long, name = "COUNT", default_value = "4")]
+        cpu_bound_processors: u32,
 
         /// Path to the possibly existing crates.io repository clone. If unset, it will be cloned to a temporary spot.
         #[structopt(short = "r", long, name = "REPO")]

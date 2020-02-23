@@ -10,13 +10,14 @@ use std::path::PathBuf;
 pub async fn process(
     db: Db,
     mut progress: prodash::tree::Item,
-    num_io_processors: u32,
+    io_bound_processors: u32,
+    cpu_bound_processors: u32,
     mut download_progress: prodash::tree::Item,
     tokio: tokio::runtime::Handle,
     assets_dir: PathBuf,
 ) -> Result<()> {
     let (tx, rx) = async_std::sync::channel(1);
-    for idx in 0..num_io_processors {
+    for idx in 0..io_bound_processors {
         // Can only use the pool if the downloader uses a futures-compatible runtime
         // Tokio is its very own thing, and futures requiring it need to run there.
         tokio.spawn(
