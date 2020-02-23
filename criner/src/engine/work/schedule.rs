@@ -1,8 +1,10 @@
 use super::iobound;
-use crate::engine::work::iobound::DownloadRequest;
-use crate::error::Result;
-use crate::persistence::{TasksTree, TreeAccess};
-use crate::{model, persistence};
+use crate::{
+    engine::work::cpubound,
+    error::Result,
+    model, persistence,
+    persistence::{TasksTree, TreeAccess},
+};
 
 pub enum Scheduling {
     //   /// Considers work done if everything was done. Will block to assure that
@@ -25,54 +27,64 @@ pub async fn tasks(
     version: &model::CrateVersion<'_>,
     mut progress: prodash::tree::Item,
     _mode: Scheduling,
-    download: &async_std::sync::Sender<iobound::DownloadRequest>,
+    perform_io: &async_std::sync::Sender<iobound::Request>,
+    perform_cpu: &async_std::sync::Sender<cpubound::Request>,
 ) -> Result<AsyncResult> {
-    let key = (
+    let downloaded_crate_key = (
         version.name.as_ref().into(),
         version.version.as_ref().into(),
         iobound::default_persisted_download_task(),
     );
-    let task = tasks.get(TasksTree::key(&key))?.map_or(key.2, |v| v);
-    submit_single(task, &mut progress, download, 1, 1, || {
-        iobound::DownloadRequest {
-            name: version.name.as_ref().into(),
-            semver: version.version.as_ref().into(),
-            kind: "crate",
-            url: format!(
-                "https://crates.io/api/v1/crates/{name}/{version}/download",
-                name = version.name,
-                version = version.version
-            ),
-        }
+    let task = tasks
+        .get(TasksTree::key(&downloaded_crate_key))?
+        .map_or(downloaded_crate_key.2, |v| v);
+    submit_single(task, &mut progress, perform_io, 1, 1, || iobound::Request {
+        name: version.name.as_ref().into(),
+        semver: version.version.as_ref().into(),
+        kind: "crate",
+        url: format!(
+            "https://crates.io/api/v1/crates/{name}/{version}/download",
+            name = version.name,
+            version = version.version
+        ),
     })
     .await;
     Ok(AsyncResult::Done)
 }
 
-async fn submit_single(
-    task: model::Task<'_>,
+enum SubmitResult<'a> {
+    Submitted(model::Task<'a>),
+    Done(model::Task<'a>),
+    PermanentFailure,
+}
+
+async fn submit_single<'a, R>(
+    task: model::Task<'a>,
     progress: &mut prodash::tree::Item,
-    download: &async_std::sync::Sender<iobound::DownloadRequest>,
+    download: &async_std::sync::Sender<R>,
     step: u32,
     max_step: u32,
-    f: impl FnOnce() -> DownloadRequest,
-) {
+    f: impl FnOnce() -> R,
+) -> SubmitResult<'a> {
     use model::TaskState::*;
+    use SubmitResult::*;
     match task.state {
         NotStarted => {
             progress.init(Some(step), Some("task"));
             progress.set(max_step);
             progress.blocked(None);
             download.send(f()).await;
+            Submitted(task)
         }
-        AttemptsWithFailure(v) if v.len() < 3 => {
+        AttemptsWithFailure(ref v) if v.len() < 3 => {
             progress.init(Some(step), Some("task"));
             progress.set(max_step);
             progress.blocked(None);
             progress.info(format!("Retrying task, attempt {}", v.len() + 1));
             download.send(f()).await;
+            Submitted(task)
         }
-        AttemptsWithFailure(_) => {}
-        Complete => {}
-    };
+        AttemptsWithFailure(_) => PermanentFailure,
+        Complete => Done(task),
+    }
 }

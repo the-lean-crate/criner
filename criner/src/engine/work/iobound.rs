@@ -6,7 +6,7 @@ use crate::{
 use std::{path::PathBuf, time::SystemTime};
 use tokio::io::AsyncWriteExt;
 
-pub struct DownloadRequest {
+pub struct Request {
     pub name: String,
     pub semver: String,
     pub kind: &'static str,
@@ -27,14 +27,14 @@ pub fn default_persisted_download_task() -> model::Task<'static> {
 pub async fn processor(
     db: persistence::Db,
     mut progress: prodash::tree::Item,
-    r: async_std::sync::Receiver<DownloadRequest>,
+    r: async_std::sync::Receiver<Request>,
     assets_dir: PathBuf,
 ) -> Result<()> {
     let mut dummy = default_persisted_download_task();
     let mut key = Vec::with_capacity(32);
     let tasks = db.tasks();
 
-    while let Some(DownloadRequest {
+    while let Some(Request {
         name,
         semver,
         kind,

@@ -30,7 +30,7 @@ pub async fn non_blocking(
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     assets_dir: PathBuf,
-    pool: impl Spawn + Clone,
+    pool: impl Spawn + Clone + Send + 'static,
     tokio: tokio::runtime::Handle,
 ) -> Result<()> {
     check(deadline)?;
@@ -48,6 +48,7 @@ pub async fn non_blocking(
                 let progress = progress.clone();
                 let db = db.clone();
                 let assets_dir = assets_dir.clone();
+                let pool = pool.clone();
                 move || {
                     stage::tasks::process(
                         db.clone(),
@@ -56,6 +57,7 @@ pub async fn non_blocking(
                         cpu_bound_processors,
                         progress.add_child("Downloads"),
                         tokio.clone(),
+                        pool.clone(),
                         assets_dir.clone(),
                     )
                 }
