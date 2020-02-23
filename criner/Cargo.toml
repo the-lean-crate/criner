@@ -12,7 +12,7 @@ readme = "README.md"
 
 [features]
 default = []
-migration = []
+migration = ["jwalk"]
 
 [lib]
 doctest = false
@@ -33,3 +33,4 @@ async-std = { version = "1.5.0", default-features = false, features = ["unstable
 reqwest = "0.10.1"
 http = { version = "0.2.0", default-features = false }
 tokio = { version = "0.2", default-features = false, features = ["fs", "rt-threaded"]}
+jwalk = { version = "0.4.0", optional = true }
