@@ -1,7 +1,7 @@
+use crate::model::CrateVersion;
 use crate::{
     engine::work,
     error::Result,
-    model,
     persistence::{Db, Keyed, TreeAccess},
 };
 use futures::{
@@ -48,33 +48,25 @@ pub async fn process(
     }
 
     let versions = db.crate_versions();
-    let mut ofs = 0;
-    loop {
-        let chunk = {
-            let tree_iter = versions.tree().iter();
-            tree_iter.skip(ofs).take(1000).collect::<Vec<_>>()
-        };
-        progress.init(Some((ofs + chunk.len()) as u32), Some("crate version"));
-        if chunk.is_empty() {
-            return Ok(());
-        }
-        let chunk_len = chunk.len();
-        for (idx, res) in chunk.into_iter().enumerate() {
-            let (_key, value) = res?;
-            progress.set((ofs + idx + 1) as u32);
-            let version: model::CrateVersion = value.into();
-
-            progress.blocked(None);
-            work::schedule::tasks(
-                db.tasks(),
-                &version,
-                progress.add_child(format!("schedule {}", version.key_string()?)),
-                work::schedule::Scheduling::AtLeastOne,
-                &tx_io,
-                &tx_cpu,
-            )
-            .await?;
-        }
-        ofs += chunk_len;
+    let num_versions = versions.tree().len();
+    let mut tree_iter = versions
+        .tree()
+        .iter()
+        .filter_map(|r| r.ok())
+        .map(|(_k, v)| CrateVersion::from(v));
+    let chunk_size = 1_000;
+    progress.init(Some(num_versions as u32), Some("crate version"));
+    while let Some(version) = tree_iter.next() {
+        progress.blocked(None);
+        work::schedule::tasks(
+            db.tasks(),
+            &version,
+            progress.add_child(format!("schedule {}", version.key_string()?)),
+            work::schedule::Scheduling::AtLeastOne,
+            &tx_io,
+            &tx_cpu,
+        )
+        .await?;
     }
+    Ok(())
 }
