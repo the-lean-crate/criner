@@ -104,7 +104,7 @@ pub async fn non_blocking(
         move || {
             stage::report::generate(
                 db.clone(),
-                progress.add_child("Report"),
+                progress.add_child("Reports"),
                 assets_dir.clone(),
                 deadline,
             )
