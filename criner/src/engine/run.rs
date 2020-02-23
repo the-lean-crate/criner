@@ -1,5 +1,5 @@
 use crate::{
-    engine::{changes, tasks, work},
+    engine::{stage, work},
     error::Result,
     model,
     persistence::Db,
@@ -69,7 +69,7 @@ pub async fn non_blocking(
                 let progress = progress.clone();
                 let db = db.clone();
                 move || {
-                    tasks::process(
+                    stage::tasks::process(
                         db.clone(),
                         progress.add_child("Process Crate Versions"),
                         tx.clone(),
@@ -89,7 +89,7 @@ pub async fn non_blocking(
         },
         deadline,
         move || {
-            changes::process(
+            stage::changes::fetch(
                 crates_io_path.clone(),
                 pool.clone(),
                 Context {
@@ -146,12 +146,11 @@ pub fn blocking(
 
     match gui {
         Some(gui_options) => {
-            let (gui, abort_handle) =
-                futures::future::abortable(prodash::tui::render_with_input(
-                    root,
-                    gui_options,
-                    context_stream(&db, start_of_computation),
-                )?);
+            let (gui, abort_handle) = futures::future::abortable(prodash::tui::render_with_input(
+                root,
+                gui_options,
+                context_stream(&db, start_of_computation),
+            )?);
 
             let either = futures::executor::block_on(futures::future::select(
                 work_handle,
@@ -192,10 +191,7 @@ fn wallclock(since: SystemTime) -> String {
     )
 }
 
-fn context_stream(
-    db: &Db,
-    start_of_computation: SystemTime,
-) -> impl futures::Stream<Item = Event> {
+fn context_stream(db: &Db, start_of_computation: SystemTime) -> impl futures::Stream<Item = Event> {
     prodash::tui::ticker(Duration::from_secs(1)).map({
         let db = db.clone();
         move |_| {

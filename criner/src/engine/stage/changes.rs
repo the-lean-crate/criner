@@ -11,7 +11,7 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-pub async fn process(
+pub async fn fetch(
     crates_io_path: impl AsRef<Path>,
     pool: impl Spawn,
     run::Context {
