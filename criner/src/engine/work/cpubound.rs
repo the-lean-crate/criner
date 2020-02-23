@@ -40,13 +40,13 @@ pub async fn processor(
         progress.set_name(format!("🏋️ ‍{}:{}", crate_name, crate_version));
         progress.init(None, Some("files"));
 
-        let kt = (crate_name.as_str(), crate_version.as_str(), dummy);
+        let mut kt = (crate_name.as_str(), crate_version.as_str(), dummy);
         key.clear();
 
         persistence::TasksTree::key_to_buf(&kt, &mut key);
         dummy = kt.2;
 
-        let task = tasks.update(&key, |t| {
+        let mut task = tasks.update(&key, |t| {
             ({
                 t.process = dummy.process.clone();
                 t.version = dummy.version.clone()
@@ -64,7 +64,19 @@ pub async fn processor(
             );
         };
 
+        let res: Result<()> = (|| Ok(()))();
+
+        task.state = match res {
+            Ok(_) => model::TaskState::Complete,
+            Err(err) => {
+                progress.fail(format!("Failed extract crate: {}", err));
+                model::TaskState::AttemptsWithFailure(vec![err.to_string()])
+            }
+        };
+        kt.2 = task;
+        tasks.upsert(&kt)?;
         progress.set_name("🏋️‍ idle");
+        progress.init(None, None);
     }
 
     Ok(())

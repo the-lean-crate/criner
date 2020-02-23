@@ -34,3 +34,4 @@ reqwest = "0.10.1"
 http = { version = "0.2.0", default-features = false }
 tokio = { version = "0.2", default-features = false, features = ["fs", "rt-threaded"]}
 jwalk = { version = "0.4.0", optional = true }
+tar = "0.4.26"
