@@ -6,12 +6,13 @@ use crate::{
     persistence::{TasksTree, TreeAccess},
 };
 
+#[derive(Clone, Copy)]
 pub enum Scheduling {
     //   /// Considers work done if everything was done. Will block to assure that
     //    All,
     /// Considers the work done if at least one task was scheduled. Will block to wait otherwise.
     AtLeastOne,
-    //    /// Prefer to never wait for workers to perform a task and instead return without having scheduled anything
+    // /// Prefer to never wait for workers to perform a task and instead return without having scheduled anything
     // NeverBlock,
 }
 
@@ -30,30 +31,52 @@ pub async fn tasks(
     perform_io: &async_std::sync::Sender<iobound::Request>,
     perform_cpu: &async_std::sync::Sender<cpubound::Request>,
 ) -> Result<AsyncResult> {
-    let downloaded_crate_key = (
+    use SubmitResult::*;
+    let io_task = task_or_default(&tasks, version, iobound::default_persisted_download_task)?;
+    Ok(
+        match submit_single(io_task, &mut progress, perform_io, 1, 1, || {
+            iobound::Request {
+                name: version.name.as_ref().into(),
+                semver: version.version.as_ref().into(),
+                kind: "crate",
+                url: format!(
+                    "https://crates.io/api/v1/crates/{name}/{version}/download",
+                    name = version.name,
+                    version = version.version
+                ),
+            }
+        })
+        .await
+        {
+            PermanentFailure | Submitted => AsyncResult::Done,
+            Done(download_crate_task) => {
+                let cpu_task =
+                    task_or_default(&tasks, version, cpubound::default_persisted_download_task)?;
+                submit_single(cpu_task, &mut progress, perform_cpu, 2, 2, || {
+                    cpubound::Request
+                })
+                .await;
+                AsyncResult::Done
+            }
+        },
+    )
+}
+
+fn task_or_default<'a, 'b>(
+    tasks: &TasksTree<'a>,
+    version: &model::CrateVersion<'b>,
+    make_task: impl FnOnce() -> model::Task<'static>,
+) -> Result<model::Task<'a>> {
+    let key = (
         version.name.as_ref().into(),
         version.version.as_ref().into(),
-        iobound::default_persisted_download_task(),
+        make_task(),
     );
-    let task = tasks
-        .get(TasksTree::key(&downloaded_crate_key))?
-        .map_or(downloaded_crate_key.2, |v| v);
-    submit_single(task, &mut progress, perform_io, 1, 1, || iobound::Request {
-        name: version.name.as_ref().into(),
-        semver: version.version.as_ref().into(),
-        kind: "crate",
-        url: format!(
-            "https://crates.io/api/v1/crates/{name}/{version}/download",
-            name = version.name,
-            version = version.version
-        ),
-    })
-    .await;
-    Ok(AsyncResult::Done)
+    Ok(tasks.get(TasksTree::key(&key))?.unwrap_or(key.2))
 }
 
 enum SubmitResult<'a> {
-    Submitted(model::Task<'a>),
+    Submitted,
     Done(model::Task<'a>),
     PermanentFailure,
 }
@@ -68,21 +91,22 @@ async fn submit_single<'a, R>(
 ) -> SubmitResult<'a> {
     use model::TaskState::*;
     use SubmitResult::*;
+    let mut configure = || {
+        progress.init(Some(step), Some("task"));
+        progress.set(max_step);
+        progress.blocked(None);
+    };
     match task.state {
         NotStarted => {
-            progress.init(Some(step), Some("task"));
-            progress.set(max_step);
-            progress.blocked(None);
+            configure();
             download.send(f()).await;
-            Submitted(task)
+            Submitted
         }
         AttemptsWithFailure(ref v) if v.len() < 3 => {
-            progress.init(Some(step), Some("task"));
-            progress.set(max_step);
-            progress.blocked(None);
+            configure();
             progress.info(format!("Retrying task, attempt {}", v.len() + 1));
             download.send(f()).await;
-            Submitted(task)
+            Submitted
         }
         AttemptsWithFailure(_) => PermanentFailure,
         Complete => Done(task),
