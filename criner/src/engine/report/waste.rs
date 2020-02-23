@@ -30,11 +30,11 @@ impl Generator {
                 marker.set_file_name(GENERATOR_VERSION);
                 if !marker
                     .symlink_metadata()
-                    .map(|m| m.is_file())
+                    .map(|m| m.file_type().is_symlink())
                     .unwrap_or(false)
                 {
                     generate_single_file(&out_file)?;
-                    fs::symlink(&out_file, &marker)?;
+                    fs::symlink(out_file.file_name().expect("filename"), &marker)?;
                 }
             }
         }
@@ -43,7 +43,14 @@ impl Generator {
 }
 
 fn generate_single_file(out: &Path) -> Result<()> {
-    std::fs::write(out, "hello world").map_err(Into::into)
+    use std::io::Write;
+    std::fs::OpenOptions::new()
+        .truncate(true)
+        .write(true)
+        .create(true)
+        .open(out)?
+        .write_all("hello world".as_bytes())
+        .map_err(Into::into)
 }
 
 fn output_file_html(base: &Path, name: &str, version: &str) -> PathBuf {

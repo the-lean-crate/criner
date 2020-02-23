@@ -1,9 +1,9 @@
 use crate::{
-    utils::check,
     engine::report,
     error::Result,
     model,
-    persistence::{self, TreeAccess}
+    persistence::{self, TreeAccess},
+    utils::check,
 };
 use itertools::Itertools;
 use std::{path::PathBuf, time::SystemTime};
