@@ -37,8 +37,8 @@ pub async fn processor(
         crate_version,
     }) = r.recv().await
     {
-        progress.set_name(format!("🏋️ ‍{}:{}", crate_name, crate_version));
-        progress.init(None, Some("files"));
+        progress.set_name(format!("🏋️ 🦖 ‍{}:{}", crate_name, crate_version));
+        progress.init(None, Some("files extracted"));
 
         let mut kt = (crate_name.as_str(), crate_version.as_str(), dummy);
         key.clear();
@@ -69,10 +69,13 @@ pub async fn processor(
                 File::open(downloaded_crate)?,
             ))?);
             let mut entries = Vec::new();
-            for e in archive.entries()? {
+            for (eid, e) in archive.entries()?.enumerate() {
+                progress.set((eid + 1) as u32);
                 let e: tar::Entry<_> = e?;
                 entries.push(model::TarEntry {
                     path: e.path_bytes().to_vec().into(),
+                    size: e.header().size()?,
+                    entry_type: e.header().entry_type().as_byte(),
                 })
             }
 

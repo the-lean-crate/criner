@@ -203,6 +203,10 @@ impl<'a> Default for Task<'a> {
 pub struct TarEntry<'a> {
     /// The normalized path of the entry. May not be unicode encoded.
     pub path: Cow<'a, [u8]>,
+    /// The size of the file in bytes
+    pub size: u64,
+    /// The type of entry, to be analyzed with tar::EntryType
+    pub entry_type: u8,
 }
 
 /// Append-variant-only data structure, otherwise migrations are needed
