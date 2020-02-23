@@ -16,7 +16,7 @@ use std::{
 
 mod changes;
 mod tasks;
-mod worker;
+mod work;
 
 pub struct Context {
     db: Db,
@@ -46,7 +46,7 @@ pub async fn run(
         // Can only use the pool if the downloader uses a futures-compatible runtime
         // Tokio is its very own thing, and futures requiring it need to run there.
         tokio.spawn(
-            worker::download(
+            work::iobound::processor(
                 db.clone(),
                 downloaders.add_child(format!("DL {} - idle", idx + 1)),
                 rx.clone(),

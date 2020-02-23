@@ -1,83 +1,44 @@
-use crate::error::{Error, Result};
-use crate::model;
-use crate::model::{Task, TaskResult, TaskState};
-use crate::persistence::{Db, TaskResultTree, TasksTree, TreeAccess};
-use std::path::{Path, PathBuf};
-use std::time::SystemTime;
+use crate::{
+    error::{Error, Result},
+    model, persistence,
+    persistence::TreeAccess,
+};
+use std::{
+    path::{Path, PathBuf},
+    time::SystemTime,
+};
 
-pub enum Scheduling {
-    //   /// Considers work done if everything was done. Will block to assure that
-    //    All,
-    /// Considers the work done if at least one task was scheduled. Will block to wait otherwise.
-    AtLeastOne,
-    //    /// Prefer to never wait for workers to perform a task and instead return without having scheduled anything
-    // NeverBlock,
+pub struct DownloadRequest {
+    pub name: String,
+    pub semver: String,
+    pub kind: &'static str,
+    pub url: String,
 }
 
-pub enum AsyncResult {
-    // /// The required scheduling cannot be fulfilled without blocking
-    // WouldBlock,
-    /// The minimal scheduling requirement was met
-    Done,
+pub fn default_persisted_download_task() -> model::Task<'static> {
+    const TASK_NAME: &str = "download";
+    const TASK_VERSION: &str = "1.0.0";
+    model::Task {
+        stored_at: SystemTime::now(),
+        process: TASK_NAME.into(),
+        version: TASK_VERSION.into(),
+        state: Default::default(),
+    }
 }
 
-pub async fn schedule_tasks(
-    tasks: TasksTree<'_>,
-    version: &model::CrateVersion<'_>,
+pub async fn processor(
+    db: persistence::Db,
     mut progress: prodash::tree::Item,
-    _mode: Scheduling,
-    download: &async_std::sync::Sender<DownloadTask>,
-) -> Result<AsyncResult> {
-    let key = (
-        version.name.as_ref().into(),
-        version.version.as_ref().into(),
-        default_download_task(),
-    );
-    let task = tasks.get(TasksTree::key(&key))?.map_or(key.2, |v| v);
-    match task.state {
-        TaskState::NotStarted => {
-            progress.init(Some(1), Some("task"));
-            progress.set(1);
-            progress.blocked(None);
-            download
-                .send(DownloadTask {
-                    name: version.name.as_ref().into(),
-                    semver: version.version.as_ref().into(),
-                    kind: "crate",
-                    url: format!(
-                        "https://crates.io/api/v1/crates/{name}/{version}/download",
-                        name = version.name,
-                        version = version.version
-                    ),
-                })
-                .await;
-        }
-        TaskState::AttemptsWithFailure(_) => {}
-        TaskState::Complete => {}
-    };
-    Ok(AsyncResult::Done)
-}
-
-pub struct DownloadTask {
-    name: String,
-    semver: String,
-    kind: &'static str,
-    url: String,
-}
-
-pub async fn download(
-    db: Db,
-    mut progress: prodash::tree::Item,
-    r: async_std::sync::Receiver<DownloadTask>,
+    r: async_std::sync::Receiver<DownloadRequest>,
     assets_dir: PathBuf,
 ) -> Result<()> {
-    let mut dummy = default_download_task();
+    let mut dummy = default_persisted_download_task();
 
     let mut key = Vec::with_capacity(32);
     let tasks = db.tasks();
     let mut body_buf = Vec::new();
 
-    while let Some(DownloadTask {
+    while let Some(DownloadRequest {
         name,
         semver,
         kind,
@@ -89,7 +50,7 @@ pub async fn download(
         let mut kt = (name.as_str(), semver.as_str(), dummy);
         key.clear();
 
-        TasksTree::key_to_buf(&kt, &mut key);
+        persistence::TasksTree::key_to_buf(&kt, &mut key);
         dummy = kt.2;
 
         let mut task = tasks.update(&key, |_| ())?;
@@ -120,7 +81,7 @@ pub async fn download(
                         name.as_str(),
                         semver.as_str(),
                         &task,
-                        TaskResult::Download {
+                        model::TaskResult::Download {
                             kind: kind.into(),
                             url: url.as_str().into(),
                             content_length: size,
@@ -131,7 +92,7 @@ pub async fn download(
                                 .map(Into::into),
                         },
                     );
-                    TaskResultTree::key_to_buf(&insert_item, &mut key);
+                    persistence::TaskResultTree::key_to_buf(&insert_item, &mut key);
                     store_data(&key, &body_buf, assets_dir.as_path()).await?;
                 }
                 Ok(())
@@ -140,10 +101,10 @@ pub async fn download(
         .await;
 
         task.state = match res {
-            Ok(_) => TaskState::Complete,
+            Ok(_) => model::TaskState::Complete,
             Err(err) => {
                 progress.fail(format!("Failed to download '{}': {}", url, err));
-                TaskState::AttemptsWithFailure(vec![err.to_string()])
+                model::TaskState::AttemptsWithFailure(vec![err.to_string()])
             }
         };
         kt.2 = task;
@@ -153,17 +114,6 @@ pub async fn download(
     }
     progress.done("Shutting down…");
     Ok(())
-}
-
-fn default_download_task() -> Task<'static> {
-    const TASK_NAME: &str = "download";
-    const TASK_VERSION: &str = "1.0.0";
-    Task {
-        stored_at: SystemTime::now(),
-        process: TASK_NAME.into(),
-        version: TASK_VERSION.into(),
-        state: Default::default(),
-    }
 }
 
 async fn store_data(key: &[u8], data: &[u8], assets_dir: &Path) -> Result<()> {

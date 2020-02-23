@@ -1,15 +1,14 @@
 use crate::{
-    engine::worker,
+    engine::work,
     error::Result,
     model,
-    persistence::TreeAccess,
-    persistence::{Db, Keyed},
+    persistence::{Db, Keyed, TreeAccess},
 };
 
 pub async fn process(
     db: Db,
     mut progress: prodash::tree::Item,
-    tx: async_std::sync::Sender<worker::DownloadTask>,
+    tx: async_std::sync::Sender<work::iobound::DownloadRequest>,
 ) -> Result<()> {
     let versions = db.crate_versions();
     let mut ofs = 0;
@@ -29,11 +28,11 @@ pub async fn process(
             let version: model::CrateVersion = value.into();
 
             progress.blocked(None);
-            worker::schedule_tasks(
+            work::schedule::tasks(
                 db.tasks(),
                 &version,
                 progress.add_child(format!("schedule {}", version.key_string()?)),
-                worker::Scheduling::AtLeastOne,
+                work::schedule::Scheduling::AtLeastOne,
                 &tx,
             )
             .await?;
