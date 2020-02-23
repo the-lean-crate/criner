@@ -1,4 +1,5 @@
 use super::iobound;
+use crate::engine::work::iobound::DownloadRequest;
 use crate::error::Result;
 use crate::persistence::{TasksTree, TreeAccess};
 use crate::{model, persistence};
@@ -32,27 +33,46 @@ pub async fn tasks(
         iobound::default_persisted_download_task(),
     );
     let task = tasks.get(TasksTree::key(&key))?.map_or(key.2, |v| v);
+    submit_single(task, &mut progress, download, 1, 1, || {
+        iobound::DownloadRequest {
+            name: version.name.as_ref().into(),
+            semver: version.version.as_ref().into(),
+            kind: "crate",
+            url: format!(
+                "https://crates.io/api/v1/crates/{name}/{version}/download",
+                name = version.name,
+                version = version.version
+            ),
+        }
+    })
+    .await;
+    Ok(AsyncResult::Done)
+}
+
+async fn submit_single(
+    task: model::Task<'_>,
+    progress: &mut prodash::tree::Item,
+    download: &async_std::sync::Sender<iobound::DownloadRequest>,
+    step: u32,
+    max_step: u32,
+    f: impl FnOnce() -> DownloadRequest,
+) {
     use model::TaskState::*;
     match task.state {
         NotStarted => {
-            progress.init(Some(1), Some("task"));
-            progress.set(1);
+            progress.init(Some(step), Some("task"));
+            progress.set(max_step);
             progress.blocked(None);
-            download
-                .send(iobound::DownloadRequest {
-                    name: version.name.as_ref().into(),
-                    semver: version.version.as_ref().into(),
-                    kind: "crate",
-                    url: format!(
-                        "https://crates.io/api/v1/crates/{name}/{version}/download",
-                        name = version.name,
-                        version = version.version
-                    ),
-                })
-                .await;
+            download.send(f()).await;
+        }
+        AttemptsWithFailure(v) if v.len() < 3 => {
+            progress.init(Some(step), Some("task"));
+            progress.set(max_step);
+            progress.blocked(None);
+            progress.info(format!("Retrying task, attempt {}", v.len() + 1));
+            download.send(f()).await;
         }
         AttemptsWithFailure(_) => {}
         Complete => {}
     };
-    Ok(AsyncResult::Done)
 }
