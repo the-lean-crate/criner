@@ -74,8 +74,11 @@ pub async fn processor(
             let mut files = Vec::new();
             let mut buf = Vec::new();
 
-            for (eid, e) in archive.entries()?.enumerate() {
-                progress.set((eid + 1) as u32);
+            let mut count = 0;
+            let mut file_count = 0;
+            for e in archive.entries()? {
+                count += 1;
+                progress.set(count);
                 let mut e: tar::Entry<_> = e?;
                 let path = e.path().ok();
                 if let Some(file_name) = path
@@ -96,6 +99,7 @@ pub async fn processor(
                 {
                     let interesting_files = ["cargo", "cargo", "readme", "license"];
                     if interesting_files.contains(&stem_lowercase.as_str()) {
+                        file_count += 1;
                         buf.clear();
                         e.read_to_end(&mut buf)?;
                         files.push((
@@ -108,6 +112,10 @@ pub async fn processor(
                     }
                 }
             }
+            progress.info(format!(
+                "Recorded {} files and stored {} in full",
+                count, file_count
+            ));
 
             {
                 let insert_item = (
