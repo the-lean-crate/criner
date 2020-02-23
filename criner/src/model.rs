@@ -168,6 +168,25 @@ pub struct Task<'a> {
     pub state: TaskState,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TaskOwned {
+    pub stored_at: SystemTime,
+    pub process: String,
+    pub version: String,
+    pub state: TaskState,
+}
+
+impl<'a> From<Task<'a>> for TaskOwned {
+    fn from(v: Task<'a>) -> Self {
+        TaskOwned {
+            stored_at: v.stored_at,
+            process: v.process.into(),
+            version: v.version.into(),
+            state: v.state,
+        }
+    }
+}
+
 impl<'a> Default for Task<'a> {
     fn default() -> Self {
         Task {

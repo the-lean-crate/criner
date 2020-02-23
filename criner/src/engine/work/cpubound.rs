@@ -3,7 +3,11 @@ use crate::{model, persistence};
 use std::path::PathBuf;
 use std::time::SystemTime;
 
-pub struct Request;
+pub struct ExtractRequest {
+    pub download_task: model::TaskOwned,
+    pub crate_name: String,
+    pub crate_version: String,
+}
 
 pub fn default_persisted_download_task() -> model::Task<'static> {
     const TASK_NAME: &str = "extract_crate";
@@ -19,7 +23,7 @@ pub fn default_persisted_download_task() -> model::Task<'static> {
 pub async fn processor(
     _db: persistence::Db,
     _progress: prodash::tree::Item,
-    _r: async_std::sync::Receiver<Request>,
+    _r: async_std::sync::Receiver<ExtractRequest>,
     _assets_dir: PathBuf,
 ) -> Result<()> {
     Ok(())

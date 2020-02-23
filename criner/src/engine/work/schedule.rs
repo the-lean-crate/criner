@@ -25,24 +25,24 @@ pub enum AsyncResult {
 
 pub async fn tasks(
     tasks: persistence::TasksTree<'_>,
-    version: &model::CrateVersion<'_>,
+    krate: &model::CrateVersion<'_>,
     mut progress: prodash::tree::Item,
     _mode: Scheduling,
-    perform_io: &async_std::sync::Sender<iobound::Request>,
-    perform_cpu: &async_std::sync::Sender<cpubound::Request>,
+    perform_io: &async_std::sync::Sender<iobound::DownloadRequest>,
+    perform_cpu: &async_std::sync::Sender<cpubound::ExtractRequest>,
 ) -> Result<AsyncResult> {
     use SubmitResult::*;
-    let io_task = task_or_default(&tasks, version, iobound::default_persisted_download_task)?;
+    let io_task = task_or_default(&tasks, krate, iobound::default_persisted_download_task)?;
     Ok(
         match submit_single(io_task, &mut progress, perform_io, 1, 1, || {
-            iobound::Request {
-                name: version.name.as_ref().into(),
-                semver: version.version.as_ref().into(),
+            iobound::DownloadRequest {
+                crate_name: krate.name.as_ref().into(),
+                crate_version: krate.version.as_ref().into(),
                 kind: "crate",
                 url: format!(
                     "https://crates.io/api/v1/crates/{name}/{version}/download",
-                    name = version.name,
-                    version = version.version
+                    name = krate.name,
+                    version = krate.version
                 ),
             }
         })
@@ -51,9 +51,13 @@ pub async fn tasks(
             PermanentFailure | Submitted => AsyncResult::Done,
             Done(download_crate_task) => {
                 let cpu_task =
-                    task_or_default(&tasks, version, cpubound::default_persisted_download_task)?;
+                    task_or_default(&tasks, krate, cpubound::default_persisted_download_task)?;
                 submit_single(cpu_task, &mut progress, perform_cpu, 2, 2, || {
-                    cpubound::Request
+                    cpubound::ExtractRequest {
+                        download_task: download_crate_task.into(),
+                        crate_name: krate.name.as_ref().into(),
+                        crate_version: krate.version.as_ref().into(),
+                    }
                 })
                 .await;
                 AsyncResult::Done
