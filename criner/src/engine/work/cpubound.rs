@@ -1,8 +1,5 @@
-use crate::error::Result;
-use crate::persistence::TreeAccess;
-use crate::{model, persistence};
-use std::path::PathBuf;
-use std::time::SystemTime;
+use crate::{error::Result, model, persistence};
+use std::{fs::File, io::BufReader, path::PathBuf, time::SystemTime};
 
 pub struct ExtractRequest {
     pub download_task: model::TaskOwned,
@@ -27,9 +24,12 @@ pub async fn processor(
     r: async_std::sync::Receiver<ExtractRequest>,
     assets_dir: PathBuf,
 ) -> Result<()> {
+    use persistence::TreeAccess;
+
     let mut key = Vec::with_capacity(32);
-    let tasks = db.tasks();
     let mut dummy = default_persisted_download_task();
+    let tasks = db.tasks();
+    let results = db.results();
 
     while let Some(ExtractRequest {
         download_task,
@@ -61,10 +61,35 @@ pub async fn processor(
                 &download_task.version,
                 "crate",
                 &crate_version_dir,
-            );
+            )
         };
 
-        let res: Result<()> = (|| Ok(()))();
+        let res: Result<()> = (|| {
+            let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new(
+                File::open(downloaded_crate)?,
+            ))?);
+            let mut entries = Vec::new();
+            for e in archive.entries()? {
+                let e: tar::Entry<_> = e?;
+                entries.push(model::TarEntry {
+                    path: e.path_bytes().to_vec().into(),
+                })
+            }
+
+            {
+                let insert_item = (
+                    crate_name.as_str(),
+                    crate_version.as_str(),
+                    &task,
+                    model::TaskResult::ExplodedCrate {
+                        entries: entries.into(),
+                    },
+                );
+                results.insert(&insert_item)?;
+            }
+
+            Ok(())
+        })();
 
         task.state = match res {
             Ok(_) => model::TaskState::Complete,

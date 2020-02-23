@@ -198,11 +198,20 @@ impl<'a> Default for Task<'a> {
     }
 }
 
+/// An entry in a tar archive, including the most important meta-data
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TarEntry<'a> {
+    /// The normalized path of the entry. May not be unicode encoded.
+    pub path: Cow<'a, [u8]>,
+}
+
 /// Append-variant-only data structure, otherwise migrations are needed
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum TaskResult<'a> {
     /// A dummy value just so that we can have a default value
     None,
+    /// Most interesting information about an unpacked crate
+    ExplodedCrate { entries: Cow<'a, [TarEntry<'a>]> },
     /// A download with meta data and the downloaded blob itself
     Download {
         kind: Cow<'a, str>,

@@ -226,7 +226,7 @@ impl<'a> Keyed for TaskResult<'a> {
     fn key_bytes_buf(&self, buf: &mut Vec<u8>) {
         match self {
             TaskResult::Download { kind, .. } => buf.extend_from_slice(kind.as_bytes()),
-            TaskResult::None => {}
+            TaskResult::None | TaskResult::ExplodedCrate { .. } => {}
         }
     }
 }
