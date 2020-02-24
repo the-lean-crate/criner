@@ -8,9 +8,18 @@ pub struct Generator;
 pub type ReportResult = Result<()>;
 
 impl Generator {
-    pub async fn merge_reports(reports: async_std::sync::Receiver<ReportResult>) -> Result<()> {
+    pub async fn merge_reports(
+        mut progress: prodash::tree::Item,
+        reports: async_std::sync::Receiver<ReportResult>,
+    ) -> Result<()> {
+        progress.init(None, Some("reports"));
+        let mut count = 0;
         while let Some(report) = reports.recv().await {
-            drop(report);
+            count += 1;
+            progress.set(count);
+            if let Err(err) = report {
+                progress.fail(format!("report failed: {}", err));
+            }
         }
         Ok(())
     }
@@ -36,9 +45,10 @@ impl Generator {
                 let mut marker = out_file.clone();
                 marker.set_file_name(GENERATOR_VERSION);
                 if !async_std::fs::symlink_metadata(&marker)
-                    .await?
-                    .file_type()
-                    .is_symlink()
+                    .await
+                    .ok()
+                    .map(|f| f.file_type().is_symlink())
+                    .unwrap_or(false)
                 {
                     generate_single_file(&out_file).await?;
                     async_std::os::unix::fs::symlink(

@@ -40,7 +40,7 @@ pub async fn generate(
     };
 
     let merge_reports = pool.spawn_with_handle(
-        report::waste::Generator::merge_reports(rx_result)
+        report::waste::Generator::merge_reports(progress.add_child("report aggregator"), rx_result)
             .map(|_| ())
             .boxed(),
     )?;
