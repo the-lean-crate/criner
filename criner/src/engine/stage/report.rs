@@ -2,7 +2,6 @@ use crate::engine::work;
 use crate::{
     engine::report,
     error::Result,
-    model,
     persistence::{self, TreeAccess},
     utils::check,
 };
@@ -36,7 +35,7 @@ pub async fn generate(
             async_std::sync::channel((cpu_o_bound_processors * 2) as usize);
         for idx in 0..cpu_o_bound_processors {
             pool.spawn(
-                work::outputbound::processor::<()>(
+                work::outputbound::processor(
                     progress.add_child(format!("{}: 🏋 → 🔆", idx + 1)),
                     rx.clone(),
                     tx_result.clone(),
@@ -56,7 +55,6 @@ pub async fn generate(
         .tree()
         .iter()
         .filter_map(|res| res.ok())
-        .map(|(k, v)| (k, model::Crate::from(v)))
         .chunks(chunk_size)
         .into_iter()
         .enumerate()
@@ -64,16 +62,11 @@ pub async fn generate(
         check(deadline.clone())?;
         progress.set(((cid + 1) * chunk_size) as u32);
         progress.blocked(None);
-        tx.send(
-            report::waste::Generator::write_files(
-                db.clone(),
-                waste_report_dir.clone(),
-                chunk.collect(),
-                progress.add_child("waste report"),
-            )
-            .map(|_| ())
-            .boxed(),
-        )
+        tx.send(report::waste::Generator::write_files(
+            db.clone(),
+            waste_report_dir.clone(),
+            chunk.collect(),
+        ))
         .await;
     }
     drop(tx);
