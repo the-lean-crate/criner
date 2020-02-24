@@ -1,6 +1,7 @@
 use crate::{error::Result, model, persistence};
 use std::path::{Path, PathBuf};
 
+const GENERATOR_NAME: &str = "waste";
 const GENERATOR_VERSION: &str = "1.0.0";
 
 pub struct Generator;
@@ -25,37 +26,35 @@ impl Generator {
     }
 
     pub async fn write_files(
-        _db: persistence::Db,
+        db: persistence::Db,
         out_dir: PathBuf,
         krates: Vec<(sled::IVec, sled::IVec)>,
         mut progress: prodash::tree::Item,
     ) -> ReportResult {
+        let reports = db.reports();
         for (k, c) in krates.into_iter() {
             let name = to_name(&k);
             let c: model::Crate = c.into();
             let mut p = progress.add_child(name);
             p.init(Some(c.versions.len() as u32), Some("versions"));
 
-            for (vid, v) in c.versions.iter().enumerate() {
+            for (vid, version) in c.versions.iter().enumerate() {
                 p.set((vid + 1) as u32);
-                let out_file = output_file_html(out_dir.as_ref(), name, &v);
+                let out_file = output_file_html(out_dir.as_ref(), name, &version);
                 async_std::fs::create_dir_all(out_file.parent().expect("parent dir for file"))
                     .await?;
 
                 let mut marker = out_file.clone();
                 marker.set_file_name(GENERATOR_VERSION);
-                if !async_std::fs::symlink_metadata(&marker)
-                    .await
-                    .ok()
-                    .map(|f| f.file_type().is_symlink())
-                    .unwrap_or(false)
-                {
+                let key = persistence::ReportsTree::key(
+                    name,
+                    &version,
+                    GENERATOR_NAME,
+                    GENERATOR_VERSION,
+                );
+                if !reports.is_done(&key) {
                     generate_single_file(&out_file).await?;
-                    async_std::os::unix::fs::symlink(
-                        out_file.file_name().expect("filename"),
-                        &marker,
-                    )
-                    .await?;
+                    reports.set_done(key);
                 }
             }
         }
