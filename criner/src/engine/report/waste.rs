@@ -1,5 +1,4 @@
 use crate::{error::Result, model, persistence};
-use futures::FutureExt;
 use std::path::{Path, PathBuf};
 
 const GENERATOR_VERSION: &str = "1.0.0";
@@ -16,47 +15,41 @@ impl Generator {
         Ok(())
     }
 
-    pub fn write_files(
+    pub async fn write_files(
         _db: persistence::Db,
         out_dir: PathBuf,
         krates: Vec<(sled::IVec, sled::IVec)>,
-    ) -> impl FnOnce(prodash::tree::Item) -> futures::future::BoxFuture<'static, ReportResult> {
-        move |mut progress: prodash::tree::Item| {
-            async move {
-                for (k, c) in krates.into_iter() {
-                    let name = to_name(&k);
-                    let c: model::Crate = c.into();
-                    let mut p = progress.add_child(name);
-                    p.init(Some(c.versions.len() as u32), Some("versions"));
+        mut progress: prodash::tree::Item,
+    ) -> ReportResult {
+        for (k, c) in krates.into_iter() {
+            let name = to_name(&k);
+            let c: model::Crate = c.into();
+            let mut p = progress.add_child(name);
+            p.init(Some(c.versions.len() as u32), Some("versions"));
 
-                    for (vid, v) in c.versions.iter().enumerate() {
-                        p.set((vid + 1) as u32);
-                        let out_file = output_file_html(out_dir.as_ref(), name, &v);
-                        async_std::fs::create_dir_all(
-                            out_file.parent().expect("parent dir for file"),
-                        )
-                        .await?;
+            for (vid, v) in c.versions.iter().enumerate() {
+                p.set((vid + 1) as u32);
+                let out_file = output_file_html(out_dir.as_ref(), name, &v);
+                async_std::fs::create_dir_all(out_file.parent().expect("parent dir for file"))
+                    .await?;
 
-                        let mut marker = out_file.clone();
-                        marker.set_file_name(GENERATOR_VERSION);
-                        if !async_std::fs::symlink_metadata(&marker)
-                            .await?
-                            .file_type()
-                            .is_symlink()
-                        {
-                            generate_single_file(&out_file).await?;
-                            async_std::os::unix::fs::symlink(
-                                out_file.file_name().expect("filename"),
-                                &marker,
-                            )
-                            .await?;
-                        }
-                    }
+                let mut marker = out_file.clone();
+                marker.set_file_name(GENERATOR_VERSION);
+                if !async_std::fs::symlink_metadata(&marker)
+                    .await?
+                    .file_type()
+                    .is_symlink()
+                {
+                    generate_single_file(&out_file).await?;
+                    async_std::os::unix::fs::symlink(
+                        out_file.file_name().expect("filename"),
+                        &marker,
+                    )
+                    .await?;
                 }
-                Ok(())
             }
-            .boxed()
         }
+        Ok(())
     }
 }
 

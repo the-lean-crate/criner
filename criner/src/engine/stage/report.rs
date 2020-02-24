@@ -33,15 +33,8 @@ pub async fn generate(
         let (tx, rx) = async_std::sync::channel(1);
         let (tx_result, rx_result) =
             async_std::sync::channel((cpu_o_bound_processors * 2) as usize);
-        for idx in 0..cpu_o_bound_processors {
-            pool.spawn(
-                work::outputbound::processor(
-                    progress.add_child(format!("{}: 🏋 → 🔆", idx + 1)),
-                    rx.clone(),
-                    tx_result.clone(),
-                )
-                .map(|_| ()),
-            )?;
+        for _ in 0..cpu_o_bound_processors {
+            pool.spawn(work::outputbound::processor(rx.clone(), tx_result.clone()).map(|_| ()))?;
         }
         (rx_result, tx)
     };
@@ -62,11 +55,15 @@ pub async fn generate(
         check(deadline.clone())?;
         progress.set(((cid + 1) * chunk_size) as u32);
         progress.blocked(None);
-        tx.send(report::waste::Generator::write_files(
-            db.clone(),
-            waste_report_dir.clone(),
-            chunk.collect(),
-        ))
+        tx.send(
+            report::waste::Generator::write_files(
+                db.clone(),
+                waste_report_dir.clone(),
+                chunk.collect(),
+                progress.add_child(""),
+            )
+            .boxed(),
+        )
         .await;
     }
     drop(tx);
