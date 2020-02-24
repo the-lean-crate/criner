@@ -1,6 +1,5 @@
 use crate::{error::Result, model, persistence};
 use std::path::{Path, PathBuf};
-use tokio::io::AsyncWriteExt;
 
 const GENERATOR_VERSION: &str = "1.0.0";
 
@@ -20,7 +19,6 @@ impl Generator {
         krates: Vec<(sled::IVec, model::Crate<'_>)>,
         mut progress: prodash::tree::Item,
     ) -> Result<()> {
-        use std::os::unix::fs;
         for (k, c) in krates.into_iter() {
             let name = to_name(&k);
             let c: model::Crate = c;
@@ -30,17 +28,22 @@ impl Generator {
             for (vid, v) in c.versions.iter().enumerate() {
                 p.set((vid + 1) as u32);
                 let out_file = output_file_html(out_dir.as_ref(), name, &v);
-                tokio::fs::create_dir_all(out_file.parent().expect("parent dir for file")).await?;
+                async_std::fs::create_dir_all(out_file.parent().expect("parent dir for file"))
+                    .await?;
 
                 let mut marker = out_file.clone();
                 marker.set_file_name(GENERATOR_VERSION);
-                if !marker
-                    .symlink_metadata()
-                    .map(|m| m.file_type().is_symlink())
-                    .unwrap_or(false)
+                if !async_std::fs::symlink_metadata(&marker)
+                    .await?
+                    .file_type()
+                    .is_symlink()
                 {
                     generate_single_file(&out_file).await?;
-                    fs::symlink(out_file.file_name().expect("filename"), &marker)?;
+                    async_std::os::unix::fs::symlink(
+                        out_file.file_name().expect("filename"),
+                        &marker,
+                    )
+                    .await?;
                 }
             }
         }
@@ -49,7 +52,8 @@ impl Generator {
 }
 
 async fn generate_single_file(out: &Path) -> Result<()> {
-    tokio::fs::OpenOptions::new()
+    use async_std::prelude::*;
+    async_std::fs::OpenOptions::new()
         .truncate(true)
         .write(true)
         .create(true)

@@ -29,7 +29,7 @@ serde_derive = "1.0.104"
 serde = "1.0.104"
 humantime = "2.0.0"
 log = "0.4.8"
-async-std = { version = "1.5.0", default-features = false, features = ["unstable"] }
+async-std = { version = "1.5.0", features = ["unstable"] }
 reqwest = "0.10.1"
 http = { version = "0.2.0", default-features = false }
 tokio = { version = "0.2", default-features = false, features = ["fs", "rt-threaded"]}

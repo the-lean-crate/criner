@@ -36,16 +36,34 @@ version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "538ecb01eb64eecd772087e5b6f7540cbc917f047727339a472dafed2185b267"
 dependencies = [
+ "async-task",
  "broadcaster",
+ "crossbeam-channel",
+ "crossbeam-deque",
  "crossbeam-utils",
  "futures-core",
  "futures-io",
  "futures-timer 2.0.2",
+ "kv-log-macro",
+ "log",
  "memchr",
+ "mio",
+ "mio-uds",
+ "num_cpus",
  "once_cell",
  "pin-project-lite",
  "pin-utils",
  "slab",
+]
+
+[[package]]
+name = "async-task"
+version = "1.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ac2c016b079e771204030951c366db398864f5026f84a44dafb0ff20f02085d"
+dependencies = [
+ "libc",
+ "winapi 0.3.8",
 ]
 
 [[package]]
@@ -773,6 +791,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kv-log-macro"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8c54d9f465d530a752e6ebdc217e081a7a614b48cb200f6f0aee21ba6bc9aabb"
+dependencies = [
+ "log",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -914,6 +941,17 @@ dependencies = [
  "net2",
  "slab",
  "winapi 0.2.8",
+]
+
+[[package]]
+name = "mio-uds"
+version = "0.6.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "966257a94e196b11bb43aca423754d87429960a768de9414f3691d6957abf125"
+dependencies = [
+ "iovec",
+ "libc",
+ "mio",
 ]
 
 [[package]]
