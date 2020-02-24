@@ -125,12 +125,6 @@ pub struct CrateVersion<'a> {
     pub dependencies: Vec<Dependency<'a>>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
-pub enum ReportResult {
-    Done,
-    NotStarted,
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum TaskState {
     /// The task was never started
