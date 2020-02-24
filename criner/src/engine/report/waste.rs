@@ -28,12 +28,11 @@ impl Generator {
         _db: persistence::Db,
         out_dir: PathBuf,
         krates: Vec<(sled::IVec, sled::IVec)>,
-        mut progress: prodash::tree::Item,
+        mut p: prodash::tree::Item,
     ) -> ReportResult {
         for (k, c) in krates.into_iter() {
             let name = to_name(&k);
             let c: model::Crate = c.into();
-            let mut p = progress.add_child(name);
             p.init(Some(c.versions.len() as u32), Some("versions"));
 
             for (vid, v) in c.versions.iter().enumerate() {
