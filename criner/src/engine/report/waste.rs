@@ -39,9 +39,6 @@ impl Generator {
             for (vid, v) in c.versions.iter().enumerate() {
                 p.set((vid + 1) as u32);
                 let out_file = output_file_html(out_dir.as_ref(), name, &v);
-                async_std::fs::create_dir_all(out_file.parent().expect("parent dir for file"))
-                    .await?;
-
                 let mut marker = out_file.clone();
                 marker.set_file_name(GENERATOR_VERSION);
                 if !async_std::fs::symlink_metadata(&marker)
@@ -50,6 +47,8 @@ impl Generator {
                     .map(|f| f.file_type().is_symlink())
                     .unwrap_or(false)
                 {
+                    async_std::fs::create_dir_all(out_file.parent().expect("parent dir for file"))
+                        .await?;
                     generate_single_file(&out_file).await?;
                     async_std::os::unix::fs::symlink(
                         out_file.file_name().expect("filename"),
