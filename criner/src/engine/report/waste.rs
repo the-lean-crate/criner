@@ -44,6 +44,8 @@ impl Generator {
                 async_std::fs::create_dir_all(out_file.parent().expect("parent dir for file"))
                     .await?;
 
+                let mut marker = out_file.clone();
+                marker.set_file_name(GENERATOR_VERSION);
                 let key = persistence::ReportsTree::key(
                     name,
                     &version,
