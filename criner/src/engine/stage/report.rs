@@ -29,18 +29,22 @@ pub async fn generate(
     let num_crates = krates.tree().len() as u32;
     progress.init(Some(num_crates), Some("crates"));
 
-    let (tx, rx) = async_std::sync::channel(1);
-    let (tx_result, rx_result) = async_std::sync::channel((cpu_o_bound_processors * 2) as usize);
-    for idx in 0..cpu_o_bound_processors {
-        tokio.spawn(
-            work::outputbound::processor::<()>(
-                progress.add_child(format!("{}: 🏋 → 🔆", idx + 1)),
-                rx.clone(),
-                tx_result.clone(),
-            )
-            .map(|_| ()),
-        );
-    }
+    let (rx_result, tx) = {
+        let (tx, rx) = async_std::sync::channel(1);
+        let (tx_result, rx_result) =
+            async_std::sync::channel((cpu_o_bound_processors * 2) as usize);
+        for idx in 0..cpu_o_bound_processors {
+            tokio.spawn(
+                work::outputbound::processor::<()>(
+                    progress.add_child(format!("{}: 🏋 → 🔆", idx + 1)),
+                    rx.clone(),
+                    tx_result.clone(),
+                )
+                .map(|_| ()),
+            );
+        }
+        (rx_result, tx)
+    };
 
     let merge_reports = tokio.spawn(
         report::waste::Generator::merge_reports(rx_result)
@@ -71,6 +75,7 @@ pub async fn generate(
         )
         .await;
     }
+    drop(tx);
     progress.set(num_crates);
     // TODO: Call function to generate top-level report
     let _report = merge_reports.await;
