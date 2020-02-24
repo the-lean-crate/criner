@@ -1,4 +1,4 @@
-use crate::model::{CrateVersion, Task, TaskResult};
+use crate::model::{CrateVersion, ReportResult, Task, TaskResult};
 use crate::{
     error::{Error, Result},
     model::{Context, Crate},
@@ -14,6 +14,7 @@ pub struct Db {
     crates: sled::Tree,
     tasks: sled::Tree,
     results: sled::Tree,
+    reports: sled::Tree,
 }
 
 impl Db {
@@ -29,6 +30,7 @@ impl Db {
         let crates = inner.open_tree("crates")?;
         let tasks = inner.open_tree("tasks")?;
         let results = inner.open_tree("results")?;
+        let reports = inner.open_tree("reports")?;
         Ok(Db {
             inner,
             meta,
@@ -36,6 +38,7 @@ impl Db {
             crates,
             tasks,
             results,
+            reports,
         })
     }
 
@@ -54,6 +57,11 @@ impl Db {
     }
     pub fn results(&self) -> TaskResultTree {
         TaskResultTree {
+            inner: &self.results,
+        }
+    }
+    pub fn reports(&self) -> ReportsTree {
+        ReportsTree {
             inner: &self.results,
         }
     }
@@ -216,6 +224,33 @@ impl<'a> TreeAccess for TasksTree<'a> {
             }
             None => t,
         })
+    }
+}
+
+// FIXME: use it or drop it - it should be used once Sled can efficiently handle this kind of data
+// as we currently use symlinks to mark completed HTML pages.
+pub struct ReportsTree<'a> {
+    inner: &'a sled::Tree,
+}
+
+impl<'a> ReportsTree<'a> {
+    pub fn key(
+        crate_name: &str,
+        crate_version: &str,
+        report_name: &str,
+        report_version: &str,
+    ) -> Vec<u8> {
+        format!(
+            "{}:{}:{}:{}",
+            crate_name, crate_version, report_name, report_version
+        )
+        .into()
+    }
+    pub fn is_done(&self, key: impl AsRef<[u8]>) -> bool {
+        self.inner.contains_key(key).unwrap_or(false)
+    }
+    pub fn set_done(&self, key: impl AsRef<[u8]>) {
+        self.inner.insert(key, ReportResult::Done).ok();
     }
 }
 
@@ -423,3 +458,4 @@ impl_ivec_transform!(Task<'_>);
 impl_ivec_transform!(TaskResult<'_>);
 impl_ivec_transform!(CrateVersion<'_>);
 impl_ivec_transform!(Context);
+impl_ivec_transform!(ReportResult);
