@@ -40,10 +40,6 @@ impl Generator {
 
             for (vid, version) in c.versions.iter().enumerate() {
                 p.set((vid + 1) as u32);
-                let out_file = output_file_html(out_dir.as_ref(), name, &version);
-                async_std::fs::create_dir_all(out_file.parent().expect("parent dir for file"))
-                    .await?;
-
                 let key = persistence::ReportsTree::key(
                     name,
                     &version,
@@ -51,6 +47,9 @@ impl Generator {
                     GENERATOR_VERSION,
                 );
                 if !reports.is_done(&key) {
+                    let out_file = output_file_html(out_dir.as_ref(), name, &version);
+                    async_std::fs::create_dir_all(out_file.parent().expect("parent dir for file"))
+                        .await?;
                     generate_single_file(&out_file).await?;
                     reports.set_done(key);
                 }
