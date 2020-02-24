@@ -6,7 +6,8 @@ use crate::{
     persistence::{self, TreeAccess},
     utils::check,
 };
-use futures::FutureExt;
+use futures::task::SpawnExt;
+use futures::{task::Spawn, FutureExt};
 use itertools::Itertools;
 use std::{path::PathBuf, time::SystemTime};
 
@@ -16,7 +17,7 @@ pub async fn generate(
     assets_dir: PathBuf,
     deadline: Option<SystemTime>,
     cpu_o_bound_processors: u32,
-    tokio: tokio::runtime::Handle,
+    pool: impl Spawn + Clone + Send + 'static + Sync,
 ) -> Result<()> {
     let krates = db.crates();
     let chunk_size = 500;
@@ -34,23 +35,23 @@ pub async fn generate(
         let (tx_result, rx_result) =
             async_std::sync::channel((cpu_o_bound_processors * 2) as usize);
         for idx in 0..cpu_o_bound_processors {
-            tokio.spawn(
+            pool.spawn(
                 work::outputbound::processor::<()>(
                     progress.add_child(format!("{}: 🏋 → 🔆", idx + 1)),
                     rx.clone(),
                     tx_result.clone(),
                 )
                 .map(|_| ()),
-            );
+            )?;
         }
         (rx_result, tx)
     };
 
-    let merge_reports = tokio.spawn(
+    let merge_reports = pool.spawn_with_handle(
         report::waste::Generator::merge_reports(rx_result)
             .map(|_| ())
             .boxed(),
-    );
+    )?;
     for (cid, chunk) in krates
         .tree()
         .iter()
