@@ -8,7 +8,7 @@ pub struct ExtractRequest {
     pub crate_version: String,
 }
 
-pub fn default_persisted_download_task() -> model::Task<'static> {
+pub fn default_persisted_extraction_task() -> model::Task<'static> {
     const TASK_NAME: &str = "extract_crate";
     const TASK_VERSION: &str = "1.0.0";
     model::Task {
@@ -28,7 +28,7 @@ pub async fn processor(
     use persistence::TreeAccess;
 
     let mut key = Vec::with_capacity(32);
-    let mut dummy = default_persisted_download_task();
+    let mut dummy = default_persisted_extraction_task();
     let tasks = db.tasks();
     let results = db.results();
 

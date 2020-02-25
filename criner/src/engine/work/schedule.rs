@@ -51,7 +51,7 @@ pub async fn tasks(
             PermanentFailure | Submitted => AsyncResult::Done,
             Done(download_crate_task) => {
                 let cpu_task =
-                    task_or_default(&tasks, krate, cpubound::default_persisted_download_task)?;
+                    task_or_default(&tasks, krate, cpubound::default_persisted_extraction_task)?;
                 submit_single(cpu_task, &mut progress, perform_cpu, 2, 2, || {
                     cpubound::ExtractRequest {
                         download_task: download_crate_task.into(),
@@ -71,11 +71,7 @@ fn task_or_default<'a, 'b>(
     version: &model::CrateVersion<'b>,
     make_task: impl FnOnce() -> model::Task<'static>,
 ) -> Result<model::Task<'a>> {
-    let key = (
-        version.name.as_ref().into(),
-        version.version.as_ref().into(),
-        make_task(),
-    );
+    let key = (version.name.as_ref(), version.version.as_ref(), make_task());
     Ok(tasks.get(TasksTree::key(&key))?.unwrap_or(key.2))
 }
 
