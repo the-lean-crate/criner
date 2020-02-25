@@ -6,6 +6,46 @@ pub fn migrate(_db_path: impl AsRef<Path>) -> crate::error::Result<()> {
 }
 
 #[allow(dead_code)]
+pub fn migrate_old_to_new_manually_and_by_pruning_trees(
+    db_path: impl AsRef<Path>,
+) -> crate::error::Result<()> {
+    use sled as old_sled;
+    log::info!("opening old db");
+    let old_db = old_sled::open(db_path.as_ref()).unwrap();
+    let new_db = sled::open("./new_new_crinerd.db").unwrap();
+    log::info!("exporting data");
+    for tree_name in old_db.tree_names() {
+        let tree_name_str = std::str::from_utf8(tree_name.as_ref()).unwrap();
+        if ["__sled__default", "reports"].contains(&tree_name_str) {
+            log::warn!("skipped {}", tree_name_str);
+            continue;
+        }
+        log::info!("processing '{}'", tree_name_str);
+        let tree = old_db.open_tree(tree_name.as_ref()).unwrap();
+        let new_tree = new_db.open_tree(tree_name).unwrap();
+        for (k, v) in tree.iter().filter_map(|v| v.ok()) {
+            new_tree.insert(k.as_ref(), v.as_ref())?;
+        }
+    }
+    Ok(())
+}
+
+#[allow(dead_code)]
+pub fn migrate_old_version_to_new_version_of_sled(
+    db_path: impl AsRef<Path>,
+) -> crate::error::Result<()> {
+    use sled as old_sled;
+    log::info!("opening old db");
+    let old_db = old_sled::open(db_path.as_ref()).unwrap();
+    let new_db = sled::open("./new_crinerd.db").unwrap();
+    log::info!("exporting data");
+    let data = old_db.export();
+    log::info!("importing data");
+    new_db.import(data);
+    Ok(())
+}
+
+#[allow(dead_code)]
 fn migrate_transform_tree_data_that_was_not_necessary_actually(
     db_path: impl AsRef<Path>,
 ) -> crate::error::Result<()> {
@@ -76,12 +116,3 @@ fn migrate_iterate_assets_and_update_db(db_path: impl AsRef<Path>) -> crate::err
     }
     Ok(())
 }
-
-// migrate old to new sled db
-// log::info!("opening old db");
-// let old_db = sled::open(db_path.as_ref())?;
-// let new_db = new_sled::open("./new_crinerd.db").unwrap();
-// log::info!("exporting data");
-// let data = old_db.export();
-// log::info!("importing data");
-// new_db.import(data);
