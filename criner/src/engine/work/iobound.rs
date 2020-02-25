@@ -124,7 +124,7 @@ pub async fn processor(
         };
         kt.2 = task;
         tasks.upsert(&kt)?;
-        progress.set_name("↓ 🔆");
+        progress.set_name("↓ IDLE");
         progress.init(None, None);
     }
     Ok(())

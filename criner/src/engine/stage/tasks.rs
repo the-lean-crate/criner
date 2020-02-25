@@ -27,7 +27,7 @@ pub async fn process(
         tokio.spawn(
             work::iobound::processor(
                 db.clone(),
-                download_progress.add_child(format!("{}: ↓ 🔆", idx + 1)),
+                download_progress.add_child(format!("{}: ↓ IDLE", idx + 1)),
                 rx.clone(),
                 assets_dir.clone(),
             )
@@ -39,7 +39,7 @@ pub async fn process(
         pool.spawn(
             work::cpubound::processor(
                 db.clone(),
-                download_progress.add_child(format!("{}:🏋 🔆", idx + 1)),
+                download_progress.add_child(format!("{}:CPU IDLE", idx + 1)),
                 rx.clone(),
                 assets_dir.clone(),
             )

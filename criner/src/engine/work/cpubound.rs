@@ -38,7 +38,7 @@ pub async fn processor(
         crate_version,
     }) = r.recv().await
     {
-        progress.set_name(format!("🏋 🦖 {}:{}", crate_name, crate_version));
+        progress.set_name(format!("CPU UNZIP+UNTAR {}:{}", crate_name, crate_version));
         progress.init(None, Some("files extracted"));
 
         let mut kt = (crate_name.as_str(), crate_version.as_str(), dummy);
@@ -135,7 +135,7 @@ pub async fn processor(
         };
         kt.2 = task;
         tasks.upsert(&kt)?;
-        progress.set_name("🏋 🔆");
+        progress.set_name("CPU IDLE");
         progress.init(None, None);
     }
 
