@@ -10,11 +10,10 @@ use std::{path::Path, time::SystemTime};
 pub struct Db {
     pub inner: sled::Db,
     meta: sled::Tree,
+    tasks: sled::Tree,
     versions: sled::Tree,
     crates: sled::Tree,
-    tasks: sled::Tree,
     results: sled::Tree,
-    reports: sled::Tree,
 }
 
 impl Db {
@@ -30,7 +29,6 @@ impl Db {
         let crates = inner.open_tree("crates")?;
         let tasks = inner.open_tree("tasks")?;
         let results = inner.open_tree("results")?;
-        let reports = inner.open_tree("reports")?;
         Ok(Db {
             inner,
             meta,
@@ -38,7 +36,6 @@ impl Db {
             crates,
             tasks,
             results,
-            reports,
         })
     }
 
@@ -57,11 +54,6 @@ impl Db {
     }
     pub fn results(&self) -> TaskResultTree {
         TaskResultTree {
-            inner: &self.results,
-        }
-    }
-    pub fn reports(&self) -> ReportsTree {
-        ReportsTree {
             inner: &self.results,
         }
     }
@@ -229,10 +221,12 @@ impl<'a> TreeAccess for TasksTree<'a> {
 
 // FIXME: use it or drop it - it should be used once Sled can efficiently handle this kind of data
 // as we currently use symlinks to mark completed HTML pages.
+#[allow(dead_code)]
 pub struct ReportsTree<'a> {
     inner: &'a sled::Tree,
 }
 
+#[allow(dead_code)]
 impl<'a> ReportsTree<'a> {
     pub fn key(
         crate_name: &str,
