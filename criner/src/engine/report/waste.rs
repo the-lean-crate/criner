@@ -47,16 +47,15 @@ impl Generator {
 
             for (vid, version) in c.versions.iter().enumerate() {
                 {
-                    let name = name.to_string();
-                    let version = version.to_string();
                     let key = (
-                        name.as_str(),
-                        version.as_str(),
+                        name,
+                        version.as_ref(),
                         &exrtaction_task_dummy,
                         dummy_extraction_result,
                     );
                     key_buf.clear();
                     // persistence::TaskResultTree::key_to_buf(&key, &mut key_buf);
+                    // The function below is the code from the function above, which borrow-checks ok
                     key_to_buf(&key, &mut key_buf);
                     dummy_extraction_result = key.3;
                 }
