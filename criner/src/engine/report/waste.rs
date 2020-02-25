@@ -54,9 +54,9 @@ impl Generator {
                         dummy_extraction_result,
                     );
                     key_buf.clear();
-                    // persistence::TaskResultTree::key_to_buf(&key, &mut key_buf);
+                    persistence::TaskResultTree::key_to_buf(&key, &mut key_buf);
                     // The function below is the code from the function above, which borrow-checks ok
-                    key_to_buf(&key, &mut key_buf);
+                    // key_to_buf(&key, &mut key_buf);
                     dummy_extraction_result = key.3;
                 }
                 p.set((vid + 1) as u32);
