@@ -78,7 +78,7 @@ pub async fn non_blocking(
                 let pool = pool.clone();
                 let tokio = tokio.clone();
                 async move {
-                    stage::tasks::process(
+                    stage::processing::process(
                         db.clone(),
                         progress.add_child("Process Crate Versions"),
                         io_bound_processors,

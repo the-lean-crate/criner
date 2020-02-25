@@ -52,10 +52,8 @@ pub async fn processor(
         dummy = kt.2;
 
         let mut task = tasks.update(&key, |t| {
-            ({
-                t.process = dummy.process.clone();
-                t.version = dummy.version.clone()
-            })
+            t.process = dummy.process.clone();
+            t.version = dummy.version.clone()
         })?;
 
         progress.blocked(None);
