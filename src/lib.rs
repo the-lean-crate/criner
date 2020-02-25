@@ -3,6 +3,7 @@ use std::{ops::Add, path::PathBuf};
 mod args;
 pub mod error;
 pub use args::*;
+use std::time::Duration;
 
 pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
     use SubCommands::*;
@@ -15,6 +16,8 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
         cpu_o_bound_processors: 10,
         repository: None,
         time_limit: None,
+        fetch_every: Duration::from_secs(60).into(),
+        process_and_report_every: Duration::from_secs(60).into(),
         db_path: PathBuf::from("criner.db"),
     });
     match cmd {
@@ -30,6 +33,8 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             cpu_o_bound_processors,
             no_gui,
             progress_message_scrollback_buffer_size,
+            fetch_every,
+            process_and_report_every,
         } => criner::run::blocking(
             db_path,
             repository
@@ -38,6 +43,8 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             io_bound_processors,
             cpu_bound_processors,
             cpu_o_bound_processors,
+            fetch_every.into(),
+            process_and_report_every.into(),
             criner::prodash::TreeOptions {
                 message_buffer_capacity: progress_message_scrollback_buffer_size,
                 ..criner::prodash::TreeOptions::default()

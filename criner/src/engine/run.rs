@@ -29,16 +29,17 @@ pub async fn non_blocking(
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
+    fetch_every: Duration,
+    process_and_report_every: Duration,
     assets_dir: PathBuf,
     pool: impl Spawn + Clone + Send + 'static + Sync,
     tokio: tokio::runtime::Handle,
 ) -> Result<()> {
     check(deadline)?;
 
-    let interval_s = 60;
     pool.spawn(
         repeat_every_s(
-            interval_s,
+            fetch_every.as_secs() as u32,
             {
                 let p = progress.clone();
                 move || p.add_child("Fetch Timer")
@@ -62,9 +63,8 @@ pub async fn non_blocking(
         .map(|_| ()),
     )?;
 
-    let interval_s = 10;
     repeat_every_s(
-        interval_s,
+        process_and_report_every.as_secs() as u32,
         {
             let p = progress.clone();
             move || p.add_child("Processing Timer")
@@ -113,6 +113,8 @@ pub fn blocking(
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
+    fetch_every: Duration,
+    process_and_report_every: Duration,
     root: prodash::Tree,
     gui: Option<prodash::tui::TuiOptions>,
 ) -> Result<()> {
@@ -149,6 +151,8 @@ pub fn blocking(
         io_bound_processors,
         cpu_bound_processors,
         cpu_o_bound_processors,
+        fetch_every,
+        process_and_report_every,
         assets_dir,
         task_pool.clone(),
         tokio_rt.handle().clone(),

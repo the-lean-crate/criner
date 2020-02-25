@@ -60,6 +60,14 @@ pub enum SubCommands {
         #[structopt(long, short = "t")]
         time_limit: Option<humantime::Duration>,
 
+        /// The time between each fetch operation, specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
+        #[structopt(long, short = "f", default_value = "60s")]
+        fetch_every: humantime::Duration,
+
+        /// The time between each processing run, specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
+        #[structopt(long, short = "p", default_value = "60s")]
+        process_and_report_every: humantime::Duration,
+
         /// Path to the possibly existing database. It's used to persist all mining results.
         db_path: PathBuf,
     },
