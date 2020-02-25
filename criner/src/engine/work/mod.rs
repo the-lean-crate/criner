@@ -2,4 +2,4 @@ pub mod iobound;
 pub mod schedule;
 
 pub mod cpubound;
-pub mod outputbound;
+pub mod general;

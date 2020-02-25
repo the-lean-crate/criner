@@ -1,5 +1,6 @@
 use crate::error::Result;
 
+/// A processor that can do anything, as it takes a future and returns its result
 pub async fn processor<T>(
     input: async_std::sync::Receiver<futures::future::BoxFuture<'static, T>>,
     output: async_std::sync::Sender<T>,

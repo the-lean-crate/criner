@@ -34,6 +34,7 @@ impl Generator {
             let name = to_name(&k);
             let c: model::Crate = c.into();
             p.init(Some(c.versions.len() as u32), Some("versions"));
+            p.set_name(name);
 
             for (vid, v) in c.versions.iter().enumerate() {
                 p.set((vid + 1) as u32);
