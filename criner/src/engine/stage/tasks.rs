@@ -50,13 +50,13 @@ pub async fn process(
     let versions = db.crate_versions();
     let num_versions = versions.tree().len();
     progress.init(Some(num_versions as u32), Some("crate versions"));
-    for (vid, version) in versions
+    for (vid, res) in versions
         .tree()
         .iter()
-        .filter_map(|r| r.ok())
-        .map(|(_k, v)| CrateVersion::from(v))
+        .map(|r| r.map(|(_k, v)| CrateVersion::from(v)))
         .enumerate()
     {
+        let version = res?;
         progress.set((vid + 1) as u32);
         progress.blocked(None);
         work::schedule::tasks(
