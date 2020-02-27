@@ -1,7 +1,39 @@
 use crate::persistence::TreeAccess;
+use std::io::Write;
 use std::path::Path;
 
-pub fn migrate(_db_path: impl AsRef<Path>) -> crate::error::Result<()> {
+pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
+    use acid_store::store::Open;
+    acid_store::init();
+    let db = sled::open(&db_path)?;
+    for tree_name in db.tree_names() {
+        let tree_name_str = std::str::from_utf8(&tree_name).unwrap();
+
+        log::info!("Creating repository '{}'", tree_name_str);
+        let mut repo = acid_store::repo::ObjectRepository::create_repo(
+            acid_store::store::DirectoryStore::open(
+                tree_name_str.into(),
+                acid_store::store::OpenOption::CREATE,
+            )
+            .unwrap(),
+            acid_store::repo::RepositoryConfig::default(),
+            None,
+        )
+        .unwrap();
+
+        let tree = db.open_tree(tree_name)?;
+        let mut count = 0;
+        for res in tree.iter() {
+            let (k, v) = res?;
+            count += 1;
+            let mut object = repo.insert(std::str::from_utf8(&k).unwrap().to_string());
+            object.write_all(v.as_ref())?;
+            object.flush().unwrap();
+        }
+        log::info!("About to commit {} objects…", count);
+        repo.commit().unwrap();
+        log::info!("Commit done");
+    }
     Ok(())
 }
 

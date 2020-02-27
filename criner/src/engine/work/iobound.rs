@@ -35,7 +35,10 @@ pub async fn processor(
     let mut key = Vec::with_capacity(32);
     let tasks = db.tasks();
     let results = db.results();
-    let client = reqwest::ClientBuilder::new().connect_timeout(std::time::Duration::from_secs(120)).gzip(true).build()?;
+    let client = reqwest::ClientBuilder::new()
+        .connect_timeout(std::time::Duration::from_secs(120))
+        .gzip(true)
+        .build()?;
 
     while let Some(DownloadRequest {
         crate_name,

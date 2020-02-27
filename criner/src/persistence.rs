@@ -434,7 +434,8 @@ macro_rules! impl_ivec_transform {
         }
         impl From<IVec> for $ty {
             fn from(b: IVec) -> Self {
-                rmp_serde::from_read_ref(b.as_ref()).expect("always valid decoding: TODO: migrations")
+                rmp_serde::from_read_ref(b.as_ref())
+                    .expect("always valid decoding: TODO: migrations")
             }
         }
         impl From<$ty> for IVec {
