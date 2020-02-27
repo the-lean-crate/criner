@@ -23,7 +23,7 @@ impl Db {
         // TODO: re-evaluate that for textual data - it might enable us to store all files, and when we
         // have more read-based workloads. Maybe it's worth it to turn on.
         // NOTE: Databases with and without compression need migration.
-        let inner = sled::Config::new().path(path).open()?;
+        let inner = sled::Config::new().cache_capacity(128 * 1024 * 1024).path(path).open()?;
         let meta = inner.open_tree("meta")?;
         let versions = inner.open_tree("crate_versions")?;
         let crates = inner.open_tree("crates")?;
