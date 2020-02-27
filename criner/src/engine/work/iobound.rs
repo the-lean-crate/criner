@@ -35,6 +35,7 @@ pub async fn processor(
     let mut key = Vec::with_capacity(32);
     let tasks = db.tasks();
     let results = db.results();
+    let client = reqwest::ClientBuilder::new().connect_timeout(std::time::Duration::from_secs(120)).gzip(true).build()?;
 
     while let Some(DownloadRequest {
         crate_name,
@@ -59,7 +60,7 @@ pub async fn processor(
         progress.blocked(None);
         let res: Result<()> = async {
             {
-                let mut res = reqwest::get(&url).await?;
+                let mut res = client.get(&url).send().await?;
                 let size: u32 = res
                     .content_length()
                     .ok_or(Error::InvalidHeader("expected content-length"))?
