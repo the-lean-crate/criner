@@ -8,29 +8,52 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
     let db = sled::open(&db_path)?;
     for tree_name in db.tree_names() {
         let tree_name_str = std::str::from_utf8(&tree_name).unwrap();
+        if ["crate_versions", "crates", "meta", "results"].contains(&tree_name_str) {
+            log::info!("Skipped {} - already done", tree_name_str);
+            continue;
+        }
 
         log::info!("Creating repository '{}'", tree_name_str);
-        let mut repo = acid_store::repo::ObjectRepository::create_repo(
-            acid_store::store::SqliteStore(
-                format!("{}.sqlite", tree_name_str).into(),
-                acid_store::store::OpenOption::CREATE,
+        let db_path: std::path::PathBuf = format!("{}.sqlite", tree_name_str).into();
+        let mut repo = if !db_path.exists() {
+            acid_store::repo::ObjectRepository::create_repo(
+                acid_store::store::SqliteStore::open(
+                    db_path.into(),
+                    acid_store::store::OpenOption::CREATE,
+                )
+                .unwrap(),
+                acid_store::repo::RepositoryConfig::default(),
+                None,
             )
-            .unwrap(),
-            acid_store::repo::RepositoryConfig::default(),
-            None,
-        )
+        } else {
+            acid_store::repo::ObjectRepository::open_repo(
+                acid_store::store::SqliteStore::open(
+                    db_path.into(),
+                    acid_store::store::OpenOption::CREATE,
+                )
+                .unwrap(),
+                None,
+                acid_store::repo::LockStrategy::Abort,
+            )
+        }
         .unwrap();
 
-        let tree = db.open_tree(tree_name)?;
+        let tree = db.open_tree(&tree_name)?;
         let mut count = 0;
         for res in tree.iter() {
             let (k, v) = res?;
             count += 1;
+            log::info!("{}: {}", tree_name_str, count);
             let mut object = repo.insert(std::str::from_utf8(&k).unwrap().to_string());
             object.write_all(v.as_ref())?;
             object.flush().unwrap();
+            if count % 1000 == 0 {
+                log::info!("Committing 1000 objects…");
+                repo.commit().unwrap();
+                log::info!("Commit done");
+            }
         }
-        log::info!("About to commit {} objects…", count);
+        log::info!("About to commit remaining objects (totalling {})", count);
         repo.commit().unwrap();
         log::info!("Commit done");
     }
