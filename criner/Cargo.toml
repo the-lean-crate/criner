@@ -22,8 +22,8 @@ quick-error = "1.2.3"
 futures = { version = "0.3.4", features = ["thread-pool"]}
 futures-timer = "3.0.1"
 # Sled should always be pinned to avoid updates with cargo update. 'sled' is the last know working version
-sled = { version = "0.31.0", package = "sled", rev = "af097b1ef4737a0c5ee56a1f72d2a27a88b70db5", git = "https://github.com/spacejam/sled" }
-#old_sled = { version = "0.31.0", package = "sled", rev = "eecbbda8e2b5859a769c0eb43a154f7ee220edc3", git = "https://github.com/spacejam/sled"}
+sled = { version = "0.31.0", package = "sled", rev = "9b6b18ecc541f217f0d45d2ad3d910e754ffa08f", git = "https://github.com/spacejam/sled" }
+#old_sled = { version = "0.31.0", package = "sled", rev = "af097b1ef4737a0c5ee56a1f72d2a27a88b70db5", git = "https://github.com/spacejam/sled"}
 crates-index-diff = "5.0.4"
 prodash = { version = "1.1.5", default-features = false, features = ["tui-renderer", "log-renderer"] }
 rmp-serde = "0.14.0"
