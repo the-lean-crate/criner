@@ -8,7 +8,7 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
     let db = sled::open(&db_path)?;
     for tree_name in db.tree_names() {
         let tree_name_str = std::str::from_utf8(&tree_name).unwrap();
-        if ["crate_versions", "crates", "meta", "results"].contains(&tree_name_str) {
+        if ["crates", "meta", "results"].contains(&tree_name_str) {
             log::info!("Skipped {} - already done", tree_name_str);
             continue;
         }
@@ -47,8 +47,8 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
             let mut object = repo.insert(std::str::from_utf8(&k).unwrap().to_string());
             object.write_all(v.as_ref())?;
             object.flush().unwrap();
-            if count % 1000 == 0 {
-                log::info!("Committing 1000 objects…");
+            if count % 100 == 0 {
+                log::info!("Committing 100 objects…");
                 repo.commit().unwrap();
                 log::info!("Commit done");
             }
