@@ -3,6 +3,7 @@ use crate::{
     model, persistence,
     persistence::TreeAccess,
 };
+use bytesize::ByteSize;
 use std::path::Path;
 use std::{path::PathBuf, time::SystemTime};
 use tokio::io::AsyncWriteExt;
@@ -70,7 +71,11 @@ pub async fn processor(
                     as u32;
                 progress.init(Some(size / 1024), Some("Kb"));
                 progress.blocked(None);
-                progress.done(format!("HEAD:{}: content-size = {}", url, size));
+                progress.done(format!(
+                    "HEAD:{}: content-length = {}",
+                    url,
+                    ByteSize(size.into())
+                ));
                 let mut bytes_received = 0;
                 let base_dir = crate_version_dir(&assets_dir, &crate_name, &crate_version);
                 tokio::fs::create_dir_all(&base_dir).await?;
@@ -92,7 +97,11 @@ pub async fn processor(
                     bytes_received += chunk.len();
                     progress.set((bytes_received / 1024) as u32);
                 }
-                progress.done(format!("GET:{}: body-size = {}", url, bytes_received));
+                progress.done(format!(
+                    "GET:{}: body-size = {}",
+                    url,
+                    ByteSize(bytes_received as u64)
+                ));
 
                 {
                     let insert_item = (
