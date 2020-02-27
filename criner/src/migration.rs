@@ -12,7 +12,7 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
         log::info!("Creating repository '{}'", tree_name_str);
         let mut repo = acid_store::repo::ObjectRepository::create_repo(
             acid_store::store::DirectoryStore::open(
-                tree_name_str.into(),
+                format!("{}.db", tree_name_str).into(),
                 acid_store::store::OpenOption::CREATE,
             )
             .unwrap(),
