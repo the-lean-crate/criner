@@ -58,7 +58,8 @@ pub async fn processor(
 
         let mut task = tasks.update(&key, |t| {
             t.process = dummy.process.clone();
-            t.version = dummy.version.clone()
+            t.version = dummy.version.clone();
+            t.stored_at = SystemTime::now();
         })?;
 
         progress.blocked(None);

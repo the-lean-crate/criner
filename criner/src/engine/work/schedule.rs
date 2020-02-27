@@ -5,6 +5,7 @@ use crate::{
     model, persistence,
     persistence::{TasksTree, TreeAccess},
 };
+use std::time::SystemTime;
 
 #[derive(Clone, Copy)]
 pub enum Scheduling {
@@ -30,12 +31,19 @@ pub async fn tasks(
     _mode: Scheduling,
     perform_io: &async_std::sync::Sender<iobound::DownloadRequest>,
     perform_cpu: &async_std::sync::Sender<cpubound::ExtractRequest>,
+    startup_time: SystemTime,
 ) -> Result<AsyncResult> {
     use SubmitResult::*;
     let io_task = task_or_default(&tasks, krate, iobound::default_persisted_download_task)?;
     Ok(
-        match submit_single(io_task, &mut progress, perform_io, 1, 1, || {
-            iobound::DownloadRequest {
+        match submit_single(
+            startup_time,
+            io_task,
+            &mut progress,
+            perform_io,
+            1,
+            1,
+            || iobound::DownloadRequest {
                 crate_name: krate.name.as_ref().into(),
                 crate_version: krate.version.as_ref().into(),
                 kind: "crate",
@@ -44,21 +52,27 @@ pub async fn tasks(
                     name = krate.name,
                     version = krate.version
                 ),
-            }
-        })
+            },
+        )
         .await
         {
             PermanentFailure | Submitted => AsyncResult::Done,
             Done(download_crate_task) => {
                 let cpu_task =
                     task_or_default(&tasks, krate, cpubound::default_persisted_extraction_task)?;
-                submit_single(cpu_task, &mut progress, perform_cpu, 2, 2, || {
-                    cpubound::ExtractRequest {
+                submit_single(
+                    startup_time,
+                    cpu_task,
+                    &mut progress,
+                    perform_cpu,
+                    2,
+                    2,
+                    || cpubound::ExtractRequest {
                         download_task: download_crate_task.into(),
                         crate_name: krate.name.as_ref().into(),
                         crate_version: krate.version.as_ref().into(),
-                    }
-                })
+                    },
+                )
                 .await;
                 AsyncResult::Done
             }
@@ -82,9 +96,10 @@ enum SubmitResult<'a> {
 }
 
 async fn submit_single<'a, R>(
+    startup_time: SystemTime,
     task: model::Task<'a>,
     progress: &mut prodash::tree::Item,
-    download: &async_std::sync::Sender<R>,
+    channel: &async_std::sync::Sender<R>,
     step: u32,
     max_step: u32,
     f: impl FnOnce() -> R,
@@ -97,15 +112,22 @@ async fn submit_single<'a, R>(
         progress.blocked(None);
     };
     match task.state {
+        InProgress => {
+            if startup_time > task.stored_at {
+                configure();
+                channel.send(f()).await;
+            };
+            Submitted
+        }
         NotStarted => {
             configure();
-            download.send(f()).await;
+            channel.send(f()).await;
             Submitted
         }
         AttemptsWithFailure(ref v) if v.len() < 3 => {
             configure();
             progress.info(format!("Retrying task, attempt {}", v.len() + 1));
-            download.send(f()).await;
+            channel.send(f()).await;
             Submitted
         }
         AttemptsWithFailure(_) => PermanentFailure,

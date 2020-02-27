@@ -36,6 +36,7 @@ pub async fn non_blocking(
     tokio: tokio::runtime::Handle,
 ) -> Result<()> {
     check(deadline)?;
+    let startup_time = SystemTime::now();
 
     pool.spawn(
         repeat_every_s(
@@ -87,6 +88,7 @@ pub async fn non_blocking(
                         tokio.clone(),
                         pool.clone(),
                         assets_dir.clone(),
+                        startup_time,
                     )
                     .await?;
                     stage::report::generate(

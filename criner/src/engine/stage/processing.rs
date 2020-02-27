@@ -8,7 +8,7 @@ use futures::{
     task::{Spawn, SpawnExt},
     FutureExt,
 };
-use std::path::PathBuf;
+use std::{path::PathBuf, time::SystemTime};
 
 pub async fn process(
     db: Db,
@@ -19,6 +19,7 @@ pub async fn process(
     tokio: tokio::runtime::Handle,
     pool: impl Spawn + Clone + Send + 'static + Sync,
     assets_dir: PathBuf,
+    startup_time: SystemTime,
 ) -> Result<()> {
     let (tx_io, rx) = async_std::sync::channel(1);
     for idx in 0..io_bound_processors {
@@ -66,6 +67,7 @@ pub async fn process(
             work::schedule::Scheduling::AtLeastOne,
             &tx_io,
             &tx_cpu,
+            startup_time,
         )
         .await?;
     }

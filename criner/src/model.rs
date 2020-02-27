@@ -139,16 +139,22 @@ pub enum TaskState {
     AttemptsWithFailure(Vec<String>),
     /// The task completed successfully
     Complete,
+    /// Indicates a task is currently running
+    /// Please note that this would be unsafe as we don't update tasks in case the user requests
+    /// a shutdown or the program is killed.
+    /// Thus we cleanup in-progress tasks by checking if their stored_at time is before the process startup time.
+    InProgress,
 }
 
 impl TaskState {
     pub fn merged(&self, other: &TaskState) -> TaskState {
+        use TaskState::*;
         match (self, other) {
-            (TaskState::AttemptsWithFailure(existing), TaskState::AttemptsWithFailure(new)) => {
+            (AttemptsWithFailure(existing), AttemptsWithFailure(new)) => {
                 let mut merged = Vec::with_capacity(existing.len() + new.len());
                 merged.extend(existing.iter().map(|e| e.clone()));
                 merged.extend(new.iter().map(|e| e.clone()));
-                TaskState::AttemptsWithFailure(merged)
+                AttemptsWithFailure(merged)
             }
             (_, other) => other.clone(),
         }
