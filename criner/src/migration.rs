@@ -1,16 +1,17 @@
 use crate::persistence::TreeAccess;
-use std::io::Write;
-use std::path::Path;
+use std::{io::Write, path::Path};
 
 pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
     use acid_store::store::Open;
+    use rayon::prelude::*;
     acid_store::init();
     let db = sled::open(&db_path)?;
-    for tree_name in db.tree_names() {
+    let tree_names: Vec<Vec<u8>> = db.tree_names().into_iter().map(|v| v.to_vec()).collect();
+    tree_names.into_par_iter().try_for_each(|tree_name| {
         let tree_name_str = std::str::from_utf8(&tree_name).unwrap();
         if ["crates", "meta", "results"].contains(&tree_name_str) {
             log::info!("Skipped {} - already done", tree_name_str);
-            continue;
+            return Ok::<_, crate::error::Error>(());
         }
 
         log::info!("Creating repository '{}'", tree_name_str);
@@ -57,8 +58,8 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
         log::info!("About to commit remaining objects (totalling {})", count);
         repo.commit().unwrap();
         log::info!("Commit done");
-    }
-    Ok(())
+        Ok(())
+    })
 }
 
 #[allow(dead_code)]

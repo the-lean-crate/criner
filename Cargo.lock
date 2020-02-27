@@ -399,6 +399,7 @@ dependencies = [
  "log",
  "prodash",
  "quick-error",
+ "rayon",
  "reqwest",
  "rmp-serde",
  "serde",
