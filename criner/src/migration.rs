@@ -40,6 +40,7 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
 
         let tree = db.open_tree(&tree_name)?;
         let mut count = 0;
+        let commit_every = 500;
         for res in tree.iter() {
             let (k, v) = res?;
             count += 1;
@@ -47,8 +48,8 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
             let mut object = repo.insert(std::str::from_utf8(&k).unwrap().to_string());
             object.write_all(v.as_ref())?;
             object.flush().unwrap();
-            if count % 100 == 0 {
-                log::info!("Committing 100 objects…");
+            if count % commit_every == 0 {
+                log::info!("Committing {} objects…", commit_every);
                 repo.commit().unwrap();
                 log::info!("Commit done");
             }
