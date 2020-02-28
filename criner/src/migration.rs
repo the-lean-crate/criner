@@ -2,6 +2,21 @@ use crate::persistence::TreeAccess;
 use std::{io::Write, path::Path};
 
 pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
+    use crate::model::{Task, TaskResult};
+    type ResultType<'a> = (String, String, Task<'a>, TaskResult<'a>);
+    let db = sled::open(db_path)?;
+    let tree = db.open_tree("results")?;
+    for (idx, res) in tree.iter().enumerate() {
+        let (k, v) = res?;
+        let v: ResultType = rmp_serde::from_read(v.as_ref()).unwrap();
+        tree.insert(k, rmp_serde::to_vec(&v.3).unwrap())?;
+        log::info!("{}", idx);
+    }
+    Ok(())
+}
+
+#[allow(dead_code)]
+pub fn migrate_sled_to_acid_store(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
     use acid_store::store::Open;
     use rayon::prelude::*;
     acid_store::init();
