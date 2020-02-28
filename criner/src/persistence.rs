@@ -113,8 +113,8 @@ impl<'a> CrateVersion<'a> {
 }
 
 pub trait TreeAccess {
-    type StorageItem: From<IVec> + Into<IVec> + for<'a> From<&'a [u8]> + Default;
-    type InsertItem: serde::Serialize;
+    type StorageItem: serde::Serialize + From<IVec> + Into<IVec> + for<'a> From<&'a [u8]> + Default;
+    type InsertItem;
     type InsertResult;
 
     fn tree(&self) -> &sled::Tree;
@@ -175,7 +175,10 @@ pub trait TreeAccess {
 
     fn insert(&self, v: &Self::InsertItem) -> Result<()> {
         self.tree()
-            .insert(Self::key(v), rmp_serde::to_vec(v)?)
+            .insert(
+                Self::key(v),
+                rmp_serde::to_vec(&self.merge(v, None).unwrap_or_else(Default::default))?,
+            )
             .map_err(Error::from)
             .map(|_| ())
     }
