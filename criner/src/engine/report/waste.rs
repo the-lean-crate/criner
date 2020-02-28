@@ -48,11 +48,9 @@ impl Generator {
 
             for (vid, version) in c.versions.iter().enumerate() {
                 {
-                    let name = name.to_string();
-                    let version = version.to_string();
                     let key = (
-                        name.as_str(),
-                        version.as_str(),
+                        name.as_ref(),
+                        version.as_ref(),
                         &exrtaction_task_dummy,
                         dummy_extraction_result,
                     );
