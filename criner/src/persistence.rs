@@ -432,14 +432,22 @@ macro_rules! impl_ivec_transform {
     ($ty:ty) => {
         impl From<&[u8]> for $ty {
             fn from(b: &[u8]) -> Self {
-                rmp_serde::from_read_ref(b)
-                    .expect(concat!("migration to succeed: ", stringify!($ty)))
+                rmp_serde::from_read_ref(b).expect(&format!(
+                    concat!(
+                        "&[u8]: migration should succeed: ",
+                        stringify!($ty),
+                        "{:#?}"
+                    ),
+                    rmpv::decode::value::read_value(&mut std::io::Cursor::new(b)).unwrap()
+                ))
             }
         }
         impl From<IVec> for $ty {
             fn from(b: IVec) -> Self {
-                rmp_serde::from_read_ref(b.as_ref())
-                    .expect(concat!("migration to succeed: ", stringify!($ty)))
+                rmp_serde::from_read_ref(b.as_ref()).expect(&format!(
+                    concat!("IVec: migration should succeed: ", stringify!($ty), "{:#?}"),
+                    rmpv::decode::value::read_value(&mut std::io::Cursor::new(b)).unwrap()
+                ))
             }
         }
         impl From<$ty> for IVec {
