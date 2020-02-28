@@ -49,6 +49,7 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
             let mut object = repo.insert(std::str::from_utf8(&k).unwrap().to_string());
             object.write_all(v.as_ref())?;
             object.flush().unwrap();
+            drop(object);
             if count % commit_every == 0 {
                 log::info!("Committing {} objects…", commit_every);
                 repo.commit().unwrap();
