@@ -18,7 +18,7 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
                 "CREATE TABLE {} (
                   key             TEXT PRIMARY KEY,
                   data            BLOB NOT NULL
-                  )",
+                  ) WITHOUT ROWID",
                 tree_name_str
             ),
             params![],
