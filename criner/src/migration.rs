@@ -3,20 +3,21 @@ use std::path::Path;
 
 #[allow(dead_code)]
 pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
-    use rayon::prelude::*;
+    // use rayon::prelude::*;
     use rusqlite::{params, Connection};
     let db = sled::open(&db_path)?;
     let sqlite_db_path = std::path::Path::new("./criner.msgpack.sqlite");
     let tree_names: Vec<Vec<u8>> = db.tree_names().into_iter().map(|v| v.to_vec()).collect();
 
-    tree_names.into_par_iter().try_for_each(|tree_name| {
+    // tree_names.into_par_iter().try_for_each(|tree_name| {
+    for tree_name in tree_names {
         let tree_name_str = std::str::from_utf8(&tree_name).unwrap();
-        let repo = Connection::open(&sqlite_db_path).unwrap();
+        let mut repo = Connection::open(&sqlite_db_path).unwrap();
         repo.execute(
             &format!(
                 "CREATE TABLE {} (
-                  key             BLOB PRIMARY KEY,
-                  data            BLOB NOT NULL,
+                  key             TEXT PRIMARY KEY,
+                  data            BLOB NOT NULL
                   )",
                 tree_name_str
             ),
@@ -26,18 +27,23 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
 
         let tree = db.open_tree(&tree_name)?;
         let mut count = 0;
+        let transaction = repo.transaction().unwrap();
         for res in tree.iter() {
             let (k, v) = res?;
             count += 1;
             log::info!("{}: {}", tree_name_str, count);
-            repo.execute(
-                &format!("INSERT INTO {} (key, data) VALUES (?1, ?2)", tree_name_str),
-                params![k.as_ref(), v.as_ref()],
-            )
-            .unwrap();
+            transaction
+                .execute(
+                    &format!("INSERT INTO {} (key, data) VALUES (?1, ?2)", tree_name_str),
+                    params![std::str::from_utf8(k.as_ref()).unwrap(), v.as_ref()],
+                )
+                .unwrap();
         }
-        Ok(())
-    })
+        log::info!("about to commit one big transaction");
+        transaction.commit().unwrap();
+        log::info!("done");
+    }
+    Ok(())
 }
 
 pub fn migrate_fix_results_storage_type(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
