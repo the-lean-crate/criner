@@ -1,7 +1,46 @@
 use crate::persistence::TreeAccess;
-use std::{io::Write, path::Path};
+use std::path::Path;
 
+#[allow(dead_code)]
 pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
+    use rayon::prelude::*;
+    use rusqlite::{params, Connection};
+    let db = sled::open(&db_path)?;
+    let sqlite_db_path = std::path::Path::new("./criner.msgpack.sqlite");
+    let tree_names: Vec<Vec<u8>> = db.tree_names().into_iter().map(|v| v.to_vec()).collect();
+
+    tree_names.into_par_iter().try_for_each(|tree_name| {
+        let tree_name_str = std::str::from_utf8(&tree_name).unwrap();
+        let repo = Connection::open(&sqlite_db_path).unwrap();
+        repo.execute(
+            &format!(
+                "CREATE TABLE {} (
+                  key             BLOB PRIMARY KEY,
+                  data            BLOB NOT NULL,
+                  )",
+                tree_name_str
+            ),
+            params![],
+        )
+        .unwrap();
+
+        let tree = db.open_tree(&tree_name)?;
+        let mut count = 0;
+        for res in tree.iter() {
+            let (k, v) = res?;
+            count += 1;
+            log::info!("{}: {}", tree_name_str, count);
+            repo.execute(
+                &format!("INSERT INTO {} (key, data) VALUES (?1, ?2)", tree_name_str),
+                params![k.as_ref(), v.as_ref()],
+            )
+            .unwrap();
+        }
+        Ok(())
+    })
+}
+
+pub fn migrate_fix_results_storage_type(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
     use crate::model::{Task, TaskResult};
     type ResultType<'a> = (String, String, Task<'a>, TaskResult<'a>);
     let db = sled::open(db_path)?;
@@ -13,69 +52,6 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
         log::info!("{}", idx);
     }
     Ok(())
-}
-
-#[allow(dead_code)]
-pub fn migrate_sled_to_acid_store(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
-    use acid_store::store::Open;
-    use rayon::prelude::*;
-    acid_store::init();
-    let db = sled::open(&db_path)?;
-    let tree_names: Vec<Vec<u8>> = db.tree_names().into_iter().map(|v| v.to_vec()).collect();
-    tree_names.into_par_iter().try_for_each(|tree_name| {
-        let tree_name_str = std::str::from_utf8(&tree_name).unwrap();
-        if ["crates", "meta", "results"].contains(&tree_name_str) {
-            log::info!("Skipped {} - already done", tree_name_str);
-            return Ok::<_, crate::error::Error>(());
-        }
-
-        log::info!("Creating repository '{}'", tree_name_str);
-        let db_path: std::path::PathBuf = format!("{}.sqlite", tree_name_str).into();
-        let mut repo = if !db_path.exists() {
-            acid_store::repo::ObjectRepository::create_repo(
-                acid_store::store::SqliteStore::open(
-                    db_path.into(),
-                    acid_store::store::OpenOption::CREATE,
-                )
-                .unwrap(),
-                acid_store::repo::RepositoryConfig::default(),
-                None,
-            )
-        } else {
-            acid_store::repo::ObjectRepository::open_repo(
-                acid_store::store::SqliteStore::open(
-                    db_path.into(),
-                    acid_store::store::OpenOption::CREATE,
-                )
-                .unwrap(),
-                None,
-                acid_store::repo::LockStrategy::Abort,
-            )
-        }
-        .unwrap();
-
-        let tree = db.open_tree(&tree_name)?;
-        let mut count = 0;
-        let commit_every = 500;
-        for res in tree.iter() {
-            let (k, v) = res?;
-            count += 1;
-            log::info!("{}: {}", tree_name_str, count);
-            let mut object = repo.insert(std::str::from_utf8(&k).unwrap().to_string());
-            object.write_all(v.as_ref())?;
-            object.flush().unwrap();
-            drop(object);
-            if count % commit_every == 0 {
-                log::info!("Committing {} objects…", commit_every);
-                repo.commit().unwrap();
-                log::info!("Commit done");
-            }
-        }
-        log::info!("About to commit remaining objects (totalling {})", count);
-        repo.commit().unwrap();
-        log::info!("Commit done");
-        Ok(())
-    })
 }
 
 #[allow(dead_code)]
