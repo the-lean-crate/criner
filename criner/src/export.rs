@@ -81,7 +81,10 @@ impl<'a> SqlConvert for model::Crate<'a> {
     }
 
     fn insert(&self, key: &str, stm: &mut Statement<'_>) -> rusqlite::Result<usize> {
-        let name = key.split(crate::persistence::KEY_SEP_CHAR).next().unwrap();
+        let mut tokens = key.split(crate::persistence::KEY_SEP_CHAR);
+        let name = tokens.next().unwrap();
+        assert!(tokens.next().is_none());
+
         let Self { versions } = self;
         for version in versions.iter() {
             stm.execute(params![name, version.as_ref()])?;

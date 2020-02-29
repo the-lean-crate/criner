@@ -2,6 +2,9 @@
 
 ## Tasks
 
+* [ ] export all data into a flattened queryable sqlite database
+* [ ] also write data to sqlite when fetching
+  * [ ] experiment with SQLITE Pragmas: performance(journal_mode, journal_size, synchronous=0), read_uncommitted
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down
    * Futures has a wrapper to catch panics, even though we don't use it yet. A panic only brings down the future that panics, not the entire program.
 
