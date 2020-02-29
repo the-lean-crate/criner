@@ -71,8 +71,23 @@ pub enum SubCommands {
         /// Path to the possibly existing database. It's used to persist all mining results.
         db_path: PathBuf,
     },
+    /// Export all Criner data into a format friendly for exploration via SQL.
+    ///
+    /// Criner stores binary blobs internally and migrates them on the fly, which is optimized for raw performance.
+    /// It's also impractical for exploring the data by hand, so the exported data will explode all types into
+    /// tables with each column being a field. Foreign key relations are set accordingly to allow joins.
+    /// Use this to get an overview of what's available, and possibly contribute a report generator which implements
+    /// a query using raw data and writes it into reports.
+    #[structopt(display_order = 1)]
+    Export {
+        /// The path to the source database in sqlite format
+        input_db_path: PathBuf,
+
+        /// Path to which to write the exported data. If it exists the operation will fail.
+        export_db_path: PathBuf,
+    },
     #[cfg(feature = "migration")]
     /// A special purpose command only to be executed in special circumstances
-    #[structopt(display_order = 1)]
+    #[structopt(display_order = 9)]
     Migrate,
 }

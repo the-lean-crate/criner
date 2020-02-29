@@ -23,6 +23,10 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
     match cmd {
         #[cfg(feature = "migration")]
         Migrate => criner::migration::migrate("./criner.db"),
+        Export {
+            input_db_path,
+            export_db_path,
+        } => criner::export::run_blocking(input_db_path, export_db_path),
         Mine {
             repository,
             db_path,

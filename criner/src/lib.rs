@@ -7,6 +7,9 @@ extern crate quick_error;
 pub mod migration;
 
 pub mod error;
+pub use error::Error;
+
+pub mod export;
 pub(crate) mod model;
 pub(crate) mod persistence;
 pub(crate) mod utils;

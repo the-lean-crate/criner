@@ -28,6 +28,9 @@ quick_error! {
         Bug(d: &'static str) {
             display("{}", d)
         }
+        Message(d: String) {
+            display("{}", d)
+        }
         InvalidHeader(d: &'static str) {
             display("{}", d)
         }
@@ -63,6 +66,10 @@ quick_error! {
             cause(err)
         }
         ParseInt(err: std::num::ParseIntError) {
+            from()
+            cause(err)
+        }
+        Rusqlite(err: rusqlite::Error) {
             from()
             cause(err)
         }
