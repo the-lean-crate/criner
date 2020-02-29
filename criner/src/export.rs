@@ -14,7 +14,10 @@ pub fn run_blocking(
     }
     let mut input = Connection::open(source_db)?;
     let mut output = Connection::open(destination_db)?;
+
     transfer::<model::Crate>(&mut input, &mut output)?;
+    transfer::<model::Task>(&mut input, &mut output)?;
+
     Ok(())
 }
 
@@ -29,7 +32,7 @@ where
     let mut count = 0;
     let start = std::time::SystemTime::now();
     {
-        let mut ostm = transaction.prepare(T::insert_statement())?;
+        let mut ostm = transaction.prepare(T::replace_statement())?;
         for res in istm.query_map(NO_PARAMS, |r| {
             let key: String = r.get(0)?;
             let value: Vec<u8> = r.get(1)?;
@@ -54,15 +57,15 @@ where
 }
 
 trait SqlConvert {
-    fn insert_statement() -> &'static str;
+    fn replace_statement() -> &'static str;
     fn source_table_name() -> &'static str;
     fn init_table_statement() -> &'static str;
     fn insert(&self, key: &str, stm: &mut rusqlite::Statement) -> rusqlite::Result<usize>;
 }
 
 impl<'a> SqlConvert for model::Crate<'a> {
-    fn insert_statement() -> &'static str {
-        "INSERT INTO crates
+    fn replace_statement() -> &'static str {
+        "REPLACE INTO crates
                    (name, version)
             VALUES (?1,   ?2)"
     }
@@ -79,9 +82,47 @@ impl<'a> SqlConvert for model::Crate<'a> {
 
     fn insert(&self, key: &str, stm: &mut Statement<'_>) -> rusqlite::Result<usize> {
         let name = key.split(crate::persistence::KEY_SEP_CHAR).next().unwrap();
-        for version in self.versions.iter() {
+        let Self { versions } = self;
+        for version in versions.iter() {
             stm.execute(params![name, version.as_ref()])?;
         }
-        Ok(self.versions.len())
+        Ok(versions.len())
+    }
+}
+
+impl<'a> SqlConvert for model::Task<'a> {
+    fn replace_statement() -> &'static str {
+        "REPLACE INTO tasks
+                   (stored_at, process, version)
+            VALUES (?1,        ?2,      ?3)"
+    }
+    fn source_table_name() -> &'static str {
+        "tasks"
+    }
+    fn init_table_statement() -> &'static str {
+        // TODO: Add the actual key, and try to link it together with a version via foreign keys
+        "CREATE TABLE tasks (
+             stored_at         TIMESTAMP PRIMARY_KEY NOT NULL,
+             process           TEXT NOT NULL,
+             version          TEXT NOT NULL
+        )"
+    }
+
+    fn insert(&self, _key: &str, stm: &mut Statement<'_>) -> rusqlite::Result<usize> {
+        let Self {
+            stored_at,
+            process,
+            version,
+            state: _,
+        } = self;
+        stm.execute(params![
+            stored_at
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs() as u32,
+            process.as_ref(),
+            version.as_ref()
+        ])?;
+        Ok(1)
     }
 }
