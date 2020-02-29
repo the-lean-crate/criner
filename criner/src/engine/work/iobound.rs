@@ -4,8 +4,7 @@ use crate::{
     persistence::TreeAccess,
 };
 use bytesize::ByteSize;
-use std::path::Path;
-use std::{path::PathBuf, time::SystemTime};
+use std::{path::Path, path::PathBuf, time::SystemTime};
 use tokio::io::AsyncWriteExt;
 
 pub struct DownloadRequest {
@@ -59,6 +58,7 @@ pub async fn processor(
         let mut task = tasks.update(&key, |t| {
             t.process = dummy.process.clone();
             t.version = dummy.version.clone();
+            t.state = t.state.merged(&model::TaskState::InProgress(None));
         })?;
 
         progress.blocked(None);

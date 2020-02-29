@@ -50,6 +50,7 @@ pub async fn processor(
         let mut task = tasks.update(&key, |t| {
             t.process = dummy.process.clone();
             t.version = dummy.version.clone();
+            t.state = t.state.merged(&model::TaskState::InProgress(None));
         })?;
 
         let downloaded_crate = {

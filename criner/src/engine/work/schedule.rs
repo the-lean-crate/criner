@@ -112,7 +112,7 @@ async fn submit_single<'a, R>(
         progress.blocked(None);
     };
     match task.state {
-        InProgress => {
+        InProgress(_) => {
             if startup_time > task.stored_at {
                 configure();
                 channel.send(f()).await;

@@ -143,18 +143,26 @@ pub enum TaskState {
     /// Please note that this would be unsafe as we don't update tasks in case the user requests
     /// a shutdown or the program is killed.
     /// Thus we cleanup in-progress tasks by checking if their stored_at time is before the process startup time.
-    InProgress,
+    InProgress(Option<Vec<String>>),
 }
 
 impl TaskState {
     pub fn merged(&self, other: &TaskState) -> TaskState {
+        fn merge_vec(mut existing: Vec<String>, new: &Vec<String>) -> Vec<String> {
+            existing.extend(new.iter().map(|e| e.clone()));
+            existing
+        }
         use TaskState::*;
         match (self, other) {
             (AttemptsWithFailure(existing), AttemptsWithFailure(new)) => {
-                let mut merged = Vec::with_capacity(existing.len() + new.len());
-                merged.extend(existing.iter().map(|e| e.clone()));
-                merged.extend(new.iter().map(|e| e.clone()));
-                AttemptsWithFailure(merged)
+                AttemptsWithFailure(merge_vec(existing.clone(), new))
+            }
+            (AttemptsWithFailure(existing), InProgress(None)) => InProgress(Some(existing.clone())),
+            (AttemptsWithFailure(_), InProgress(Some(_))) => {
+                panic!("One must not create inProgress preloaded with failed attempts, I think :D")
+            }
+            (InProgress(Some(existing)), AttemptsWithFailure(other)) => {
+                AttemptsWithFailure(merge_vec(existing.clone(), other))
             }
             (_, other) => other.clone(),
         }
