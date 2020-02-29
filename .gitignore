@@ -15,3 +15,8 @@ criner/Cargo.lock
 **/*.rs.bk
 
 # End of https://www.gitignore.io/api/rust
+
+# Databases and assets
+/index-bare/
+/criner.db/
+/*.sqlite
