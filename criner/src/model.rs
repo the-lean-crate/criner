@@ -147,13 +147,13 @@ pub enum TaskState {
 }
 
 impl TaskState {
-    pub fn merged(&self, other: &TaskState) -> TaskState {
+    pub fn merge_with(&mut self, other: &TaskState) {
         fn merge_vec(mut existing: Vec<String>, new: &Vec<String>) -> Vec<String> {
             existing.extend(new.iter().map(|e| e.clone()));
             existing
         }
         use TaskState::*;
-        match (self, other) {
+        *self = match (&self, other) {
             (AttemptsWithFailure(existing), AttemptsWithFailure(new)) => {
                 AttemptsWithFailure(merge_vec(existing.clone(), new))
             }
@@ -165,7 +165,7 @@ impl TaskState {
                 AttemptsWithFailure(merge_vec(existing.clone(), other))
             }
             (_, other) => other.clone(),
-        }
+        };
     }
 }
 

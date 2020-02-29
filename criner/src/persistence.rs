@@ -142,21 +142,13 @@ pub trait TreeAccess {
     fn update(
         &self,
         key: impl AsRef<[u8]>,
-        f: impl Fn(&mut Self::StorageItem),
+        f: impl Fn(Self::StorageItem) -> Self::StorageItem,
     ) -> Result<Self::StorageItem> {
         self.tree()
             .update_and_fetch(key, |bytes: Option<&[u8]>| {
                 Some(match bytes {
-                    Some(bytes) => {
-                        let mut v = bytes.into();
-                        f(&mut v);
-                        v.into()
-                    }
-                    None => {
-                        let mut v = Self::StorageItem::default();
-                        f(&mut v);
-                        v.into()
-                    }
+                    Some(bytes) => f(bytes.into()).into(),
+                    None => f(Self::StorageItem::default()).into(),
                 })
             })?
             .map(From::from)
@@ -215,9 +207,9 @@ impl<'a> TreeAccess for TasksTree<'a> {
         let mut t = t.clone();
         t.stored_at = SystemTime::now();
         Some(match existing_item {
-            Some(existing_item) => {
-                let new_state = existing_item.state.merged(&t.state);
-                t.state = new_state;
+            Some(mut existing_item) => {
+                existing_item.state.merge_with(&t.state);
+                t.state = existing_item.state;
                 t
             }
             None => t,
@@ -336,7 +328,10 @@ impl<'a> TreeAccess for ContextTree<'a> {
 
 impl<'a> ContextTree<'a> {
     pub fn update_today(&self, f: impl Fn(&mut Context)) -> Result<Context> {
-        self.update(Self::key(&Context::default()), f)
+        self.update(Self::key(&Context::default()), |mut c| {
+            f(&mut c);
+            c
+        })
     }
 
     // NOTE: impl iterator is not allowed in traits unfortunately, but one could implement one manually

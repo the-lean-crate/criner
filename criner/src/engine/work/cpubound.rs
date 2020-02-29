@@ -47,10 +47,11 @@ pub async fn processor(
         persistence::TasksTree::key_to_buf(&kt, &mut key);
         dummy = kt.2;
 
-        let mut task = tasks.update(&key, |t| {
+        let mut task = tasks.update(&key, |mut t| {
             t.process = dummy.process.clone();
             t.version = dummy.version.clone();
-            t.state = t.state.merged(&model::TaskState::InProgress(None));
+            t.state.merge_with(&model::TaskState::InProgress(None));
+            t
         })?;
 
         let downloaded_crate = {
