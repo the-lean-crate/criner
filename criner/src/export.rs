@@ -6,25 +6,30 @@ pub fn run_blocking(
     source_db: impl AsRef<Path>,
     destination_db: impl AsRef<Path>,
 ) -> crate::error::Result<()> {
-    let input = Connection::open(source_db)?;
     if destination_db.as_ref().is_file() {
         return Err(crate::Error::Message(format!(
             "Destination database at '{}' does already exist - this is currently unsupported",
             destination_db.as_ref().display()
         )));
     }
-    let mut istm = input.prepare(&format!(
-        "SELECT key, data FROM {}",
-        model::Crate::source_table_name()
-    ))?;
-
+    let mut input = Connection::open(source_db)?;
     let mut output = Connection::open(destination_db)?;
-    output.execute(model::Crate::init_table_statement(), NO_PARAMS)?;
+    transfer::<model::Crate>(&mut input, &mut output)?;
+    Ok(())
+}
+
+fn transfer<T>(input: &mut Connection, output: &mut Connection) -> rusqlite::Result<()>
+where
+    // FIXME: How can one specify the From<&[u8]> type bound without having to specify 'a which prevents borrowing… Need local non-static lifetime
+    T: SqlConvert + From<Vec<u8>>,
+{
+    output.execute(T::init_table_statement(), NO_PARAMS)?;
+    let mut istm = input.prepare(&format!("SELECT key, data FROM {}", T::source_table_name()))?;
     let transaction = output.transaction()?;
     let mut count = 0;
     let start = std::time::SystemTime::now();
     {
-        let mut ostm = transaction.prepare(model::Crate::insert_statement())?;
+        let mut ostm = transaction.prepare(T::insert_statement())?;
         for res in istm.query_map(NO_PARAMS, |r| {
             let key: String = r.get(0)?;
             let value: Vec<u8> = r.get(1)?;
@@ -32,14 +37,16 @@ pub fn run_blocking(
         })? {
             count += 1;
             let (key, value) = res?;
-            let value: model::Crate = value.as_slice().into();
+            // TODO: value.as_slice() should work!
+            let value = T::from(value);
             value.insert(&key, &mut ostm)?;
         }
     }
     transaction.commit()?;
     log::info!(
-        "Inserted {} crates in {:?}s",
+        "Inserted {} {} in {:?}s",
         count,
+        T::source_table_name(),
         std::time::SystemTime::now().duration_since(start).unwrap()
     );
 
