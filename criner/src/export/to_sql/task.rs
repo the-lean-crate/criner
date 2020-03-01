@@ -3,13 +3,13 @@ use rusqlite::{params, Statement};
 
 impl<'a> SqlConvert for model::Task<'a> {
     fn replace_statement() -> &'static str {
-        "REPLACE INTO tasks
+        "REPLACE INTO task
                    (id, crate_name, crate_version, process, version, stored_at, state)
             VALUES (?1, ?2,         ?3,            ?4,      ?5,      ?6,        ?7); "
     }
     fn secondary_replace_statement() -> Option<&'static str> {
         Some(
-            "REPLACE INTO task_errors
+            "REPLACE INTO task_error
                         (parent_id, error)
                 VALUES  (?1       , ?2);",
         )
@@ -19,7 +19,7 @@ impl<'a> SqlConvert for model::Task<'a> {
     }
     fn init_table_statement() -> &'static str {
         "BEGIN;
-            CREATE TABLE tasks (
+            CREATE TABLE task (
                  id               INTEGER UNIQUE NOT NULL,
                  crate_name       TEXT NOT NULL,
                  crate_version    TEXT NOT NULL,
@@ -29,10 +29,10 @@ impl<'a> SqlConvert for model::Task<'a> {
                  state            TEXT NOT NULL,
                  PRIMARY KEY      (crate_name, crate_version, process, version)
             );
-            CREATE TABLE task_errors (
+            CREATE TABLE task_error (
                  parent_id        INTEGER NOT NULL,
                  error            TEXT NOT NULL,
-                 FOREIGN KEY (parent_id) REFERENCES tasks(id)
+                 FOREIGN KEY (parent_id) REFERENCES task(id)
             );
          COMMIT;"
     }

@@ -45,7 +45,7 @@ where
     let start = std::time::SystemTime::now();
     {
         if let Some(res) = T::convert_to_sql(&mut istm, &transaction) {
-            res?;
+            count = res?;
         } else {
             let mut ostm = transaction.prepare(T::replace_statement())?;
             let mut secondary_ostm = match T::secondary_replace_statement() {

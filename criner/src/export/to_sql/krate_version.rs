@@ -3,7 +3,7 @@ use rusqlite::{params, Statement};
 
 impl<'a> SqlConvert for model::CrateVersion<'a> {
     fn replace_statement() -> &'static str {
-        "REPLACE INTO crate_versions
+        "REPLACE INTO crate_version
                    (id, name, version, kind, checksum, features)
             VALUES (?1, ?2  , ?3     , ?4  , ?5      , ?6);
         "
@@ -11,7 +11,7 @@ impl<'a> SqlConvert for model::CrateVersion<'a> {
 
     fn secondary_replace_statement() -> Option<&'static str> {
         Some(
-            "REPLACE INTO crate_version_dependencies
+            "REPLACE INTO crate_version_dependency
                         (parent_id, name, required_version, features, optional, default_features, target, kind, package)
                 VALUES  (?1       , ?2  , ?3              , ?4      , ?5      , ?6              , ?7    , ?8  , ?9);",
         )
@@ -22,7 +22,7 @@ impl<'a> SqlConvert for model::CrateVersion<'a> {
     }
 
     fn init_table_statement() -> &'static str {
-        "CREATE TABLE crate_versions (
+        "CREATE TABLE crate_version (
             id                  INTEGER UNIQUE NOT NULL,
             name                TEXT NOT NULL,
             version             TEXT NOT NULL,
@@ -31,7 +31,7 @@ impl<'a> SqlConvert for model::CrateVersion<'a> {
             features            TEXT NOT NULL, -- JSON
             PRIMARY KEY (name, version)
         );
-        CREATE TABLE crate_version_dependencies (
+        CREATE TABLE crate_version_dependency (
              parent_id              INTEGER NOT NULL,
              name                   TEXT NOT NULL,
              required_version       TEXT NOT NULL,
@@ -41,7 +41,7 @@ impl<'a> SqlConvert for model::CrateVersion<'a> {
              target                 TEXT,
              kind                   TEXT,
              package                TEXT,
-             FOREIGN KEY (parent_id) REFERENCES crate_versions(id)
+             FOREIGN KEY (parent_id) REFERENCES crate_version(id)
         );
         "
     }

@@ -4,7 +4,7 @@ use rusqlite::{params, Statement};
 
 impl SqlConvert for model::Context {
     fn replace_statement() -> &'static str {
-        "INSERT INTO runtime_statistics
+        "INSERT INTO runtime_statistic
                 (sample_day, num_new_crate_versions, num_new_crates, dur_s_fetch_new_crate_versions)
          VALUES (?1        , ?2                    , ?3            , ?4);
         "
@@ -15,7 +15,7 @@ impl SqlConvert for model::Context {
     }
 
     fn init_table_statement() -> &'static str {
-        "CREATE TABLE runtime_statistics (
+        "CREATE TABLE runtime_statistic (
             sample_day                      TIMESTAMP NOT NULL,
             num_new_crate_versions          INTEGER NOT NULL,
             num_new_crates                  INTEGER NOT NULL,

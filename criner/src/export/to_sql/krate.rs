@@ -3,7 +3,7 @@ use rusqlite::{params, Statement};
 
 impl<'a> SqlConvert for model::Crate<'a> {
     fn replace_statement() -> &'static str {
-        "REPLACE INTO crates
+        "REPLACE INTO crate
                    (name, version)
             VALUES (?1,   ?2)"
     }
@@ -11,7 +11,7 @@ impl<'a> SqlConvert for model::Crate<'a> {
         "crates"
     }
     fn init_table_statement() -> &'static str {
-        "CREATE TABLE crates (
+        "CREATE TABLE crate (
              name           TEXT NOT NULL,
              version        TEXT NOT NULL,
              PRIMARY KEY (name, version)
