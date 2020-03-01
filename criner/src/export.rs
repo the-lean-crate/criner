@@ -32,15 +32,18 @@ where
     let start = std::time::SystemTime::now();
     {
         let mut ostm = transaction.prepare(T::replace_statement())?;
-        for res in istm.query_map(NO_PARAMS, |r| {
-            let key: String = r.get(0)?;
-            let value: Vec<u8> = r.get(1)?;
-            Ok((key, value))
-        })? {
+        for (uid, res) in istm
+            .query_map(NO_PARAMS, |r| {
+                let key: String = r.get(0)?;
+                let value: Vec<u8> = r.get(1)?;
+                Ok((key, value))
+            })?
+            .enumerate()
+        {
             count += 1;
             let (key, value) = res?;
             let value = T::from(value.as_slice());
-            value.insert(&key, &mut ostm)?;
+            value.insert(&key, uid as i32, &mut ostm)?;
         }
     }
     transaction.commit()?;
@@ -58,7 +61,12 @@ trait SqlConvert {
     fn replace_statement() -> &'static str;
     fn source_table_name() -> &'static str;
     fn init_table_statement() -> &'static str;
-    fn insert(&self, key: &str, stm: &mut rusqlite::Statement) -> rusqlite::Result<usize>;
+    fn insert(
+        &self,
+        key: &str,
+        uid: i32,
+        sstm: &mut rusqlite::Statement,
+    ) -> rusqlite::Result<usize>;
 }
 
 impl<'a> SqlConvert for model::Crate<'a> {
@@ -78,7 +86,7 @@ impl<'a> SqlConvert for model::Crate<'a> {
         )"
     }
 
-    fn insert(&self, key: &str, stm: &mut Statement<'_>) -> rusqlite::Result<usize> {
+    fn insert(&self, key: &str, _uid: i32, stm: &mut Statement<'_>) -> rusqlite::Result<usize> {
         let mut tokens = key.split(crate::persistence::KEY_SEP_CHAR);
         let name = tokens.next().unwrap();
         assert!(tokens.next().is_none());
@@ -94,8 +102,8 @@ impl<'a> SqlConvert for model::Crate<'a> {
 impl<'a> SqlConvert for model::Task<'a> {
     fn replace_statement() -> &'static str {
         "REPLACE INTO tasks
-                   (crate_name, crate_version, process, version, stored_at, state)
-            VALUES (?1,         ?2,            ?3,      ?4,      ?5,        ?6)"
+                   (id, crate_name, crate_version, process, version, stored_at, state)
+            VALUES (?1, ?2,         ?3,            ?4,      ?5,      ?6,        ?7)"
     }
     fn source_table_name() -> &'static str {
         "tasks"
@@ -103,18 +111,24 @@ impl<'a> SqlConvert for model::Task<'a> {
     fn init_table_statement() -> &'static str {
         "BEGIN;
         CREATE TABLE tasks (
+             id               INTEGER UNIQUE NOT NULL,
              crate_name       TEXT NOT NULL,
              crate_version    TEXT NOT NULL,
              process          TEXT NOT NULL,
              version          TEXT NOT NULL,
-             stored_at        TIMESTAMP PRIMARY_KEY NOT NULL,
+             stored_at        TIMESTAMP NOT NULL,
              state            TEXT NOT NULL,
              PRIMARY KEY      (crate_name, crate_version, process, version)
+        );
+        CREATE TABLE task_errors (
+             parent_task      INTEGER NOT NULL,
+             error            TEXT NOT NULL,
+             FOREIGN KEY (parent_task) REFERENCES tasks(id)
         );
         COMMIT;"
     }
 
-    fn insert(&self, key: &str, stm: &mut Statement<'_>) -> rusqlite::Result<usize> {
+    fn insert(&self, key: &str, uid: i32, stm: &mut Statement<'_>) -> rusqlite::Result<usize> {
         use model::TaskState::*;
         let mut tokens = key.split(crate::persistence::KEY_SEP_CHAR);
         let crate_name = tokens.next().unwrap();
@@ -129,6 +143,7 @@ impl<'a> SqlConvert for model::Task<'a> {
             state,
         } = self;
         stm.execute(params![
+            uid,
             crate_name,
             crate_version,
             process.as_ref(),
