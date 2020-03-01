@@ -468,21 +468,6 @@ macro_rules! impl_ivec_transform {
                 })
             }
         }
-        impl From<Vec<u8>> for $ty {
-            fn from(b: Vec<u8>) -> Self {
-                expect(rmp_serde::from_read(b.as_slice()), |e| {
-                    format!(
-                        concat!(
-                            "IVec: migration should succeed: ",
-                            stringify!($ty),
-                            "{:#?}: {}"
-                        ),
-                        rmpv::decode::value::read_value(&mut std::io::Cursor::new(b)).unwrap(),
-                        e
-                    )
-                })
-            }
-        }
         impl From<$ty> for IVec {
             fn from(c: $ty) -> Self {
                 rmp_serde::to_vec(&c)

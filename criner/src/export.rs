@@ -23,8 +23,7 @@ pub fn run_blocking(
 
 fn transfer<T>(input: &mut Connection, output: &mut Connection) -> rusqlite::Result<()>
 where
-    // FIXME: How can one specify the From<&[u8]> type bound without having to specify 'a which prevents borrowing… Need local non-static lifetime
-    T: SqlConvert + From<Vec<u8>>,
+    for<'a> T: SqlConvert + From<&'a [u8]>,
 {
     output.execute(T::init_table_statement(), NO_PARAMS)?;
     let mut istm = input.prepare(&format!("SELECT key, data FROM {}", T::source_table_name()))?;
@@ -40,8 +39,7 @@ where
         })? {
             count += 1;
             let (key, value) = res?;
-            // TODO: value.as_slice() should work!
-            let value = T::from(value);
+            let value = T::from(value.as_slice());
             value.insert(&key, &mut ostm)?;
         }
     }
