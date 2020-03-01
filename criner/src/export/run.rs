@@ -24,6 +24,8 @@ pub fn run_blocking(
     PRAGMA journal_mode = 'OFF' -- no journal, direct writes
 ",
     )?;
+
+    transfer::<model::TaskResult>(&mut input, &mut output)?;
     transfer::<model::Crate>(&mut input, &mut output)?;
     transfer::<model::Task>(&mut input, &mut output)?;
     transfer::<model::Context>(&mut input, &mut output)?;
@@ -42,23 +44,27 @@ where
     let mut count = 0;
     let start = std::time::SystemTime::now();
     {
-        let mut ostm = transaction.prepare(T::replace_statement())?;
-        let mut secondary_ostm = match T::secondary_replace_statement() {
-            Some(s) => Some(transaction.prepare(s)?),
-            None => None,
-        };
-        for (uid, res) in istm
-            .query_map(NO_PARAMS, |r| {
-                let key: String = r.get(0)?;
-                let value: Vec<u8> = r.get(1)?;
-                Ok((key, value))
-            })?
-            .enumerate()
-        {
-            count += 1;
-            let (key, value) = res?;
-            let value = T::from(value.as_slice());
-            value.insert(&key, uid as i32, &mut ostm, secondary_ostm.as_mut())?;
+        if let Some(res) = T::convert_to_sql(&mut istm, &transaction) {
+            res?;
+        } else {
+            let mut ostm = transaction.prepare(T::replace_statement())?;
+            let mut secondary_ostm = match T::secondary_replace_statement() {
+                Some(s) => Some(transaction.prepare(s)?),
+                None => None,
+            };
+            for (uid, res) in istm
+                .query_map(NO_PARAMS, |r| {
+                    let key: String = r.get(0)?;
+                    let value: Vec<u8> = r.get(1)?;
+                    Ok((key, value))
+                })?
+                .enumerate()
+            {
+                count += 1;
+                let (key, value) = res?;
+                let value = T::from(value.as_slice());
+                value.insert(&key, uid as i32, &mut ostm, secondary_ostm.as_mut())?;
+            }
         }
     }
     transaction.commit()?;

@@ -1,9 +1,16 @@
 mod krate;
 mod krate_version;
 mod meta;
+mod result;
 mod task;
 
 pub trait SqlConvert {
+    fn convert_to_sql(
+        _input_statement: &mut rusqlite::Statement,
+        _transaction: &rusqlite::Transaction,
+    ) -> Option<crate::error::Result<usize>> {
+        None
+    }
     fn replace_statement() -> &'static str;
     fn secondary_replace_statement() -> Option<&'static str> {
         None
