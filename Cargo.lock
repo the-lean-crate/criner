@@ -272,6 +272,7 @@ dependencies = [
  "jwalk",
  "libflate",
  "log",
+ "parking_lot",
  "prodash",
  "quick-error",
  "rayon",

@@ -46,3 +46,4 @@ rusqlite = { version = "0.21.0", features = ["bundled"] }
 
 # For 'export' functionality only (embed json in SQL text for simplicity)
 serde_json = "1.0.48"
+parking_lot = "0.10.0"

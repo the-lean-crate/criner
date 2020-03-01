@@ -7,6 +7,11 @@ use crate::{
 use sled::IVec;
 use std::time::SystemTime;
 
+/// Required as we send futures to threads. The type system can't statically prove that in fact
+/// these connections will only ever be created while already in the thread they should execute on.
+/// Also no one can prevent futures from being resumed in after having been send to a different thread.
+pub type ThreadSafeConnection = std::sync::Arc<parking_lot::Mutex<rusqlite::Connection>>;
+
 pub trait TreeAccess {
     type StorageItem: serde::Serialize + From<IVec> + Into<IVec> + for<'a> From<&'a [u8]> + Default;
     type InsertItem;
@@ -72,7 +77,7 @@ pub trait TreeAccess {
 }
 
 pub struct TasksTree<'a> {
-    pub inner: &'a sled::Tree,
+    pub inner: (&'a sled::Tree, ThreadSafeConnection),
 }
 
 impl<'a> TreeAccess for TasksTree<'a> {
@@ -81,7 +86,7 @@ impl<'a> TreeAccess for TasksTree<'a> {
     type InsertResult = Task<'a>;
 
     fn tree(&self) -> &sled::Tree {
-        self.inner
+        self.inner.0
     }
 
     fn key_to_buf((name, version, t): &Self::InsertItem, buf: &mut Vec<u8>) {
@@ -116,7 +121,7 @@ impl<'a> TreeAccess for TasksTree<'a> {
 // as we currently use symlinks to mark completed HTML pages.
 #[allow(dead_code)]
 pub struct ReportsTree<'a> {
-    inner: &'a sled::Tree,
+    inner: (&'a sled::Tree, ThreadSafeConnection),
 }
 
 #[allow(dead_code)]
@@ -134,15 +139,15 @@ impl<'a> ReportsTree<'a> {
         .into()
     }
     pub fn is_done(&self, key: impl AsRef<[u8]>) -> bool {
-        self.inner.contains_key(key).unwrap_or(false)
+        self.inner.0.contains_key(key).unwrap_or(false)
     }
     pub fn set_done(&self, key: impl AsRef<[u8]>) {
-        self.inner.insert(key, ReportResult::Done).ok();
+        self.inner.0.insert(key, ReportResult::Done).ok();
     }
 }
 
 pub struct TaskResultTree<'a> {
-    pub inner: &'a sled::Tree,
+    pub inner: (&'a sled::Tree, ThreadSafeConnection),
 }
 
 impl<'a> TreeAccess for TaskResultTree<'a> {
@@ -151,7 +156,7 @@ impl<'a> TreeAccess for TaskResultTree<'a> {
     type InsertResult = ();
 
     fn tree(&self) -> &sled::Tree {
-        self.inner
+        self.inner.0
     }
 
     fn key_to_buf(v: &(&str, &str, &Task, TaskResult<'a>), buf: &mut Vec<u8>) {
@@ -176,7 +181,7 @@ impl<'a> TreeAccess for TaskResultTree<'a> {
 }
 
 pub struct ContextTree<'a> {
-    pub inner: &'a sled::Tree,
+    pub inner: (&'a sled::Tree, ThreadSafeConnection),
 }
 
 impl<'a> TreeAccess for ContextTree<'a> {
@@ -185,7 +190,7 @@ impl<'a> TreeAccess for ContextTree<'a> {
     type InsertResult = ();
 
     fn tree(&self) -> &sled::Tree {
-        self.inner
+        self.inner.0
     }
 
     fn key_to_buf(_item: &Self::InsertItem, buf: &mut Vec<u8>) {
@@ -222,7 +227,7 @@ impl<'a> ContextTree<'a> {
 
     // NOTE: impl iterator is not allowed in traits unfortunately, but one could implement one manually
     pub fn iter(&self) -> impl DoubleEndedIterator<Item = Result<(String, Context)>> {
-        self.inner.iter().map(|r| {
+        self.inner.0.iter().map(|r| {
             r.map(|(k, v)| {
                 (
                     String::from_utf8(k.as_ref().to_vec()).expect("utf8"),
@@ -236,7 +241,7 @@ impl<'a> ContextTree<'a> {
 
 #[derive(Clone)]
 pub struct CratesTree<'a> {
-    pub inner: &'a sled::Tree,
+    pub inner: (&'a sled::Tree, ThreadSafeConnection),
 }
 
 impl<'a> TreeAccess for CratesTree<'a> {
@@ -245,7 +250,7 @@ impl<'a> TreeAccess for CratesTree<'a> {
     type InsertResult = bool;
 
     fn tree(&self) -> &sled::Tree {
-        self.inner
+        self.inner.0
     }
 
     fn key_to_buf(item: &crates_index_diff::CrateVersion, buf: &mut Vec<u8>) {
@@ -283,7 +288,7 @@ impl<'a> TreeAccess for CratesTree<'a> {
 
 #[derive(Clone)]
 pub struct CrateVersionsTree<'a> {
-    pub inner: &'a sled::Tree,
+    pub inner: (&'a sled::Tree, ThreadSafeConnection),
 }
 
 impl<'a> TreeAccess for CrateVersionsTree<'a> {
@@ -292,7 +297,7 @@ impl<'a> TreeAccess for CrateVersionsTree<'a> {
     type InsertResult = ();
 
     fn tree(&self) -> &sled::Tree {
-        self.inner
+        self.inner.0
     }
 
     fn key_to_buf(v: &crates_index_diff::CrateVersion, buf: &mut Vec<u8>) {
