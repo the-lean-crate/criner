@@ -48,3 +48,11 @@ impl<'a> Keyed for TaskResult<'a> {
         }
     }
 }
+
+impl<'a> CrateVersion<'a> {
+    pub fn key_from(name: &str, version: &str, buf: &mut Vec<u8>) {
+        buf.extend_from_slice(&name.as_bytes());
+        buf.push(KEY_SEP);
+        buf.extend_from_slice(&version.as_bytes());
+    }
+}
