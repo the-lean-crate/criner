@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::Result;
 
 /// A processor that can do anything, as it takes a future and returns its result
 pub async fn processor<T>(

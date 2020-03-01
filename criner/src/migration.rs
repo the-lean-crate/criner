@@ -1,7 +1,7 @@
 use crate::persistence::TreeAccess;
 use std::path::Path;
 
-pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
+pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
     // use rayon::prelude::*;
     use rusqlite::{params, Connection};
     let db = sled::open(&db_path)?;
@@ -49,9 +49,7 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
 }
 
 #[allow(dead_code)]
-pub fn migrate_remove_task_by_type_from_sled(
-    db_path: impl AsRef<Path>,
-) -> crate::error::Result<()> {
+pub fn migrate_remove_task_by_type_from_sled(db_path: impl AsRef<Path>) -> crate::Result<()> {
     let db = crate::persistence::Db::open(&db_path)?;
     let tasks = db.tasks();
     let tasks_tree = tasks.tree();
@@ -64,7 +62,7 @@ pub fn migrate_remove_task_by_type_from_sled(
     Ok(())
 }
 
-pub fn migrate_fix_results_storage_type(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
+pub fn migrate_fix_results_storage_type(db_path: impl AsRef<Path>) -> crate::Result<()> {
     use crate::model::{Task, TaskResult};
     type ResultType<'a> = (String, String, Task<'a>, TaskResult<'a>);
     let db = sled::open(db_path)?;
@@ -81,7 +79,7 @@ pub fn migrate_fix_results_storage_type(db_path: impl AsRef<Path>) -> crate::err
 #[allow(dead_code)]
 pub fn migrate_old_to_new_manually_and_by_pruning_trees(
     db_path: impl AsRef<Path>,
-) -> crate::error::Result<()> {
+) -> crate::Result<()> {
     use sled as old_sled;
     log::info!("opening old db");
     let old_db = old_sled::open(db_path.as_ref()).unwrap();
@@ -104,9 +102,7 @@ pub fn migrate_old_to_new_manually_and_by_pruning_trees(
 }
 
 #[allow(dead_code)]
-pub fn migrate_old_version_to_new_version_of_sled(
-    db_path: impl AsRef<Path>,
-) -> crate::error::Result<()> {
+pub fn migrate_old_version_to_new_version_of_sled(db_path: impl AsRef<Path>) -> crate::Result<()> {
     use sled as old_sled;
     log::info!("opening old db");
     let old_db = old_sled::open(db_path.as_ref()).unwrap();
@@ -121,7 +117,7 @@ pub fn migrate_old_version_to_new_version_of_sled(
 #[allow(dead_code)]
 fn migrate_transform_tree_data_that_was_not_necessary_actually(
     db_path: impl AsRef<Path>,
-) -> crate::error::Result<()> {
+) -> crate::Result<()> {
     let db = crate::persistence::Db::open(&db_path)?;
     for (k, v) in db.tasks().tree().iter().filter_map(Result::ok) {
         let ks = String::from_utf8(k.to_vec()).unwrap();
@@ -138,7 +134,7 @@ fn migrate_transform_tree_data_that_was_not_necessary_actually(
 }
 
 #[allow(dead_code)]
-fn migrate_iterate_assets_and_update_db(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
+fn migrate_iterate_assets_and_update_db(db_path: impl AsRef<Path>) -> crate::Result<()> {
     let assets_dir = db_path.as_ref().join("assets");
     let db = crate::persistence::Db::open(&db_path)?;
     let results = db.results();

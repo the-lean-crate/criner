@@ -7,7 +7,7 @@ extern crate quick_error;
 pub mod migration;
 
 pub mod error;
-pub use error::Error;
+pub use error::{Error, Result};
 
 pub mod export;
 pub(crate) mod model;

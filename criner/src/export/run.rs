@@ -6,7 +6,7 @@ use std::path::Path;
 pub fn run_blocking(
     source_db: impl AsRef<Path>,
     destination_db: impl AsRef<Path>,
-) -> crate::error::Result<()> {
+) -> crate::Result<()> {
     if destination_db.as_ref().is_file() {
         return Err(crate::Error::Message(format!(
             "Destination database at '{}' does already exist - this is currently unsupported",
@@ -34,7 +34,7 @@ pub fn run_blocking(
     Ok(())
 }
 
-fn transfer<T>(input: &mut Connection, output: &mut Connection) -> crate::error::Result<()>
+fn transfer<T>(input: &mut Connection, output: &mut Connection) -> crate::Result<()>
 where
     for<'a> T: SqlConvert + From<&'a [u8]>,
 {

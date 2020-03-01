@@ -24,7 +24,7 @@ impl<'a> SqlConvert for model::Crate<'a> {
         _uid: i32,
         stm: &mut Statement<'_>,
         _sstm: Option<&mut rusqlite::Statement<'_>>,
-    ) -> crate::error::Result<usize> {
+    ) -> crate::Result<usize> {
         let mut tokens = key.split(crate::persistence::KEY_SEP_CHAR);
         let name = tokens.next().unwrap();
         assert!(tokens.next().is_none());

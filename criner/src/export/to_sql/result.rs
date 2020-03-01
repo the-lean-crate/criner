@@ -6,7 +6,7 @@ impl<'a> SqlConvert for model::TaskResult<'a> {
     fn convert_to_sql(
         istm: &mut rusqlite::Statement,
         transaction: &rusqlite::Transaction,
-    ) -> Option<crate::error::Result<usize>> {
+    ) -> Option<crate::Result<usize>> {
         let res = (|| {
             let mut num_downloads = 0;
             let mut num_extract_crates = 0;
@@ -187,7 +187,7 @@ impl<'a> SqlConvert for model::TaskResult<'a> {
         _uid: i32,
         _stm: &mut Statement<'_>,
         _sstm: Option<&mut Statement<'_>>,
-    ) -> crate::error::Result<usize> {
+    ) -> crate::Result<usize> {
         unimplemented!("we implement convert_to_sql instead (having our own loop and unlimited prepared statements")
     }
 }

@@ -43,7 +43,7 @@ impl<'a> SqlConvert for model::Task<'a> {
         uid: i32,
         stm: &mut Statement<'_>,
         sstm: Option<&mut rusqlite::Statement<'_>>,
-    ) -> crate::error::Result<usize> {
+    ) -> crate::Result<usize> {
         use model::TaskState::*;
         let mut tokens = key.split(crate::persistence::KEY_SEP_CHAR);
         let crate_name = tokens.next().unwrap();

@@ -52,7 +52,7 @@ impl<'a> SqlConvert for model::CrateVersion<'a> {
         uid: i32,
         stm: &mut Statement<'_>,
         sstm: Option<&mut Statement<'_>>,
-    ) -> crate::error::Result<usize> {
+    ) -> crate::Result<usize> {
         let model::CrateVersion {
             name,
             kind,
