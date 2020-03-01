@@ -71,7 +71,7 @@ pub enum SubCommands {
         /// Path to the possibly existing database. It's used to persist all mining results.
         db_path: PathBuf,
     },
-    /// Export all Criner data into a format friendly for exploration via SQL.
+    /// Export all Criner data into a format friendly for exploration via SQL, best viewed with https://sqlitebrowser.org
     ///
     /// Criner stores binary blobs internally and migrates them on the fly, which is optimized for raw performance.
     /// It's also impractical for exploring the data by hand, so the exported data will explode all types into

@@ -1,4 +1,5 @@
 mod krate;
+mod krate_version;
 mod meta;
 mod task;
 
