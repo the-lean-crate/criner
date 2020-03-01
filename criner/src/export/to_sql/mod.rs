@@ -1,4 +1,5 @@
 mod krate;
+mod meta;
 mod task;
 
 pub trait SqlConvert {

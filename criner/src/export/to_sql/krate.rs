@@ -1,5 +1,4 @@
-use super::SqlConvert;
-use crate::model;
+use crate::{export::to_sql::SqlConvert, model};
 use rusqlite::{params, Statement};
 
 impl<'a> SqlConvert for model::Crate<'a> {

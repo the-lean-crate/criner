@@ -26,6 +26,7 @@ pub fn run_blocking(
     )?;
     transfer::<model::Crate>(&mut input, &mut output)?;
     transfer::<model::Task>(&mut input, &mut output)?;
+    transfer::<model::Context>(&mut input, &mut output)?;
 
     Ok(())
 }

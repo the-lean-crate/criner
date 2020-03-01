@@ -1,5 +1,4 @@
-use super::SqlConvert;
-use crate::model;
+use crate::{export::to_sql::SqlConvert, model};
 use rusqlite::{params, Statement};
 
 impl<'a> SqlConvert for model::Task<'a> {
@@ -67,7 +66,7 @@ impl<'a> SqlConvert for model::Task<'a> {
             stored_at
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
-                .as_secs() as u32,
+                .as_secs() as i64,
             match state {
                 NotStarted => "NotStarted",
                 Complete => "Complete",
