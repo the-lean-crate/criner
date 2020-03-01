@@ -74,7 +74,7 @@ impl<'a> SqlConvert for model::Crate<'a> {
         "CREATE TABLE crates (
              name           TEXT NOT NULL,
              version        TEXT NOT NULL,
-          CONSTRAINT con_primary_name PRIMARY KEY (name, version)
+             PRIMARY KEY (name, version)
         )"
     }
 
@@ -109,7 +109,7 @@ impl<'a> SqlConvert for model::Task<'a> {
              version          TEXT NOT NULL,
              stored_at        TIMESTAMP PRIMARY_KEY NOT NULL,
              state            TEXT NOT NULL,
-          CONSTRAINT con_primary_name PRIMARY KEY (crate_name, crate_version, process, version)
+             PRIMARY KEY      (crate_name, crate_version, process, version)
         );
         COMMIT;"
     }
@@ -128,7 +128,7 @@ impl<'a> SqlConvert for model::Task<'a> {
             version,
             state,
         } = self;
-        let row_id = stm.insert(params![
+        stm.execute(params![
             crate_name,
             crate_version,
             process.as_ref(),
@@ -145,7 +145,7 @@ impl<'a> SqlConvert for model::Task<'a> {
             }
         ])?;
         match state {
-            InProgress(Some(errors)) | AttemptsWithFailure(errors) => {},
+            InProgress(Some(errors)) | AttemptsWithFailure(errors) => {}
             _ => {}
         }
         Ok(1)
