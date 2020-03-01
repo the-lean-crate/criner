@@ -9,9 +9,9 @@ impl<'a> SqlConvert for model::Task<'a> {
     }
     fn secondary_replace_statement() -> Option<&'static str> {
         Some(
-            "replace into task_errors
-                        (parent_task, error)
-                VALUES  (?1,          ?2);",
+            "REPLACE INTO task_errors
+                        (parent_id, error)
+                VALUES  (?1       , ?2);",
         )
     }
     fn source_table_name() -> &'static str {
@@ -30,9 +30,9 @@ impl<'a> SqlConvert for model::Task<'a> {
                  PRIMARY KEY      (crate_name, crate_version, process, version)
             );
             CREATE TABLE task_errors (
-                 parent_task      INTEGER NOT NULL,
+                 parent_id        INTEGER NOT NULL,
                  error            TEXT NOT NULL,
-                 FOREIGN KEY (parent_task) REFERENCES tasks(id)
+                 FOREIGN KEY (parent_id) REFERENCES tasks(id)
             );
          COMMIT;"
     }
