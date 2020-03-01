@@ -94,22 +94,30 @@ impl<'a> SqlConvert for model::Crate<'a> {
 impl<'a> SqlConvert for model::Task<'a> {
     fn replace_statement() -> &'static str {
         "REPLACE INTO tasks
-                   (stored_at, process, version)
-            VALUES (?1,        ?2,      ?3)"
+                   (crate_name, crate_version, process, version, stored_at)
+            VALUES (?1,         ?2,            ?3,      ?4,      ?5)"
     }
     fn source_table_name() -> &'static str {
         "tasks"
     }
     fn init_table_statement() -> &'static str {
-        // TODO: Add the actual key, and try to link it together with a version via foreign keys
         "CREATE TABLE tasks (
-             stored_at         TIMESTAMP PRIMARY_KEY NOT NULL,
-             process           TEXT NOT NULL,
-             version          TEXT NOT NULL
+             crate_name       TEXT NOT NULL,
+             crate_version    TEXT NOT NULL,
+             process          TEXT NOT NULL,
+             version          TEXT NOT NULL,
+             stored_at        TIMESTAMP PRIMARY_KEY NOT NULL,
+          CONSTRAINT con_primary_name PRIMARY KEY (crate_name, crate_version, process, version)
         )"
     }
 
-    fn insert(&self, _key: &str, stm: &mut Statement<'_>) -> rusqlite::Result<usize> {
+    fn insert(&self, key: &str, stm: &mut Statement<'_>) -> rusqlite::Result<usize> {
+        let mut tokens = key.split(crate::persistence::KEY_SEP_CHAR);
+        let crate_name = tokens.next().unwrap();
+        let crate_version = tokens.next().unwrap();
+        let _process_name = tokens.next().unwrap();
+        assert!(tokens.next().is_none());
+
         let Self {
             stored_at,
             process,
@@ -117,12 +125,14 @@ impl<'a> SqlConvert for model::Task<'a> {
             state: _,
         } = self;
         stm.execute(params![
+            crate_name,
+            crate_version,
+            process.as_ref(),
+            version.as_ref(),
             stored_at
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_secs() as u32,
-            process.as_ref(),
-            version.as_ref()
         ])?;
         Ok(1)
     }
