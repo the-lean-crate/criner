@@ -25,7 +25,7 @@ fn transfer<T>(input: &mut Connection, output: &mut Connection) -> rusqlite::Res
 where
     for<'a> T: SqlConvert + From<&'a [u8]>,
 {
-    output.execute(T::init_table_statement(), NO_PARAMS)?;
+    output.execute_batch(T::init_table_statement())?;
     let mut istm = input.prepare(&format!("SELECT key, data FROM {}", T::source_table_name()))?;
     let transaction = output.transaction()?;
     let mut count = 0;
@@ -94,24 +94,28 @@ impl<'a> SqlConvert for model::Crate<'a> {
 impl<'a> SqlConvert for model::Task<'a> {
     fn replace_statement() -> &'static str {
         "REPLACE INTO tasks
-                   (crate_name, crate_version, process, version, stored_at)
-            VALUES (?1,         ?2,            ?3,      ?4,      ?5)"
+                   (crate_name, crate_version, process, version, stored_at, state)
+            VALUES (?1,         ?2,            ?3,      ?4,      ?5,        ?6)"
     }
     fn source_table_name() -> &'static str {
         "tasks"
     }
     fn init_table_statement() -> &'static str {
-        "CREATE TABLE tasks (
+        "BEGIN;
+        CREATE TABLE tasks (
              crate_name       TEXT NOT NULL,
              crate_version    TEXT NOT NULL,
              process          TEXT NOT NULL,
              version          TEXT NOT NULL,
              stored_at        TIMESTAMP PRIMARY_KEY NOT NULL,
+             state            TEXT NOT NULL,
           CONSTRAINT con_primary_name PRIMARY KEY (crate_name, crate_version, process, version)
-        )"
+        );
+        COMMIT;"
     }
 
     fn insert(&self, key: &str, stm: &mut Statement<'_>) -> rusqlite::Result<usize> {
+        use model::TaskState::*;
         let mut tokens = key.split(crate::persistence::KEY_SEP_CHAR);
         let crate_name = tokens.next().unwrap();
         let crate_version = tokens.next().unwrap();
@@ -122,9 +126,9 @@ impl<'a> SqlConvert for model::Task<'a> {
             stored_at,
             process,
             version,
-            state: _,
+            state,
         } = self;
-        stm.execute(params![
+        let row_id = stm.insert(params![
             crate_name,
             crate_version,
             process.as_ref(),
@@ -133,7 +137,17 @@ impl<'a> SqlConvert for model::Task<'a> {
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_secs() as u32,
+            match state {
+                NotStarted => "NotStarted",
+                Complete => "Complete",
+                InProgress(_) => "InProgress",
+                AttemptsWithFailure(_) => "AttemptsWithFailure",
+            }
         ])?;
+        match state {
+            InProgress(Some(errors)) | AttemptsWithFailure(errors) => {},
+            _ => {}
+        }
         Ok(1)
     }
 }
