@@ -1,7 +1,6 @@
 use crate::persistence::TreeAccess;
 use std::path::Path;
 
-#[allow(dead_code)]
 pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
     // use rayon::prelude::*;
     use rusqlite::{params, Connection};
@@ -12,6 +11,9 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
     // tree_names.into_par_iter().try_for_each(|tree_name| {
     for tree_name in tree_names {
         let tree_name_str = std::str::from_utf8(&tree_name).unwrap();
+        if tree_name_str == "__sled__default" {
+            continue;
+        }
         let mut repo = Connection::open(&sqlite_db_path).unwrap();
         repo.execute(
             &format!(
@@ -42,6 +44,22 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::error::Result<()> {
         log::info!("about to commit one big transaction");
         transaction.commit().unwrap();
         log::info!("done");
+    }
+    Ok(())
+}
+
+#[allow(dead_code)]
+pub fn migrate_remove_task_by_type_from_sled(
+    db_path: impl AsRef<Path>,
+) -> crate::error::Result<()> {
+    let db = crate::persistence::Db::open(&db_path)?;
+    let tasks = db.tasks();
+    let tasks_tree = tasks.tree();
+    for (k, _v) in tasks_tree.iter().filter_map(Result::ok) {
+        let ks = String::from_utf8(k.to_vec()).unwrap();
+        if ks.ends_with("extract_crate") {
+            tasks_tree.remove(k)?;
+        }
     }
     Ok(())
 }

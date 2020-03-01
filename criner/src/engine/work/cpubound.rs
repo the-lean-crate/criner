@@ -90,7 +90,7 @@ pub async fn processor(
                     p.file_stem()
                         .and_then(|stem| stem.to_str().map(str::to_lowercase))
                 }) {
-                    let interesting_files = ["cargo", "cargo", "readme", "license"];
+                    let interesting_files = ["cargo", "cargo", "readme", "license", "build"];
                     if interesting_files.contains(&stem_lowercase.as_str()) {
                         file_count += 1;
                         buf.clear();
