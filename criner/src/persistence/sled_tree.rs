@@ -58,9 +58,9 @@ pub trait TreeAccess {
             })?
             .map(From::from)
             .ok_or_else(|| Error::Bug("We always set a value"));
-        let new_value = self
-            .connection()
-            .lock()
+        let mut guard = self.connection().lock();
+        let transaction = guard.savepoint()?;
+        let new_value = transaction
             .query_row(
                 &format!(
                     "SELECT data FROM {} WHERE key = '{}'",
@@ -73,7 +73,7 @@ pub trait TreeAccess {
             .optional()?
             .map_or_else(Self::StorageItem::default, |d| f(d.as_slice().into()));
         // NOTE: Copied from insert - can't use it now as it also inserts to sled.
-        self.connection().lock().execute(
+        transaction.execute(
             &format!(
                 "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
                 self.table_name()
