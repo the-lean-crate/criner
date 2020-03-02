@@ -4,7 +4,7 @@ use crate::{
     persistence::{Keyed, KEY_SEP},
     Error, Result,
 };
-use rusqlite::params;
+use rusqlite::{params, OptionalExtension, NO_PARAMS};
 use sled::IVec;
 use std::time::SystemTime;
 
@@ -48,15 +48,39 @@ pub trait TreeAccess {
         key: impl AsRef<[u8]>,
         f: impl Fn(Self::StorageItem) -> Self::StorageItem,
     ) -> Result<Self::StorageItem> {
-        self.tree()
-            .update_and_fetch(key, |bytes: Option<&[u8]>| {
+        let res = self
+            .tree()
+            .update_and_fetch(key.as_ref(), |bytes: Option<&[u8]>| {
                 Some(match bytes {
                     Some(bytes) => f(bytes.into()).into(),
                     None => f(Self::StorageItem::default()).into(),
                 })
             })?
             .map(From::from)
-            .ok_or_else(|| Error::Bug("We always set a value"))
+            .ok_or_else(|| Error::Bug("We always set a value"));
+        let new_value = self
+            .connection()
+            .lock()
+            .query_row(
+                &format!(
+                    "SELECT data FROM {} WHERE key = '{}'",
+                    self.table_name(),
+                    std::str::from_utf8(key.as_ref()).expect("utf8-keys")
+                ),
+                NO_PARAMS,
+                |r| r.get::<_, Vec<u8>>(0),
+            )
+            .optional()?
+            .map_or_else(Self::StorageItem::default, |d| f(d.as_slice().into()));
+        // NOTE: Copied from insert - can't use it now as it also inserts to sled.
+        self.connection().lock().execute(
+            &format!(
+                "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
+                self.table_name()
+            ),
+            params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
+        )?;
+        return res;
     }
 
     /// Similar to 'update', but provides full control over the default
