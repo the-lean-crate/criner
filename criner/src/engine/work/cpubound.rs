@@ -29,8 +29,8 @@ pub async fn processor(
 
     let mut key = Vec::with_capacity(32);
     let mut dummy = default_persisted_extraction_task();
-    let tasks = db.tasks();
-    let results = db.results();
+    let tasks = db.open_tasks()?;
+    let results = db.open_results()?;
 
     while let Some(ExtractRequest {
         download_task,

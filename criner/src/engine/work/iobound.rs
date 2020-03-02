@@ -33,8 +33,8 @@ pub async fn processor(
 ) -> Result<()> {
     let mut dummy = default_persisted_download_task();
     let mut key = Vec::with_capacity(32);
-    let tasks = db.tasks();
-    let results = db.results();
+    let tasks = db.open_tasks()?;
+    let results = db.open_results()?;
     let client = reqwest::ClientBuilder::new()
         .connect_timeout(std::time::Duration::from_secs(120))
         .gzip(true)

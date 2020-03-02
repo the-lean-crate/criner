@@ -209,7 +209,8 @@ fn context_stream(db: &Db, start_of_computation: SystemTime) -> impl futures::St
     prodash::tui::ticker(Duration::from_secs(1)).map({
         let db = db.clone();
         move |_| {
-            db.context()
+            db.open_context()
+                .unwrap()
                 .iter()
                 .next_back()
                 .and_then(Result::ok)

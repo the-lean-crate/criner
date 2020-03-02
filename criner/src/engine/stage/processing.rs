@@ -48,7 +48,7 @@ pub async fn process(
         )?;
     }
 
-    let versions = db.crate_versions();
+    let versions = db.open_crate_versions()?;
     let num_versions = versions.tree().len();
     progress.init(Some(num_versions as u32), Some("crate versions"));
     for (vid, res) in versions
@@ -61,7 +61,7 @@ pub async fn process(
         progress.set((vid + 1) as u32);
         progress.blocked(None);
         work::schedule::tasks(
-            db.tasks(),
+            db.open_tasks()?,
             &version,
             progress.add_child(format!("schedule {}", version.key_string()?)),
             work::schedule::Scheduling::AtLeastOne,

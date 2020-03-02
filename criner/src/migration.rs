@@ -51,7 +51,7 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
 #[allow(dead_code)]
 pub fn migrate_remove_task_by_type_from_sled(db_path: impl AsRef<Path>) -> crate::Result<()> {
     let db = crate::persistence::Db::open(&db_path)?;
-    let tasks = db.tasks();
+    let tasks = db.open_tasks()?;
     let tasks_tree = tasks.tree();
     for (k, _v) in tasks_tree.iter().filter_map(Result::ok) {
         let ks = String::from_utf8(k.to_vec()).unwrap();
@@ -119,7 +119,7 @@ fn migrate_transform_tree_data_that_was_not_necessary_actually(
     db_path: impl AsRef<Path>,
 ) -> crate::Result<()> {
     let db = crate::persistence::Db::open(&db_path)?;
-    for (k, v) in db.tasks().tree().iter().filter_map(Result::ok) {
+    for (k, v) in db.open_tasks()?.tree().iter().filter_map(Result::ok) {
         let ks = String::from_utf8(k.to_vec()).unwrap();
         let t: crate::model::Task = v.into();
         assert_eq!(t.version, "1.0.0");
@@ -137,7 +137,7 @@ fn migrate_transform_tree_data_that_was_not_necessary_actually(
 fn migrate_iterate_assets_and_update_db(db_path: impl AsRef<Path>) -> crate::Result<()> {
     let assets_dir = db_path.as_ref().join("assets");
     let db = crate::persistence::Db::open(&db_path)?;
-    let results = db.results();
+    let results = db.open_results()?;
     let task = crate::engine::work::iobound::default_persisted_download_task();
 
     for entry in jwalk::WalkDir::new(assets_dir)

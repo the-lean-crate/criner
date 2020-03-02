@@ -38,7 +38,7 @@ impl Generator {
             entries_meta_data: Default::default(),
             selected_entries: Default::default(),
         };
-        let results = db.results();
+        let results = db.open_results()?;
         let mut key_buf = Vec::with_capacity(32);
         for (krate_key, krate) in krates.into_iter() {
             let name = to_name(&krate_key);

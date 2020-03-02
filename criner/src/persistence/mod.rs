@@ -59,35 +59,34 @@ impl Db {
         })
     }
 
-    pub fn crate_versions(&self) -> CrateVersionsTree {
-        CrateVersionsTree {
-            inner: (&self.versions, open_connection(&self.sqlite_path).unwrap()),
-        }
+    pub fn open_crate_versions(&self) -> Result<CrateVersionsTree> {
+        Ok(CrateVersionsTree {
+            inner: (&self.versions, open_connection(&self.sqlite_path)?),
+        })
     }
-    pub fn crates(&self) -> CratesTree {
-        CratesTree {
-            inner: (&self.crates, open_connection(&self.sqlite_path).unwrap()),
-        }
+    pub fn open_crates(&self) -> Result<CratesTree> {
+        Ok(CratesTree {
+            inner: (&self.crates, open_connection(&self.sqlite_path)?),
+        })
     }
-    pub fn tasks(&self) -> TasksTree {
-        TasksTree {
-            inner: (&self.tasks, open_connection(&self.sqlite_path).unwrap()),
-        }
+    pub fn open_tasks(&self) -> Result<TasksTree> {
+        Ok(TasksTree {
+            inner: (&self.tasks, open_connection(&self.sqlite_path)?),
+        })
     }
-    pub fn results(&self) -> TaskResultTree {
-        TaskResultTree {
-            inner: (&self.results, open_connection(&self.sqlite_path).unwrap()),
-        }
+    pub fn open_results(&self) -> Result<TaskResultTree> {
+        Ok(TaskResultTree {
+            inner: (&self.results, open_connection(&self.sqlite_path)?),
+        })
     }
-    pub fn context(&self) -> ContextTree {
-        ContextTree {
-            inner: (&self.meta, open_connection(&self.sqlite_path).unwrap()),
-        }
+    pub fn open_context(&self) -> Result<ContextTree> {
+        Ok(ContextTree {
+            inner: (&self.meta, open_connection(&self.sqlite_path)?),
+        })
     }
 }
 
 fn open_connection(db_path: &Path) -> Result<ThreadSafeConnection> {
-    // TODO: don't let callers of this function unwrap()!
     Ok(std::sync::Arc::new(parking_lot::Mutex::new(
         rusqlite::Connection::open(db_path)?,
     )))

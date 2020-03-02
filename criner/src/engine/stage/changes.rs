@@ -44,9 +44,9 @@ pub async fn fetch(
         {
             let db = db.clone();
             async move {
-                let versions = db.crate_versions();
-                let krate = db.crates();
-                let context = db.context();
+                let versions = db.open_crate_versions()?;
+                let krate = db.open_crates()?;
+                let context = db.open_context()?;
                 // NOTE: this loop can also be a stream, but that makes computation slower due to overhead
                 // Thus we just do this 'quickly' on the main thread, knowing that criner really needs its
                 // own executor or resources.
