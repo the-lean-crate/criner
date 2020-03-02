@@ -73,6 +73,15 @@ pub trait TreeAccess {
             .optional()?
             .map_or_else(Self::StorageItem::default, |d| f(d.as_slice().into()));
         // NOTE: Copied from insert - can't use it now as it also inserts to sled.
+        // Here the connection upgrades to EXCLUSIVE lock, BUT…the read part before
+        // may have read now outdated information, as writes are allowed to happen
+        // while reading (previous) data. At least in theory.
+        // This means that here we may just block as failure since if there was another writer
+        // during the transaction (see https://sqlite.org/lang_transaction.html) it will return sqlite busy.
+        // but on busy we wait, so we will just timeout and fail. This is good, but we can be better and
+        // handle this to actually retry from the beginning.
+        // This would mean we have to handle sqlite busy ourselves everywhere or deactivate the busy timer
+        // for a moment.
         transaction.execute(
             &format!(
                 "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
