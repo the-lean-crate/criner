@@ -4,6 +4,7 @@ use crate::{
     persistence::{Keyed, KEY_SEP},
     Error, Result,
 };
+use rusqlite::params;
 use sled::IVec;
 use std::time::SystemTime;
 
@@ -18,6 +19,9 @@ pub trait TreeAccess {
     type InsertResult;
 
     fn tree(&self) -> &sled::Tree;
+    fn connection(&self) -> &ThreadSafeConnection;
+    fn table_name(&self) -> &'static str;
+
     fn key(item: &Self::InsertItem) -> Vec<u8> {
         let mut buf = Vec::with_capacity(16);
         Self::key_to_buf(item, &mut buf);
@@ -72,7 +76,18 @@ pub trait TreeAccess {
                 rmp_serde::to_vec(&self.merge(v, None).unwrap_or_else(Default::default))?,
             )
             .map_err(Error::from)
-            .map(|_| ())
+            .map(|_| ())?;
+        self.connection().lock().execute(
+            &format!(
+                "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
+                self.table_name()
+            ),
+            params![
+                Self::key(v),
+                rmp_serde::to_vec(&self.merge(v, None).unwrap_or_else(Default::default))?
+            ],
+        )?;
+        Ok(())
     }
 }
 
@@ -87,6 +102,13 @@ impl<'a> TreeAccess for TasksTree<'a> {
 
     fn tree(&self) -> &sled::Tree {
         self.inner.0
+    }
+
+    fn connection(&self) -> &ThreadSafeConnection {
+        &self.inner.1
+    }
+    fn table_name(&self) -> &'static str {
+        "task"
     }
 
     fn key_to_buf((name, version, t): &Self::InsertItem, buf: &mut Vec<u8>) {
@@ -158,6 +180,12 @@ impl<'a> TreeAccess for TaskResultTree<'a> {
     fn tree(&self) -> &sled::Tree {
         self.inner.0
     }
+    fn connection(&self) -> &ThreadSafeConnection {
+        &self.inner.1
+    }
+    fn table_name(&self) -> &'static str {
+        "result"
+    }
 
     fn key_to_buf(v: &(&str, &str, &Task, TaskResult<'a>), buf: &mut Vec<u8>) {
         TasksTree::key_to_buf(&(v.0, v.1, v.2.clone()), buf);
@@ -191,6 +219,12 @@ impl<'a> TreeAccess for ContextTree<'a> {
 
     fn tree(&self) -> &sled::Tree {
         self.inner.0
+    }
+    fn connection(&self) -> &ThreadSafeConnection {
+        &self.inner.1
+    }
+    fn table_name(&self) -> &'static str {
+        "meta"
     }
 
     fn key_to_buf(_item: &Self::InsertItem, buf: &mut Vec<u8>) {
@@ -252,6 +286,12 @@ impl<'a> TreeAccess for CratesTree<'a> {
     fn tree(&self) -> &sled::Tree {
         self.inner.0
     }
+    fn connection(&self) -> &ThreadSafeConnection {
+        &self.inner.1
+    }
+    fn table_name(&self) -> &'static str {
+        "crate"
+    }
 
     fn key_to_buf(item: &crates_index_diff::CrateVersion, buf: &mut Vec<u8>) {
         buf.extend_from_slice(item.name.as_bytes());
@@ -298,6 +338,12 @@ impl<'a> TreeAccess for CrateVersionsTree<'a> {
 
     fn tree(&self) -> &sled::Tree {
         self.inner.0
+    }
+    fn connection(&self) -> &ThreadSafeConnection {
+        &self.inner.1
+    }
+    fn table_name(&self) -> &'static str {
+        "crate_version"
     }
 
     fn key_to_buf(v: &crates_index_diff::CrateVersion, buf: &mut Vec<u8>) {

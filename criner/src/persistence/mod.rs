@@ -23,14 +23,26 @@ pub struct Db {
 impl Db {
     pub fn open(path: impl AsRef<Path>) -> Result<Db> {
         std::fs::create_dir_all(&path)?;
-        let sqlite_path = path.as_ref().join("db.sqlite");
+        let sqlite_path = path.as_ref().join("db.msgpack.sqlite");
         {
-            let connection = rusqlite::Connection::open(&sqlite_path)?;
+            let mut connection = rusqlite::Connection::open(&sqlite_path)?;
             connection.execute_batch("
                 PRAGMA journal_mode = WAL;          -- better write-concurrency
-                PRAGMA schema.synchronous = NORMAL; -- fsync only in critical moments
+                PRAGMA synchronous = NORMAL;        -- fsync only in critical moments
                 PRAGMA wal_autocheckpoint = 1000;   -- write WAL changes back every 1000 pages, for an in average 1MB WAL file. May affect readers if number is increased
             ")?;
+
+            let transaction = connection.transaction()?;
+            for name in &["meta", "crate_version", "crate", "task", "result"] {
+                transaction.execute_batch(&format!(
+                    "CREATE TABLE IF NOT EXISTS {} (
+                          key             TEXT PRIMARY KEY,
+                          data            BLOB NOT NULL
+                    )",
+                    name
+                ))?;
+            }
+            transaction.commit()?;
         }
 
         // NOTE: Default compression achieves cutting disk space in half, but the processing speed is cut in half

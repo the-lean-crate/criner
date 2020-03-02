@@ -10,7 +10,10 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
 
     // tree_names.into_par_iter().try_for_each(|tree_name| {
     for tree_name in tree_names {
-        let tree_name_str = std::str::from_utf8(&tree_name).unwrap();
+        let mut tree_name_str = std::str::from_utf8(&tree_name).unwrap();
+        if tree_name_str.ends_with('s') {
+            tree_name_str = &tree_name_str[..tree_name_str.len() - 1];
+        }
         if tree_name_str == "__sled__default" {
             continue;
         }
