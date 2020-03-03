@@ -36,10 +36,27 @@ pub trait TreeAccess {
     ) -> Option<Self::StorageItem>;
 
     fn get(&self, key: impl AsRef<[u8]>) -> Result<Option<Self::StorageItem>> {
-        self.tree()
-            .get(key)
+        let res = self
+            .tree()
+            .get(&key)
             .map_err(Into::into)
-            .map(|r| r.map(Into::into))
+            .map(|r| r.map(Into::into));
+
+        let _value_in_sqlite = self
+            .connection()
+            .lock()
+            .query_row(
+                &format!(
+                    "SELECT data FROM {} WHERE key = '{}'",
+                    self.table_name(),
+                    std::str::from_utf8(key.as_ref()).expect("utf8-keys")
+                ),
+                NO_PARAMS,
+                |r| r.get::<_, Vec<u8>>(0),
+            )
+            .optional()?
+            .map(|d| Self::StorageItem::from(d.as_slice()));
+        res
     }
 
     /// Update an existing item, or create it as default, returning the stored item
