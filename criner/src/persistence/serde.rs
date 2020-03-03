@@ -31,8 +31,8 @@ macro_rules! impl_deserialize {
 }
 
 impl_deserialize!(Crate<'_>);
-impl_deserialize!(Task<'_>);
-impl_deserialize!(TaskResult<'_>);
+impl_deserialize!(Task);
+impl_deserialize!(TaskResult);
 impl_deserialize!(CrateVersion<'_>);
 impl_deserialize!(Context);
 impl_deserialize!(ReportResult);

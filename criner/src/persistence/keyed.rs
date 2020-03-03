@@ -17,13 +17,13 @@ pub trait Keyed {
     }
 }
 
-impl<'a> Task<'a> {
+impl Task {
     pub fn key_from(process: &str, buf: &mut Vec<u8>) {
         buf.extend_from_slice(&process.as_bytes());
     }
 }
 
-impl<'a> Keyed for Task<'a> {
+impl Keyed for Task {
     fn key_bytes_buf(&self, buf: &mut Vec<u8>) {
         Task::key_from(&self.process, buf)
     }
@@ -41,7 +41,7 @@ impl<'a> Keyed for CrateVersion<'a> {
     }
 }
 
-impl<'a> Keyed for TaskResult<'a> {
+impl Keyed for TaskResult {
     fn key_bytes_buf(&self, buf: &mut Vec<u8>) {
         match self {
             TaskResult::Download { kind, .. } => buf.extend_from_slice(kind.as_bytes()),

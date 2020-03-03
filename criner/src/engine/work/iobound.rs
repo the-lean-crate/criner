@@ -14,7 +14,7 @@ pub struct DownloadRequest {
     pub url: String,
 }
 
-pub fn default_persisted_download_task() -> model::Task<'static> {
+pub fn default_persisted_download_task() -> model::Task {
     const TASK_NAME: &str = "download";
     const TASK_VERSION: &str = "1.0.0";
     model::Task {
@@ -41,18 +41,20 @@ pub async fn processor(
         .build()?;
 
     while let Some(DownloadRequest {
-        crate_name,
-        crate_version,
+        mut crate_name,
+        mut crate_version,
         kind,
         url,
     }) = r.recv().await
     {
         progress.set_name(format!("↓ {}:{}", crate_name, crate_version));
         progress.init(None, None);
-        let mut kt = (crate_name.as_str(), crate_version.as_str(), dummy);
+        let mut kt = (crate_name, crate_version, dummy);
         key.clear();
 
         persistence::TasksTree::key_to_buf(&kt, &mut key);
+        crate_name = kt.0;
+        crate_version = kt.1;
         dummy = kt.2;
 
         let mut task = tasks.update(&key, |mut t| {
@@ -106,8 +108,8 @@ pub async fn processor(
 
                 {
                     let insert_item = (
-                        crate_name.as_str(),
-                        crate_version.as_str(),
+                        crate_name,
+                        crate_version,
                         &task,
                         model::TaskResult::Download {
                             kind: kind.into(),

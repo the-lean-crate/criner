@@ -177,37 +177,18 @@ impl Default for TaskState {
 
 /// Information about a task
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Task<'a> {
+pub struct Task {
     /// This is set automatically, and can be roughly equivalent to the time a task was finished running (no matter if successfully or failed,
     /// but is generally equivalent to the last time the task was saved
     pub stored_at: SystemTime,
     /// Information about the process that we used to run
-    pub process: Cow<'a, str>,
-    /// Information about the process version
-    pub version: Cow<'a, str>,
-    pub state: TaskState,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct TaskOwned {
-    pub stored_at: SystemTime,
     pub process: String,
+    /// Information about the process version
     pub version: String,
     pub state: TaskState,
 }
 
-impl<'a> From<Task<'a>> for TaskOwned {
-    fn from(v: Task<'a>) -> Self {
-        TaskOwned {
-            stored_at: v.stored_at,
-            process: v.process.into(),
-            version: v.version.into(),
-            state: v.state,
-        }
-    }
-}
-
-impl<'a> Default for Task<'a> {
+impl Default for Task {
     fn default() -> Self {
         Task {
             stored_at: SystemTime::now(),
@@ -220,9 +201,9 @@ impl<'a> Default for Task<'a> {
 
 /// An entry in a tar archive, including the most important meta-data
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct TarHeader<'a> {
+pub struct TarHeader {
     /// The normalized path of the entry. May not be unicode encoded.
-    pub path: Cow<'a, [u8]>,
+    pub path: Vec<u8>,
     /// The size of the file in bytes
     pub size: u64,
     /// The type of entry, to be analyzed with tar::EntryType
@@ -231,28 +212,28 @@ pub struct TarHeader<'a> {
 
 /// Append-variant-only data structure, otherwise migrations are needed
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum TaskResult<'a> {
+pub enum TaskResult {
     /// A dummy value just so that we can have a default value
     None,
     /// Most interesting information about an unpacked crate
     ExplodedCrate {
         /// Meta data of all entries in the crate
-        entries_meta_data: Cow<'a, [TarHeader<'a>]>,
+        entries_meta_data: Vec<TarHeader>,
         /// The actual content of selected files, usually README, License and Cargo.* files
         /// Note that these are also present in entries_meta_data.
-        selected_entries: Cow<'a, [(TarHeader<'a>, Cow<'a, [u8]>)]>,
+        selected_entries: Vec<(TarHeader, Vec<u8>)>,
     },
     /// A download with meta data and the downloaded blob itself
     Download {
-        kind: Cow<'a, str>,
-        url: Cow<'a, str>,
+        kind: String,
+        url: String,
         content_length: u32,
         /// The content type, it's optional because it might not be set (even though it should)
-        content_type: Option<Cow<'a, str>>,
+        content_type: Option<String>,
     },
 }
 
-impl<'a> Default for TaskResult<'a> {
+impl Default for TaskResult {
     fn default() -> Self {
         TaskResult::None
     }

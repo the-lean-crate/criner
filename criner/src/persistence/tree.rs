@@ -161,14 +161,14 @@ pub trait TreeAccess {
     }
 }
 
-pub struct TasksTree<'a> {
+pub struct TasksTree {
     pub inner: ThreadSafeConnection,
 }
 
-impl<'a> TreeAccess for TasksTree<'a> {
-    type StorageItem = Task<'a>;
-    type InsertItem = (&'a str, &'a str, Task<'a>);
-    type InsertResult = Task<'a>;
+impl TreeAccess for TasksTree {
+    type StorageItem = Task;
+    type InsertItem = (String, String, Task);
+    type InsertResult = Task;
 
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
@@ -208,12 +208,12 @@ impl<'a> TreeAccess for TasksTree<'a> {
 // FIXME: use it or drop it - it should be used once Sled can efficiently handle this kind of data
 // as we currently use symlinks to mark completed HTML pages.
 #[allow(dead_code)]
-pub struct ReportsTree<'a> {
+pub struct ReportsTree {
     inner: ThreadSafeConnection,
 }
 
 #[allow(dead_code)]
-impl<'a> ReportsTree<'a> {
+impl ReportsTree {
     pub fn key(
         crate_name: &str,
         crate_version: &str,
@@ -255,13 +255,13 @@ impl<'a> ReportsTree<'a> {
     }
 }
 
-pub struct TaskResultTree<'a> {
+pub struct TaskResultTree {
     pub inner: ThreadSafeConnection,
 }
 
-impl<'a> TreeAccess for TaskResultTree<'a> {
-    type StorageItem = TaskResult<'a>;
-    type InsertItem = (&'a str, &'a str, &'a Task<'a>, TaskResult<'a>);
+impl<'a> TreeAccess for TaskResultTree {
+    type StorageItem = TaskResult;
+    type InsertItem = (String, String, &'a Task, TaskResult);
     type InsertResult = ();
 
     fn connection(&self) -> &ThreadSafeConnection {
@@ -271,7 +271,7 @@ impl<'a> TreeAccess for TaskResultTree<'a> {
         "result"
     }
 
-    fn key_to_buf(v: &(&str, &str, &Task, TaskResult<'a>), buf: &mut Vec<u8>) {
+    fn key_to_buf(v: &(&str, &str, &Task, TaskResult), buf: &mut Vec<u8>) {
         TasksTree::key_to_buf(&(v.0, v.1, v.2.clone()), buf);
         buf.push(KEY_SEP);
         buf.extend_from_slice(v.2.version.as_bytes());

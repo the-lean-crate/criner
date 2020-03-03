@@ -3,12 +3,12 @@ use std::io::Read;
 use std::{fs::File, io::BufReader, path::PathBuf, time::SystemTime};
 
 pub struct ExtractRequest {
-    pub download_task: model::TaskOwned,
+    pub download_task: model::Task,
     pub crate_name: String,
     pub crate_version: String,
 }
 
-pub fn default_persisted_extraction_task() -> model::Task<'static> {
+pub fn default_persisted_extraction_task() -> model::Task {
     const TASK_NAME: &str = "extract_crate";
     const TASK_VERSION: &str = "1.0.0";
     model::Task {
@@ -34,17 +34,19 @@ pub async fn processor(
 
     while let Some(ExtractRequest {
         download_task,
-        crate_name,
-        crate_version,
+        mut crate_name,
+        mut crate_version,
     }) = r.recv().await
     {
         progress.set_name(format!("CPU UNZIP+UNTAR {}:{}", crate_name, crate_version));
         progress.init(None, Some("files extracted"));
 
-        let mut kt = (crate_name.as_str(), crate_version.as_str(), dummy);
+        let mut kt = (crate_name, crate_version, dummy);
         key.clear();
 
         persistence::TasksTree::key_to_buf(&kt, &mut key);
+        crate_name = kt.0;
+        crate_version = kt.1;
         dummy = kt.2;
 
         let mut task = tasks.update(&key, |mut t| {
@@ -81,7 +83,7 @@ pub async fn processor(
                 let mut e: tar::Entry<_> = e?;
                 let path = e.path().ok();
                 meta_data.push(model::TarHeader {
-                    path: e.path_bytes().to_vec().into(),
+                    path: e.path_bytes().to_vec(),
                     size: e.header().size()?,
                     entry_type: e.header().entry_type().as_byte(),
                 });
@@ -112,8 +114,8 @@ pub async fn processor(
 
             {
                 let insert_item = (
-                    crate_name.as_str(),
-                    crate_version.as_str(),
+                    crate_name,
+                    crate_version,
                     &task,
                     model::TaskResult::ExplodedCrate {
                         entries_meta_data: meta_data.into(),

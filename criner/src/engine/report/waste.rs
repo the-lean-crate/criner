@@ -1,6 +1,5 @@
 use crate::persistence::TreeAccess;
 use crate::{error::Result, model, persistence};
-use std::borrow::Cow;
 use std::path::{Path, PathBuf};
 
 const GENERATOR_VERSION: &str = "1.0.0";
@@ -94,8 +93,8 @@ impl Generator {
 
 async fn generate_single_file<'a>(
     out: &Path,
-    _entries_meta_data: Cow<'a, [model::TarHeader<'a>]>,
-    _selected_entries: Cow<'a, [(model::TarHeader<'a>, Cow<'a, [u8]>)]>,
+    _entries_meta_data: Vec<model::TarHeader>,
+    _selected_entries: Vec<(model::TarHeader, Vec<u8>)>,
 ) -> Result<()> {
     use async_std::prelude::*;
     async_std::fs::OpenOptions::new()
@@ -119,7 +118,7 @@ fn to_name(key: &[u8]) -> &str {
 
 // FIXME: this is a copy of persistence::TaskResultTree, which doens't work as it wants &'static str, but doesn't tell
 // Seems to be some sort of borrow checker bug.
-fn key_to_buf<'a>(v: &(&str, &str, &model::Task, model::TaskResult<'a>), buf: &mut Vec<u8>) {
+fn key_to_buf(v: &(&str, &str, &model::Task, model::TaskResult), buf: &mut Vec<u8>) {
     use persistence::Keyed;
     persistence::TasksTree::key_to_buf(&(v.0, v.1, v.2.clone()), buf);
     buf.push(persistence::KEY_SEP);

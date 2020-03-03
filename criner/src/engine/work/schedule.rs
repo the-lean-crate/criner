@@ -25,7 +25,7 @@ pub enum AsyncResult {
 }
 
 pub async fn tasks(
-    tasks: persistence::TasksTree<'_>,
+    tasks: persistence::TasksTree,
     krate: &model::CrateVersion<'_>,
     mut progress: prodash::tree::Item,
     _mode: Scheduling,
@@ -80,30 +80,30 @@ pub async fn tasks(
     )
 }
 
-fn task_or_default<'a, 'b>(
-    tasks: &TasksTree<'a>,
-    version: &model::CrateVersion<'b>,
-    make_task: impl FnOnce() -> model::Task<'static>,
-) -> Result<model::Task<'a>> {
+fn task_or_default(
+    tasks: &TasksTree,
+    version: &model::CrateVersion,
+    make_task: impl FnOnce() -> model::Task,
+) -> Result<model::Task> {
     let key = (version.name.as_ref(), version.version.as_ref(), make_task());
     Ok(tasks.get(TasksTree::key(&key))?.unwrap_or(key.2))
 }
 
-enum SubmitResult<'a> {
+enum SubmitResult {
     Submitted,
-    Done(model::Task<'a>),
+    Done(model::Task),
     PermanentFailure,
 }
 
-async fn submit_single<'a, R>(
+async fn submit_single<R>(
     startup_time: SystemTime,
-    task: model::Task<'a>,
+    task: model::Task,
     progress: &mut prodash::tree::Item,
     channel: &async_std::sync::Sender<R>,
     step: u32,
     max_step: u32,
     f: impl FnOnce() -> R,
-) -> SubmitResult<'a> {
+) -> SubmitResult {
     use model::TaskState::*;
     use SubmitResult::*;
     let mut configure = || {
