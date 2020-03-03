@@ -29,7 +29,7 @@ impl Generator {
     pub async fn write_files(
         db: persistence::Db,
         out_dir: PathBuf,
-        krates: Vec<(sled::IVec, sled::IVec)>,
+        krates: Vec<(String, Vec<u8>)>,
         mut p: prodash::tree::Item,
     ) -> ReportResult {
         let exrtaction_task_dummy =
@@ -40,9 +40,8 @@ impl Generator {
         };
         let results = db.open_results()?;
         let mut key_buf = Vec::with_capacity(32);
-        for (krate_key, krate) in krates.into_iter() {
-            let name = to_name(&krate_key);
-            let c: model::Crate = krate.into();
+        for (name, krate) in krates.into_iter() {
+            let c: model::Crate = krate.as_slice().into();
             p.init(Some(c.versions.len() as u32), Some("versions"));
             p.set_name(name);
 
@@ -60,7 +59,7 @@ impl Generator {
                     dummy_extraction_result = key.3;
                 }
                 p.set((vid + 1) as u32);
-                let out_file = output_file_html(out_dir.as_ref(), name, &version);
+                let out_file = output_file_html(out_dir.as_ref(), &name, &version);
                 let mut marker = out_file.clone();
                 marker.set_file_name(GENERATOR_VERSION);
                 if !async_std::fs::symlink_metadata(&marker)
@@ -114,7 +113,7 @@ fn output_file_html(base: &Path, name: &str, version: &str) -> PathBuf {
     base.join(name).join(version).join("index.html")
 }
 
-fn to_name(key: &sled::IVec) -> &str {
+fn to_name(key: &[u8]) -> &str {
     std::str::from_utf8(key).expect("unicode keys")
 }
 

@@ -8,6 +8,7 @@ use crate::{
 use futures::task::SpawnExt;
 use futures::{task::Spawn, FutureExt};
 use itertools::Itertools;
+use rusqlite::NO_PARAMS;
 use std::{path::PathBuf, time::SystemTime};
 
 pub async fn generate(
@@ -44,27 +45,33 @@ pub async fn generate(
             .map(|_| ())
             .boxed(),
     )?;
-    for (cid, chunk) in krates
-        .tree()
-        .iter()
-        .filter_map(|res| res.ok())
-        .chunks(chunk_size)
-        .into_iter()
-        .enumerate()
-    {
-        check(deadline.clone())?;
-        progress.set(((cid + 1) * chunk_size) as u32);
-        progress.blocked(None);
-        tx.send(
-            report::waste::Generator::write_files(
-                db.clone(),
-                waste_report_dir.clone(),
-                chunk.collect(),
-                progress.add_child(""),
+    let connection = krates.connection().lock();
+    let mut statement = connection.prepare(&format!(
+        "SELECT * FROM {} ORDER BY _rowid_ ASC",
+        krates.table_name()
+    ))?;
+    let mut rows = statement.query(NO_PARAMS)?;
+    let mut chunk = Vec::<(String, Vec<u8>)>::with_capacity(chunk_size);
+    let mut cid = 0;
+    while let Some(r) = rows.next()? {
+        chunk.push((r.get(0)?, r.get(1)?));
+        if chunk.len() == chunk_size {
+            cid += 1;
+            check(deadline.clone())?;
+            progress.set((cid * chunk_size) as u32);
+            progress.blocked(None);
+            tx.send(
+                report::waste::Generator::write_files(
+                    db.clone(),
+                    waste_report_dir.clone(),
+                    chunk,
+                    progress.add_child(""),
+                )
+                .boxed(),
             )
-            .boxed(),
-        )
-        .await;
+            .await;
+            chunk = Vec::with_capacity(chunk_size);
+        }
     }
     drop(tx);
     progress.set(num_crates);

@@ -2,7 +2,7 @@ use crate::model::{Context, Crate, TaskResult};
 use crate::{
     model::{CrateVersion, Task},
     persistence::{Keyed, KEY_SEP},
-    Error, Result,
+    Result,
 };
 use rusqlite::{params, OptionalExtension, NO_PARAMS};
 use std::time::SystemTime;
@@ -13,7 +13,7 @@ use std::time::SystemTime;
 pub type ThreadSafeConnection = std::sync::Arc<parking_lot::Mutex<rusqlite::Connection>>;
 
 pub trait TreeAccess {
-    type StorageItem: serde::Serialize + From<IVec> + Into<IVec> + for<'a> From<&'a [u8]> + Default;
+    type StorageItem: serde::Serialize + for<'a> From<&'a [u8]> + Default;
     type InsertItem;
     type InsertResult;
 
@@ -26,7 +26,7 @@ pub trait TreeAccess {
         buf
     }
     fn key_to_buf(item: &Self::InsertItem, buf: &mut Vec<u8>);
-    fn map_insert_return_value(&self, v: IVec) -> Self::InsertResult;
+    fn map_insert_return_value(&self, v: Self::StorageItem) -> Self::InsertResult;
     fn merge(
         &self,
         new_item: &Self::InsertItem,
@@ -34,7 +34,6 @@ pub trait TreeAccess {
     ) -> Option<Self::StorageItem>;
 
     fn count(&self) -> u64 {
-        let res = self.tree().len();
         self.connection()
             .lock()
             .query_row(
@@ -42,17 +41,10 @@ pub trait TreeAccess {
                 NO_PARAMS,
                 |r| r.get::<_, i64>(0),
             )
-            .unwrap_or(0) as u64;
-        res as u64
+            .unwrap_or(0) as u64
     }
     fn get(&self, key: impl AsRef<[u8]>) -> Result<Option<Self::StorageItem>> {
-        let res = self
-            .tree()
-            .get(&key)
-            .map_err(Into::into)
-            .map(|r| r.map(Into::into));
-
-        let _value_in_sqlite = self
+        Ok(self
             .connection()
             .lock()
             .query_row(
@@ -65,8 +57,7 @@ pub trait TreeAccess {
                 |r| r.get::<_, Vec<u8>>(0),
             )
             .optional()?
-            .map(|d| Self::StorageItem::from(d.as_slice()));
-        res
+            .map(|d| Self::StorageItem::from(d.as_slice())))
     }
 
     /// Update an existing item, or create it as default, returning the stored item
@@ -75,17 +66,6 @@ pub trait TreeAccess {
         key: impl AsRef<[u8]>,
         f: impl Fn(Self::StorageItem) -> Self::StorageItem,
     ) -> Result<Self::StorageItem> {
-        let res = self
-            .tree()
-            .update_and_fetch(key.as_ref(), |bytes: Option<&[u8]>| {
-                Some(match bytes {
-                    Some(bytes) => f(bytes.into()).into(),
-                    None => f(Self::StorageItem::default()).into(),
-                })
-            })?
-            .map(From::from)
-            .ok_or_else(|| Error::Bug("We always set a value"));
-
         let mut guard = self.connection().lock();
         let transaction = {
             let mut t = guard.savepoint()?;
@@ -104,7 +84,7 @@ pub trait TreeAccess {
             )
             .optional()?
             .map_or_else(Self::StorageItem::default, |d| f(d.as_slice().into()));
-        // NOTE: Copied from insert - can't use it now as it also inserts to sled.
+        // NOTE: Copied from insert - can't use it now as it also inserts to sled. TODO - do it
         // Here the connection upgrades to EXCLUSIVE lock, BUT…the read part before
         // may have read now outdated information, as writes are allowed to happen
         // while reading (previous) data. At least in theory.
@@ -122,19 +102,11 @@ pub trait TreeAccess {
             params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
         )?;
 
-        return res;
+        Ok(new_value)
     }
 
     /// Similar to 'update', but provides full control over the default and allows deletion
     fn upsert(&self, item: &Self::InsertItem) -> Result<Self::InsertResult> {
-        let res = self
-            .tree()
-            .update_and_fetch(Self::key(item), |existing: Option<&[u8]>| {
-                self.merge(item, existing.map(From::from)).map(Into::into)
-            })?
-            .ok_or_else(|| Error::Bug("We always put a value or update the existing one"))
-            .map(|v| self.map_insert_return_value(v));
-
         let mut guard = self.connection().lock();
         let key = Self::key(item);
         let key_str = std::str::from_utf8(key.as_slice()).expect("utf8-keys");
@@ -168,22 +140,13 @@ pub trait TreeAccess {
                     ),
                     params![key_str, rmp_serde::to_vec(&value)?],
                 )?;
+                Ok(self.map_insert_return_value(value))
             }
             None => todo!("deletion of values - I don't think we need that"),
-        };
-
-        res
+        }
     }
 
     fn insert(&self, v: &Self::InsertItem) -> Result<()> {
-        self.tree()
-            .insert(
-                Self::key(v),
-                rmp_serde::to_vec(&self.merge(v, None).unwrap_or_else(Default::default))?,
-            )
-            .map_err(Error::from)
-            .map(|_| ())?;
-
         self.connection().lock().execute(
             &format!(
                 "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
@@ -194,13 +157,12 @@ pub trait TreeAccess {
                 rmp_serde::to_vec(&self.merge(v, None).unwrap_or_else(Default::default))?
             ],
         )?;
-
         Ok(())
     }
 }
 
 pub struct TasksTree<'a> {
-    pub inner: (&'a sled::Tree, ThreadSafeConnection),
+    pub inner: ThreadSafeConnection,
 }
 
 impl<'a> TreeAccess for TasksTree<'a> {
@@ -208,12 +170,8 @@ impl<'a> TreeAccess for TasksTree<'a> {
     type InsertItem = (&'a str, &'a str, Task<'a>);
     type InsertResult = Task<'a>;
 
-    fn tree(&self) -> &sled::Tree {
-        self.inner.0
-    }
-
     fn connection(&self) -> &ThreadSafeConnection {
-        &self.inner.1
+        &self.inner
     }
     fn table_name(&self) -> &'static str {
         "task"
@@ -225,8 +183,8 @@ impl<'a> TreeAccess for TasksTree<'a> {
         t.key_bytes_buf(buf);
     }
 
-    fn map_insert_return_value(&self, v: IVec) -> Self::InsertResult {
-        v.into()
+    fn map_insert_return_value(&self, v: Self::StorageItem) -> Self::InsertResult {
+        v
     }
 
     fn merge(
@@ -251,7 +209,7 @@ impl<'a> TreeAccess for TasksTree<'a> {
 // as we currently use symlinks to mark completed HTML pages.
 #[allow(dead_code)]
 pub struct ReportsTree<'a> {
-    inner: (&'a sled::Tree, ThreadSafeConnection),
+    inner: ThreadSafeConnection,
 }
 
 #[allow(dead_code)]
@@ -298,7 +256,7 @@ impl<'a> ReportsTree<'a> {
 }
 
 pub struct TaskResultTree<'a> {
-    pub inner: (&'a sled::Tree, ThreadSafeConnection),
+    pub inner: ThreadSafeConnection,
 }
 
 impl<'a> TreeAccess for TaskResultTree<'a> {
@@ -306,11 +264,8 @@ impl<'a> TreeAccess for TaskResultTree<'a> {
     type InsertItem = (&'a str, &'a str, &'a Task<'a>, TaskResult<'a>);
     type InsertResult = ();
 
-    fn tree(&self) -> &sled::Tree {
-        self.inner.0
-    }
     fn connection(&self) -> &ThreadSafeConnection {
-        &self.inner.1
+        &self.inner
     }
     fn table_name(&self) -> &'static str {
         "result"
@@ -324,7 +279,7 @@ impl<'a> TreeAccess for TaskResultTree<'a> {
         v.3.key_bytes_buf(buf);
     }
 
-    fn map_insert_return_value(&self, _v: IVec) -> Self::InsertResult {
+    fn map_insert_return_value(&self, _v: Self::StorageItem) -> Self::InsertResult {
         ()
     }
 
@@ -338,7 +293,7 @@ impl<'a> TreeAccess for TaskResultTree<'a> {
 }
 
 pub struct ContextTree<'a> {
-    pub inner: (&'a sled::Tree, ThreadSafeConnection),
+    pub inner: ThreadSafeConnection,
 }
 
 impl<'a> TreeAccess for ContextTree<'a> {
@@ -346,11 +301,8 @@ impl<'a> TreeAccess for ContextTree<'a> {
     type InsertItem = Context;
     type InsertResult = ();
 
-    fn tree(&self) -> &sled::Tree {
-        self.inner.0
-    }
     fn connection(&self) -> &ThreadSafeConnection {
-        &self.inner.1
+        &self.inner
     }
     fn table_name(&self) -> &'static str {
         "meta"
@@ -369,7 +321,7 @@ impl<'a> TreeAccess for ContextTree<'a> {
         );
     }
 
-    fn map_insert_return_value(&self, _v: IVec) -> Self::InsertResult {
+    fn map_insert_return_value(&self, _v: Self::StorageItem) -> Self::InsertResult {
         ()
     }
 
@@ -389,22 +341,22 @@ impl<'a> ContextTree<'a> {
     }
 
     // NOTE: impl iterator is not allowed in traits unfortunately, but one could implement one manually
-    pub fn iter(&self) -> impl DoubleEndedIterator<Item = Result<(String, Context)>> {
-        self.inner.0.iter().map(|r| {
-            r.map(|(k, v)| {
-                (
-                    String::from_utf8(k.as_ref().to_vec()).expect("utf8"),
-                    Context::from(v),
-                )
-            })
-            .map_err(Error::from)
-        })
+    pub fn most_recent(&self) -> Result<Option<(String, Context)>> {
+        self.connection()
+            .lock()
+            .query_row(
+                "SELECT key, data FROM meta ORDER BY key DESC limit 1",
+                NO_PARAMS,
+                |r| (r.get::<_, String>(0), r.get::<_, Vec<u8>>(1)),
+            )
+            .optional()?
+            .map(|(k, v)| (k, Context::from(v.as_slice())))
     }
 }
 
 #[derive(Clone)]
 pub struct CratesTree<'a> {
-    pub inner: (&'a sled::Tree, ThreadSafeConnection),
+    pub inner: ThreadSafeConnection,
 }
 
 impl<'a> TreeAccess for CratesTree<'a> {
@@ -412,11 +364,8 @@ impl<'a> TreeAccess for CratesTree<'a> {
     type InsertItem = crates_index_diff::CrateVersion;
     type InsertResult = bool;
 
-    fn tree(&self) -> &sled::Tree {
-        self.inner.0
-    }
     fn connection(&self) -> &ThreadSafeConnection {
-        &self.inner.1
+        &self.inner
     }
     fn table_name(&self) -> &'static str {
         "crate"
@@ -426,9 +375,8 @@ impl<'a> TreeAccess for CratesTree<'a> {
         buf.extend_from_slice(item.name.as_bytes());
     }
 
-    fn map_insert_return_value(&self, v: IVec) -> Self::InsertResult {
-        let c = Crate::from(v);
-        c.versions.len() == 1
+    fn map_insert_return_value(&self, v: Self::StorageItem) -> Self::InsertResult {
+        v.versions.len() == 1
     }
 
     fn merge(
@@ -457,7 +405,7 @@ impl<'a> TreeAccess for CratesTree<'a> {
 
 #[derive(Clone)]
 pub struct CrateVersionsTree<'a> {
-    pub inner: (&'a sled::Tree, ThreadSafeConnection),
+    pub inner: ThreadSafeConnection,
 }
 
 impl<'a> TreeAccess for CrateVersionsTree<'a> {
@@ -465,11 +413,8 @@ impl<'a> TreeAccess for CrateVersionsTree<'a> {
     type InsertItem = crates_index_diff::CrateVersion;
     type InsertResult = ();
 
-    fn tree(&self) -> &sled::Tree {
-        self.inner.0
-    }
     fn connection(&self) -> &ThreadSafeConnection {
-        &self.inner.1
+        &self.inner
     }
     fn table_name(&self) -> &'static str {
         "crate_version"
@@ -479,7 +424,7 @@ impl<'a> TreeAccess for CrateVersionsTree<'a> {
         v.key_bytes_buf(buf);
     }
 
-    fn map_insert_return_value(&self, _v: IVec) -> Self::InsertResult {
+    fn map_insert_return_value(&self, _v: Self::StorageItem) -> Self::InsertResult {
         ()
     }
 

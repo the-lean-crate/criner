@@ -5,19 +5,13 @@ mod keyed;
 pub use keyed::*;
 
 mod serde;
-mod sled_tree;
+mod tree;
 use crate::persistence::ThreadSafeConnection;
-pub use sled_tree::*;
+pub use tree::*;
 
 #[derive(Clone)]
 pub struct Db {
-    pub inner: sled::Db,
     sqlite_path: PathBuf,
-    meta: sled::Tree,
-    tasks: sled::Tree,
-    versions: sled::Tree,
-    crates: sled::Tree,
-    results: sled::Tree,
 }
 
 impl Db {
@@ -50,55 +44,32 @@ impl Db {
             transaction.commit()?;
         }
 
-        // NOTE: Default compression achieves cutting disk space in half, but the processing speed is cut in half
-        // for our binary data as well.
-        // TODO: re-evaluate that for textual data - it might enable us to store all files, and when we
-        // have more read-based workloads. Maybe it's worth it to turn on.
-        // NOTE: Databases with and without compression need migration.
-        let inner = sled::Config::new()
-            .cache_capacity(128 * 1024 * 1024)
-            .path(&path)
-            .open()?;
-
-        let meta = inner.open_tree("meta")?;
-        let versions = inner.open_tree("crate_versions")?;
-        let crates = inner.open_tree("crates")?;
-        let tasks = inner.open_tree("tasks")?;
-        let results = inner.open_tree("results")?;
-        Ok(Db {
-            sqlite_path,
-            inner,
-            meta,
-            versions,
-            crates,
-            tasks,
-            results,
-        })
+        Ok(Db { sqlite_path })
     }
 
     pub fn open_crate_versions(&self) -> Result<CrateVersionsTree> {
         Ok(CrateVersionsTree {
-            inner: (&self.versions, open_connection(&self.sqlite_path)?),
+            inner: open_connection(&self.sqlite_path)?,
         })
     }
     pub fn open_crates(&self) -> Result<CratesTree> {
         Ok(CratesTree {
-            inner: (&self.crates, open_connection(&self.sqlite_path)?),
+            inner: open_connection(&self.sqlite_path)?,
         })
     }
     pub fn open_tasks(&self) -> Result<TasksTree> {
         Ok(TasksTree {
-            inner: (&self.tasks, open_connection(&self.sqlite_path)?),
+            inner: open_connection(&self.sqlite_path)?,
         })
     }
     pub fn open_results(&self) -> Result<TaskResultTree> {
         Ok(TaskResultTree {
-            inner: (&self.results, open_connection(&self.sqlite_path)?),
+            inner: open_connection(&self.sqlite_path)?,
         })
     }
     pub fn open_context(&self) -> Result<ContextTree> {
         Ok(ContextTree {
-            inner: (&self.meta, open_connection(&self.sqlite_path)?),
+            inner: open_connection(&self.sqlite_path)?,
         })
     }
 }

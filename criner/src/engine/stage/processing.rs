@@ -8,6 +8,7 @@ use futures::{
     task::{Spawn, SpawnExt},
     FutureExt,
 };
+use rusqlite::NO_PARAMS;
 use std::{path::PathBuf, time::SystemTime};
 
 pub async fn process(
@@ -58,15 +59,20 @@ pub async fn process(
     }
 
     let versions = db.open_crate_versions()?;
+    let guard = versions.connection().lock();
+    let mut statement = guard.prepare(&format!(
+        "SELECT data FROM {} ORDER BY _rowid_ ASC",
+        versions.table_name()
+    ))?;
+    let mut rows = statement.query(NO_PARAMS)?;
+
     let num_versions = versions.count();
     progress.init(Some(num_versions as u32), Some("crate versions"));
-    for (vid, res) in versions
-        .tree()
-        .iter()
-        .map(|r| r.map(|(_k, v)| CrateVersion::from(v)))
-        .enumerate()
-    {
-        let version = res?;
+    let mut vid = 0;
+    while let Some(r) = rows.next()? {
+        let version: Vec<u8> = r.get(0)?;
+        let version = CrateVersion::from(version.as_slice());
+
         progress.set((vid + 1) as u32);
         progress.blocked(None);
         work::schedule::tasks(
@@ -79,6 +85,7 @@ pub async fn process(
             startup_time,
         )
         .await?;
+        vid += 1;
     }
     Ok(())
 }
