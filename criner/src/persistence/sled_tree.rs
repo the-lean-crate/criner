@@ -1,6 +1,6 @@
 use crate::model::{Context, Crate, TaskResult};
 use crate::{
-    model::{CrateVersion, ReportResult, Task},
+    model::{CrateVersion, Task},
     persistence::{Keyed, KEY_SEP},
     Error, Result,
 };
@@ -259,10 +259,31 @@ impl<'a> ReportsTree<'a> {
         .into()
     }
     pub fn is_done(&self, key: impl AsRef<[u8]>) -> bool {
-        self.inner.0.contains_key(key).unwrap_or(false)
+        self.inner
+            .1
+            .lock()
+            .query_row(
+                &format!(
+                    "SELECT value FROM report_done where key = {}",
+                    std::str::from_utf8(key.as_ref()).expect("utf8 keys")
+                ),
+                NO_PARAMS,
+                |_r| Ok(()),
+            )
+            .optional()
+            .ok()
+            .map(|_| true)
+            .unwrap_or(false)
     }
     pub fn set_done(&self, key: impl AsRef<[u8]>) {
-        self.inner.0.insert(key, ReportResult::Done).ok();
+        self.inner
+            .1
+            .lock()
+            .execute(
+                "INSERT INTO report_done (key) VALUES (?1)",
+                params![std::str::from_utf8(key.as_ref()).expect("utf8 keys")],
+            )
+            .ok();
     }
 }
 

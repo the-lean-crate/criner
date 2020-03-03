@@ -36,12 +36,17 @@ impl Db {
             for name in &["meta", "crate_version", "crate", "task", "result"] {
                 transaction.execute_batch(&format!(
                     "CREATE TABLE IF NOT EXISTS {} (
-                          key             TEXT PRIMARY KEY,
+                          key             TEXT PRIMARY KEY NOT NULL,
                           data            BLOB NOT NULL
                     )",
                     name
                 ))?;
             }
+            transaction.execute_batch(
+                "CREATE TABLE IF NOT EXISTS report_done (
+                        key             TEXT PRIMARY KEY NOT NULL
+                )",
+            )?;
             transaction.commit()?;
         }
 
