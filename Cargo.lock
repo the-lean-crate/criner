@@ -268,7 +268,6 @@ dependencies = [
  "futures-timer 3.0.2",
  "http",
  "humantime 2.0.0",
- "itertools",
  "jwalk",
  "libflate",
  "log",

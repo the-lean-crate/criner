@@ -1,7 +1,7 @@
 use crate::{export::to_sql::SqlConvert, model};
 use rusqlite::{params, Statement};
 
-impl<'a> SqlConvert for model::CrateVersion<'a> {
+impl SqlConvert for model::CrateVersion {
     fn replace_statement() -> &'static str {
         "REPLACE INTO crate_version
                    (id, name, version, kind, checksum, features)

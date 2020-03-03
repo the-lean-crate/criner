@@ -1,26 +1,7 @@
 use crate::persistence::TreeAccess;
 use std::path::Path;
 
-pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
-    Ok(())
-}
-
-#[allow(dead_code)]
-fn migrate_transform_tree_data_that_was_not_necessary_actually(
-    db_path: impl AsRef<Path>,
-) -> crate::Result<()> {
-    let db = crate::persistence::Db::open(&db_path)?;
-    for (k, v) in db.open_tasks()?.tree().iter().filter_map(Result::ok) {
-        let ks = String::from_utf8(k.to_vec()).unwrap();
-        let t: crate::model::Task = v.into();
-        assert_eq!(t.version, "1.0.0");
-        if ks.ends_with("download") {
-            continue;
-        }
-        if !ks.ends_with("extract_crate") {
-            panic!("got one");
-        }
-    }
+pub fn migrate(_db_path: impl AsRef<Path>) -> crate::Result<()> {
     Ok(())
 }
 
@@ -57,9 +38,9 @@ fn migrate_iterate_assets_and_update_db(db_path: impl AsRef<Path>) -> crate::Res
         log::info!("{} {}", name, version);
 
         let insert_item = (
-            name,
-            version,
-            &task,
+            name.to_owned(),
+            version.to_owned(),
+            task.clone(),
             crate::model::TaskResult::Download {
                 kind: "crate".into(),
                 url: format!(

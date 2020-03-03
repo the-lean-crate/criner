@@ -1,13 +1,10 @@
-use crate::engine::work;
 use crate::{
-    engine::report,
+    engine::{report, work},
     error::Result,
     persistence::{self, TreeAccess},
     utils::check,
 };
-use futures::task::SpawnExt;
-use futures::{task::Spawn, FutureExt};
-use itertools::Itertools;
+use futures::{task::Spawn, task::SpawnExt, FutureExt};
 use rusqlite::NO_PARAMS;
 use std::{path::PathBuf, time::SystemTime};
 

@@ -35,7 +35,7 @@ impl Keyed for crates_index_diff::CrateVersion {
     }
 }
 
-impl<'a> Keyed for CrateVersion<'a> {
+impl Keyed for CrateVersion {
     fn key_bytes_buf(&self, buf: &mut Vec<u8>) {
         CrateVersion::key_from(&self.name, &self.version, buf)
     }
@@ -50,7 +50,7 @@ impl Keyed for TaskResult {
     }
 }
 
-impl<'a> CrateVersion<'a> {
+impl CrateVersion {
     pub fn key_from(name: &str, version: &str, buf: &mut Vec<u8>) {
         buf.extend_from_slice(&name.as_bytes());
         buf.push(KEY_SEP);

@@ -1,18 +1,15 @@
 use serde_derive::{Deserialize, Serialize};
-use std::{
-    borrow::Cow, collections::HashMap, iter::FromIterator, ops::Add, time::Duration,
-    time::SystemTime,
-};
+use std::{collections::HashMap, iter::FromIterator, ops::Add, time::Duration, time::SystemTime};
 
 /// Represents a top-level crate and associated information
 #[derive(Serialize, Deserialize, Default, Clone)]
-pub struct Crate<'a> {
+pub struct Crate {
     /// All versions published to crates.io, guaranteed to be sorted so that the most recent version is last.
     /// The format is as specified in Cargo.toml:version
-    pub versions: Vec<Cow<'a, str>>,
+    pub versions: Vec<String>,
 }
 
-impl<'a> From<&crates_index_diff::CrateVersion> for Crate<'a> {
+impl From<&crates_index_diff::CrateVersion> for Crate {
     fn from(v: &crates_index_diff::CrateVersion) -> Self {
         Crate {
             versions: vec![v.version.to_owned().into()],
@@ -64,27 +61,27 @@ impl Add<&Context> for Context {
 
 /// A single dependency of a specific crate version
 #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
-pub struct Dependency<'a> {
+pub struct Dependency {
     /// The crate name
-    pub name: Cow<'a, str>,
+    pub name: String,
     /// The version the parent crate requires of this dependency
     #[serde(rename = "req")]
-    pub required_version: Cow<'a, str>,
+    pub required_version: String,
     /// All cargo features configured by the parent crate
-    pub features: Vec<Cow<'a, str>>,
+    pub features: Vec<String>,
     /// True if this is an optional dependency
     pub optional: bool,
     /// True if default features are enabled
     pub default_features: bool,
     /// The name of the build target
-    pub target: Option<Cow<'a, str>>,
+    pub target: Option<String>,
     /// The kind of dependency, usually 'normal' or 'dev'
-    pub kind: Option<Cow<'a, str>>,
+    pub kind: Option<String>,
     /// The package this crate is contained in
-    pub package: Option<Cow<'a, str>>,
+    pub package: Option<String>,
 }
 
-impl<'a> From<&crates_index_diff::Dependency> for Dependency<'a> {
+impl From<&crates_index_diff::Dependency> for Dependency {
     fn from(v: &crates_index_diff::Dependency) -> Self {
         Dependency {
             name: v.name.to_owned().into(),
@@ -106,23 +103,23 @@ impl<'a> From<&crates_index_diff::Dependency> for Dependency<'a> {
 
 /// Pack all information we know about a change made to a version of a crate.
 #[derive(Debug, Serialize, Deserialize, Default, Clone)]
-pub struct CrateVersion<'a> {
+pub struct CrateVersion {
     /// The crate name, i.e. `clap`.
-    pub name: Cow<'a, str>,
+    pub name: String,
     /// The kind of change.
     #[serde(rename = "yanked")]
     pub kind: crates_index_diff::ChangeKind,
     /// The semantic version of the crate.
     #[serde(rename = "vers")]
-    pub version: Cow<'a, str>,
+    pub version: String,
     /// The checksum over the crate archive
     #[serde(rename = "cksum")]
-    pub checksum: Cow<'a, str>,
+    pub checksum: String,
     /// All cargo features
-    pub features: HashMap<Cow<'a, str>, Vec<Cow<'a, str>>>,
+    pub features: HashMap<String, Vec<String>>,
     /// All crate dependencies
     #[serde(rename = "deps")]
-    pub dependencies: Vec<Dependency<'a>>,
+    pub dependencies: Vec<Dependency>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
@@ -239,7 +236,7 @@ impl Default for TaskResult {
     }
 }
 
-impl<'a> From<&crates_index_diff::CrateVersion> for CrateVersion<'a> {
+impl From<&crates_index_diff::CrateVersion> for CrateVersion {
     fn from(
         crates_index_diff::CrateVersion {
             name,

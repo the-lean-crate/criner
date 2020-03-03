@@ -121,7 +121,7 @@ impl<'a> SqlConvert for model::TaskResult {
                                     .expect("utf8 path in crate - lets see how long this is true"),
                                 *size as i64,
                                 entry_type,
-                                data.as_ref()
+                                data
                             ])?;
                             num_crate_entries += 1;
                         }

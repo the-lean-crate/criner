@@ -228,7 +228,6 @@ impl ReportsTree {
     }
     pub fn is_done(&self, key: impl AsRef<[u8]>) -> bool {
         self.inner
-            .1
             .lock()
             .query_row(
                 &format!(
@@ -245,7 +244,6 @@ impl ReportsTree {
     }
     pub fn set_done(&self, key: impl AsRef<[u8]>) {
         self.inner
-            .1
             .lock()
             .execute(
                 "INSERT INTO report_done (key) VALUES (?1)",
@@ -259,9 +257,9 @@ pub struct TaskResultTree {
     pub inner: ThreadSafeConnection,
 }
 
-impl<'a> TreeAccess for TaskResultTree {
+impl TreeAccess for TaskResultTree {
     type StorageItem = TaskResult;
-    type InsertItem = (String, String, &'a Task, TaskResult);
+    type InsertItem = (String, String, Task, TaskResult);
     type InsertResult = ();
 
     fn connection(&self) -> &ThreadSafeConnection {
@@ -271,8 +269,8 @@ impl<'a> TreeAccess for TaskResultTree {
         "result"
     }
 
-    fn key_to_buf(v: &(&str, &str, &Task, TaskResult), buf: &mut Vec<u8>) {
-        TasksTree::key_to_buf(&(v.0, v.1, v.2.clone()), buf);
+    fn key_to_buf(v: &(String, String, Task, TaskResult), buf: &mut Vec<u8>) {
+        TasksTree::key_to_buf(&(v.0.clone(), v.1.clone(), v.2.clone()), buf);
         buf.push(KEY_SEP);
         buf.extend_from_slice(v.2.version.as_bytes());
         buf.push(KEY_SEP);
@@ -292,11 +290,11 @@ impl<'a> TreeAccess for TaskResultTree {
     }
 }
 
-pub struct ContextTree<'a> {
+pub struct ContextTree {
     pub inner: ThreadSafeConnection,
 }
 
-impl<'a> TreeAccess for ContextTree<'a> {
+impl TreeAccess for ContextTree {
     type StorageItem = Context;
     type InsertItem = Context;
     type InsertResult = ();
@@ -332,7 +330,7 @@ impl<'a> TreeAccess for ContextTree<'a> {
     }
 }
 
-impl<'a> ContextTree<'a> {
+impl ContextTree {
     pub fn update_today(&self, f: impl Fn(&mut Context)) -> Result<Context> {
         self.update(Self::key(&Context::default()), |mut c| {
             f(&mut c);
@@ -342,25 +340,26 @@ impl<'a> ContextTree<'a> {
 
     // NOTE: impl iterator is not allowed in traits unfortunately, but one could implement one manually
     pub fn most_recent(&self) -> Result<Option<(String, Context)>> {
-        self.connection()
+        Ok(self
+            .connection()
             .lock()
             .query_row(
                 "SELECT key, data FROM meta ORDER BY key DESC limit 1",
                 NO_PARAMS,
-                |r| (r.get::<_, String>(0), r.get::<_, Vec<u8>>(1)),
+                |r| Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?)),
             )
             .optional()?
-            .map(|(k, v)| (k, Context::from(v.as_slice())))
+            .map(|(k, v)| (k, Context::from(v.as_slice()))))
     }
 }
 
 #[derive(Clone)]
-pub struct CratesTree<'a> {
+pub struct CratesTree {
     pub inner: ThreadSafeConnection,
 }
 
-impl<'a> TreeAccess for CratesTree<'a> {
-    type StorageItem = Crate<'a>;
+impl TreeAccess for CratesTree {
+    type StorageItem = Crate;
     type InsertItem = crates_index_diff::CrateVersion;
     type InsertResult = bool;
 
@@ -382,8 +381,8 @@ impl<'a> TreeAccess for CratesTree<'a> {
     fn merge(
         &self,
         new_item: &crates_index_diff::CrateVersion,
-        existing_item: Option<Crate<'a>>,
-    ) -> Option<Crate<'a>> {
+        existing_item: Option<Crate>,
+    ) -> Option<Crate> {
         Some(match existing_item {
             Some(mut c) => {
                 if let Some(existing_version) = c
@@ -404,12 +403,12 @@ impl<'a> TreeAccess for CratesTree<'a> {
 }
 
 #[derive(Clone)]
-pub struct CrateVersionsTree<'a> {
+pub struct CrateVersionsTree {
     pub inner: ThreadSafeConnection,
 }
 
-impl<'a> TreeAccess for CrateVersionsTree<'a> {
-    type StorageItem = CrateVersion<'a>;
+impl TreeAccess for CrateVersionsTree {
+    type StorageItem = CrateVersion;
     type InsertItem = crates_index_diff::CrateVersion;
     type InsertResult = ();
 

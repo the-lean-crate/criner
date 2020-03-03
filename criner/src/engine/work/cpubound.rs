@@ -41,7 +41,7 @@ pub async fn processor(
         progress.set_name(format!("CPU UNZIP+UNTAR {}:{}", crate_name, crate_version));
         progress.init(None, Some("files extracted"));
 
-        let mut kt = (crate_name, crate_version, dummy);
+        let kt = (crate_name, crate_version, dummy);
         key.clear();
 
         persistence::TasksTree::key_to_buf(&kt, &mut key);
@@ -67,65 +67,70 @@ pub async fn processor(
             )
         };
 
-        let res: Result<()> = (|| {
-            let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new(
-                File::open(downloaded_crate)?,
-            ))?);
-            let mut meta_data = Vec::new();
-            let mut files = Vec::new();
-            let mut buf = Vec::new();
+        let res: Result<()> = ({
+            let crate_name = crate_name.clone();
+            let crate_version = crate_version.clone();
+            let task = task.clone();
+            || {
+                let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new(
+                    File::open(downloaded_crate)?,
+                ))?);
+                let mut meta_data = Vec::new();
+                let mut files = Vec::new();
+                let mut buf = Vec::new();
 
-            let mut count = 0;
-            let mut file_count = 0;
-            for e in archive.entries()? {
-                count += 1;
-                progress.set(count);
-                let mut e: tar::Entry<_> = e?;
-                let path = e.path().ok();
-                meta_data.push(model::TarHeader {
-                    path: e.path_bytes().to_vec(),
-                    size: e.header().size()?,
-                    entry_type: e.header().entry_type().as_byte(),
-                });
+                let mut count = 0;
+                let mut file_count = 0;
+                for e in archive.entries()? {
+                    count += 1;
+                    progress.set(count);
+                    let mut e: tar::Entry<_> = e?;
+                    let path = e.path().ok();
+                    meta_data.push(model::TarHeader {
+                        path: e.path_bytes().to_vec(),
+                        size: e.header().size()?,
+                        entry_type: e.header().entry_type().as_byte(),
+                    });
 
-                if let Some(stem_lowercase) = path.and_then(|p| {
-                    p.file_stem()
-                        .and_then(|stem| stem.to_str().map(str::to_lowercase))
-                }) {
-                    let interesting_files = ["cargo", "cargo", "readme", "license", "build"];
-                    if interesting_files.contains(&stem_lowercase.as_str()) {
-                        file_count += 1;
-                        buf.clear();
-                        e.read_to_end(&mut buf)?;
-                        files.push((
-                            meta_data
-                                .last()
-                                .expect("to have pushed one just now")
-                                .to_owned(),
-                            buf.to_owned().into(),
-                        ));
+                    if let Some(stem_lowercase) = path.and_then(|p| {
+                        p.file_stem()
+                            .and_then(|stem| stem.to_str().map(str::to_lowercase))
+                    }) {
+                        let interesting_files = ["cargo", "cargo", "readme", "license", "build"];
+                        if interesting_files.contains(&stem_lowercase.as_str()) {
+                            file_count += 1;
+                            buf.clear();
+                            e.read_to_end(&mut buf)?;
+                            files.push((
+                                meta_data
+                                    .last()
+                                    .expect("to have pushed one just now")
+                                    .to_owned(),
+                                buf.to_owned().into(),
+                            ));
+                        }
                     }
                 }
-            }
-            progress.info(format!(
-                "Recorded {} files and stored {} in full",
-                count, file_count
-            ));
+                progress.info(format!(
+                    "Recorded {} files and stored {} in full",
+                    count, file_count
+                ));
 
-            {
-                let insert_item = (
-                    crate_name,
-                    crate_version,
-                    &task,
-                    model::TaskResult::ExplodedCrate {
-                        entries_meta_data: meta_data.into(),
-                        selected_entries: files.into(),
-                    },
-                );
-                results.insert(&insert_item)?;
-            }
+                {
+                    let insert_item = (
+                        crate_name,
+                        crate_version,
+                        task,
+                        model::TaskResult::ExplodedCrate {
+                            entries_meta_data: meta_data.into(),
+                            selected_entries: files.into(),
+                        },
+                    );
+                    results.insert(&insert_item)?;
+                }
 
-            Ok(())
+                Ok(())
+            }
         })();
 
         task.state = match res {
@@ -135,8 +140,7 @@ pub async fn processor(
                 model::TaskState::AttemptsWithFailure(vec![err.to_string()])
             }
         };
-        kt.2 = task;
-        tasks.upsert(&kt)?;
+        tasks.upsert(&(crate_name, crate_version, task))?;
         progress.set_name("CPU IDLE");
         progress.init(None, None);
     }

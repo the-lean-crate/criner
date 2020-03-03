@@ -211,9 +211,9 @@ fn context_stream(db: &Db, start_of_computation: SystemTime) -> impl futures::St
         move |_| {
             db.open_context()
                 .unwrap()
-                .iter()
-                .next_back()
-                .and_then(Result::ok)
+                .most_recent()
+                .ok()
+                .flatten()
                 .map(|(_, c): (_, model::Context)| {
                     let lines = vec![
                         Line::Text(wallclock(start_of_computation)),

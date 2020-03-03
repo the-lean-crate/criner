@@ -2,6 +2,8 @@
 
 ## Tasks
 
+* [ ] review and eliminate some of the 'silly' copies we now make after removing zero-copy
+* [ ] Make all tree methods take an actual key and get rid of the insertion item - it's the reason for being so unwieldy
 * [x] export all data into a flattened queryable sqlite database
 * [x] also write data to sqlite when fetching
   * [ ] experiment with SQLITE Pragmas: performance(journal_mode, journal_size, synchronous=0), read_uncommitted

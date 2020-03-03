@@ -61,8 +61,8 @@ impl SqlConvert for model::Task {
             uid,
             crate_name,
             crate_version,
-            process.as_ref(),
-            version.as_ref(),
+            process,
+            version,
             stored_at
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()

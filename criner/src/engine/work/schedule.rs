@@ -26,7 +26,7 @@ pub enum AsyncResult {
 
 pub async fn tasks(
     tasks: persistence::TasksTree,
-    krate: &model::CrateVersion<'_>,
+    krate: &model::CrateVersion,
     mut progress: prodash::tree::Item,
     _mode: Scheduling,
     perform_io: &async_std::sync::Sender<iobound::DownloadRequest>,
@@ -44,8 +44,8 @@ pub async fn tasks(
             1,
             1,
             || iobound::DownloadRequest {
-                crate_name: krate.name.as_ref().into(),
-                crate_version: krate.version.as_ref().into(),
+                crate_name: krate.name.clone(),
+                crate_version: krate.version.clone(),
                 kind: "crate",
                 url: format!(
                     "https://crates.io/api/v1/crates/{name}/{version}/download",
@@ -69,8 +69,8 @@ pub async fn tasks(
                     2,
                     || cpubound::ExtractRequest {
                         download_task: download_crate_task.into(),
-                        crate_name: krate.name.as_ref().into(),
-                        crate_version: krate.version.as_ref().into(),
+                        crate_name: krate.name.clone(),
+                        crate_version: krate.version.clone(),
                     },
                 )
                 .await;
@@ -85,7 +85,11 @@ fn task_or_default(
     version: &model::CrateVersion,
     make_task: impl FnOnce() -> model::Task,
 ) -> Result<model::Task> {
-    let key = (version.name.as_ref(), version.version.as_ref(), make_task());
+    let key = (
+        version.name.to_owned(),
+        version.version.to_owned(),
+        make_task(),
+    );
     Ok(tasks.get(TasksTree::key(&key))?.unwrap_or(key.2))
 }
 

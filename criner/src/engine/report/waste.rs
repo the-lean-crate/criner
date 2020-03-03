@@ -42,13 +42,13 @@ impl Generator {
         for (name, krate) in krates.into_iter() {
             let c: model::Crate = krate.as_slice().into();
             p.init(Some(c.versions.len() as u32), Some("versions"));
-            p.set_name(name);
+            p.set_name(&name);
 
             for (vid, version) in c.versions.iter().enumerate() {
                 {
                     let key = (
-                        name.as_ref(),
-                        version.as_ref(),
+                        name.as_str(),
+                        version.as_str(),
                         &exrtaction_task_dummy,
                         dummy_extraction_result,
                     );
@@ -112,15 +112,11 @@ fn output_file_html(base: &Path, name: &str, version: &str) -> PathBuf {
     base.join(name).join(version).join("index.html")
 }
 
-fn to_name(key: &[u8]) -> &str {
-    std::str::from_utf8(key).expect("unicode keys")
-}
-
-// FIXME: this is a copy of persistence::TaskResultTree, which doens't work as it wants &'static str, but doesn't tell
+// FIXME: this is a copy of persistence::TaskResultTree, which does not work as it wants &'static str, but doesn't tell
 // Seems to be some sort of borrow checker bug.
 fn key_to_buf(v: &(&str, &str, &model::Task, model::TaskResult), buf: &mut Vec<u8>) {
     use persistence::Keyed;
-    persistence::TasksTree::key_to_buf(&(v.0, v.1, v.2.clone()), buf);
+    persistence::TasksTree::key_to_buf(&(v.0.to_owned(), v.1.to_owned(), v.2.clone()), buf);
     buf.push(persistence::KEY_SEP);
     buf.extend_from_slice(v.2.version.as_bytes());
     buf.push(persistence::KEY_SEP);
