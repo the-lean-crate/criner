@@ -98,14 +98,54 @@ pub trait TreeAccess {
         return res;
     }
 
-    /// Similar to 'update', but provides full control over the default
+    /// Similar to 'update', but provides full control over the default and allows deletion
     fn upsert(&self, item: &Self::InsertItem) -> Result<Self::InsertResult> {
-        self.tree()
+        let res = self
+            .tree()
             .update_and_fetch(Self::key(item), |existing: Option<&[u8]>| {
                 self.merge(item, existing.map(From::from)).map(Into::into)
             })?
             .ok_or_else(|| Error::Bug("We always put a value or update the existing one"))
-            .map(|v| self.map_insert_return_value(v))
+            .map(|v| self.map_insert_return_value(v));
+
+        let mut guard = self.connection().lock();
+        let key = Self::key(item);
+        let key_str = std::str::from_utf8(key.as_slice()).expect("utf8-keys");
+
+        let transaction = {
+            let mut t = guard.savepoint()?;
+            t.set_drop_behavior(rusqlite::DropBehavior::Commit);
+            t
+        };
+        let new_value = {
+            let maybe_vec = transaction
+                .query_row(
+                    &format!(
+                        "SELECT data FROM {} WHERE key = '{}'",
+                        self.table_name(),
+                        key_str
+                    ),
+                    NO_PARAMS,
+                    |r| r.get::<_, Vec<u8>>(0),
+                )
+                .optional()?;
+            self.merge(item, maybe_vec.map(|v| v.as_slice().into()))
+        };
+        // NOTE: Copied from update, with minor changes to support deletion
+        match new_value {
+            Some(value) => {
+                transaction.execute(
+                    &format!(
+                        "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
+                        self.table_name()
+                    ),
+                    params![key_str, rmp_serde::to_vec(&value)?],
+                )?;
+            }
+            None => todo!("deletion of values - I don't think we need that"),
+        };
+
+        res
     }
 
     fn insert(&self, v: &Self::InsertItem) -> Result<()> {
