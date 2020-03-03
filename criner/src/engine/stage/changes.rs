@@ -30,11 +30,35 @@ pub async fn fetch(
         &pool,
     )
     .await??;
-    subprogress.set_name("Fetching crates index to see changes");
-    let crate_versions = enforce_blocking(deadline, move || index.fetch_changes(), &pool).await??;
+    let crate_versions = enforce_blocking(
+        deadline,
+        move || {
+            let mut cbs = crates_index_diff::git2::RemoteCallbacks::new();
+            let mut opts = {
+                cbs.transfer_progress(|p| {
+                    subprogress.set_name(format!(
+                        "Fetching crates index ({} received)",
+                        bytesize::ByteSize(p.received_bytes() as u64)
+                    ));
+                    subprogress.init(
+                        Some((p.total_deltas() + p.total_objects()) as u32),
+                        Some("objects"),
+                    );
+                    subprogress.set((p.indexed_deltas() + p.received_objects()) as u32);
+                    true
+                });
+                let mut opts = crates_index_diff::git2::FetchOptions::new();
+                opts.remote_callbacks(cbs);
+                opts
+            };
+
+            index.fetch_changes_with_options(Some(&mut opts))
+        },
+        &pool,
+    )
+    .await??;
 
     progress.done(format!("Fetched {} changed crates", crate_versions.len()));
-    drop(subprogress);
 
     let mut store_progress = progress.add_child("processing new crates");
     store_progress.init(Some(crate_versions.len() as u32), Some("crate versions"));
