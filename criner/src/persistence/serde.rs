@@ -10,7 +10,7 @@ fn expect<T, E: std::fmt::Display>(
     }
 }
 
-macro_rules! impl_ivec_transform {
+macro_rules! impl_deserialize {
     ($ty:ty) => {
         impl From<&[u8]> for $ty {
             fn from(b: &[u8]) -> Self {
@@ -27,34 +27,12 @@ macro_rules! impl_ivec_transform {
                 })
             }
         }
-        impl From<sled::IVec> for $ty {
-            fn from(b: sled::IVec) -> Self {
-                expect(rmp_serde::from_read_ref(b.as_ref()), |e| {
-                    format!(
-                        concat!(
-                            "IVec: migration should succeed: ",
-                            stringify!($ty),
-                            "{:#?}: {}"
-                        ),
-                        rmpv::decode::value::read_value(&mut std::io::Cursor::new(b)).unwrap(),
-                        e
-                    )
-                })
-            }
-        }
-        impl From<$ty> for sled::IVec {
-            fn from(c: $ty) -> Self {
-                rmp_serde::to_vec(&c)
-                    .expect("serialization to always succeed")
-                    .into()
-            }
-        }
     };
 }
 
-impl_ivec_transform!(Crate<'_>);
-impl_ivec_transform!(Task<'_>);
-impl_ivec_transform!(TaskResult<'_>);
-impl_ivec_transform!(CrateVersion<'_>);
-impl_ivec_transform!(Context);
-impl_ivec_transform!(ReportResult);
+impl_deserialize!(Crate<'_>);
+impl_deserialize!(Task<'_>);
+impl_deserialize!(TaskResult<'_>);
+impl_deserialize!(CrateVersion<'_>);
+impl_deserialize!(Context);
+impl_deserialize!(ReportResult);

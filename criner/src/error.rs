@@ -1,9 +1,7 @@
 use crates_index_diff::git2;
 use humantime;
 use rmp_serde;
-use sled;
-use std::fmt;
-use std::time;
+use std::{fmt, time};
 
 #[derive(Debug)]
 pub struct FormatDeadline(pub time::SystemTime);
@@ -46,10 +44,6 @@ quick_error! {
             cause(err)
         }
         Git2(err: git2::Error) {
-            from()
-            cause(err)
-        }
-        Sled(err: sled::Error) {
             from()
             cause(err)
         }

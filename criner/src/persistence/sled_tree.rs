@@ -5,7 +5,6 @@ use crate::{
     Error, Result,
 };
 use rusqlite::{params, OptionalExtension, NO_PARAMS};
-use sled::IVec;
 use std::time::SystemTime;
 
 /// Required as we send futures to threads. The type system can't statically prove that in fact
@@ -18,7 +17,6 @@ pub trait TreeAccess {
     type InsertItem;
     type InsertResult;
 
-    fn tree(&self) -> &sled::Tree;
     fn connection(&self) -> &ThreadSafeConnection;
     fn table_name(&self) -> &'static str;
 
