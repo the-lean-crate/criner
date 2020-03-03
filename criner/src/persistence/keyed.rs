@@ -5,6 +5,7 @@ pub const KEY_SEP: u8 = b':';
 pub const KEY_SEP_CHAR: char = ':';
 
 pub trait Keyed {
+    /// TODO: without sled, we can use strings right away
     fn key_bytes_buf(&self, buf: &mut Vec<u8>);
     fn key_bytes(&self) -> Vec<u8> {
         let mut buf = Vec::with_capacity(16);

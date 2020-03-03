@@ -58,6 +58,7 @@ pub trait TreeAccess {
             })?
             .map(From::from)
             .ok_or_else(|| Error::Bug("We always set a value"));
+
         let mut guard = self.connection().lock();
         let transaction = {
             let mut t = guard.savepoint()?;
@@ -93,6 +94,7 @@ pub trait TreeAccess {
             ),
             params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
         )?;
+
         return res;
     }
 
@@ -114,6 +116,7 @@ pub trait TreeAccess {
             )
             .map_err(Error::from)
             .map(|_| ())?;
+
         self.connection().lock().execute(
             &format!(
                 "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
@@ -124,6 +127,7 @@ pub trait TreeAccess {
                 rmp_serde::to_vec(&self.merge(v, None).unwrap_or_else(Default::default))?
             ],
         )?;
+
         Ok(())
     }
 }

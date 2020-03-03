@@ -32,7 +32,11 @@ pub async fn process(
                 rx.clone(),
                 assets_dir.clone(),
             )
-            .map(|_| ()),
+            .map(|r| {
+                if let Err(e) = r {
+                    log::error!("iobound processor failed: {}", e);
+                }
+            }),
         );
     }
     let (tx_cpu, rx) = async_std::sync::channel(1);
@@ -44,7 +48,12 @@ pub async fn process(
                 rx.clone(),
                 assets_dir.clone(),
             )
-            .map(|_| ()),
+            .map(|r| {
+                if let Err(e) = r {
+                    log::error!("CPU bound processor failed: {}", e);
+                }
+                ()
+            }),
         )?;
     }
 
