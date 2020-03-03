@@ -59,7 +59,11 @@ pub trait TreeAccess {
             .map(From::from)
             .ok_or_else(|| Error::Bug("We always set a value"));
         let mut guard = self.connection().lock();
-        let transaction = guard.savepoint()?;
+        let transaction = {
+            let mut t = guard.savepoint()?;
+            t.set_drop_behavior(rusqlite::DropBehavior::Commit);
+            t
+        };
         let new_value = transaction
             .query_row(
                 &format!(
