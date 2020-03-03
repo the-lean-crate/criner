@@ -4,11 +4,14 @@ use std::path::Path;
 pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
     // use rayon::prelude::*;
     use rusqlite::{params, Connection};
+    // Trigger db schema generation
+    {
+        crate::persistence::Db::open(&db_path)?;
+    }
     let db = sled::open(&db_path)?;
-    let sqlite_db_path = std::path::Path::new("./criner.msgpack.sqlite");
+    let sqlite_db_path = db_path.as_ref().join("db.msgpack.sqlite");
     let tree_names: Vec<Vec<u8>> = db.tree_names().into_iter().map(|v| v.to_vec()).collect();
 
-    // tree_names.into_par_iter().try_for_each(|tree_name| {
     for tree_name in tree_names {
         let mut tree_name_str = std::str::from_utf8(&tree_name).unwrap();
         if tree_name_str.ends_with('s') {
@@ -18,18 +21,6 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
             continue;
         }
         let mut repo = Connection::open(&sqlite_db_path).unwrap();
-        repo.execute(
-            &format!(
-                "CREATE TABLE {} (
-                  key             TEXT PRIMARY KEY,
-                  data            BLOB NOT NULL
-                  )",
-                tree_name_str
-            ),
-            params![],
-        )
-        .unwrap();
-
         let tree = db.open_tree(&tree_name)?;
         let mut count = 0;
         let transaction = repo.transaction().unwrap();
