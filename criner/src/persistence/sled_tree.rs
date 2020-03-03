@@ -35,6 +35,18 @@ pub trait TreeAccess {
         existing_item: Option<Self::StorageItem>,
     ) -> Option<Self::StorageItem>;
 
+    fn count(&self) -> u64 {
+        let res = self.tree().len();
+        self.connection()
+            .lock()
+            .query_row(
+                &format!("SELECT COUNT(*) FROM {}", self.table_name()),
+                NO_PARAMS,
+                |r| r.get::<_, i64>(0),
+            )
+            .unwrap_or(0) as u64;
+        res as u64
+    }
     fn get(&self, key: impl AsRef<[u8]>) -> Result<Option<Self::StorageItem>> {
         let res = self
             .tree()

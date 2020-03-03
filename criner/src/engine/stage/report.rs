@@ -26,7 +26,7 @@ pub async fn generate(
         .join("reports");
     let waste_report_dir = output_dir.join("waste");
     std::fs::create_dir_all(&waste_report_dir)?;
-    let num_crates = krates.tree().len() as u32;
+    let num_crates = krates.count() as u32;
     progress.init(Some(num_crates), Some("crates"));
 
     let (rx_result, tx) = {

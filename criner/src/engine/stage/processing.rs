@@ -58,7 +58,7 @@ pub async fn process(
     }
 
     let versions = db.open_crate_versions()?;
-    let num_versions = versions.tree().len();
+    let num_versions = versions.count();
     progress.init(Some(num_versions as u32), Some("crate versions"));
     for (vid, res) in versions
         .tree()
