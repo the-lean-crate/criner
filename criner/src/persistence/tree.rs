@@ -1,5 +1,4 @@
 use crate::model::{Context, Crate, TaskResult};
-use crate::persistence::KEY_SEP_CHAR;
 use crate::{
     model::{CrateVersion, Task},
     persistence::Keyed,
@@ -177,9 +176,7 @@ impl TreeAccess for TasksTree {
     }
 
     fn key_to_buf((name, version, t): &Self::InsertItem, buf: &mut String) {
-        CrateVersion::key_from(name, version, buf);
-        buf.push(KEY_SEP_CHAR);
-        t.key_buf(buf);
+        t.fq_key(name, version, buf);
     }
 
     fn merge(
@@ -264,11 +261,7 @@ impl TreeAccess for TaskResultTree {
     }
 
     fn key_to_buf(v: &(String, String, Task, TaskResult), buf: &mut String) {
-        TasksTree::key_to_buf(&(v.0.clone(), v.1.clone(), v.2.clone()), buf);
-        buf.push(KEY_SEP_CHAR);
-        buf.push_str(&v.2.version);
-        buf.push(KEY_SEP_CHAR);
-        v.3.key_buf(buf);
+        v.3.fq_key(&v.0, &v.1, &v.2, buf);
     }
 
     fn merge(
@@ -295,17 +288,8 @@ impl TreeAccess for ContextTree {
         "meta"
     }
 
-    fn key_to_buf(_item: &Self::InsertItem, buf: &mut String) {
-        use std::fmt::Write;
-        write!(
-            buf,
-            "context/{}",
-            humantime::format_rfc3339(SystemTime::now())
-                .to_string()
-                .get(..10)
-                .expect("YYYY-MM-DD - 10 bytes")
-        )
-        .ok();
+    fn key_to_buf(item: &Self::InsertItem, buf: &mut String) {
+        item.key_buf(buf);
     }
 
     fn merge(&self, new: &Context, existing_item: Option<Context>) -> Option<Self::StorageItem> {
@@ -355,7 +339,7 @@ impl TreeAccess for CratesTree {
     }
 
     fn key_to_buf(item: &crates_index_diff::CrateVersion, buf: &mut String) {
-        buf.push_str(&item.name);
+        item.key_buf(buf);
     }
 
     fn merge(

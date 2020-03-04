@@ -4,6 +4,8 @@
 
 * [ ] review and eliminate some of the 'silly' copies we now make after removing zero-copy
 * [ ] Make all tree methods take an actual key and get rid of the insertion item - it's the reason for being so unwieldy
+* [ ] Store Task by name and version - otherwise they can never change in case they do change.
+      Can be done quickly without redownloading by checking for presence of file or with migration (better)
 * [ ] remove io/cpubound duplication and generalize tasks
   * [ ] allow task dependencies, so that one triggers another potentially. Fixes that right now, two processing runs are needed
         to untar downloads

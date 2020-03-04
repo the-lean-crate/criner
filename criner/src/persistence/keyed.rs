@@ -1,4 +1,5 @@
-use crate::model::{CrateVersion, Task, TaskResult};
+use crate::model::{Context, CrateVersion, Task, TaskResult};
+use std::time::SystemTime;
 
 pub const KEY_SEP_CHAR: char = ':';
 
@@ -24,9 +25,23 @@ impl Keyed for Task {
     }
 }
 
+impl Task {
+    pub fn fq_key(&self, crate_name: &str, crate_version: &str, buf: &mut String) {
+        CrateVersion::key_from(crate_name, crate_version, buf);
+        buf.push(KEY_SEP_CHAR);
+        self.key_buf(buf);
+    }
+}
+
 impl Keyed for crates_index_diff::CrateVersion {
     fn key_buf(&self, buf: &mut String) {
         CrateVersion::key_from(&self.name, &self.version, buf)
+    }
+}
+
+impl Keyed for &crates_index_diff::CrateVersion {
+    fn key_buf(&self, buf: &mut String) {
+        buf.push_str(&self.name);
     }
 }
 
@@ -42,6 +57,32 @@ impl Keyed for TaskResult {
             TaskResult::Download { kind, .. } => buf.push_str(kind),
             TaskResult::None | TaskResult::ExplodedCrate { .. } => {}
         }
+    }
+}
+
+impl TaskResult {
+    pub fn fq_key(&self, crate_name: &str, crate_version: &str, task: &Task, buf: &mut String) {
+        task.fq_key(crate_name, crate_version, buf);
+        buf.push(KEY_SEP_CHAR);
+        // TODO/FIXME let task use version already
+        buf.push_str(&task.version);
+        buf.push(KEY_SEP_CHAR);
+        self.key_buf(buf);
+    }
+}
+
+impl Keyed for Context {
+    fn key_buf(&self, buf: &mut String) {
+        use std::fmt::Write;
+        write!(
+            buf,
+            "context/{}",
+            humantime::format_rfc3339(SystemTime::now())
+                .to_string()
+                .get(..10)
+                .expect("YYYY-MM-DD - 10 bytes")
+        )
+        .ok();
     }
 }
 
