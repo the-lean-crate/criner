@@ -82,7 +82,7 @@ pub async fn fetch(
                         versions.insert(&version)?;
                         context.update_today(|c| c.counts.crate_versions += 1)?;
                     }
-                    if krate.upsert(&version)? {
+                    if krate.upsert(&version)?.versions.len() == 1 {
                         context.update_today(|c| c.counts.crates += 1)?;
                     }
 

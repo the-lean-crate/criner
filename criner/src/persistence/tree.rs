@@ -16,7 +16,6 @@ pub type ThreadSafeConnection = std::sync::Arc<parking_lot::Mutex<rusqlite::Conn
 pub trait TreeAccess {
     type StorageItem: serde::Serialize + for<'a> From<&'a [u8]> + Default;
     type InsertItem;
-    type InsertResult;
 
     fn connection(&self) -> &ThreadSafeConnection;
     fn table_name(&self) -> &'static str;
@@ -29,7 +28,6 @@ pub trait TreeAccess {
     }
     // TODO: remove this method
     fn key_to_buf(item: &Self::InsertItem, buf: &mut String);
-    fn map_insert_return_value(&self, v: Self::StorageItem) -> Self::InsertResult;
     fn merge(
         &self,
         new_item: &Self::InsertItem,
@@ -109,7 +107,7 @@ pub trait TreeAccess {
     }
 
     /// Similar to 'update', but provides full control over the default and allows deletion
-    fn upsert(&self, item: &Self::InsertItem) -> Result<Self::InsertResult> {
+    fn upsert(&self, item: &Self::InsertItem) -> Result<Self::StorageItem> {
         let mut guard = self.connection().lock();
         let key_str = Self::key(item);
 
@@ -142,7 +140,7 @@ pub trait TreeAccess {
                     ),
                     params![key_str, rmp_serde::to_vec(&value)?],
                 )?;
-                Ok(self.map_insert_return_value(value))
+                Ok(value)
             }
             None => todo!("deletion of values - I don't think we need that"),
         }
@@ -170,7 +168,6 @@ pub struct TasksTree {
 impl TreeAccess for TasksTree {
     type StorageItem = Task;
     type InsertItem = (String, String, Task);
-    type InsertResult = Task;
 
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
@@ -183,10 +180,6 @@ impl TreeAccess for TasksTree {
         CrateVersion::key_from(name, version, buf);
         buf.push(KEY_SEP_CHAR);
         t.key_buf(buf);
-    }
-
-    fn map_insert_return_value(&self, v: Self::StorageItem) -> Self::InsertResult {
-        v
     }
 
     fn merge(
@@ -262,7 +255,6 @@ pub struct TaskResultTree {
 impl TreeAccess for TaskResultTree {
     type StorageItem = TaskResult;
     type InsertItem = (String, String, Task, TaskResult);
-    type InsertResult = ();
 
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
@@ -277,10 +269,6 @@ impl TreeAccess for TaskResultTree {
         buf.push_str(&v.2.version);
         buf.push(KEY_SEP_CHAR);
         v.3.key_buf(buf);
-    }
-
-    fn map_insert_return_value(&self, _v: Self::StorageItem) -> Self::InsertResult {
-        ()
     }
 
     fn merge(
@@ -299,7 +287,6 @@ pub struct ContextTree {
 impl TreeAccess for ContextTree {
     type StorageItem = Context;
     type InsertItem = Context;
-    type InsertResult = ();
 
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
@@ -319,10 +306,6 @@ impl TreeAccess for ContextTree {
                 .expect("YYYY-MM-DD - 10 bytes")
         )
         .ok();
-    }
-
-    fn map_insert_return_value(&self, _v: Self::StorageItem) -> Self::InsertResult {
-        ()
     }
 
     fn merge(&self, new: &Context, existing_item: Option<Context>) -> Option<Self::StorageItem> {
@@ -363,7 +346,6 @@ pub struct CratesTree {
 impl TreeAccess for CratesTree {
     type StorageItem = Crate;
     type InsertItem = crates_index_diff::CrateVersion;
-    type InsertResult = bool;
 
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
@@ -374,10 +356,6 @@ impl TreeAccess for CratesTree {
 
     fn key_to_buf(item: &crates_index_diff::CrateVersion, buf: &mut String) {
         buf.push_str(&item.name);
-    }
-
-    fn map_insert_return_value(&self, v: Self::StorageItem) -> Self::InsertResult {
-        v.versions.len() == 1
     }
 
     fn merge(
@@ -412,7 +390,6 @@ pub struct CrateVersionsTree {
 impl TreeAccess for CrateVersionsTree {
     type StorageItem = CrateVersion;
     type InsertItem = crates_index_diff::CrateVersion;
-    type InsertResult = ();
 
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
@@ -423,10 +400,6 @@ impl TreeAccess for CrateVersionsTree {
 
     fn key_to_buf(v: &crates_index_diff::CrateVersion, buf: &mut String) {
         v.key_buf(buf);
-    }
-
-    fn map_insert_return_value(&self, _v: Self::StorageItem) -> Self::InsertResult {
-        ()
     }
 
     fn merge(
