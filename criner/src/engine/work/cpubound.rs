@@ -28,7 +28,11 @@ pub async fn processor(
     use persistence::TreeAccess;
 
     let mut key = String::with_capacity(32);
-    let dummy = default_persisted_extraction_task();
+    let dummy_task = default_persisted_extraction_task();
+    let dummy_result = model::TaskResult::ExplodedCrate {
+        entries_meta_data: vec![],
+        selected_entries: vec![],
+    };
     let tasks = db.open_tasks()?;
     let results = db.open_results()?;
 
@@ -42,11 +46,11 @@ pub async fn processor(
         progress.init(None, Some("files extracted"));
 
         key.clear();
-        dummy.fq_key(&crate_name, &crate_version, &mut key);
+        dummy_task.fq_key(&crate_name, &crate_version, &mut key);
 
         let mut task = tasks.update(&key, |mut t| {
-            t.process = dummy.process.clone();
-            t.version = dummy.version.clone();
+            t.process = dummy_task.process.clone();
+            t.version = dummy_task.version.clone();
             t.state.merge_with(&model::TaskState::InProgress(None));
             t
         })?;
@@ -62,61 +66,10 @@ pub async fn processor(
             )
         };
 
-        let res: Result<()> = (|| {
-            let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new(
-                File::open(downloaded_crate)?,
-            ))?);
-            let mut meta_data = Vec::new();
-            let mut files = Vec::new();
-            let mut buf = Vec::new();
-
-            let mut count = 0;
-            let mut file_count = 0;
-            for e in archive.entries()? {
-                count += 1;
-                progress.set(count);
-                let mut e: tar::Entry<_> = e?;
-                let path = e.path().ok();
-                meta_data.push(model::TarHeader {
-                    path: e.path_bytes().to_vec(),
-                    size: e.header().size()?,
-                    entry_type: e.header().entry_type().as_byte(),
-                });
-
-                if let Some(stem_lowercase) = path.and_then(|p| {
-                    p.file_stem()
-                        .and_then(|stem| stem.to_str().map(str::to_lowercase))
-                }) {
-                    let interesting_files = ["cargo", "cargo", "readme", "license", "build"];
-                    if interesting_files.contains(&stem_lowercase.as_str()) {
-                        file_count += 1;
-                        buf.clear();
-                        e.read_to_end(&mut buf)?;
-                        files.push((
-                            meta_data
-                                .last()
-                                .expect("to have pushed one just now")
-                                .to_owned(),
-                            buf.to_owned().into(),
-                        ));
-                    }
-                }
-            }
-            progress.info(format!(
-                "Recorded {} files and stored {} in full",
-                count, file_count
-            ));
-
-            let task_result = model::TaskResult::ExplodedCrate {
-                entries_meta_data: meta_data.into(),
-                selected_entries: files.into(),
-            };
-            key.clear();
-            task_result.fq_key(&crate_name, &crate_version, &task, &mut key);
-            results.insert(&key, &task_result)?;
-
-            Ok(())
-        })();
+        progress.blocked(None);
+        key.clear();
+        dummy_result.fq_key(&crate_name, &crate_version, &task, &mut key);
+        let res: Result<()> = extract_crate(&results, &key, &mut progress, downloaded_crate);
 
         task.state = match res {
             Ok(_) => model::TaskState::Complete,
@@ -133,6 +86,66 @@ pub async fn processor(
         progress.set_name("CPU IDLE");
         progress.init(None, None);
     }
+
+    Ok(())
+}
+
+fn extract_crate(
+    results: &persistence::TaskResultTree,
+    key: &str,
+    progress: &mut prodash::tree::Item,
+    downloaded_crate: PathBuf,
+) -> Result<()> {
+    use persistence::TreeAccess;
+    let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new(File::open(
+        downloaded_crate,
+    )?))?);
+    let mut meta_data = Vec::new();
+    let mut files = Vec::new();
+    let mut buf = Vec::new();
+
+    let mut count = 0;
+    let mut file_count = 0;
+    for e in archive.entries()? {
+        count += 1;
+        progress.set(count);
+        let mut e: tar::Entry<_> = e?;
+        let path = e.path().ok();
+        meta_data.push(model::TarHeader {
+            path: e.path_bytes().to_vec(),
+            size: e.header().size()?,
+            entry_type: e.header().entry_type().as_byte(),
+        });
+
+        if let Some(stem_lowercase) = path.and_then(|p| {
+            p.file_stem()
+                .and_then(|stem| stem.to_str().map(str::to_lowercase))
+        }) {
+            let interesting_files = ["cargo", "cargo", "readme", "license", "build"];
+            if interesting_files.contains(&stem_lowercase.as_str()) {
+                file_count += 1;
+                buf.clear();
+                e.read_to_end(&mut buf)?;
+                files.push((
+                    meta_data
+                        .last()
+                        .expect("to have pushed one just now")
+                        .to_owned(),
+                    buf.to_owned().into(),
+                ));
+            }
+        }
+    }
+    progress.info(format!(
+        "Recorded {} files and stored {} in full",
+        count, file_count
+    ));
+
+    let task_result = model::TaskResult::ExplodedCrate {
+        entries_meta_data: meta_data.into(),
+        selected_entries: files.into(),
+    };
+    results.insert(&key, &task_result)?;
 
     Ok(())
 }

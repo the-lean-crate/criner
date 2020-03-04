@@ -32,7 +32,7 @@ pub async fn generate(
         let (tx_result, rx_result) =
             async_std::sync::channel((cpu_o_bound_processors * 2) as usize);
         for _ in 0..cpu_o_bound_processors {
-            pool.spawn(work::general::processor(rx.clone(), tx_result.clone()).map(|_| ()))?;
+            pool.spawn(work::simple::processor(rx.clone(), tx_result.clone()).map(|_| ()))?;
         }
         (rx_result, tx)
     };
