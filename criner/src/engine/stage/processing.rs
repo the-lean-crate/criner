@@ -62,7 +62,7 @@ pub async fn process(
     let num_versions = versions.count();
     let guard = versions.connection().lock();
     let mut statement = guard.prepare(&format!(
-        "SELECT data FROM {} ORDER BY _rowid_ ASC",
+        "SELECT data FROM {} ORDER BY _rowid_ DESC",
         versions.table_name()
     ))?;
 
