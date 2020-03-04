@@ -4,7 +4,6 @@ use std::time::SystemTime;
 pub const KEY_SEP_CHAR: char = ':';
 
 pub trait Keyed {
-    /// TODO: without sled, we can use strings right away
     fn key_buf(&self, buf: &mut String);
     fn key(&self) -> String {
         let mut buf = String::with_capacity(16);
@@ -13,15 +12,11 @@ pub trait Keyed {
     }
 }
 
-impl Task {
-    pub fn key_from(process: &str, buf: &mut String) {
-        buf.push_str(process);
-    }
-}
-
 impl Keyed for Task {
     fn key_buf(&self, buf: &mut String) {
-        Task::key_from(&self.process, buf)
+        buf.push_str(&self.process);
+        buf.push(KEY_SEP_CHAR);
+        buf.push_str(&self.version);
     }
 }
 
@@ -63,9 +58,6 @@ impl Keyed for TaskResult {
 impl TaskResult {
     pub fn fq_key(&self, crate_name: &str, crate_version: &str, task: &Task, buf: &mut String) {
         task.fq_key(crate_name, crate_version, buf);
-        buf.push(KEY_SEP_CHAR);
-        // TODO/FIXME let task use version already
-        buf.push_str(&task.version);
         buf.push(KEY_SEP_CHAR);
         self.key_buf(buf);
     }

@@ -1,7 +1,33 @@
 use crate::persistence::TreeAccess;
+use rusqlite::{params, NO_PARAMS};
 use std::path::Path;
 
-pub fn migrate(_db_path: impl AsRef<Path>) -> crate::Result<()> {
+pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
+    log::info!("open db");
+    let db = crate::persistence::Db::open(&db_path)?;
+    let tasks = db.open_tasks()?;
+    let connection = tasks.connection().lock();
+    let mut keys = Vec::<String>::new();
+    {
+        log::info!("begin iteration");
+        let mut statement =
+            connection.prepare(&format!("SELECT key FROM {}", tasks.table_name()))?;
+        let mut rows = statement.query(NO_PARAMS)?;
+        while let Some(r) = rows.next()? {
+            keys.push(r.get(0)?);
+        }
+        log::info!("got {} keys", keys.len());
+    }
+    {
+        log::info!("begin change");
+        let mut statement = connection.prepare(&format!(
+            "UPDATE {} SET key=?1 WHERE key=?2;",
+            tasks.table_name()
+        ))?;
+        for key in keys.into_iter() {
+            statement.execute(params![format!("{}:1.0.0", key), key])?;
+        }
+    }
     Ok(())
 }
 
