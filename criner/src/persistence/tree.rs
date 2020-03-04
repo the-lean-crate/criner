@@ -106,17 +106,7 @@ pub trait TreeAccess {
     }
 
     /// Similar to 'update', but provides full control over the default and allows deletion
-    fn upsert(&self, item: &Self::InsertItem) -> Result<Self::StorageItem> {
-        let key_str = Self::key(item);
-        self.upsert_with_key(key_str, item)
-    }
-
-    /// Similar to 'update', but provides full control over the default and allows deletion
-    fn upsert_with_key(
-        &self,
-        key: impl AsRef<str>,
-        item: &Self::InsertItem,
-    ) -> Result<Self::StorageItem> {
+    fn upsert(&self, key: impl AsRef<str>, item: &Self::InsertItem) -> Result<Self::StorageItem> {
         let mut guard = self.connection().lock();
 
         let transaction = {

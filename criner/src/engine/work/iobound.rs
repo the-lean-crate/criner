@@ -138,7 +138,7 @@ pub async fn processor(
 
         key.clear();
         task.fq_key(&crate_name, &crate_version, &mut key);
-        tasks.upsert_with_key(&key, &task)?;
+        tasks.upsert(&key, &task)?;
         progress.set_name("↓ IDLE");
         progress.init(None, None);
     }

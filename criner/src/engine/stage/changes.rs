@@ -86,7 +86,7 @@ pub async fn fetch(
                     }
                     key_buf.clear();
                     <&crates_index_diff::CrateVersion as Keyed>::key_buf(&version, &mut key_buf);
-                    if krate.upsert_with_key(&key_buf, &version)?.versions.len() == 1 {
+                    if krate.upsert(&key_buf, &version)?.versions.len() == 1 {
                         context.update_today(|c| c.counts.crates += 1)?;
                     }
 
