@@ -76,11 +76,3 @@ where
 {
     enforce(deadline, s.spawn_with_handle(async { f() })?).await
 }
-
-pub async fn enforce_future<F, T>(deadline: Option<SystemTime>, f: F, s: impl Spawn) -> Result<T>
-where
-    F: Future<Output = T> + Send + 'static,
-    T: Send + 'static,
-{
-    enforce(deadline, s.spawn_with_handle(f)?).await
-}

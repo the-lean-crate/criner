@@ -63,11 +63,11 @@ pub async fn fetch(
     let mut store_progress = progress.add_child("processing new crates");
     store_progress.init(Some(crate_versions.len() as u32), Some("crate versions"));
 
-    enforce_future(
+    enforce_blocking(
         deadline,
         {
             let db = db.clone();
-            async move {
+            move || {
                 let versions = db.open_crate_versions()?;
                 let krate = db.open_crates()?;
                 let context = db.open_context()?;
