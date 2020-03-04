@@ -43,7 +43,7 @@ pub trait TreeAccess {
             )
             .unwrap_or(0) as u64
     }
-    fn get(&self, key: impl AsRef<[u8]>) -> Result<Option<Self::StorageItem>> {
+    fn get(&self, key: impl AsRef<str>) -> Result<Option<Self::StorageItem>> {
         Ok(self
             .connection()
             .lock()
@@ -51,7 +51,7 @@ pub trait TreeAccess {
                 &format!(
                     "SELECT data FROM {} WHERE key = '{}'",
                     self.table_name(),
-                    std::str::from_utf8(key.as_ref()).expect("utf8-keys")
+                    key.as_ref()
                 ),
                 NO_PARAMS,
                 |r| r.get::<_, Vec<u8>>(0),
@@ -63,7 +63,7 @@ pub trait TreeAccess {
     /// Update an existing item, or create it as default, returning the stored item
     fn update(
         &self,
-        key: impl AsRef<[u8]>,
+        key: impl AsRef<str>,
         f: impl Fn(Self::StorageItem) -> Self::StorageItem,
     ) -> Result<Self::StorageItem> {
         let mut guard = self.connection().lock();
@@ -77,7 +77,7 @@ pub trait TreeAccess {
                 &format!(
                     "SELECT data FROM {} WHERE key = '{}'",
                     self.table_name(),
-                    std::str::from_utf8(key.as_ref()).expect("utf8-keys")
+                    key.as_ref()
                 ),
                 NO_PARAMS,
                 |r| r.get::<_, Vec<u8>>(0),
