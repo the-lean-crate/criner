@@ -1,7 +1,7 @@
 use crate::model::{Context, Crate, TaskResult};
+use crate::persistence::Keyed;
 use crate::{
     model::{CrateVersion, Task},
-    persistence::Keyed,
     Result,
 };
 use rusqlite::{params, OptionalExtension, NO_PARAMS};
@@ -19,14 +19,6 @@ pub trait TreeAccess {
     fn connection(&self) -> &ThreadSafeConnection;
     fn table_name(&self) -> &'static str;
 
-    // TODO: remove this method
-    fn key(item: &Self::InsertItem) -> String {
-        let mut buf = String::with_capacity(16);
-        Self::key_to_buf(item, &mut buf);
-        buf
-    }
-    // TODO: remove this method
-    fn key_to_buf(item: &Self::InsertItem, buf: &mut String);
     fn merge(
         &self,
         new_item: &Self::InsertItem,
@@ -144,11 +136,7 @@ pub trait TreeAccess {
         }
     }
 
-    fn insert(&self, v: &Self::InsertItem) -> Result<()> {
-        self.insert_with_key(Self::key(v), v)
-    }
-
-    fn insert_with_key(&self, key: impl AsRef<str>, v: &Self::InsertItem) -> Result<()> {
+    fn insert(&self, key: impl AsRef<str>, v: &Self::InsertItem) -> Result<()> {
         self.connection().lock().execute(
             &format!(
                 "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
@@ -176,10 +164,6 @@ impl TreeAccess for TasksTree {
     }
     fn table_name(&self) -> &'static str {
         "task"
-    }
-
-    fn key_to_buf(_v: &Self::InsertItem, _buf: &mut String) {
-        todo!("remove me");
     }
 
     fn merge(
@@ -254,7 +238,7 @@ pub struct TaskResultTree {
 
 impl TreeAccess for TaskResultTree {
     type StorageItem = TaskResult;
-    type InsertItem = (String, String, Task, TaskResult);
+    type InsertItem = TaskResult;
 
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
@@ -263,16 +247,12 @@ impl TreeAccess for TaskResultTree {
         "result"
     }
 
-    fn key_to_buf(v: &(String, String, Task, TaskResult), buf: &mut String) {
-        v.3.fq_key(&v.0, &v.1, &v.2, buf);
-    }
-
     fn merge(
         &self,
-        new_item: &Self::InsertItem,
+        new_item: &TaskResult,
         _existing_item: Option<TaskResult>,
     ) -> Option<Self::StorageItem> {
-        Some(new_item.3.clone().into())
+        Some(new_item.to_owned())
     }
 }
 
@@ -291,10 +271,6 @@ impl TreeAccess for ContextTree {
         "meta"
     }
 
-    fn key_to_buf(item: &Self::InsertItem, buf: &mut String) {
-        item.key_buf(buf);
-    }
-
     fn merge(&self, new: &Context, existing_item: Option<Context>) -> Option<Self::StorageItem> {
         existing_item
             .map(|existing| existing + new)
@@ -304,7 +280,7 @@ impl TreeAccess for ContextTree {
 
 impl ContextTree {
     pub fn update_today(&self, f: impl Fn(&mut Context)) -> Result<Context> {
-        self.update(Self::key(&Context::default()), |mut c| {
+        self.update(Context::default().key(), |mut c| {
             f(&mut c);
             c
         })
@@ -339,10 +315,6 @@ impl TreeAccess for CratesTree {
     }
     fn table_name(&self) -> &'static str {
         "crate"
-    }
-
-    fn key_to_buf(item: &crates_index_diff::CrateVersion, buf: &mut String) {
-        item.key_buf(buf);
     }
 
     fn merge(
@@ -383,10 +355,6 @@ impl TreeAccess for CrateVersionsTree {
     }
     fn table_name(&self) -> &'static str {
         "crate_version"
-    }
-
-    fn key_to_buf(v: &crates_index_diff::CrateVersion, buf: &mut String) {
-        v.key_buf(buf);
     }
 
     fn merge(

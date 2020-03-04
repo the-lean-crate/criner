@@ -81,7 +81,9 @@ pub async fn fetch(
                 for (versions_stored, version) in crate_versions.iter().enumerate() {
                     // NOTE: For now, not transactional, but we *could*!
                     {
-                        versions.insert(&version)?;
+                        key_buf.clear();
+                        <crates_index_diff::CrateVersion as Keyed>::key_buf(version, &mut key_buf);
+                        versions.insert(&key_buf, &version)?;
                         context.update_today(|c| c.counts.crate_versions += 1)?;
                     }
                     key_buf.clear();

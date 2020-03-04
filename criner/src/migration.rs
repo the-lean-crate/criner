@@ -11,6 +11,7 @@ fn migrate_iterate_assets_and_update_db(db_path: impl AsRef<Path>) -> crate::Res
     let db = crate::persistence::Db::open(&db_path)?;
     let results = db.open_results()?;
     let task = crate::engine::work::iobound::default_persisted_download_task();
+    let mut key = String::new();
 
     for entry in jwalk::WalkDir::new(assets_dir)
         .preload_metadata(true)
@@ -37,23 +38,20 @@ fn migrate_iterate_assets_and_update_db(db_path: impl AsRef<Path>) -> crate::Res
         let version = iter.next().and_then(|p| p.to_str()).unwrap();
         log::info!("{} {}", name, version);
 
-        let insert_item = (
-            name.to_owned(),
-            version.to_owned(),
-            task.clone(),
-            crate::model::TaskResult::Download {
-                kind: "crate".into(),
-                url: format!(
-                    "https://crates.io/api/v1/crates/{name}/{version}/download",
-                    name = name,
-                    version = version,
-                )
-                .into(),
-                content_length: file_size as u32,
-                content_type: Some("application/x-tar".into()),
-            },
-        );
-        results.insert(&insert_item)?;
+        key.clear();
+        let task_result = crate::model::TaskResult::Download {
+            kind: "crate".into(),
+            url: format!(
+                "https://crates.io/api/v1/crates/{name}/{version}/download",
+                name = name,
+                version = version,
+            )
+            .into(),
+            content_length: file_size as u32,
+            content_type: Some("application/x-tar".into()),
+        };
+        task_result.fq_key(name, version, &task, &mut key);
+        results.insert(&key, &task_result)?;
     }
     Ok(())
 }
