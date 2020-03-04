@@ -27,7 +27,7 @@ pub async fn processor(
 ) -> Result<()> {
     use persistence::TreeAccess;
 
-    let mut key = Vec::with_capacity(32);
+    let mut key = String::with_capacity(32);
     let mut dummy = default_persisted_extraction_task();
     let tasks = db.open_tasks()?;
     let results = db.open_results()?;

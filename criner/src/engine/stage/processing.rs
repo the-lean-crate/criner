@@ -78,7 +78,7 @@ pub async fn process(
         work::schedule::tasks(
             db.open_tasks()?,
             &version,
-            progress.add_child(format!("schedule {}", version.key_string()?)),
+            progress.add_child(format!("schedule {}", version.key())),
             work::schedule::Scheduling::AtLeastOne,
             &tx_io,
             &tx_cpu,

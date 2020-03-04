@@ -1,7 +1,8 @@
 use crate::model::{Context, Crate, TaskResult};
+use crate::persistence::KEY_SEP_CHAR;
 use crate::{
     model::{CrateVersion, Task},
-    persistence::{Keyed, KEY_SEP},
+    persistence::Keyed,
     Result,
 };
 use rusqlite::{params, OptionalExtension, NO_PARAMS};
@@ -20,12 +21,14 @@ pub trait TreeAccess {
     fn connection(&self) -> &ThreadSafeConnection;
     fn table_name(&self) -> &'static str;
 
-    fn key(item: &Self::InsertItem) -> Vec<u8> {
-        let mut buf = Vec::with_capacity(16);
+    // TODO: remove this method
+    fn key(item: &Self::InsertItem) -> String {
+        let mut buf = String::with_capacity(16);
         Self::key_to_buf(item, &mut buf);
         buf
     }
-    fn key_to_buf(item: &Self::InsertItem, buf: &mut Vec<u8>);
+    // TODO: remove this method
+    fn key_to_buf(item: &Self::InsertItem, buf: &mut String);
     fn map_insert_return_value(&self, v: Self::StorageItem) -> Self::InsertResult;
     fn merge(
         &self,
@@ -108,8 +111,7 @@ pub trait TreeAccess {
     /// Similar to 'update', but provides full control over the default and allows deletion
     fn upsert(&self, item: &Self::InsertItem) -> Result<Self::InsertResult> {
         let mut guard = self.connection().lock();
-        let key = Self::key(item);
-        let key_str = std::str::from_utf8(key.as_slice()).expect("utf8-keys");
+        let key_str = Self::key(item);
 
         let transaction = {
             let mut t = guard.savepoint()?;
@@ -177,10 +179,10 @@ impl TreeAccess for TasksTree {
         "task"
     }
 
-    fn key_to_buf((name, version, t): &Self::InsertItem, buf: &mut Vec<u8>) {
+    fn key_to_buf((name, version, t): &Self::InsertItem, buf: &mut String) {
         CrateVersion::key_from(name, version, buf);
-        buf.push(KEY_SEP);
-        t.key_bytes_buf(buf);
+        buf.push(KEY_SEP_CHAR);
+        t.key_buf(buf);
     }
 
     fn map_insert_return_value(&self, v: Self::StorageItem) -> Self::InsertResult {
@@ -269,12 +271,12 @@ impl TreeAccess for TaskResultTree {
         "result"
     }
 
-    fn key_to_buf(v: &(String, String, Task, TaskResult), buf: &mut Vec<u8>) {
+    fn key_to_buf(v: &(String, String, Task, TaskResult), buf: &mut String) {
         TasksTree::key_to_buf(&(v.0.clone(), v.1.clone(), v.2.clone()), buf);
-        buf.push(KEY_SEP);
-        buf.extend_from_slice(v.2.version.as_bytes());
-        buf.push(KEY_SEP);
-        v.3.key_bytes_buf(buf);
+        buf.push(KEY_SEP_CHAR);
+        buf.push_str(&v.2.version);
+        buf.push(KEY_SEP_CHAR);
+        v.3.key_buf(buf);
     }
 
     fn map_insert_return_value(&self, _v: Self::StorageItem) -> Self::InsertResult {
@@ -306,17 +308,17 @@ impl TreeAccess for ContextTree {
         "meta"
     }
 
-    fn key_to_buf(_item: &Self::InsertItem, buf: &mut Vec<u8>) {
-        buf.extend_from_slice(
-            format!(
-                "context/{}",
-                humantime::format_rfc3339(SystemTime::now())
-                    .to_string()
-                    .get(..10)
-                    .expect("YYYY-MM-DD - 10 bytes")
-            )
-            .as_bytes(),
-        );
+    fn key_to_buf(_item: &Self::InsertItem, buf: &mut String) {
+        use std::fmt::Write;
+        write!(
+            buf,
+            "context/{}",
+            humantime::format_rfc3339(SystemTime::now())
+                .to_string()
+                .get(..10)
+                .expect("YYYY-MM-DD - 10 bytes")
+        )
+        .ok();
     }
 
     fn map_insert_return_value(&self, _v: Self::StorageItem) -> Self::InsertResult {
@@ -370,8 +372,8 @@ impl TreeAccess for CratesTree {
         "crate"
     }
 
-    fn key_to_buf(item: &crates_index_diff::CrateVersion, buf: &mut Vec<u8>) {
-        buf.extend_from_slice(item.name.as_bytes());
+    fn key_to_buf(item: &crates_index_diff::CrateVersion, buf: &mut String) {
+        buf.push_str(&item.name);
     }
 
     fn map_insert_return_value(&self, v: Self::StorageItem) -> Self::InsertResult {
@@ -419,8 +421,8 @@ impl TreeAccess for CrateVersionsTree {
         "crate_version"
     }
 
-    fn key_to_buf(v: &crates_index_diff::CrateVersion, buf: &mut Vec<u8>) {
-        v.key_bytes_buf(buf);
+    fn key_to_buf(v: &crates_index_diff::CrateVersion, buf: &mut String) {
+        v.key_buf(buf);
     }
 
     fn map_insert_return_value(&self, _v: Self::StorageItem) -> Self::InsertResult {

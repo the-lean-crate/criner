@@ -38,7 +38,7 @@ impl Generator {
             selected_entries: Default::default(),
         };
         let results = db.open_results()?;
-        let mut key_buf = Vec::with_capacity(32);
+        let mut key_buf = String::with_capacity(32);
         for (name, krate) in krates.into_iter() {
             let c: model::Crate = krate.as_slice().into();
             p.init(Some(c.versions.len() as u32), Some("versions"));
@@ -114,11 +114,11 @@ fn output_file_html(base: &Path, name: &str, version: &str) -> PathBuf {
 
 // FIXME: this is a copy of persistence::TaskResultTree, which does not work as it wants &'static str, but doesn't tell
 // Seems to be some sort of borrow checker bug.
-fn key_to_buf(v: &(&str, &str, &model::Task, model::TaskResult), buf: &mut Vec<u8>) {
+fn key_to_buf(v: &(&str, &str, &model::Task, model::TaskResult), buf: &mut String) {
     use persistence::Keyed;
     persistence::TasksTree::key_to_buf(&(v.0.to_owned(), v.1.to_owned(), v.2.clone()), buf);
-    buf.push(persistence::KEY_SEP);
-    buf.extend_from_slice(v.2.version.as_bytes());
-    buf.push(persistence::KEY_SEP);
-    v.3.key_bytes_buf(buf);
+    buf.push(persistence::KEY_SEP_CHAR);
+    buf.push_str(&v.2.version);
+    buf.push(persistence::KEY_SEP_CHAR);
+    v.3.key_buf(buf);
 }

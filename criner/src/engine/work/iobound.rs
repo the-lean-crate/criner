@@ -32,7 +32,7 @@ pub async fn processor(
     assets_dir: PathBuf,
 ) -> Result<()> {
     let mut dummy = default_persisted_download_task();
-    let mut key = Vec::with_capacity(32);
+    let mut key = String::with_capacity(32);
     let tasks = db.open_tasks()?;
     let results = db.open_results()?;
     let client = reqwest::ClientBuilder::new()
