@@ -79,6 +79,6 @@ fn open_connection(db_path: &Path) -> Result<ThreadSafeConnection> {
     // TODO: this one day could be rewritten to using async sleeps. However, that is some extra work in the face of
     // traits not supporting async fn natively (there is a crate though). So figure out if this is an issue, possibly
     // by busy-logging ourselves.
-    connection.busy_timeout(std::time::Duration::from_millis(500))?;
+    connection.busy_timeout(std::time::Duration::from_millis(1000))?;
     Ok(std::sync::Arc::new(parking_lot::Mutex::new(connection)))
 }

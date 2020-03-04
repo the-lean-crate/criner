@@ -10,6 +10,9 @@
   * [ ] experiment with SQLITE Pragmas: performance(journal_mode, journal_size, synchronous=0), read_uncommitted
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down
    * Futures has a wrapper to catch panics, even though we don't use it yet. A panic only brings down the future that panics, not the entire program.
+* [ ] Graceful shutdown on Ctrl+C
+  * The current implementation relies on the database to handle aborted writes, and is no problem for that reason. However, it would be nice to have
+    A well-behaving program.
 
 ## Lessons learned
 

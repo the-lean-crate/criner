@@ -33,7 +33,12 @@ where
     MakeProgress: FnMut() -> prodash::tree::Item,
 {
     loop {
-        make_future().await?;
+        if let Err(err) = make_future().await {
+            make_progress().fail(format!(
+                "{} : ignored by repeat_every({}s,…)",
+                err, interval_s
+            ))
+        }
         wait_with_progress(interval_s, make_progress(), deadline).await?;
     }
 }
