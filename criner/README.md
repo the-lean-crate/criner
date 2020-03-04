@@ -2,8 +2,6 @@
 
 ## Tasks
 
-* [ ] Store Task by name and version - otherwise they can never change in case they do change.
-      Can be done quickly without redownloading by checking for presence of file or with migration (better)
 * [ ] remove io/cpubound duplication and generalize tasks
   * [ ] allow task dependencies, so that one triggers another potentially. Fixes that right now, two processing runs are needed
         to untar downloads

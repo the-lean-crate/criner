@@ -59,14 +59,15 @@ pub async fn process(
     }
 
     let versions = db.open_crate_versions()?;
+    let num_versions = versions.count();
     let guard = versions.connection().lock();
     let mut statement = guard.prepare(&format!(
         "SELECT data FROM {} ORDER BY _rowid_ ASC",
         versions.table_name()
     ))?;
+
     let mut rows = statement.query(NO_PARAMS)?;
 
-    let num_versions = versions.count();
     progress.init(Some(num_versions as u32), Some("crate versions"));
     let mut vid = 0;
     while let Some(r) = rows.next()? {
