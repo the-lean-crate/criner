@@ -31,7 +31,7 @@ pub async fn processor(
     r: async_std::sync::Receiver<DownloadRequest>,
     assets_dir: PathBuf,
 ) -> Result<()> {
-    let mut dummy = default_persisted_download_task();
+    let dummy = default_persisted_download_task();
     let mut key = String::with_capacity(32);
     let tasks = db.open_tasks()?;
     let results = db.open_results()?;
@@ -41,22 +41,17 @@ pub async fn processor(
         .build()?;
 
     while let Some(DownloadRequest {
-        mut crate_name,
-        mut crate_version,
+        crate_name,
+        crate_version,
         kind,
         url,
     }) = r.recv().await
     {
         progress.set_name(format!("↓ {}:{}", crate_name, crate_version));
         progress.init(None, None);
-        let kt = (crate_name, crate_version, dummy);
+
         key.clear();
-
-        persistence::TasksTree::key_to_buf(&kt, &mut key);
-        crate_name = kt.0;
-        crate_version = kt.1;
-        dummy = kt.2;
-
+        dummy.fq_key(&crate_name, &crate_version, &mut key);
         let mut task = tasks.update(&key, |mut t| {
             t.process = dummy.process.clone();
             t.version = dummy.version.clone();
@@ -141,7 +136,9 @@ pub async fn processor(
             }
         };
 
-        tasks.upsert(&(crate_name.to_owned(), crate_version.to_owned(), task))?;
+        key.clear();
+        task.fq_key(&crate_name, &crate_version, &mut key);
+        tasks.upsert_with_key(&key, &task)?;
         progress.set_name("↓ IDLE");
         progress.init(None, None);
     }

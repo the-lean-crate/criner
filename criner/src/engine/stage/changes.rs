@@ -1,3 +1,4 @@
+use crate::persistence::Keyed;
 use crate::{
     error::{Error, Result},
     persistence,
@@ -76,13 +77,16 @@ pub async fn fetch(
                 // own executor or resources.
                 // We could chunk things, but that would only make the code harder to read. No gains here…
                 // NOTE: Even chunks of 1000 were not faster, didn't even saturate a single core...
+                let mut key_buf = String::new();
                 for (versions_stored, version) in crate_versions.iter().enumerate() {
                     // NOTE: For now, not transactional, but we *could*!
                     {
                         versions.insert(&version)?;
                         context.update_today(|c| c.counts.crate_versions += 1)?;
                     }
-                    if krate.upsert(&version)?.versions.len() == 1 {
+                    key_buf.clear();
+                    <&crates_index_diff::CrateVersion as Keyed>::key_buf(&version, &mut key_buf);
+                    if krate.upsert_with_key(&key_buf, &version)?.versions.len() == 1 {
                         context.update_today(|c| c.counts.crates += 1)?;
                     }
 

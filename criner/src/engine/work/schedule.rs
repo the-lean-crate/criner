@@ -82,15 +82,13 @@ pub async fn tasks(
 
 fn task_or_default(
     tasks: &TasksTree,
-    version: &model::CrateVersion,
+    crate_version: &model::CrateVersion,
     make_task: impl FnOnce() -> model::Task,
 ) -> Result<model::Task> {
-    let key = (
-        version.name.to_owned(),
-        version.version.to_owned(),
-        make_task(),
-    );
-    Ok(tasks.get(TasksTree::key(&key))?.unwrap_or(key.2))
+    let task = make_task();
+    let mut buf = String::with_capacity(16);
+    task.fq_key(&crate_version.name, &crate_version.version, &mut buf);
+    Ok(tasks.get(&buf)?.unwrap_or(task))
 }
 
 enum SubmitResult {

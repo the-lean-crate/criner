@@ -28,26 +28,21 @@ pub async fn processor(
     use persistence::TreeAccess;
 
     let mut key = String::with_capacity(32);
-    let mut dummy = default_persisted_extraction_task();
+    let dummy = default_persisted_extraction_task();
     let tasks = db.open_tasks()?;
     let results = db.open_results()?;
 
     while let Some(ExtractRequest {
         download_task,
-        mut crate_name,
-        mut crate_version,
+        crate_name,
+        crate_version,
     }) = r.recv().await
     {
         progress.set_name(format!("CPU UNZIP+UNTAR {}:{}", crate_name, crate_version));
         progress.init(None, Some("files extracted"));
 
-        let kt = (crate_name, crate_version, dummy);
         key.clear();
-
-        persistence::TasksTree::key_to_buf(&kt, &mut key);
-        crate_name = kt.0;
-        crate_version = kt.1;
-        dummy = kt.2;
+        dummy.fq_key(&crate_name, &crate_version, &mut key);
 
         let mut task = tasks.update(&key, |mut t| {
             t.process = dummy.process.clone();
@@ -140,7 +135,11 @@ pub async fn processor(
                 model::TaskState::AttemptsWithFailure(vec![err.to_string()])
             }
         };
-        tasks.upsert(&(crate_name, crate_version, task))?;
+
+        key.clear();
+        task.fq_key(&crate_name, &crate_version, &mut key);
+        tasks.upsert_with_key(&key, &task)?;
+
         progress.set_name("CPU IDLE");
         progress.init(None, None);
     }

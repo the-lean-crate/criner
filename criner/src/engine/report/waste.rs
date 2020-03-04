@@ -33,7 +33,7 @@ impl Generator {
     ) -> ReportResult {
         let exrtaction_task_dummy =
             crate::engine::work::cpubound::default_persisted_extraction_task();
-        let mut dummy_extraction_result = crate::model::TaskResult::ExplodedCrate {
+        let dummy_extraction_result = crate::model::TaskResult::ExplodedCrate {
             entries_meta_data: Default::default(),
             selected_entries: Default::default(),
         };
@@ -45,18 +45,13 @@ impl Generator {
             p.set_name(&name);
 
             for (vid, version) in c.versions.iter().enumerate() {
-                {
-                    let key = (
-                        name.as_str(),
-                        version.as_str(),
-                        &exrtaction_task_dummy,
-                        dummy_extraction_result,
-                    );
-                    key_buf.clear();
-                    // persistence::TaskResultTree::key_to_buf(&key, &mut key_buf);
-                    key_to_buf(&key, &mut key_buf);
-                    dummy_extraction_result = key.3;
-                }
+                key_buf.clear();
+                dummy_extraction_result.fq_key(
+                    &name,
+                    &version,
+                    &exrtaction_task_dummy,
+                    &mut key_buf,
+                );
                 p.set((vid + 1) as u32);
                 let out_file = output_file_html(out_dir.as_ref(), &name, &version);
                 let mut marker = out_file.clone();
@@ -110,15 +105,4 @@ async fn generate_single_file<'a>(
 
 fn output_file_html(base: &Path, name: &str, version: &str) -> PathBuf {
     base.join(name).join(version).join("index.html")
-}
-
-// FIXME: this is a copy of persistence::TaskResultTree, which does not work as it wants &'static str, but doesn't tell
-// Seems to be some sort of borrow checker bug.
-fn key_to_buf(v: &(&str, &str, &model::Task, model::TaskResult), buf: &mut String) {
-    use persistence::Keyed;
-    persistence::TasksTree::key_to_buf(&(v.0.to_owned(), v.1.to_owned(), v.2.clone()), buf);
-    buf.push(persistence::KEY_SEP_CHAR);
-    buf.push_str(&v.2.version);
-    buf.push(persistence::KEY_SEP_CHAR);
-    v.3.key_buf(buf);
 }

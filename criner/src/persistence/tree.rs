@@ -107,8 +107,17 @@ pub trait TreeAccess {
 
     /// Similar to 'update', but provides full control over the default and allows deletion
     fn upsert(&self, item: &Self::InsertItem) -> Result<Self::StorageItem> {
-        let mut guard = self.connection().lock();
         let key_str = Self::key(item);
+        self.upsert_with_key(key_str, item)
+    }
+
+    /// Similar to 'update', but provides full control over the default and allows deletion
+    fn upsert_with_key(
+        &self,
+        key: impl AsRef<str>,
+        item: &Self::InsertItem,
+    ) -> Result<Self::StorageItem> {
+        let mut guard = self.connection().lock();
 
         let transaction = {
             let mut t = guard.savepoint()?;
@@ -121,7 +130,7 @@ pub trait TreeAccess {
                     &format!(
                         "SELECT data FROM {} WHERE key = '{}'",
                         self.table_name(),
-                        key_str
+                        key.as_ref()
                     ),
                     NO_PARAMS,
                     |r| r.get::<_, Vec<u8>>(0),
@@ -137,7 +146,7 @@ pub trait TreeAccess {
                         "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
                         self.table_name()
                     ),
-                    params![key_str, rmp_serde::to_vec(&value)?],
+                    params![key.as_ref(), rmp_serde::to_vec(&value)?],
                 )?;
                 Ok(value)
             }
@@ -146,13 +155,17 @@ pub trait TreeAccess {
     }
 
     fn insert(&self, v: &Self::InsertItem) -> Result<()> {
+        self.insert_with_key(Self::key(v), v)
+    }
+
+    fn insert_with_key(&self, key: impl AsRef<str>, v: &Self::InsertItem) -> Result<()> {
         self.connection().lock().execute(
             &format!(
                 "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
                 self.table_name()
             ),
             params![
-                Self::key(v),
+                key.as_ref(),
                 rmp_serde::to_vec(&self.merge(v, None).unwrap_or_else(Default::default))?
             ],
         )?;
@@ -166,7 +179,7 @@ pub struct TasksTree {
 
 impl TreeAccess for TasksTree {
     type StorageItem = Task;
-    type InsertItem = (String, String, Task);
+    type InsertItem = Task;
 
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
@@ -175,18 +188,18 @@ impl TreeAccess for TasksTree {
         "task"
     }
 
-    fn key_to_buf((name, version, t): &Self::InsertItem, buf: &mut String) {
-        t.fq_key(name, version, buf);
+    fn key_to_buf(_v: &Self::InsertItem, _buf: &mut String) {
+        todo!("remove me");
     }
 
     fn merge(
         &self,
-        (_n, _v, t): &Self::InsertItem,
-        existing_item: Option<Self::StorageItem>,
+        new_task: &Self::InsertItem,
+        existing_task: Option<Self::StorageItem>,
     ) -> Option<Self::StorageItem> {
-        let mut t = t.clone();
+        let mut t = new_task.clone();
         t.stored_at = SystemTime::now();
-        Some(match existing_item {
+        Some(match existing_task {
             Some(mut existing_item) => {
                 existing_item.state.merge_with(&t.state);
                 t.state = existing_item.state;
