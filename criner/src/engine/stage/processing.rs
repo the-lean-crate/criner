@@ -43,11 +43,11 @@ pub async fn process(
     let (tx_cpu, rx) = async_std::sync::channel(1);
     for idx in 0..cpu_bound_processors {
         pool.spawn(
-            work::cpubound::processor(
+            work::generic::processor(
                 db.clone(),
                 download_progress.add_child(format!("{}:CPU IDLE", idx + 1)),
                 rx.clone(),
-                assets_dir.clone(),
+                work::cpubound::Agent::new(assets_dir.clone(), &db)?,
             )
             .map(|r| {
                 if let Err(e) = r {

@@ -1,6 +1,4 @@
-use crate::{
-    engine::work::generic::Processor, error::Result, model, model::Task, persistence, Error,
-};
+use crate::{error::Result, model, model::Task, persistence, Error};
 use async_trait::async_trait;
 use prodash::tree::Item;
 use std::{fs::File, io::BufReader, io::Read, path::PathBuf, time::SystemTime};
@@ -109,77 +107,6 @@ pub fn default_persisted_extraction_task() -> model::Task {
         version: TASK_VERSION.into(),
         state: Default::default(),
     }
-}
-
-pub async fn processor(
-    db: persistence::Db,
-    mut progress: prodash::tree::Item,
-    r: async_std::sync::Receiver<ExtractRequest>,
-    assets_dir: PathBuf,
-) -> Result<()> {
-    use persistence::TreeAccess;
-
-    let mut key = String::with_capacity(32);
-    let dummy_task = default_persisted_extraction_task();
-    let dummy_result = model::TaskResult::ExplodedCrate {
-        entries_meta_data: vec![],
-        selected_entries: vec![],
-    };
-    let tasks = db.open_tasks()?;
-    let results = db.open_results()?;
-
-    while let Some(ExtractRequest {
-        download_task,
-        crate_name,
-        crate_version,
-    }) = r.recv().await
-    {
-        progress.set_name(format!("CPU UNZIP+UNTAR {}:{}", crate_name, crate_version));
-        progress.init(None, Some("files extracted"));
-
-        key.clear();
-        dummy_task.fq_key(&crate_name, &crate_version, &mut key);
-
-        let mut task = tasks.update(&key, |mut t| {
-            t.process = dummy_task.process.clone();
-            t.version = dummy_task.version.clone();
-            t.state.merge_with(&model::TaskState::InProgress(None));
-            t
-        })?;
-
-        let downloaded_crate = {
-            let crate_version_dir =
-                super::iobound::crate_version_dir(&assets_dir, &crate_name, &crate_version);
-            super::iobound::download_file_path(
-                &download_task.process,
-                &download_task.version,
-                "crate",
-                &crate_version_dir,
-            )
-        };
-
-        progress.blocked(None);
-        key.clear();
-        dummy_result.fq_key(&crate_name, &crate_version, &task, &mut key);
-        let res = extract_crate(&results, &key, &mut progress, downloaded_crate);
-
-        task.state = match res {
-            Ok(_) => model::TaskState::Complete,
-            Err(err) => {
-                progress.fail(format!("Failed extract crate: {}", err));
-                model::TaskState::AttemptsWithFailure(vec![err.to_string()])
-            }
-        };
-
-        key.clear();
-        task.fq_key(&crate_name, &crate_version, &mut key);
-        tasks.upsert(&key, &task)?;
-
-        progress.set_name("CPU IDLE");
-        progress.init(None, None);
-    }
-
-    Ok(())
 }
 
 fn extract_crate(
