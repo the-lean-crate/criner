@@ -2,6 +2,7 @@
 
 ## Tasks
 
+* [ ] too much CPU time to check all crates for tasks
 * [x] export all data into a flattened queryable sqlite database
 * [x] also write data to sqlite when fetching
   * [ ] experiment with SQLITE Pragmas: performance(journal_mode, journal_size, synchronous=0), read_uncommitted
@@ -15,9 +16,14 @@
 
 * futures::ThreadPools - panicking futures crash only one thread
 * long-running futures need error and potentially panick recovery. Futures has a panick catcher that could be useful.
+* async_std channel blocks if there is no receiver, which can definitely byte you if your processors are down.
 
 ### When migrating to Sqlite
 
+* sqlite…
+  * is really not suited for many concurrent writers - you have to prepare for database locked errors, and the busy_handler doesn't help most of the time.
+  * writing many small objects is slow, and can only be alleviated with prepared statements which are not always feasible or nice to use with a persistence
+    design inspired by sled. To alleviate, the whole application must embrace Sqlite and work with statements directly.
 * sled databases are about 4 times bigger than an Sqlite database with the same content
 * sled is easy to handle in a threaded/concurrent environment, but iteration isn't possible across awaits as it's not sync
   * Sqlite is not sync nor is it send, so it needs more treatment before it can be used with spawened futures
