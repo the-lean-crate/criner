@@ -4,7 +4,7 @@ use futures::{
     stream::StreamExt,
     task::{Spawn, SpawnExt},
 };
-use log::{error, info};
+use log::{info, warn};
 use prodash::tui::{Event, Line};
 use std::{
     path::{Path, PathBuf},
@@ -178,7 +178,7 @@ pub fn blocking(
                     abort_handle.abort();
                     futures::executor::block_on(gui).ok();
                     if let Err(e) = work_result {
-                        error!("work processor failed: {}", e);
+                        warn!("work processor failed: {}", e);
                     }
                 }
                 Either::Right((_, _work_handle)) => {}
@@ -187,7 +187,7 @@ pub fn blocking(
         None => {
             let work_result = futures::executor::block_on(work_handle);
             if let Err(e) = work_result {
-                error!("work processor failed: {}", e);
+                warn!("work processor failed: {}", e);
             }
         }
     };

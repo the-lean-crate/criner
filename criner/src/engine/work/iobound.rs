@@ -21,11 +21,17 @@ pub struct Agent {
     asset_dir: PathBuf,
     client: reqwest::Client,
     results: persistence::TaskResultTree,
+    channel: async_std::sync::Sender<super::cpubound::ExtractRequest>,
     state: Option<ProcessingState>,
+    extraction_request: Option<super::cpubound::ExtractRequest>,
 }
 
 impl Agent {
-    pub fn new(assets_dir: impl Into<PathBuf>, db: &persistence::Db) -> Result<Agent> {
+    pub fn new(
+        assets_dir: impl Into<PathBuf>,
+        db: &persistence::Db,
+        channel: async_std::sync::Sender<super::cpubound::ExtractRequest>,
+    ) -> Result<Agent> {
         let client = reqwest::ClientBuilder::new()
             .connect_timeout(std::time::Duration::from_secs(120))
             .gzip(true)
@@ -36,7 +42,9 @@ impl Agent {
             asset_dir: assets_dir.into(),
             client,
             results,
+            channel,
             state: None,
+            extraction_request: None,
         })
     }
 }
@@ -81,9 +89,34 @@ impl crate::engine::work::generic::Processor for Agent {
                     out_file,
                     key,
                 });
+                self.extraction_request = Some(super::cpubound::ExtractRequest {
+                    download_task: dummy_task.clone(),
+                    crate_name,
+                    crate_version,
+                });
                 Ok((dummy_task, progress_message))
             }
         }
+    }
+
+    async fn schedule_next(
+        &mut self,
+        progress: &mut prodash::tree::Item,
+    ) -> std::result::Result<(), Error> {
+        let extract_request = self
+            .extraction_request
+            .take()
+            .expect("this to be set when we are called");
+        progress.blocked(None);
+        // Here we risk doing this work twice, but must of the time, we don't. And since it's fast,
+        // we take the risk of duplicate work for keeping more precessors busy.
+        // And yes, this send is blocking the source processor, but should not be an issue as CPU
+        // processors are so fast - slow producer, fast consumer.
+        // BUT: Try not to block (racy, but ok)
+        if !self.channel.is_full() {
+            self.channel.send(extract_request).await;
+        }
+        Ok(())
     }
 
     fn idle_message(&self) -> String {

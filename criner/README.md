@@ -2,9 +2,6 @@
 
 ## Tasks
 
-* [x] remove io/cpubound duplication and generalize tasks
-  * [ ] allow task dependencies, so that one triggers another potentially. Fixes that right now, two processing runs are needed
-        to untar downloads
 * [x] export all data into a flattened queryable sqlite database
 * [x] also write data to sqlite when fetching
   * [ ] experiment with SQLITE Pragmas: performance(journal_mode, journal_size, synchronous=0), read_uncommitted

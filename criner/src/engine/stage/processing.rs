@@ -16,47 +16,55 @@ pub async fn process(
     mut progress: prodash::tree::Item,
     io_bound_processors: u32,
     cpu_bound_processors: u32,
-    mut download_progress: prodash::tree::Item,
+    mut processing_progress: prodash::tree::Item,
     tokio: tokio::runtime::Handle,
     pool: impl Spawn + Clone + Send + 'static + Sync,
     assets_dir: PathBuf,
     startup_time: SystemTime,
 ) -> Result<()> {
-    let (tx_io, rx) = async_std::sync::channel(1);
-    for idx in 0..io_bound_processors {
-        // Can only use the pool if the downloader uses a futures-compatible runtime
-        // Tokio is its very own thing, and futures requiring it need to run there.
-        tokio.spawn(
-            work::generic::processor(
-                db.clone(),
-                download_progress.add_child(format!("{}: ↓ IDLE", idx + 1)),
-                rx.clone(),
-                work::iobound::Agent::new(assets_dir.clone(), &db)?,
-            )
-            .map(|r| {
-                if let Err(e) = r {
-                    log::error!("iobound processor failed: {}", e);
-                }
-            }),
-        );
-    }
-    let (tx_cpu, rx) = async_std::sync::channel(1);
-    for idx in 0..cpu_bound_processors {
-        pool.spawn(
-            work::generic::processor(
-                db.clone(),
-                download_progress.add_child(format!("{}:CPU IDLE", idx + 1)),
-                rx.clone(),
-                work::cpubound::Agent::new(assets_dir.clone(), &db)?,
-            )
-            .map(|r| {
-                if let Err(e) = r {
-                    log::error!("CPU bound processor failed: {}", e);
-                }
-                ()
-            }),
-        )?;
-    }
+    processing_progress.set_name("Downloads and Extractors");
+    let tx_cpu = {
+        let (tx_cpu, rx) = async_std::sync::channel(1);
+        for idx in 0..cpu_bound_processors {
+            pool.spawn(
+                work::generic::processor(
+                    db.clone(),
+                    processing_progress.add_child(format!("{}:CPU IDLE", idx + 1)),
+                    rx.clone(),
+                    work::cpubound::Agent::new(assets_dir.clone(), &db)?,
+                )
+                .map(|r| {
+                    if let Err(e) = r {
+                        log::warn!("CPU bound processor failed: {}", e);
+                    }
+                    ()
+                }),
+            )?;
+        }
+        tx_cpu
+    };
+
+    let tx_io = {
+        let (tx_io, rx) = async_std::sync::channel(1);
+        for idx in 0..io_bound_processors {
+            // Can only use the pool if the downloader uses a futures-compatible runtime
+            // Tokio is its very own thing, and futures requiring it need to run there.
+            tokio.spawn(
+                work::generic::processor(
+                    db.clone(),
+                    processing_progress.add_child(format!("{}: ↓ IDLE", idx + 1)),
+                    rx.clone(),
+                    work::iobound::Agent::new(assets_dir.clone(), &db, tx_cpu.clone())?,
+                )
+                .map(|r| {
+                    if let Err(e) = r {
+                        log::warn!("iobound processor failed: {}", e);
+                    }
+                }),
+            );
+        }
+        tx_io
+    };
 
     let versions = db.open_crate_versions()?;
     let num_versions = versions.count();

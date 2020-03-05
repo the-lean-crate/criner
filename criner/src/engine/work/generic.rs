@@ -20,13 +20,19 @@ pub trait Processor {
         &mut self,
         progress: &mut prodash::tree::Item,
     ) -> std::result::Result<(), (Error, String)>;
+    async fn schedule_next(
+        &mut self,
+        _progress: &mut prodash::tree::Item,
+    ) -> std::result::Result<(), Error> {
+        Ok(())
+    }
 }
 
 pub async fn processor<T>(
     db: persistence::Db,
     mut progress: prodash::tree::Item,
     r: async_std::sync::Receiver<T>,
-    mut agent: impl Processor<Item = T>,
+    mut agent: impl Processor<Item = T> + Send,
 ) -> Result<()> {
     let mut key = String::with_capacity(32);
     let tasks = db.open_tasks()?;
@@ -47,7 +53,10 @@ pub async fn processor<T>(
         let res = agent.process(&mut progress).await;
 
         task.state = match res {
-            Ok(_) => model::TaskState::Complete,
+            Ok(_) => {
+                agent.schedule_next(&mut progress).await.ok();
+                model::TaskState::Complete
+            }
             Err((err, msg)) => {
                 progress.fail(format!("{}: {}", msg, err));
                 model::TaskState::AttemptsWithFailure(vec![err.to_string()])
