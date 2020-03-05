@@ -7,6 +7,115 @@ use bytesize::ByteSize;
 use std::{path::Path, path::PathBuf, time::SystemTime};
 use tokio::io::AsyncWriteExt;
 
+use crate::model::Task;
+use async_trait::async_trait;
+
+struct ProcessingState {
+    url: String,
+    kind: &'static str,
+    base_dir: PathBuf,
+    out_file: PathBuf,
+    key: String,
+}
+pub struct Agent {
+    asset_dir: PathBuf,
+    client: reqwest::Client,
+    results: persistence::TaskResultTree,
+    state: Option<ProcessingState>,
+}
+
+impl Agent {
+    pub fn new(assets_dir: impl Into<PathBuf>, db: &persistence::Db) -> Result<Agent> {
+        let client = reqwest::ClientBuilder::new()
+            .connect_timeout(std::time::Duration::from_secs(120))
+            .gzip(true)
+            .build()?;
+
+        let results = db.open_results()?;
+        Ok(Agent {
+            asset_dir: assets_dir.into(),
+            client,
+            results,
+            state: None,
+        })
+    }
+}
+
+#[async_trait]
+impl crate::engine::work::generic::Processor for Agent {
+    type Item = DownloadRequest;
+
+    fn set(
+        &mut self,
+        request: Self::Item,
+        out_key: &mut String,
+        progress: &mut prodash::tree::Item,
+    ) -> Result<(Task, String)> {
+        progress.init(None, None);
+        match request {
+            DownloadRequest {
+                crate_name,
+                crate_version,
+                kind,
+                url,
+            } => {
+                let dummy_task = default_persisted_download_task();
+                let progress_message = format!("↓ {}:{}", crate_name, crate_version);
+
+                dummy_task.fq_key(&crate_name, &crate_version, out_key);
+                let task_result = model::TaskResult::Download {
+                    kind: kind.to_owned(),
+                    url: String::new(),
+                    content_length: 0,
+                    content_type: None,
+                };
+                let mut key = String::with_capacity(out_key.len() * 2);
+                task_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut key);
+                let base_dir = crate_version_dir(&self.asset_dir, &crate_name, &crate_version);
+                let out_file =
+                    download_file_path(&dummy_task.process, &dummy_task.version, kind, &base_dir);
+                self.state = Some(ProcessingState {
+                    url,
+                    kind,
+                    base_dir,
+                    out_file,
+                    key,
+                });
+                Ok((dummy_task, progress_message))
+            }
+        }
+    }
+
+    fn idle_message(&self) -> String {
+        "↓ IDLE".into()
+    }
+
+    async fn process(
+        &mut self,
+        progress: &mut prodash::tree::Item,
+    ) -> std::result::Result<(), (Error, String)> {
+        let ProcessingState {
+            url,
+            kind,
+            base_dir,
+            out_file,
+            key,
+        } = self.state.take().expect("initialized state");
+        download_file_and_store_result(
+            progress,
+            &key,
+            &self.results,
+            &self.client,
+            kind,
+            &url,
+            base_dir,
+            out_file,
+        )
+        .await
+        .map_err(|err| (err, format!("Failed to download '{}'", url)))
+    }
+}
+
 pub struct DownloadRequest {
     pub crate_name: String,
     pub crate_version: String,
@@ -74,7 +183,7 @@ pub async fn processor(
         progress.blocked(None);
         let res = download_file_and_store_result(
             &mut progress,
-            &mut key,
+            &key,
             &results,
             &client,
             kind,

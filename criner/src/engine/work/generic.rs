@@ -9,9 +9,17 @@ use async_trait::async_trait;
 pub trait Processor {
     type Item;
 
-    fn set(&mut self, request: Self::Item, out_key: &mut String) -> Result<(model::Task, String)>;
+    fn set(
+        &mut self,
+        request: Self::Item,
+        out_key: &mut String,
+        progress: &mut prodash::tree::Item,
+    ) -> Result<(model::Task, String)>;
     fn idle_message(&self) -> String;
-    async fn process(&mut self) -> std::result::Result<(), (Error, String)>;
+    async fn process(
+        &mut self,
+        progress: &mut prodash::tree::Item,
+    ) -> std::result::Result<(), (Error, String)>;
 }
 
 pub async fn processor<T>(
@@ -24,9 +32,9 @@ pub async fn processor<T>(
     let tasks = db.open_tasks()?;
 
     while let Some(request) = r.recv().await {
-        let (dummy_task, progress_info) = agent.set(request, &mut key)?;
+        key.clear();
+        let (dummy_task, progress_info) = agent.set(request, &mut key, &mut progress)?;
         progress.set_name(progress_info);
-        progress.init(None, None);
 
         let mut task = tasks.update(&key, |mut t| {
             t.process = dummy_task.process.clone();
@@ -36,7 +44,7 @@ pub async fn processor<T>(
         })?;
 
         progress.blocked(None);
-        let res = agent.process().await;
+        let res = agent.process(&mut progress).await;
 
         task.state = match res {
             Ok(_) => model::TaskState::Complete,
