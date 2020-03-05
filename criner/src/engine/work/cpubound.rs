@@ -1,6 +1,98 @@
-use crate::{error::Result, model, persistence};
-use std::io::Read;
-use std::{fs::File, io::BufReader, path::PathBuf, time::SystemTime};
+use crate::{
+    engine::work::generic::Processor, error::Result, model, model::Task, persistence, Error,
+};
+use async_trait::async_trait;
+use prodash::tree::Item;
+use std::{fs::File, io::BufReader, io::Read, path::PathBuf, time::SystemTime};
+
+struct ProcessingState {
+    downloaded_crate: PathBuf,
+    key: String,
+}
+pub struct Agent {
+    asset_dir: PathBuf,
+    results: persistence::TaskResultTree,
+    state: Option<ProcessingState>,
+}
+
+impl Agent {
+    pub fn new(asset_dir: PathBuf, db: &persistence::Db) -> Result<Agent> {
+        let results = db.open_results()?;
+        Ok(Agent {
+            asset_dir,
+            results,
+            state: None,
+        })
+    }
+}
+
+#[async_trait]
+impl crate::engine::work::generic::Processor for Agent {
+    type Item = ExtractRequest;
+
+    fn set(
+        &mut self,
+        request: Self::Item,
+        out_key: &mut String,
+        progress: &mut Item,
+    ) -> Result<(Task, String)> {
+        progress.init(None, Some("files extracted"));
+        match request {
+            ExtractRequest {
+                download_task,
+                crate_name,
+                crate_version,
+            } => {
+                let progress_info = format!("CPU UNZIP+UNTAR {}:{}", crate_name, crate_version);
+                let dummy_task = default_persisted_extraction_task();
+                dummy_task.fq_key(&crate_name, &crate_version, out_key);
+
+                let downloaded_crate = {
+                    let crate_version_dir = super::iobound::crate_version_dir(
+                        &self.asset_dir,
+                        &crate_name,
+                        &crate_version,
+                    );
+                    super::iobound::download_file_path(
+                        &download_task.process,
+                        &download_task.version,
+                        "crate",
+                        &crate_version_dir,
+                    )
+                };
+                let dummy_result = model::TaskResult::ExplodedCrate {
+                    entries_meta_data: vec![],
+                    selected_entries: vec![],
+                };
+
+                let mut key = String::with_capacity(out_key.len() * 2);
+                dummy_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut key);
+
+                self.state = Some(ProcessingState {
+                    downloaded_crate,
+                    key,
+                });
+                Ok((dummy_task, progress_info))
+            }
+        }
+    }
+
+    fn idle_message(&self) -> String {
+        "CPU IDLE".into()
+    }
+
+    async fn process(
+        &mut self,
+        progress: &mut prodash::tree::Item,
+    ) -> std::result::Result<(), (Error, String)> {
+        let ProcessingState {
+            downloaded_crate,
+            key,
+        } = self.state.take().expect("state to be set");
+        extract_crate(&self.results, &key, progress, downloaded_crate)
+            .map_err(|err| (err, "Failed to extract crate".into()))
+    }
+}
 
 pub struct ExtractRequest {
     pub download_task: model::Task,
