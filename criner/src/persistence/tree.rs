@@ -58,59 +58,14 @@ pub trait TreeAccess {
         key: impl AsRef<str>,
         f: impl Fn(Self::StorageItem) -> Self::StorageItem,
     ) -> Result<Self::StorageItem> {
-        let mut guard = self.connection().lock();
-        let transaction = {
-            let mut t = guard.savepoint()?;
-            t.set_drop_behavior(rusqlite::DropBehavior::Commit);
-            t
-        };
-        let new_value = transaction
-            .query_row(
-                &format!(
-                    "SELECT data FROM {} WHERE key = '{}'",
-                    self.table_name(),
-                    key.as_ref()
-                ),
-                NO_PARAMS,
-                |r| r.get::<_, Vec<u8>>(0),
-            )
-            .optional()?
-            .map_or_else(
-                || f(Self::StorageItem::default()),
-                |d| f(d.as_slice().into()),
-            );
-        // NOTE: Copied from insert - can't use it now as it also inserts to sled. TODO - do it
-        // Here the connection upgrades to EXCLUSIVE lock, BUT…the read part before
-        // may have read now outdated information, as writes are allowed to happen
-        // while reading (previous) data. At least in theory.
-        // This means that here we may just block as failure since if there was another writer
-        // during the transaction (see https://sqlite.org/lang_transaction.html) it will return sqlite busy.
-        // but on busy we wait, so we will just timeout and fail. This is good, but we can be better and
-        // handle this to actually retry from the beginning.
-        // This would mean we have to handle sqlite busy ourselves everywhere or deactivate the busy timer
-        // for a moment.
-        transaction.execute(
-            &format!(
-                "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
-                self.table_name()
-            ),
-            params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
-        )?;
-
-        Ok(new_value)
-    }
-
-    /// Similar to 'update', but provides full control over the default and allows deletion
-    fn upsert(&self, key: impl AsRef<str>, item: &Self::InsertItem) -> Result<Self::StorageItem> {
-        let mut guard = self.connection().lock();
-
-        let transaction = {
-            let mut t = guard.savepoint()?;
-            t.set_drop_behavior(rusqlite::DropBehavior::Commit);
-            t
-        };
-        let new_value = {
-            let maybe_vec = transaction
+        retry_on_failure(|| {
+            let mut guard = self.connection().lock();
+            let transaction = {
+                let mut t = guard.savepoint()?;
+                t.set_drop_behavior(rusqlite::DropBehavior::Commit);
+                t
+            };
+            let new_value = transaction
                 .query_row(
                     &format!(
                         "SELECT data FROM {} WHERE key = '{}'",
@@ -120,23 +75,72 @@ pub trait TreeAccess {
                     NO_PARAMS,
                     |r| r.get::<_, Vec<u8>>(0),
                 )
-                .optional()?;
-            self.merge(item, maybe_vec.map(|v| v.as_slice().into()))
-        };
-        // NOTE: Copied from update, with minor changes to support deletion
-        match new_value {
-            Some(value) => {
-                transaction.execute(
-                    &format!(
-                        "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
-                        self.table_name()
-                    ),
-                    params![key.as_ref(), rmp_serde::to_vec(&value)?],
-                )?;
-                Ok(value)
+                .optional()?
+                .map_or_else(
+                    || f(Self::StorageItem::default()),
+                    |d| f(d.as_slice().into()),
+                );
+            // NOTE: Copied from insert - can't use it now as it also inserts to sled. TODO - do it
+            // Here the connection upgrades to EXCLUSIVE lock, BUT…the read part before
+            // may have read now outdated information, as writes are allowed to happen
+            // while reading (previous) data. At least in theory.
+            // This means that here we may just block as failure since if there was another writer
+            // during the transaction (see https://sqlite.org/lang_transaction.html) it will return sqlite busy.
+            // but on busy we wait, so we will just timeout and fail. This is good, but we can be better and
+            // handle this to actually retry from the beginning.
+            // This would mean we have to handle sqlite busy ourselves everywhere or deactivate the busy timer
+            // for a moment.
+            transaction.execute(
+                &format!(
+                    "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
+                    self.table_name()
+                ),
+                params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
+            )?;
+
+            Ok(new_value)
+        })
+    }
+
+    /// Similar to 'update', but provides full control over the default and allows deletion
+    fn upsert(&self, key: impl AsRef<str>, item: &Self::InsertItem) -> Result<Self::StorageItem> {
+        retry_on_failure(|| {
+            let mut guard = self.connection().lock();
+
+            let transaction = {
+                let mut t = guard.savepoint()?;
+                t.set_drop_behavior(rusqlite::DropBehavior::Commit);
+                t
+            };
+            let new_value = {
+                let maybe_vec = transaction
+                    .query_row(
+                        &format!(
+                            "SELECT data FROM {} WHERE key = '{}'",
+                            self.table_name(),
+                            key.as_ref()
+                        ),
+                        NO_PARAMS,
+                        |r| r.get::<_, Vec<u8>>(0),
+                    )
+                    .optional()?;
+                self.merge(item, maybe_vec.map(|v| v.as_slice().into()))
+            };
+            // NOTE: Copied from update, with minor changes to support deletion
+            match new_value {
+                Some(value) => {
+                    transaction.execute(
+                        &format!(
+                            "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
+                            self.table_name()
+                        ),
+                        params![key.as_ref(), rmp_serde::to_vec(&value)?],
+                    )?;
+                    Ok(value)
+                }
+                None => todo!("deletion of values - I don't think we need that"),
             }
-            None => todo!("deletion of values - I don't think we need that"),
-        }
+        })
     }
 
     fn insert(&self, key: impl AsRef<str>, v: &Self::InsertItem) -> Result<()> {
@@ -151,6 +155,35 @@ pub trait TreeAccess {
             ],
         )?;
         Ok(())
+    }
+}
+
+fn retry_on_failure<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
+    let max_wait_ms = 1000;
+    let mut attempt = 0;
+    loop {
+        attempt += 1;
+        match f() {
+            Ok(v) => return Ok(v),
+            Err(
+                err
+                @
+                crate::Error::Rusqlite(rusqlite::Error::SqliteFailure(
+                    rusqlite::ffi::Error {
+                        code: rusqlite::ffi::ErrorCode::DatabaseBusy,
+                        extended_code: 5,
+                    },
+                    _,
+                )),
+            ) => {
+                if attempt == max_wait_ms {
+                    return Err(err);
+                }
+                log::warn!("Waiting 1ms for {:?} (attempt {})", err, attempt);
+                std::thread::sleep(std::time::Duration::from_millis(1));
+            }
+            Err(err) => return Err(err),
+        }
     }
 }
 

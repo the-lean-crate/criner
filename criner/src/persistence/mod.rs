@@ -74,11 +74,17 @@ impl Db {
     }
 }
 
+fn sleeper(attempts: i32) -> bool {
+    log::warn!("SQLITE_BUSY, retrying after 1ms (attempt {})", attempts);
+    std::thread::sleep(std::time::Duration::from_millis(1));
+    true
+}
+
 fn open_connection(db_path: &Path) -> Result<ThreadSafeConnection> {
     let connection = rusqlite::Connection::open(db_path)?;
     // TODO: this one day could be rewritten to using async sleeps. However, that is some extra work in the face of
     // traits not supporting async fn natively (there is a crate though). So figure out if this is an issue, possibly
     // by busy-logging ourselves.
-    connection.busy_timeout(std::time::Duration::from_millis(1000))?;
+    connection.busy_handler(Some(sleeper))?;
     Ok(std::sync::Arc::new(parking_lot::Mutex::new(connection)))
 }
