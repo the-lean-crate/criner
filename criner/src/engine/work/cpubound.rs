@@ -1,6 +1,5 @@
-use crate::{error::Result, model, model::Task, persistence, Error};
+use crate::{error::Result, model, persistence, Error};
 use async_trait::async_trait;
-use prodash::tree::Item;
 use std::{fs::File, io::BufReader, io::Read, path::PathBuf, time::SystemTime};
 
 struct ProcessingState {
@@ -32,8 +31,8 @@ impl crate::engine::work::generic::Processor for Agent {
         &mut self,
         request: Self::Item,
         out_key: &mut String,
-        progress: &mut Item,
-    ) -> Result<(Task, String)> {
+        progress: &mut prodash::tree::Item,
+    ) -> Result<(model::Task, String)> {
         progress.init(None, Some("files extracted"));
         match request {
             ExtractRequest {
