@@ -75,7 +75,10 @@ pub trait TreeAccess {
                 |r| r.get::<_, Vec<u8>>(0),
             )
             .optional()?
-            .map_or_else(Self::StorageItem::default, |d| f(d.as_slice().into()));
+            .map_or_else(
+                || f(Self::StorageItem::default()),
+                |d| f(d.as_slice().into()),
+            );
         // NOTE: Copied from insert - can't use it now as it also inserts to sled. TODO - do it
         // Here the connection upgrades to EXCLUSIVE lock, BUT…the read part before
         // may have read now outdated information, as writes are allowed to happen
