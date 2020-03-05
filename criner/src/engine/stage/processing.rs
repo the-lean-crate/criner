@@ -27,11 +27,11 @@ pub async fn process(
         // Can only use the pool if the downloader uses a futures-compatible runtime
         // Tokio is its very own thing, and futures requiring it need to run there.
         tokio.spawn(
-            work::iobound::processor(
+            work::generic::processor(
                 db.clone(),
                 download_progress.add_child(format!("{}: ↓ IDLE", idx + 1)),
                 rx.clone(),
-                assets_dir.clone(),
+                work::iobound::Agent::new(assets_dir.clone(), &db)?,
             )
             .map(|r| {
                 if let Err(e) = r {

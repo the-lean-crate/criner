@@ -1,4 +1,4 @@
-mod generic;
+pub mod generic;
 pub mod iobound;
 pub mod schedule;
 
