@@ -69,7 +69,7 @@ pub async fn processor(
         progress.blocked(None);
         key.clear();
         dummy_result.fq_key(&crate_name, &crate_version, &task, &mut key);
-        let res: Result<()> = extract_crate(&results, &key, &mut progress, downloaded_crate);
+        let res = extract_crate(&results, &key, &mut progress, downloaded_crate);
 
         task.state = match res {
             Ok(_) => model::TaskState::Complete,

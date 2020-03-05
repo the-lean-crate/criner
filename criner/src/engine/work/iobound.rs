@@ -31,7 +31,7 @@ pub async fn processor(
     r: async_std::sync::Receiver<DownloadRequest>,
     assets_dir: PathBuf,
 ) -> Result<()> {
-    let dummy = default_persisted_download_task();
+    let dummy_task = default_persisted_download_task();
     let mut key = String::with_capacity(32);
     let tasks = db.open_tasks()?;
     let results = db.open_results()?;
@@ -51,72 +51,37 @@ pub async fn processor(
         progress.init(None, None);
 
         key.clear();
-        dummy.fq_key(&crate_name, &crate_version, &mut key);
+        dummy_task.fq_key(&crate_name, &crate_version, &mut key);
         let mut task = tasks.update(&key, |mut t| {
-            t.process = dummy.process.clone();
-            t.version = dummy.version.clone();
+            t.process = dummy_task.process.clone();
+            t.version = dummy_task.version.clone();
             t.state.merge_with(&model::TaskState::InProgress(None));
             t
         })?;
 
-        progress.blocked(None);
-        let res: Result<()> = async {
-            {
-                let mut res = client.get(&url).send().await?;
-                let size: u32 = res
-                    .content_length()
-                    .ok_or(Error::InvalidHeader("expected content-length"))?
-                    as u32;
-                progress.init(Some(size / 1024), Some("Kb"));
-                progress.blocked(None);
-                progress.done(format!(
-                    "HEAD:{}: content-length = {}",
-                    url,
-                    ByteSize(size.into())
-                ));
-                let mut bytes_received = 0;
-                let base_dir = crate_version_dir(&assets_dir, &crate_name, &crate_version);
-                tokio::fs::create_dir_all(&base_dir).await?;
-                let out_file = download_file_path(
-                    dummy.process.as_ref(),
-                    dummy.version.as_ref(),
-                    kind,
-                    &base_dir,
-                );
-                let mut out = tokio::fs::OpenOptions::new()
-                    .create(true)
-                    .truncate(true)
-                    .write(true)
-                    .open(out_file)
-                    .await?;
-                while let Some(chunk) = res.chunk().await? {
-                    out.write(&chunk).await?;
-                    // body_buf.extend(chunk);
-                    bytes_received += chunk.len();
-                    progress.set((bytes_received / 1024) as u32);
-                }
-                progress.done(format!(
-                    "GET:{}: body-size = {}",
-                    url,
-                    ByteSize(bytes_received as u64)
-                ));
+        let task_result = model::TaskResult::Download {
+            kind: kind.to_owned(),
+            url: String::new(),
+            content_length: 0,
+            content_type: None,
+        };
+        key.clear();
+        task_result.fq_key(&crate_name, &crate_version, &task, &mut key);
+        let base_dir = crate_version_dir(&assets_dir, &crate_name, &crate_version);
+        let out_file =
+            download_file_path(&dummy_task.process, &dummy_task.version, kind, &base_dir);
 
-                let task_result = model::TaskResult::Download {
-                    kind: kind.into(),
-                    url: url.as_str().into(),
-                    content_length: size,
-                    content_type: res
-                        .headers()
-                        .get(http::header::CONTENT_TYPE)
-                        .and_then(|t| t.to_str().ok())
-                        .map(Into::into),
-                };
-                key.clear();
-                task_result.fq_key(&crate_name, &crate_version, &task, &mut key);
-                results.insert(&key, &task_result)?;
-                Ok(())
-            }
-        }
+        progress.blocked(None);
+        let res = download_file_and_store_result(
+            &mut progress,
+            &mut key,
+            &results,
+            &client,
+            kind,
+            &url,
+            base_dir,
+            out_file,
+        )
         .await;
 
         task.state = match res {
@@ -133,6 +98,63 @@ pub async fn processor(
         progress.set_name("↓ IDLE");
         progress.init(None, None);
     }
+    Ok(())
+}
+
+async fn download_file_and_store_result(
+    progress: &mut prodash::tree::Item,
+    key: &str,
+    results: &persistence::TaskResultTree,
+    client: &reqwest::Client,
+    kind: &str,
+    url: &str,
+    base_dir: PathBuf,
+    out_file: PathBuf,
+) -> Result<()> {
+    let mut res = client.get(url).send().await?;
+    let size: u32 = res
+        .content_length()
+        .ok_or(Error::InvalidHeader("expected content-length"))? as u32;
+    progress.init(Some(size / 1024), Some("Kb"));
+    progress.blocked(None);
+    progress.done(format!(
+        "HEAD:{}: content-length = {}",
+        url,
+        ByteSize(size.into())
+    ));
+
+    let mut bytes_received = 0;
+    tokio::fs::create_dir_all(&base_dir).await?;
+    let mut out = tokio::fs::OpenOptions::new()
+        .create(true)
+        .truncate(true)
+        .write(true)
+        .open(out_file)
+        .await?;
+
+    while let Some(chunk) = res.chunk().await? {
+        out.write(&chunk).await?;
+        // body_buf.extend(chunk);
+        bytes_received += chunk.len();
+        progress.set((bytes_received / 1024) as u32);
+    }
+    progress.done(format!(
+        "GET:{}: body-size = {}",
+        url,
+        ByteSize(bytes_received as u64)
+    ));
+
+    let task_result = model::TaskResult::Download {
+        kind: kind.to_owned(),
+        url: url.to_owned(),
+        content_length: size,
+        content_type: res
+            .headers()
+            .get(http::header::CONTENT_TYPE)
+            .and_then(|t| t.to_str().ok())
+            .map(Into::into),
+    };
+    results.insert(&key, &task_result)?;
     Ok(())
 }
 
