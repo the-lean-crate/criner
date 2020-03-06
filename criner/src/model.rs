@@ -9,10 +9,10 @@ pub struct Crate {
     pub versions: Vec<String>,
 }
 
-impl From<&CrateVersion> for Crate {
-    fn from(v: &CrateVersion) -> Self {
+impl From<CrateVersion> for Crate {
+    fn from(v: CrateVersion) -> Self {
         Crate {
-            versions: vec![v.version.to_owned().into()],
+            versions: vec![v.version],
         }
     }
 }

@@ -13,8 +13,8 @@ use std::time::SystemTime;
 pub type ThreadSafeConnection = std::sync::Arc<parking_lot::Mutex<rusqlite::Connection>>;
 
 pub trait TreeAccess {
-    type StorageItem: serde::Serialize + for<'a> From<&'a [u8]> + Default;
-    type InsertItem;
+    type StorageItem: serde::Serialize + for<'a> From<&'a [u8]> + Default + From<Self::InsertItem>;
+    type InsertItem: Clone;
 
     fn connection(&self) -> &ThreadSafeConnection;
     fn table_name(&self) -> &'static str;
@@ -22,8 +22,10 @@ pub trait TreeAccess {
     fn merge(
         &self,
         new_item: &Self::InsertItem,
-        existing_item: Option<Self::StorageItem>,
-    ) -> Self::StorageItem;
+        _existing_item: Option<Self::StorageItem>,
+    ) -> Self::StorageItem {
+        Self::StorageItem::from(new_item.clone())
+    }
 
     fn count(&self) -> u64 {
         self.connection()
@@ -191,10 +193,10 @@ impl TreeAccess for TasksTree {
     ) -> Self::StorageItem {
         Task {
             stored_at: SystemTime::now(),
-            ..match existing_task {
-                Some(existing_item) => existing_item.merge(&new_task),
-                None => new_task.clone(),
-            }
+            ..existing_task.map_or_else(
+                || new_task.clone(),
+                |existing_task| existing_task.merge(new_task),
+            )
         }
     }
 }
@@ -331,10 +333,7 @@ impl TreeAccess for CratesTree {
     }
 
     fn merge(&self, new_item: &CrateVersion, existing_item: Option<Crate>) -> Crate {
-        match existing_item {
-            Some(c) => c.merge(new_item),
-            None => Crate::from(new_item),
-        }
+        existing_item.map_or_else(|| Crate::from(new_item.to_owned()), |c| c.merge(new_item))
     }
 }
 
