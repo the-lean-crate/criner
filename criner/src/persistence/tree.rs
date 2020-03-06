@@ -263,14 +263,6 @@ impl TreeAccess for TaskResultTree {
     fn table_name(&self) -> &'static str {
         "result"
     }
-
-    fn merge(
-        &self,
-        new_item: &TaskResult,
-        _existing_item: Option<TaskResult>,
-    ) -> Self::StorageItem {
-        new_item.to_owned()
-    }
 }
 
 pub struct ContextTree {
@@ -351,13 +343,5 @@ impl TreeAccess for CrateVersionsTree {
     }
     fn table_name(&self) -> &'static str {
         "crate_version"
-    }
-
-    fn merge(
-        &self,
-        new_item: &Self::InsertItem,
-        _existing_item: Option<CrateVersion>,
-    ) -> Self::StorageItem {
-        new_item.to_owned()
     }
 }

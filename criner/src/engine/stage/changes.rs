@@ -76,9 +76,6 @@ pub async fn fetch(
                 let krate = persistence::CratesTree {
                     inner: connection.clone(),
                 };
-                let context = persistence::ContextTree {
-                    inner: connection.clone(),
-                };
 
                 let mut key_buf = String::new();
                 let crate_versions_len = crate_versions.len();
@@ -105,7 +102,7 @@ pub async fn fetch(
                 }
                 Index::from_path_or_cloned(index_path)?
                     .set_last_seen_reference(last_seen_git_object)?;
-                context.update_today(|c| {
+                db.open_context()?.update_today(|c| {
                     c.counts.crate_versions += new_crate_versions;
                     c.counts.crates += new_crates;
                     c.durations.fetch_crate_versions += SystemTime::now()
