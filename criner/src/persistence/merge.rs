@@ -7,7 +7,9 @@ pub trait Merge<T> {
 
 impl Merge<model::Task> for model::Task {
     fn merge(mut self, other: &Task) -> Self {
-        self.state = self.state.merge(&other.state);
+        let my_state = self.state;
+        self = other.clone();
+        self.state = my_state.merge(&other.state);
         self
     }
 }

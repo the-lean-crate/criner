@@ -1,7 +1,7 @@
-use crate::model::{Context, Crate, TaskResult};
-use crate::persistence::Keyed;
 use crate::{
+    model::{Context, Crate, TaskResult},
     model::{CrateVersion, Task},
+    persistence::{merge::Merge, Keyed},
     Result,
 };
 use rusqlite::{params, OptionalExtension, NO_PARAMS};
@@ -23,7 +23,7 @@ pub trait TreeAccess {
         &self,
         new_item: &Self::InsertItem,
         existing_item: Option<Self::StorageItem>,
-    ) -> Option<Self::StorageItem>;
+    ) -> Self::StorageItem;
 
     fn count(&self) -> u64 {
         self.connection()
@@ -114,20 +114,13 @@ pub trait TreeAccess {
                     .optional()?;
                 self.merge(item, maybe_vec.map(|v| v.as_slice().into()))
             };
-            // NOTE: Copied from update, with minor changes to support deletion
-            let new_value = match new_value {
-                Some(value) => {
-                    transaction.execute(
-                        &format!(
-                            "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
-                            self.table_name()
-                        ),
-                        params![key.as_ref(), rmp_serde::to_vec(&value)?],
-                    )?;
-                    value
-                }
-                None => todo!("deletion of values - I don't think we need that"),
-            };
+            transaction.execute(
+                &format!(
+                    "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
+                    self.table_name()
+                ),
+                params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
+            )?;
             transaction.commit()?;
             Ok(new_value)
         })
@@ -140,10 +133,7 @@ pub trait TreeAccess {
                     "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
                     self.table_name()
                 ),
-                params![
-                    key.as_ref(),
-                    rmp_serde::to_vec(&self.merge(v, None).unwrap_or_else(Default::default))?
-                ],
+                params![key.as_ref(), rmp_serde::to_vec(&self.merge(v, None))?],
             )?;
             Ok(())
         })
@@ -198,17 +188,14 @@ impl TreeAccess for TasksTree {
         &self,
         new_task: &Self::InsertItem,
         existing_task: Option<Self::StorageItem>,
-    ) -> Option<Self::StorageItem> {
-        let mut t = new_task.clone();
-        t.stored_at = SystemTime::now();
-        Some(match existing_task {
-            Some(mut existing_item) => {
-                existing_item.state.merge_with(&t.state);
-                t.state = existing_item.state;
-                t
+    ) -> Self::StorageItem {
+        Task {
+            stored_at: SystemTime::now(),
+            ..match existing_task {
+                Some(existing_item) => existing_item.merge(&new_task),
+                None => new_task.clone(),
             }
-            None => t,
-        })
+        }
     }
 }
 
@@ -279,8 +266,8 @@ impl TreeAccess for TaskResultTree {
         &self,
         new_item: &TaskResult,
         _existing_item: Option<TaskResult>,
-    ) -> Option<Self::StorageItem> {
-        Some(new_item.to_owned())
+    ) -> Self::StorageItem {
+        new_item.to_owned()
     }
 }
 
@@ -299,10 +286,8 @@ impl TreeAccess for ContextTree {
         "meta"
     }
 
-    fn merge(&self, new: &Context, existing_item: Option<Context>) -> Option<Self::StorageItem> {
-        existing_item
-            .map(|existing| existing + new)
-            .or_else(|| Some(new.clone()))
+    fn merge(&self, new: &Context, existing_item: Option<Context>) -> Self::StorageItem {
+        existing_item.map_or_else(|| new.to_owned(), |existing| existing.merge(new))
     }
 }
 
@@ -345,23 +330,11 @@ impl TreeAccess for CratesTree {
         "crate"
     }
 
-    fn merge(&self, new_item: &CrateVersion, existing_item: Option<Crate>) -> Option<Crate> {
-        Some(match existing_item {
-            Some(mut c) => {
-                if let Some(existing_version) = c
-                    .versions
-                    .iter_mut()
-                    .find(|other| *other == &std::borrow::Cow::from(&new_item.version))
-                {
-                    *existing_version = new_item.version.to_owned().into();
-                } else {
-                    c.versions.push(new_item.version.to_owned().into());
-                }
-                c.versions.sort();
-                c
-            }
+    fn merge(&self, new_item: &CrateVersion, existing_item: Option<Crate>) -> Crate {
+        match existing_item {
+            Some(c) => c.merge(new_item),
             None => Crate::from(new_item),
-        })
+        }
     }
 }
 
@@ -385,7 +358,7 @@ impl TreeAccess for CrateVersionsTree {
         &self,
         new_item: &Self::InsertItem,
         _existing_item: Option<CrateVersion>,
-    ) -> Option<Self::StorageItem> {
-        Some(new_item.to_owned())
+    ) -> Self::StorageItem {
+        new_item.to_owned()
     }
 }
