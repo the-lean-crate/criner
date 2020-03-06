@@ -17,7 +17,7 @@ pub trait TreeAccess {
     type InsertItem: Clone;
 
     fn connection(&self) -> &ThreadSafeConnection;
-    fn table_name(&self) -> &'static str;
+    fn table_name() -> &'static str;
 
     fn merge(
         new_item: &Self::InsertItem,
@@ -30,7 +30,7 @@ pub trait TreeAccess {
         self.connection()
             .lock()
             .query_row(
-                &format!("SELECT COUNT(*) FROM {}", self.table_name()),
+                &format!("SELECT COUNT(*) FROM {}", Self::table_name()),
                 NO_PARAMS,
                 |r| r.get::<_, i64>(0),
             )
@@ -45,7 +45,7 @@ pub trait TreeAccess {
                 .query_row(
                     &format!(
                         "SELECT data FROM {} WHERE key = '{}'",
-                        self.table_name(),
+                        Self::table_name(),
                         key.as_ref()
                     ),
                     NO_PARAMS,
@@ -57,13 +57,12 @@ pub trait TreeAccess {
     }
 
     /// Update an existing item, or create it as default, returning the stored item
+    /// f(existing) should merge the items as desired
     fn update(
         &self,
         key: impl AsRef<str>,
         f: impl Fn(Self::StorageItem) -> Self::StorageItem,
     ) -> Result<Self::StorageItem> {
-        // TODO: We should call merge after the update call to be consistent! Currently updaters overwrite
-        // instead of merging.
         retry_on_db_lock(|| {
             let mut guard = self.connection().lock();
             let transaction = guard.savepoint()?;
@@ -71,7 +70,7 @@ pub trait TreeAccess {
                 .query_row(
                     &format!(
                         "SELECT data FROM {} WHERE key = '{}'",
-                        self.table_name(),
+                        Self::table_name(),
                         key.as_ref()
                     ),
                     NO_PARAMS,
@@ -85,7 +84,7 @@ pub trait TreeAccess {
             transaction.execute(
                 &format!(
                     "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
-                    self.table_name()
+                    Self::table_name()
                 ),
                 params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
             )?;
@@ -106,7 +105,7 @@ pub trait TreeAccess {
                     .query_row(
                         &format!(
                             "SELECT data FROM {} WHERE key = '{}'",
-                            self.table_name(),
+                            Self::table_name(),
                             key.as_ref()
                         ),
                         NO_PARAMS,
@@ -118,7 +117,7 @@ pub trait TreeAccess {
             transaction.execute(
                 &format!(
                     "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
-                    self.table_name()
+                    Self::table_name()
                 ),
                 params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
             )?;
@@ -132,7 +131,7 @@ pub trait TreeAccess {
             self.connection().lock().execute(
                 &format!(
                     "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
-                    self.table_name()
+                    Self::table_name()
                 ),
                 params![key.as_ref(), rmp_serde::to_vec(&Self::merge(v, None))?],
             )?;
@@ -181,7 +180,7 @@ impl TreeAccess for TasksTree {
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
     }
-    fn table_name(&self) -> &'static str {
+    fn table_name() -> &'static str {
         "task"
     }
 
@@ -258,7 +257,7 @@ impl TreeAccess for TaskResultTree {
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
     }
-    fn table_name(&self) -> &'static str {
+    fn table_name() -> &'static str {
         "result"
     }
 }
@@ -274,7 +273,7 @@ impl TreeAccess for ContextTree {
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
     }
-    fn table_name(&self) -> &'static str {
+    fn table_name() -> &'static str {
         "meta"
     }
 
@@ -318,7 +317,7 @@ impl TreeAccess for CratesTree {
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
     }
-    fn table_name(&self) -> &'static str {
+    fn table_name() -> &'static str {
         "crate"
     }
 
@@ -339,7 +338,7 @@ impl TreeAccess for CrateVersionsTree {
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
     }
-    fn table_name(&self) -> &'static str {
+    fn table_name() -> &'static str {
         "crate_version"
     }
 }

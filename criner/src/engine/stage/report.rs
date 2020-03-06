@@ -45,7 +45,7 @@ pub async fn generate(
     let connection = krates.connection().lock();
     let mut statement = connection.prepare(&format!(
         "SELECT * FROM {} ORDER BY _rowid_ ASC",
-        krates.table_name()
+        persistence::CratesTree::table_name()
     ))?;
     let mut rows = statement.query(NO_PARAMS)?;
     let mut chunk = Vec::<(String, Vec<u8>)>::with_capacity(chunk_size);

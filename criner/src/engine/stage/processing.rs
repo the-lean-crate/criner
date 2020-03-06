@@ -1,3 +1,4 @@
+use crate::persistence::CrateVersionsTree;
 use crate::{
     engine::work,
     error::Result,
@@ -71,7 +72,7 @@ pub async fn process(
     let guard = versions.connection().lock();
     let mut statement = guard.prepare(&format!(
         "SELECT data FROM {} ORDER BY _rowid_ DESC",
-        versions.table_name()
+        CrateVersionsTree::table_name()
     ))?;
 
     let mut rows = statement.query(NO_PARAMS)?;
