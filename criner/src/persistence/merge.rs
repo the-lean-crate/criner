@@ -2,24 +2,24 @@ use crate::model;
 use crate::model::Task;
 
 pub trait Merge<T> {
-    fn merge(self, other: T) -> Self;
+    fn merge(self, other: &T) -> Self;
 }
 
 impl Merge<model::Task> for model::Task {
-    fn merge(self, mut other: Task) -> Self {
-        other.state = self.state.merge(other.state);
-        other
+    fn merge(mut self, other: &Task) -> Self {
+        self.state = self.state.merge(&other.state);
+        self
     }
 }
 
 impl Merge<model::TaskState> for model::TaskState {
-    fn merge(mut self, other: model::TaskState) -> Self {
-        fn merge_vec(mut existing: Vec<String>, new: Vec<String>) -> Vec<String> {
-            existing.extend(new.into_iter());
+    fn merge(mut self, other: &model::TaskState) -> Self {
+        fn merge_vec(mut existing: Vec<String>, new: &Vec<String>) -> Vec<String> {
+            existing.extend(new.iter().map(|v| v.clone()));
             existing
         }
         use model::TaskState::*;
-        self = match (self, other) {
+        self = match (&self, other) {
             (AttemptsWithFailure(existing), AttemptsWithFailure(new)) => {
                 AttemptsWithFailure(merge_vec(existing.clone(), new))
             }
