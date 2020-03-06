@@ -86,6 +86,8 @@ pub async fn fetch(
                 // NOTE: Even chunks of 1000 were not faster, didn't even saturate a single core...
                 let mut key_buf = String::new();
                 let crate_versions_len = crate_versions.len();
+                let mut new_crate_versions = 0;
+                let mut new_crates = 0;
                 for (versions_stored, version) in crate_versions
                     .into_iter()
                     .map(CrateVersion::from)
@@ -96,17 +98,19 @@ pub async fn fetch(
                         key_buf.clear();
                         version.key_buf(&mut key_buf);
                         versions.insert(&key_buf, &version)?;
-                        context.update_today(|c| c.counts.crate_versions += 1)?;
+                        new_crate_versions += 1;
                     }
                     key_buf.clear();
                     Crate::key_from_version_buf(&version, &mut key_buf);
                     if krate.upsert(&key_buf, &version)?.versions.len() == 1 {
-                        context.update_today(|c| c.counts.crates += 1)?;
+                        new_crates += 1;
                     }
 
                     store_progress.set((versions_stored + 1) as u32);
                 }
                 context.update_today(|c| {
+                    c.counts.crate_versions += new_crate_versions;
+                    c.counts.crates += new_crates;
                     c.durations.fetch_crate_versions += SystemTime::now()
                         .duration_since(start)
                         .unwrap_or_else(|_| Duration::default())
