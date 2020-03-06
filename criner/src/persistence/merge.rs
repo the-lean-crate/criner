@@ -1,5 +1,5 @@
 use crate::model;
-use crate::model::Task;
+use crate::model::{Context, CrateVersion, Task};
 
 pub trait Merge<T> {
     fn merge(self, other: &T) -> Self;
@@ -32,6 +32,22 @@ impl Merge<model::TaskState> for model::TaskState {
             }
             (_, other) => other.clone(),
         };
+        self
+    }
+}
+
+impl Merge<model::Context> for model::Context {
+    fn merge(self, other: &Context) -> Self {
+        self + other
+    }
+}
+
+impl Merge<model::CrateVersion> for model::Crate {
+    fn merge(mut self, other: &CrateVersion) -> Self {
+        if !self.versions.contains(&other.version) {
+            self.versions.push(other.version.to_owned());
+        }
+        self.versions.sort();
         self
     }
 }
