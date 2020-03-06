@@ -77,6 +77,7 @@ pub async fn process(
     let mut rows = statement.query(NO_PARAMS)?;
 
     progress.init(Some(num_versions as u32), Some("crate versions"));
+    let tasks = db.open_tasks()?;
     let mut vid = 0;
     while let Some(r) = rows.next()? {
         let version: Vec<u8> = r.get(0)?;
@@ -85,7 +86,7 @@ pub async fn process(
         progress.set((vid + 1) as u32);
         progress.blocked(None);
         work::schedule::tasks(
-            db.open_tasks()?,
+            &tasks,
             &version,
             progress.add_child(format!("schedule {}", version.key())),
             work::schedule::Scheduling::AtLeastOne,

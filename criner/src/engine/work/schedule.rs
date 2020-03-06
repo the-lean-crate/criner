@@ -25,7 +25,7 @@ pub enum AsyncResult {
 }
 
 pub async fn tasks(
-    tasks: persistence::TasksTree,
+    tasks: &persistence::TasksTree,
     krate: &model::CrateVersion,
     mut progress: prodash::tree::Item,
     _mode: Scheduling,
@@ -34,7 +34,13 @@ pub async fn tasks(
     startup_time: SystemTime,
 ) -> Result<AsyncResult> {
     use SubmitResult::*;
-    let io_task = task_or_default(&tasks, krate, iobound::default_persisted_download_task)?;
+    let mut key_buf = String::with_capacity(32);
+    let io_task = task_or_default(
+        tasks,
+        &mut key_buf,
+        krate,
+        iobound::default_persisted_download_task,
+    )?;
     Ok(
         match submit_single(
             startup_time,
@@ -58,8 +64,12 @@ pub async fn tasks(
         {
             PermanentFailure | Submitted => AsyncResult::Done,
             Done(download_crate_task) => {
-                let cpu_task =
-                    task_or_default(&tasks, krate, cpubound::default_persisted_extraction_task)?;
+                let cpu_task = task_or_default(
+                    tasks,
+                    &mut key_buf,
+                    krate,
+                    cpubound::default_persisted_extraction_task,
+                )?;
                 submit_single(
                     startup_time,
                     cpu_task,
@@ -82,13 +92,14 @@ pub async fn tasks(
 
 fn task_or_default(
     tasks: &TasksTree,
+    key_buf: &mut String,
     crate_version: &model::CrateVersion,
     make_task: impl FnOnce() -> model::Task,
 ) -> Result<model::Task> {
     let task = make_task();
-    let mut buf = String::with_capacity(16);
-    task.fq_key(&crate_version.name, &crate_version.version, &mut buf);
-    Ok(tasks.get(&buf)?.unwrap_or(task))
+    key_buf.clear();
+    task.fq_key(&crate_version.name, &crate_version.version, key_buf);
+    Ok(tasks.get(key_buf)?.unwrap_or(task))
 }
 
 enum SubmitResult {
