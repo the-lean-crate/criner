@@ -30,7 +30,7 @@ pub async fn fetch(
         &pool,
     )
     .await??;
-    let crate_versions = enforce_blocking(
+    let (crate_versions, last_seen_git_object) = enforce_blocking(
         deadline,
         move || {
             let mut cbs = crates_index_diff::git2::RemoteCallbacks::new();
@@ -52,7 +52,7 @@ pub async fn fetch(
                 opts
             };
 
-            index.fetch_changes_with_options(Some(&mut opts))
+            index.peek_changes_with_options(Some(&mut opts))
         },
         &pool,
     )
@@ -67,6 +67,7 @@ pub async fn fetch(
         deadline,
         {
             let db = db.clone();
+            let index_path = crates_io_path.as_ref().to_path_buf();
             move || {
                 let connection = db.open_connection()?;
                 let versions = persistence::CrateVersionsTree {
@@ -108,6 +109,8 @@ pub async fn fetch(
 
                     store_progress.set((versions_stored + 1) as u32);
                 }
+                Index::from_path_or_cloned(index_path)?
+                    .set_last_seen_reference(last_seen_git_object)?;
                 context.update_today(|c| {
                     c.counts.crate_versions += new_crate_versions;
                     c.counts.crates += new_crates;
