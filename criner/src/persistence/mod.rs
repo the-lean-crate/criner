@@ -24,6 +24,7 @@ impl Db {
                 PRAGMA journal_mode = WAL;          -- better write-concurrency
                 PRAGMA synchronous = NORMAL;        -- fsync only in critical moments
                 PRAGMA wal_autocheckpoint = 1000;   -- write WAL changes back every 1000 pages, for an in average 1MB WAL file. May affect readers if number is increased
+                PRAGMA wal_checkpoint(TRUNCATE);    -- free some space by truncating possibly massive WAL files from the last run.
             ")?;
 
             let transaction = connection.transaction()?;
@@ -45,6 +46,10 @@ impl Db {
         }
 
         Ok(Db { sqlite_path })
+    }
+
+    pub fn open_connection(&self) -> Result<ThreadSafeConnection> {
+        open_connection(&self.sqlite_path)
     }
 
     pub fn open_crate_versions(&self) -> Result<CrateVersionsTree> {

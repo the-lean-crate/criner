@@ -65,11 +65,7 @@ pub trait TreeAccess {
         // instead of merging.
         retry_on_db_lock(|| {
             let mut guard = self.connection().lock();
-            let transaction = {
-                let mut t = guard.savepoint()?;
-                t.set_drop_behavior(rusqlite::DropBehavior::Commit);
-                t
-            };
+            let transaction = guard.savepoint()?;
             let new_value = transaction
                 .query_row(
                     &format!(
@@ -92,6 +88,7 @@ pub trait TreeAccess {
                 ),
                 params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
             )?;
+            transaction.commit()?;
 
             Ok(new_value)
         })
@@ -101,12 +98,8 @@ pub trait TreeAccess {
     fn upsert(&self, key: impl AsRef<str>, item: &Self::InsertItem) -> Result<Self::StorageItem> {
         retry_on_db_lock(|| {
             let mut guard = self.connection().lock();
+            let transaction = guard.savepoint()?;
 
-            let transaction = {
-                let mut t = guard.savepoint()?;
-                t.set_drop_behavior(rusqlite::DropBehavior::Commit);
-                t
-            };
             let new_value = {
                 let maybe_vec = transaction
                     .query_row(
@@ -122,7 +115,7 @@ pub trait TreeAccess {
                 self.merge(item, maybe_vec.map(|v| v.as_slice().into()))
             };
             // NOTE: Copied from update, with minor changes to support deletion
-            match new_value {
+            let new_value = match new_value {
                 Some(value) => {
                     transaction.execute(
                         &format!(
@@ -131,10 +124,12 @@ pub trait TreeAccess {
                         ),
                         params![key.as_ref(), rmp_serde::to_vec(&value)?],
                     )?;
-                    Ok(value)
+                    value
                 }
                 None => todo!("deletion of values - I don't think we need that"),
-            }
+            };
+            transaction.commit()?;
+            Ok(new_value)
         })
     }
 
