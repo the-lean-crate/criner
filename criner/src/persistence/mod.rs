@@ -2,6 +2,7 @@ use crate::Result;
 use std::path::{Path, PathBuf};
 
 mod keyed;
+mod merge;
 pub use keyed::*;
 
 mod serde;

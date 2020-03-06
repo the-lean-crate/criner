@@ -80,11 +80,6 @@ pub async fn fetch(
                     inner: connection.clone(),
                 };
 
-                // NOTE: this loop can also be a stream, but that makes computation slower due to overhead
-                // Thus we just do this 'quickly' on the main thread, knowing that criner really needs its
-                // own executor or resources.
-                // We could chunk things, but that would only make the code harder to read. No gains here…
-                // NOTE: Even chunks of 1000 were not faster, didn't even saturate a single core...
                 let mut key_buf = String::new();
                 let crate_versions_len = crate_versions.len();
                 let mut new_crate_versions = 0;
@@ -94,7 +89,6 @@ pub async fn fetch(
                     .map(CrateVersion::from)
                     .enumerate()
                 {
-                    // NOTE: For now, not transactional, but we *could*!
                     {
                         key_buf.clear();
                         version.key_buf(&mut key_buf);
