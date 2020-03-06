@@ -20,7 +20,6 @@ pub trait TreeAccess {
     fn table_name(&self) -> &'static str;
 
     fn merge(
-        &self,
         new_item: &Self::InsertItem,
         _existing_item: Option<Self::StorageItem>,
     ) -> Self::StorageItem {
@@ -114,7 +113,7 @@ pub trait TreeAccess {
                         |r| r.get::<_, Vec<u8>>(0),
                     )
                     .optional()?;
-                self.merge(item, maybe_vec.map(|v| v.as_slice().into()))
+                Self::merge(item, maybe_vec.map(|v| v.as_slice().into()))
             };
             transaction.execute(
                 &format!(
@@ -135,7 +134,7 @@ pub trait TreeAccess {
                     "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
                     self.table_name()
                 ),
-                params![key.as_ref(), rmp_serde::to_vec(&self.merge(v, None))?],
+                params![key.as_ref(), rmp_serde::to_vec(&Self::merge(v, None))?],
             )?;
             Ok(())
         })
@@ -187,7 +186,6 @@ impl TreeAccess for TasksTree {
     }
 
     fn merge(
-        &self,
         new_task: &Self::InsertItem,
         existing_task: Option<Self::StorageItem>,
     ) -> Self::StorageItem {
@@ -280,7 +278,7 @@ impl TreeAccess for ContextTree {
         "meta"
     }
 
-    fn merge(&self, new: &Context, existing_item: Option<Context>) -> Self::StorageItem {
+    fn merge(new: &Context, existing_item: Option<Context>) -> Self::StorageItem {
         existing_item.map_or_else(|| new.to_owned(), |existing| existing.merge(new))
     }
 }
@@ -324,7 +322,7 @@ impl TreeAccess for CratesTree {
         "crate"
     }
 
-    fn merge(&self, new_item: &CrateVersion, existing_item: Option<Crate>) -> Crate {
+    fn merge(new_item: &CrateVersion, existing_item: Option<Crate>) -> Crate {
         existing_item.map_or_else(|| Crate::from(new_item.to_owned()), |c| c.merge(new_item))
     }
 }
