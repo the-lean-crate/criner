@@ -1,4 +1,4 @@
-use crate::model::{Context, CrateVersion, Task, TaskResult};
+use crate::model::{Context, Crate, CrateVersion, Task, TaskResult};
 use std::time::SystemTime;
 
 pub const KEY_SEP_CHAR: char = ':';
@@ -28,21 +28,15 @@ impl Task {
     }
 }
 
-impl Keyed for crates_index_diff::CrateVersion {
-    fn key_buf(&self, buf: &mut String) {
-        CrateVersion::key_from(&self.name, &self.version, buf)
-    }
-}
-
-impl Keyed for &crates_index_diff::CrateVersion {
-    fn key_buf(&self, buf: &mut String) {
-        buf.push_str(&self.name);
-    }
-}
-
 impl Keyed for CrateVersion {
     fn key_buf(&self, buf: &mut String) {
         CrateVersion::key_from(&self.name, &self.version, buf)
+    }
+}
+
+impl Crate {
+    pub fn key_from_version_buf(v: &CrateVersion, buf: &mut String) {
+        buf.push_str(&v.name);
     }
 }
 

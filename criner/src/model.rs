@@ -1,5 +1,5 @@
 use serde_derive::{Deserialize, Serialize};
-use std::{collections::HashMap, iter::FromIterator, ops::Add, time::Duration, time::SystemTime};
+use std::{collections::HashMap, ops::Add, time::Duration, time::SystemTime};
 
 /// Represents a top-level crate and associated information
 #[derive(Serialize, Deserialize, Default, Clone)]
@@ -9,8 +9,8 @@ pub struct Crate {
     pub versions: Vec<String>,
 }
 
-impl From<&crates_index_diff::CrateVersion> for Crate {
-    fn from(v: &crates_index_diff::CrateVersion) -> Self {
+impl From<&CrateVersion> for Crate {
+    fn from(v: &CrateVersion) -> Self {
         Crate {
             versions: vec![v.version.to_owned().into()],
         }
@@ -81,22 +81,27 @@ pub struct Dependency {
     pub package: Option<String>,
 }
 
-impl From<&crates_index_diff::Dependency> for Dependency {
-    fn from(v: &crates_index_diff::Dependency) -> Self {
+impl From<crates_index_diff::Dependency> for Dependency {
+    fn from(v: crates_index_diff::Dependency) -> Self {
+        let crates_index_diff::Dependency {
+            name,
+            required_version,
+            features,
+            optional,
+            default_features,
+            target,
+            kind,
+            package,
+        } = v;
         Dependency {
-            name: v.name.to_owned().into(),
-            required_version: v.required_version.to_owned().into(),
-            features: v
-                .features
-                .iter()
-                .map(ToOwned::to_owned)
-                .map(Into::into)
-                .collect(),
-            optional: v.optional,
-            default_features: v.default_features,
-            target: v.target.as_ref().map(|v| v.to_owned().into()),
-            kind: v.kind.as_ref().map(|v| v.to_owned().into()),
-            package: v.package.as_ref().map(|v| v.to_owned().into()),
+            name,
+            required_version,
+            features,
+            optional,
+            default_features,
+            target,
+            kind,
+            package,
         }
     }
 }
@@ -236,29 +241,23 @@ impl Default for TaskResult {
     }
 }
 
-impl From<&crates_index_diff::CrateVersion> for CrateVersion {
-    fn from(
-        crates_index_diff::CrateVersion {
+impl From<crates_index_diff::CrateVersion> for CrateVersion {
+    fn from(v: crates_index_diff::CrateVersion) -> Self {
+        let crates_index_diff::CrateVersion {
             name,
             kind,
             version,
             checksum,
             features,
             dependencies,
-        }: &crates_index_diff::CrateVersion,
-    ) -> Self {
+        } = v;
         CrateVersion {
-            name: name.clone().into(),
-            kind: *kind,
-            version: version.clone().into(),
-            checksum: checksum.clone().into(),
-            features: HashMap::from_iter(features.iter().map(|(k, v)| {
-                (
-                    k.to_owned().into(),
-                    v.iter().map(|v| v.to_owned().into()).collect(),
-                )
-            })),
-            dependencies: dependencies.iter().map(Into::into).collect(),
+            name,
+            kind,
+            version,
+            checksum,
+            features,
+            dependencies: dependencies.into_iter().map(Into::into).collect(),
         }
     }
 }

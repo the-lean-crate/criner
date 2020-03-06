@@ -341,7 +341,7 @@ pub struct CratesTree {
 
 impl TreeAccess for CratesTree {
     type StorageItem = Crate;
-    type InsertItem = crates_index_diff::CrateVersion;
+    type InsertItem = CrateVersion;
 
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
@@ -350,11 +350,7 @@ impl TreeAccess for CratesTree {
         "crate"
     }
 
-    fn merge(
-        &self,
-        new_item: &crates_index_diff::CrateVersion,
-        existing_item: Option<Crate>,
-    ) -> Option<Crate> {
+    fn merge(&self, new_item: &CrateVersion, existing_item: Option<Crate>) -> Option<Crate> {
         Some(match existing_item {
             Some(mut c) => {
                 if let Some(existing_version) = c
@@ -381,7 +377,7 @@ pub struct CrateVersionsTree {
 
 impl TreeAccess for CrateVersionsTree {
     type StorageItem = CrateVersion;
-    type InsertItem = crates_index_diff::CrateVersion;
+    type InsertItem = CrateVersion;
 
     fn connection(&self) -> &ThreadSafeConnection {
         &self.inner
@@ -395,6 +391,6 @@ impl TreeAccess for CrateVersionsTree {
         new_item: &Self::InsertItem,
         _existing_item: Option<CrateVersion>,
     ) -> Option<Self::StorageItem> {
-        Some(new_item.into())
+        Some(new_item.to_owned())
     }
 }

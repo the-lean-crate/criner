@@ -1,8 +1,7 @@
-use crate::persistence::Keyed;
 use crate::{
     error::{Error, Result},
-    persistence,
-    persistence::TreeAccess,
+    model::{Crate, CrateVersion},
+    persistence::{self, Keyed, TreeAccess},
     utils::*,
 };
 use crates_index_diff::Index;
@@ -78,16 +77,21 @@ pub async fn fetch(
                 // We could chunk things, but that would only make the code harder to read. No gains here…
                 // NOTE: Even chunks of 1000 were not faster, didn't even saturate a single core...
                 let mut key_buf = String::new();
-                for (versions_stored, version) in crate_versions.iter().enumerate() {
+                let crate_versions_len = crate_versions.len();
+                for (versions_stored, version) in crate_versions
+                    .into_iter()
+                    .map(CrateVersion::from)
+                    .enumerate()
+                {
                     // NOTE: For now, not transactional, but we *could*!
                     {
                         key_buf.clear();
-                        <crates_index_diff::CrateVersion as Keyed>::key_buf(version, &mut key_buf);
+                        version.key_buf(&mut key_buf);
                         versions.insert(&key_buf, &version)?;
                         context.update_today(|c| c.counts.crate_versions += 1)?;
                     }
                     key_buf.clear();
-                    <&crates_index_diff::CrateVersion as Keyed>::key_buf(&version, &mut key_buf);
+                    Crate::key_from_version_buf(&version, &mut key_buf);
                     if krate.upsert(&key_buf, &version)?.versions.len() == 1 {
                         context.update_today(|c| c.counts.crates += 1)?;
                     }
@@ -101,7 +105,7 @@ pub async fn fetch(
                 })?;
                 store_progress.done(format!(
                     "Stored {} crate versions to database",
-                    crate_versions.len()
+                    crate_versions_len
                 ));
                 Ok::<_, Error>(())
             }
