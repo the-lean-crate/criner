@@ -41,6 +41,20 @@ pub fn new_value_query<'stm>(
         table_name
     ))?)
 }
+
+pub fn value_iter<'conn, StorageItem>(
+    statement: &'conn mut rusqlite::Statement<'conn>,
+) -> Result<impl Iterator<Item = Result<StorageItem>> + 'conn>
+where
+    StorageItem: for<'a> From<&'a [u8]>,
+{
+    Ok(statement
+        .query_map(NO_PARAMS, |r| {
+            r.get::<_, Vec<u8>>(0)
+                .map(|v| StorageItem::from(v.as_slice()))
+        })?
+        .map(|r| r.map_err(Into::into)))
+}
 impl<'stm, T> IterValues<'stm, T> {
     pub fn from_rows(rows: rusqlite::Rows<'stm>) -> IterValues<'stm, T> {
         IterValues {
