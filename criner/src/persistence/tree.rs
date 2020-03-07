@@ -206,9 +206,11 @@ fn retry_on_db_lock<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
     use rusqlite::ffi::Error as SqliteFFIError;
     use rusqlite::ffi::ErrorCode as SqliteFFIErrorCode;
     use rusqlite::Error as SqliteError;
-    let max_wait_ms = Duration::from_secs(10);
+
+    let max_wait_ms = Duration::from_secs(100);
     let mut total_wait_time = Duration::default();
     let mut wait_for = Duration::from_millis(1);
+    let max_wait_time = Duration::from_millis(250);
     loop {
         total_wait_time += wait_for;
         match f() {
@@ -219,6 +221,17 @@ fn retry_on_db_lock<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
                 Error::Rusqlite(SqliteError::SqliteFailure(
                     SqliteFFIError {
                         code: SqliteFFIErrorCode::DatabaseBusy,
+                        extended_code: _,
+                    },
+                    _,
+                )),
+            )
+            | Err(
+                err
+                @
+                Error::Rusqlite(SqliteError::SqliteFailure(
+                    SqliteFFIError {
+                        code: SqliteFFIErrorCode::DatabaseLocked,
                         extended_code: _,
                     },
                     _,
@@ -238,7 +251,7 @@ fn retry_on_db_lock<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
                     total_wait_time
                 );
                 std::thread::sleep(wait_for);
-                wait_for *= 2;
+                wait_for = (wait_for * 2).min(max_wait_time);
             }
             Err(err) => return Err(err),
         }
