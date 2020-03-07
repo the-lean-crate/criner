@@ -1,3 +1,4 @@
+use crate::persistence::KEY_SEP_CHAR;
 use crate::{
     model::{Context, Crate, TaskResult},
     model::{CrateVersion, Task},
@@ -40,6 +41,13 @@ pub fn new_key_value_insertion<'conn>(
         "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
         table_name
     ))?)
+}
+
+pub fn new_key_insertion<'conn>(
+    table_name: &str,
+    connection: &'conn rusqlite::Connection,
+) -> Result<rusqlite::Statement<'conn>> {
+    Ok(connection.prepare(&format!("REPLACE INTO {} (key) VALUES (?1)", table_name))?)
 }
 
 pub fn value_iter<'stm, 'conn, StorageItem>(
@@ -266,7 +274,7 @@ fn retry_on_db_busy<T>(
 }
 
 pub struct TasksTree {
-    pub inner: ThreadSafeConnection,
+    pub(crate) inner: ThreadSafeConnection,
 }
 
 impl TreeAccess for TasksTree {
@@ -297,56 +305,50 @@ impl TreeAccess for TasksTree {
     }
 }
 
-// FIXME: use it or drop it - it should be used once Sled can efficiently handle this kind of data
-// as we currently use symlinks to mark completed HTML pages.
-#[allow(dead_code)]
 pub struct ReportsTree {
-    inner: ThreadSafeConnection,
+    pub(crate) inner: ThreadSafeConnection,
 }
 
 #[allow(dead_code)]
 impl ReportsTree {
-    pub fn key(
+    pub fn table_name() -> &'static str {
+        "report_done"
+    }
+    pub fn key_buf(
         crate_name: &str,
         crate_version: &str,
         report_name: &str,
         report_version: &str,
-    ) -> Vec<u8> {
-        format!(
-            "{}:{}:{}:{}",
-            crate_name, crate_version, report_name, report_version
-        )
-        .into()
+        buf: &mut String,
+    ) {
+        buf.push_str(crate_name);
+        buf.push(KEY_SEP_CHAR);
+        buf.push_str(crate_version);
+        buf.push(KEY_SEP_CHAR);
+        buf.push_str(report_name);
+        buf.push(KEY_SEP_CHAR);
+        buf.push_str(report_version);
     }
-    pub fn is_done(&self, key: impl AsRef<[u8]>) -> bool {
+    pub fn is_done(&self, key: impl AsRef<str>) -> bool {
         self.inner
             .lock()
             .query_row(
                 &format!(
-                    "SELECT value FROM report_done where key = {}",
-                    std::str::from_utf8(key.as_ref()).expect("utf8 keys")
+                    "SELECT key FROM {} where key = {}",
+                    Self::table_name(),
+                    key.as_ref()
                 ),
                 NO_PARAMS,
                 |_r| Ok(()),
             )
             .optional()
             .ok()
-            .map(|_| true)
-            .unwrap_or(false)
-    }
-    pub fn set_done(&self, key: impl AsRef<[u8]>) {
-        self.inner
-            .lock()
-            .execute(
-                "INSERT INTO report_done (key) VALUES (?1)",
-                params![std::str::from_utf8(key.as_ref()).expect("utf8 keys")],
-            )
-            .ok();
+            .map_or(false, |_| true)
     }
 }
 
 pub struct TaskResultTree {
-    pub inner: ThreadSafeConnection,
+    pub(crate) inner: ThreadSafeConnection,
 }
 
 impl TreeAccess for TaskResultTree {
@@ -365,7 +367,7 @@ impl TreeAccess for TaskResultTree {
 }
 
 pub struct ContextTree {
-    pub inner: ThreadSafeConnection,
+    pub(crate) inner: ThreadSafeConnection,
 }
 
 impl TreeAccess for ContextTree {
@@ -412,7 +414,7 @@ impl ContextTree {
 
 #[derive(Clone)]
 pub struct CratesTree {
-    pub inner: ThreadSafeConnection,
+    pub(crate) inner: ThreadSafeConnection,
 }
 
 impl TreeAccess for CratesTree {
@@ -436,7 +438,7 @@ impl TreeAccess for CratesTree {
 
 #[derive(Clone)]
 pub struct CrateVersionsTree {
-    pub inner: ThreadSafeConnection,
+    pub(crate) inner: ThreadSafeConnection,
 }
 
 impl TreeAccess for CrateVersionsTree {

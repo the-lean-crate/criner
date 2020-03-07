@@ -86,6 +86,11 @@ impl Db {
             inner: self.open_connection()?,
         })
     }
+    pub fn open_reports(&self) -> Result<ReportsTree> {
+        Ok(ReportsTree {
+            inner: self.open_connection()?,
+        })
+    }
 }
 
 fn sleeper(attempts: i32) -> bool {
