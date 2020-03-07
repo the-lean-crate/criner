@@ -12,12 +12,22 @@ use std::time::SystemTime;
 /// Also no one can prevent futures from being resumed in after having been send to a different thread.
 pub type ThreadSafeConnection = std::sync::Arc<parking_lot::Mutex<rusqlite::Connection>>;
 
-pub fn new_value_query<'stm>(
+pub fn new_value_query<'conn>(
     table_name: &str,
-    connection: &'stm mut rusqlite::Connection,
-) -> Result<rusqlite::Statement<'stm>> {
+    connection: &'conn mut rusqlite::Connection,
+) -> Result<rusqlite::Statement<'conn>> {
     Ok(connection.prepare(&format!(
         "SELECT data FROM {} ORDER BY _rowid_ DESC",
+        table_name
+    ))?)
+}
+
+pub fn new_key_value_query<'conn>(
+    table_name: &str,
+    connection: &'conn mut rusqlite::Connection,
+) -> Result<rusqlite::Statement<'conn>> {
+    Ok(connection.prepare(&format!(
+        "SELECT key,data FROM {} ORDER BY _rowid_ ASC",
         table_name
     ))?)
 }

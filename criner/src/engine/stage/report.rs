@@ -1,3 +1,4 @@
+use crate::persistence::new_key_value_query;
 use crate::{
     engine::{report, work},
     error::Result,
@@ -42,11 +43,9 @@ pub async fn generate(
             .map(|_| ())
             .boxed(),
     )?;
-    let connection = krates.connection().lock();
-    let mut statement = connection.prepare(&format!(
-        "SELECT * FROM {} ORDER BY _rowid_ ASC",
-        persistence::CratesTree::table_name()
-    ))?;
+    let mut connection = krates.connection().lock();
+    let mut statement =
+        new_key_value_query(persistence::CratesTree::table_name(), &mut *connection)?;
     let mut rows = statement.query(NO_PARAMS)?;
     let mut chunk = Vec::<(String, Vec<u8>)>::with_capacity(chunk_size);
     let mut cid = 0;
