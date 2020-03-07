@@ -334,12 +334,12 @@ impl ReportsTree {
             .lock()
             .query_row(
                 &format!(
-                    "SELECT key FROM {} where key = {}",
+                    "SELECT key FROM {} where key = '{}'",
                     Self::table_name(),
                     key.as_ref()
                 ),
                 NO_PARAMS,
-                |_r| Ok(()),
+                |r| r.get::<_, String>(0),
             )
             .optional()
             .ok()

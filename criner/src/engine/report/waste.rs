@@ -63,7 +63,6 @@ impl Generator {
                     );
 
                     if !reports.is_done(&key_buf) {
-                        // unreachable!("everything is processed, got {}:{}", name, version);
                         let reports_key = key_buf.clone();
                         key_buf.clear();
                         dummy_extraction_result.fq_key(
