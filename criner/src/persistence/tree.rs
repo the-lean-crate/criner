@@ -99,22 +99,20 @@ pub trait TreeAccess {
     }
 
     fn get(&self, key: impl AsRef<str>) -> Result<Option<Self::StorageItem>> {
-        retry_on_db_busy(|| {
-            Ok(self
-                .connection()
-                .lock()
-                .query_row(
-                    &format!(
-                        "SELECT data FROM {} WHERE key = '{}'",
-                        Self::table_name(),
-                        key.as_ref()
-                    ),
-                    NO_PARAMS,
-                    |r| r.get::<_, Vec<u8>>(0),
-                )
-                .optional()?
-                .map(|d| Self::StorageItem::from(d.as_slice())))
-        })
+        Ok(self
+            .connection()
+            .lock()
+            .query_row(
+                &format!(
+                    "SELECT data FROM {} WHERE key = '{}'",
+                    Self::table_name(),
+                    key.as_ref()
+                ),
+                NO_PARAMS,
+                |r| r.get::<_, Vec<u8>>(0),
+            )
+            .optional()?
+            .map(|d| Self::StorageItem::from(d.as_slice())))
     }
 
     /// Update an existing item, or create it as default, returning the stored item
