@@ -3,7 +3,7 @@ use crate::{
     engine::work,
     error::Result,
     model::CrateVersion,
-    persistence::{Db, Keyed, TreeAccess},
+    persistence::{Db, IterValues, Keyed, TreeAccess},
 };
 use futures::{
     task::{Spawn, SpawnExt},
@@ -69,20 +69,18 @@ pub async fn process(
 
     let versions = db.open_crate_versions()?;
     let num_versions = versions.count();
-    let guard = versions.connection().lock();
-    let mut statement = guard.prepare(&format!(
-        "SELECT data FROM {} ORDER BY _rowid_ DESC",
-        CrateVersionsTree::table_name()
-    ))?;
-
-    let mut rows = statement.query(NO_PARAMS)?;
+    let connection = versions.into_connection();
+    let mut guard = connection.lock();
+    let mut statement =
+        IterValues::<CrateVersion>::new_statement(CrateVersionsTree::table_name(), &mut *guard)?;
+    let rows = statement.query(NO_PARAMS)?;
+    let iter = IterValues::<CrateVersion>::from_rows::<CrateVersion>(rows);
 
     progress.init(Some(num_versions as u32), Some("crate versions"));
     let tasks = db.open_tasks()?;
     let mut vid = 0;
-    while let Some(r) = rows.next()? {
-        let version: Vec<u8> = r.get(0)?;
-        let version = CrateVersion::from(version.as_slice());
+    for version in iter {
+        let version = version?;
 
         progress.set((vid + 1) as u32);
         progress.blocked(None);

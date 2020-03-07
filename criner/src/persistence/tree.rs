@@ -42,7 +42,7 @@ impl<'stm, T> IterValues<'stm, T> {
             table_name
         ))?)
     }
-    pub fn new<StorageItem>(rows: rusqlite::Rows<'stm>) -> IterValues<'stm, StorageItem> {
+    pub fn from_rows<StorageItem>(rows: rusqlite::Rows<'stm>) -> IterValues<'stm, StorageItem> {
         IterValues {
             rows,
             _phantom: PhantomData::default(),
@@ -63,6 +63,8 @@ pub trait TreeAccess {
     ) -> Self::StorageItem {
         Self::StorageItem::from(new_item.clone())
     }
+
+    fn into_connection(self) -> ThreadSafeConnection;
 
     fn count(&self) -> u64 {
         self.connection()
@@ -221,7 +223,6 @@ impl TreeAccess for TasksTree {
     fn table_name() -> &'static str {
         "task"
     }
-
     fn merge(
         new_task: &Self::InsertItem,
         existing_task: Option<Self::StorageItem>,
@@ -233,6 +234,10 @@ impl TreeAccess for TasksTree {
                 |existing_task| existing_task.merge(new_task),
             )
         }
+    }
+
+    fn into_connection(self) -> ThreadSafeConnection {
+        self.inner
     }
 }
 
@@ -298,6 +303,9 @@ impl TreeAccess for TaskResultTree {
     fn table_name() -> &'static str {
         "result"
     }
+    fn into_connection(self) -> ThreadSafeConnection {
+        self.inner
+    }
 }
 
 pub struct ContextTree {
@@ -317,6 +325,9 @@ impl TreeAccess for ContextTree {
 
     fn merge(new: &Context, existing_item: Option<Context>) -> Self::StorageItem {
         existing_item.map_or_else(|| new.to_owned(), |existing| existing.merge(new))
+    }
+    fn into_connection(self) -> ThreadSafeConnection {
+        self.inner
     }
 }
 
@@ -362,6 +373,9 @@ impl TreeAccess for CratesTree {
     fn merge(new_item: &CrateVersion, existing_item: Option<Crate>) -> Crate {
         existing_item.map_or_else(|| Crate::from(new_item.to_owned()), |c| c.merge(new_item))
     }
+    fn into_connection(self) -> ThreadSafeConnection {
+        self.inner
+    }
 }
 
 #[derive(Clone)]
@@ -378,5 +392,8 @@ impl TreeAccess for CrateVersionsTree {
     }
     fn table_name() -> &'static str {
         "crate_version"
+    }
+    fn into_connection(self) -> ThreadSafeConnection {
+        self.inner
     }
 }
