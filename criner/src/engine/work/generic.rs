@@ -42,7 +42,7 @@ pub async fn processor<T>(
         let (dummy_task, progress_info) = agent.set(request, &mut key, &mut progress)?;
         progress.set_name(progress_info);
 
-        let mut task = tasks.update(&key, |mut t| {
+        let mut task = tasks.update(Some(&mut progress), &key, |mut t| {
             t.process = dummy_task.process.clone();
             t.version = dummy_task.version.clone();
             t.state.merge_with(&model::TaskState::InProgress(None));
@@ -63,7 +63,7 @@ pub async fn processor<T>(
             }
         };
 
-        tasks.upsert(&key, &task)?;
+        tasks.upsert(&mut progress, &key, &task)?;
         progress.set_name(agent.idle_message());
         progress.init(None, None);
     }

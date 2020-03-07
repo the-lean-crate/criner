@@ -119,10 +119,11 @@ pub trait TreeAccess {
     /// f(existing) should merge the items as desired
     fn update(
         &self,
+        progress: Option<&mut prodash::tree::Item>,
         key: impl AsRef<str>,
         f: impl Fn(Self::StorageItem) -> Self::StorageItem,
     ) -> Result<Self::StorageItem> {
-        retry_on_db_busy(|| {
+        retry_on_db_busy(progress, || {
             let mut guard = self.connection().lock();
             let transaction =
                 guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
@@ -155,8 +156,13 @@ pub trait TreeAccess {
     }
 
     /// Similar to 'update', but provides full control over the default and allows deletion
-    fn upsert(&self, key: impl AsRef<str>, item: &Self::InsertItem) -> Result<Self::StorageItem> {
-        retry_on_db_busy(|| {
+    fn upsert(
+        &self,
+        progress: &mut prodash::tree::Item,
+        key: impl AsRef<str>,
+        item: &Self::InsertItem,
+    ) -> Result<Self::StorageItem> {
+        retry_on_db_busy(Some(progress), || {
             let mut guard = self.connection().lock();
             let transaction =
                 guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
@@ -187,8 +193,13 @@ pub trait TreeAccess {
         })
     }
 
-    fn insert(&self, key: impl AsRef<str>, v: &Self::InsertItem) -> Result<()> {
-        retry_on_db_busy(|| {
+    fn insert(
+        &self,
+        progress: &mut prodash::tree::Item,
+        key: impl AsRef<str>,
+        v: &Self::InsertItem,
+    ) -> Result<()> {
+        retry_on_db_busy(Some(progress), || {
             self.connection().lock().execute(
                 &format!(
                     "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
@@ -201,7 +212,10 @@ pub trait TreeAccess {
     }
 }
 
-fn retry_on_db_busy<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
+fn retry_on_db_busy<T>(
+    mut progress: Option<&mut prodash::tree::Item>,
+    mut f: impl FnMut() -> Result<T>,
+) -> Result<T> {
     use crate::Error;
     use rusqlite::ffi::Error as SqliteFFIError;
     use rusqlite::ffi::ErrorCode as SqliteFFIErrorCode;
@@ -239,6 +253,9 @@ fn retry_on_db_busy<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
                     err,
                     total_wait_time
                 );
+                progress
+                    .as_mut()
+                    .map(|p| p.blocked(Some(SystemTime::now() + wait_for)));
                 std::thread::sleep(wait_for);
                 wait_for *= 2;
             }
@@ -371,7 +388,7 @@ impl TreeAccess for ContextTree {
 
 impl ContextTree {
     pub fn update_today(&self, f: impl Fn(&mut Context)) -> Result<Context> {
-        self.update(Context::default().key(), |mut c| {
+        self.update(None, Context::default().key(), |mut c| {
             f(&mut c);
             c
         })

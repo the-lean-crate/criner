@@ -38,6 +38,8 @@ fn migrate_iterate_assets_and_update_db(db_path: impl AsRef<Path>) -> crate::Res
     let results = db.open_results()?;
     let task = crate::engine::work::iobound::default_persisted_download_task();
     let mut key = String::new();
+    let root = prodash::Tree::new();
+    let mut progress = root.add_child("does not matter");
 
     for entry in jwalk::WalkDir::new(assets_dir)
         .preload_metadata(true)
@@ -77,7 +79,7 @@ fn migrate_iterate_assets_and_update_db(db_path: impl AsRef<Path>) -> crate::Res
             content_type: Some("application/x-tar".into()),
         };
         task_result.fq_key(name, version, &task, &mut key);
-        results.insert(&key, &task_result)?;
+        results.insert(&mut progress, &key, &task_result)?;
     }
     Ok(())
 }

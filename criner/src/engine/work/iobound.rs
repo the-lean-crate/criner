@@ -220,7 +220,7 @@ async fn download_file_and_store_result(
             .and_then(|t| t.to_str().ok())
             .map(Into::into),
     };
-    results.insert(&key, &task_result)?;
+    results.insert(progress, &key, &task_result)?;
     Ok(())
 }
 

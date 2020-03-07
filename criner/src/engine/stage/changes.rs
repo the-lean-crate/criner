@@ -120,7 +120,12 @@ pub async fn fetch(
                 }
 
                 transaction.commit()?;
-                let transaction = connection.transaction()?;
+                let transaction = {
+                    let mut t = connection
+                        .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+                    t.set_drop_behavior(rusqlite::DropBehavior::Commit);
+                    t
+                };
                 {
                     let mut statement =
                         new_key_value_insertion(CratesTree::table_name(), &transaction)?;

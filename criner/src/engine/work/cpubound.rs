@@ -163,7 +163,7 @@ fn extract_crate(
         entries_meta_data: meta_data.into(),
         selected_entries: files.into(),
     };
-    results.insert(&key, &task_result)?;
+    results.insert(progress, &key, &task_result)?;
 
     Ok(())
 }
