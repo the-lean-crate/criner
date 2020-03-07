@@ -1,6 +1,4 @@
-use crate::persistence::{
-    commit_transaction_with_retry, key_value_iter, new_key_value_query, CratesTree,
-};
+use crate::persistence::{key_value_iter, new_key_value_query, CratesTree};
 use crate::{
     error::{Error, Result},
     model,
@@ -120,7 +118,8 @@ pub async fn fetch(
                         store_progress.set((versions_stored + 1) as u32);
                     }
                 }
-                commit_transaction_with_retry(transaction)?;
+
+                transaction.commit()?;
                 let transaction = connection.transaction()?;
                 {
                     let mut statement =
@@ -129,7 +128,7 @@ pub async fn fetch(
                         statement.execute(params![key, rmp_serde::to_vec(&value)?])?;
                     }
                 }
-                commit_transaction_with_retry(transaction)?;
+                transaction.commit()?;
 
                 Index::from_path_or_cloned(index_path)?
                     .set_last_seen_reference(last_seen_git_object)?;
