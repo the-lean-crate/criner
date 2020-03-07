@@ -140,7 +140,7 @@ impl<'a> SqlConvert for model::TaskResult {
     }
 
     fn source_table_name() -> &'static str {
-        "results"
+        "result"
     }
 
     fn init_table_statement() -> &'static str {

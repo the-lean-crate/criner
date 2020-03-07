@@ -18,7 +18,7 @@ impl SqlConvert for model::CrateVersion {
     }
 
     fn source_table_name() -> &'static str {
-        "crate_versions"
+        "crate_version"
     }
 
     fn init_table_statement() -> &'static str {

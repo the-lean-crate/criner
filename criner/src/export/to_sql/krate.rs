@@ -8,7 +8,7 @@ impl<'a> SqlConvert for model::Crate {
             VALUES (?1,   ?2)"
     }
     fn source_table_name() -> &'static str {
-        "crates"
+        "crate"
     }
     fn init_table_statement() -> &'static str {
         "CREATE TABLE crate (

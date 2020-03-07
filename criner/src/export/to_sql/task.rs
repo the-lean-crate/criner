@@ -15,7 +15,7 @@ impl SqlConvert for model::Task {
         )
     }
     fn source_table_name() -> &'static str {
-        "tasks"
+        "task"
     }
     fn init_table_statement() -> &'static str {
         "BEGIN;
@@ -49,6 +49,7 @@ impl SqlConvert for model::Task {
         let crate_name = tokens.next().unwrap();
         let crate_version = tokens.next().unwrap();
         let _process_name = tokens.next().unwrap();
+        let _process_version = tokens.next().unwrap();
         assert!(tokens.next().is_none());
 
         let Self {
