@@ -22,8 +22,8 @@ pub async fn fetch(
     deadline: Option<SystemTime>,
 ) -> Result<()> {
     let start = SystemTime::now();
-    let mut subprogress =
-        progress.add_child("Potentially cloning crates index - this can take a while…");
+    let mut subprogress = progress.add_child("Fetching changes from crates.io index");
+    subprogress.blocked("potentially cloning", None);
     let index = enforce_blocking(
         deadline,
         {
@@ -76,7 +76,7 @@ pub async fn fetch(
                 let mut connection = db.open_connection_no_async()?;
                 let mut crates_lut = {
                     let transaction = connection.transaction()?;
-                    store_progress.blocked(None);
+                    store_progress.blocked("caching crates", None);
                     let mut statement =
                         new_key_value_query(CratesTree::table_name(), &transaction)?;
                     let iter = key_value_iter::<model::Crate>(&mut statement)?.flat_map(Result::ok);
@@ -87,7 +87,7 @@ pub async fn fetch(
                 let crate_versions_len = crate_versions.len();
                 let mut new_crate_versions = 0;
                 let mut new_crates = 0;
-                store_progress.blocked(None);
+                store_progress.blocked("write lock for crate versions", None);
                 let transaction = connection
                     .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
                 {
@@ -120,11 +120,11 @@ pub async fn fetch(
                     }
                 }
 
-                store_progress.blocked(None);
+                store_progress.blocked("commit crate versions", None);
                 transaction.commit()?;
 
                 let transaction = {
-                    store_progress.blocked(None);
+                    store_progress.blocked("write lock for crates", None);
                     let mut t = connection
                         .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
                     t.set_drop_behavior(rusqlite::DropBehavior::Commit);
@@ -139,7 +139,7 @@ pub async fn fetch(
                         store_progress.set((cid + 1) as u32);
                     }
                 }
-                store_progress.blocked(None);
+                store_progress.blocked("commit crates", None);
                 transaction.commit()?;
 
                 Index::from_path_or_cloned(index_path)?

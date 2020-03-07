@@ -55,7 +55,7 @@ pub async fn generate(
             cid += 1;
             check(deadline.clone())?;
             progress.set((cid * chunk_size) as u32);
-            progress.blocked(None);
+            progress.blocked("write crate report", None);
             tx.send(
                 report::waste::Generator::write_files(
                     db.clone(),

@@ -49,7 +49,7 @@ pub async fn processor<T>(
             t
         })?;
 
-        progress.blocked(None);
+        progress.blocked("working", None);
         let res = agent.process(&mut progress).await;
 
         task.state = match res {

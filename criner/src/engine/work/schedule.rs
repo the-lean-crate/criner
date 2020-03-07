@@ -122,7 +122,7 @@ async fn submit_single<R>(
     let mut configure = || {
         progress.init(Some(step), Some("task"));
         progress.set(max_step);
-        progress.blocked(None);
+        progress.blocked("wait for consumer", None);
     };
     match task.state {
         InProgress(_) => {

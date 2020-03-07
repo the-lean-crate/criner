@@ -81,7 +81,7 @@ pub async fn process(
         let version = version?;
 
         progress.set((vid + 1) as u32);
-        progress.blocked(None);
+        progress.blocked("wait for task consumers", None);
         work::schedule::tasks(
             &tasks,
             &version,

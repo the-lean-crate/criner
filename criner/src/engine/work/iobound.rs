@@ -107,15 +107,12 @@ impl crate::engine::work::generic::Processor for Agent {
             .extraction_request
             .take()
             .expect("this to be set when we are called");
-        progress.blocked(None);
+        progress.blocked("schedule crate extraction", None);
         // Here we risk doing this work twice, but must of the time, we don't. And since it's fast,
         // we take the risk of duplicate work for keeping more precessors busy.
         // And yes, this send is blocking the source processor, but should not be an issue as CPU
         // processors are so fast - slow producer, fast consumer.
-        // BUT: Try not to block (racy, but ok)
-        if !self.channel.is_full() {
-            self.channel.send(extract_request).await;
-        }
+        self.channel.send(extract_request).await;
         Ok(())
     }
 
@@ -177,12 +174,12 @@ async fn download_file_and_store_result(
     base_dir: PathBuf,
     out_file: PathBuf,
 ) -> Result<()> {
+    progress.blocked("fetch HEAD", None);
     let mut res = client.get(url).send().await?;
     let size: u32 = res
         .content_length()
         .ok_or(Error::InvalidHeader("expected content-length"))? as u32;
     progress.init(Some(size / 1024), Some("Kb"));
-    progress.blocked(None);
     progress.done(format!(
         "HEAD:{}: content-length = {}",
         url,
