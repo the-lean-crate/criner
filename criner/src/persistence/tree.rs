@@ -99,7 +99,7 @@ pub trait TreeAccess {
     }
 
     fn get(&self, key: impl AsRef<str>) -> Result<Option<Self::StorageItem>> {
-        retry_on_db_lock(|| {
+        retry_on_db_busy(|| {
             Ok(self
                 .connection()
                 .lock()
@@ -124,7 +124,7 @@ pub trait TreeAccess {
         key: impl AsRef<str>,
         f: impl Fn(Self::StorageItem) -> Self::StorageItem,
     ) -> Result<Self::StorageItem> {
-        retry_on_db_lock(|| {
+        retry_on_db_busy(|| {
             let mut guard = self.connection().lock();
             let transaction = guard.savepoint()?;
             let new_value = transaction
@@ -157,7 +157,7 @@ pub trait TreeAccess {
 
     /// Similar to 'update', but provides full control over the default and allows deletion
     fn upsert(&self, key: impl AsRef<str>, item: &Self::InsertItem) -> Result<Self::StorageItem> {
-        retry_on_db_lock(|| {
+        retry_on_db_busy(|| {
             let mut guard = self.connection().lock();
             let transaction = guard.savepoint()?;
 
@@ -188,7 +188,7 @@ pub trait TreeAccess {
     }
 
     fn insert(&self, key: impl AsRef<str>, v: &Self::InsertItem) -> Result<()> {
-        retry_on_db_lock(|| {
+        retry_on_db_busy(|| {
             self.connection().lock().execute(
                 &format!(
                     "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
@@ -201,16 +201,19 @@ pub trait TreeAccess {
     }
 }
 
-fn retry_on_db_lock<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
+pub fn commit_transaction_with_retry(t: rusqlite::Transaction) -> Result<()> {
+    retry_on_db_busy(|| t.execute_batch("COMMIT").map_err(Into::into))
+}
+
+fn retry_on_db_busy<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
     use crate::Error;
     use rusqlite::ffi::Error as SqliteFFIError;
     use rusqlite::ffi::ErrorCode as SqliteFFIErrorCode;
     use rusqlite::Error as SqliteError;
 
-    let max_wait_ms = Duration::from_secs(100);
+    let max_wait_ms = Duration::from_secs(10);
     let mut total_wait_time = Duration::default();
     let mut wait_for = Duration::from_millis(1);
-    let max_wait_time = Duration::from_millis(250);
     loop {
         total_wait_time += wait_for;
         match f() {
@@ -225,17 +228,6 @@ fn retry_on_db_lock<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
                     },
                     _,
                 )),
-            )
-            | Err(
-                err
-                @
-                Error::Rusqlite(SqliteError::SqliteFailure(
-                    SqliteFFIError {
-                        code: SqliteFFIErrorCode::DatabaseLocked,
-                        extended_code: _,
-                    },
-                    _,
-                )),
             ) => {
                 if total_wait_time >= max_wait_ms {
                     log::warn!(
@@ -246,12 +238,13 @@ fn retry_on_db_lock<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
                     return Err(err);
                 }
                 log::warn!(
-                    "Waiting 1ms for {:?} (total wait time {:?})",
+                    "Waiting {:?} for {:?} (total wait time {:?})",
+                    wait_for,
                     err,
                     total_wait_time
                 );
                 std::thread::sleep(wait_for);
-                wait_for = (wait_for * 2).min(max_wait_time);
+                wait_for *= 2;
             }
             Err(err) => return Err(err),
         }

@@ -26,7 +26,7 @@ impl Db {
                 PRAGMA synchronous = NORMAL;        -- fsync only in critical moments
                 PRAGMA wal_autocheckpoint = 1000;   -- write WAL changes back every 1000 pages, for an in average 1MB WAL file. May affect readers if number is increased
                 PRAGMA wal_checkpoint(TRUNCATE);    -- free some space by truncating possibly massive WAL files from the last run.
-               --  PRAGMA read_uncommitted;            -- read other uncommitted changes in shard cache mode
+                PRAGMA read_uncommitted;            -- read other uncommitted changes in shard cache mode
             ")?;
 
             let transaction = connection.transaction()?;
@@ -82,16 +82,14 @@ impl Db {
 }
 
 fn sleeper(attempts: i32) -> bool {
-    log::warn!("SQLITE_BUSY, retrying after 1ms (attempt {})", attempts);
-    std::thread::sleep(std::time::Duration::from_millis(1));
+    log::warn!("SQLITE_BUSY, retrying after 250ms (attempt {})", attempts);
+    std::thread::sleep(std::time::Duration::from_millis(250));
     true
 }
 
 fn open_connection(db_path: &Path) -> Result<ThreadSafeConnection> {
-    let connection = rusqlite::Connection::open_with_flags(
-        db_path,
-        rusqlite::OpenFlags::default() | rusqlite::OpenFlags::SQLITE_OPEN_SHARED_CACHE,
-    )?;
+    let connection =
+        rusqlite::Connection::open_with_flags(db_path, rusqlite::OpenFlags::default())?;
     // TODO: this one day could be rewritten to using async sleeps. However, that is some extra work in the face of
     // traits not supporting async fn natively (there is a crate though). So figure out if this is an issue, possibly
     // by busy-logging ourselves.
