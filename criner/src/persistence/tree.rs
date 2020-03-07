@@ -207,7 +207,7 @@ pub fn commit_transaction_with_retry(t: rusqlite::Transaction) -> Result<()> {
     retry_on_db_busy(|| t.execute_batch("COMMIT").map_err(Into::into))
 }
 
-fn retry_on_db_busy<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
+pub fn retry_on_db_busy<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
     use crate::Error;
     use rusqlite::ffi::Error as SqliteFFIError;
     use rusqlite::ffi::ErrorCode as SqliteFFIErrorCode;

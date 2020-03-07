@@ -75,10 +75,9 @@ pub async fn fetch(
             let index_path = crates_io_path.as_ref().to_path_buf();
             move || {
                 use std::iter::FromIterator;
-                let connection = db.open_connection()?;
-                let mut guard = connection.lock();
+                let mut connection = db.open_connection_no_async()?;
                 let mut crates_lut = {
-                    let transaction = guard.transaction()?;
+                    let transaction = connection.transaction()?;
                     store_progress.blocked(None);
                     let mut statement =
                         new_key_value_query(CratesTree::table_name(), &transaction)?;
@@ -90,8 +89,8 @@ pub async fn fetch(
                 let crate_versions_len = crate_versions.len();
                 let mut new_crate_versions = 0;
                 let mut new_crates = 0;
-                let transaction =
-                    guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+                let transaction = connection
+                    .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
                 {
                     let mut statement =
                         new_key_value_insertion(CrateVersionsTree::table_name(), &transaction)?;
@@ -122,7 +121,7 @@ pub async fn fetch(
                     }
                 }
                 commit_transaction_with_retry(transaction)?;
-                let transaction = guard.transaction()?;
+                let transaction = connection.transaction()?;
                 {
                     let mut statement =
                         new_key_value_insertion(CratesTree::table_name(), &transaction)?;

@@ -25,6 +25,8 @@
   * is really not suited for many concurrent writers - you have to prepare for database locked errors, and the busy_handler doesn't help most of the time.
   * writing many small objects is slow, and can only be alleviated with prepared statements which are not always feasible or nice to use with a persistence
     design inspired by sled. To alleviate, the whole application must embrace Sqlite and work with statements directly.
+  * Working with the lifetimes associated with transactions is a necessary evil, but it is painful too when trying to refactor anything! I just don't understand
+    anymore what it tries to do, and have the feeling the compiler is confused itself (as in theory, there is no issue).
 * sled databases are about 4 times bigger than an Sqlite database with the same content
 * sled is easy to handle in a threaded/concurrent environment, but iteration isn't possible across awaits as it's not sync
   * Sqlite is not sync nor is it send, so it needs more treatment before it can be used with spawened futures

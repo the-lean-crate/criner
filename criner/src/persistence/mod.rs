@@ -53,6 +53,10 @@ impl Db {
         open_connection(&self.sqlite_path)
     }
 
+    pub fn open_connection_no_async(&self) -> Result<rusqlite::Connection> {
+        open_connection_no_async(&self.sqlite_path)
+    }
+
     pub fn open_crate_versions(&self) -> Result<CrateVersionsTree> {
         Ok(CrateVersionsTree {
             inner: open_connection(&self.sqlite_path)?,
@@ -87,11 +91,14 @@ fn sleeper(attempts: i32) -> bool {
 }
 
 fn open_connection(db_path: &Path) -> Result<ThreadSafeConnection> {
+    Ok(std::sync::Arc::new(parking_lot::Mutex::new(
+        open_connection_no_async(db_path)?,
+    )))
+}
+
+fn open_connection_no_async(db_path: &Path) -> Result<rusqlite::Connection> {
     let connection =
         rusqlite::Connection::open_with_flags(db_path, rusqlite::OpenFlags::default())?;
-    // TODO: this one day could be rewritten to using async sleeps. However, that is some extra work in the face of
-    // traits not supporting async fn natively (there is a crate though). So figure out if this is an issue, possibly
-    // by busy-logging ourselves.
     connection.busy_handler(Some(sleeper))?;
-    Ok(std::sync::Arc::new(parking_lot::Mutex::new(connection)))
+    Ok(connection)
 }
