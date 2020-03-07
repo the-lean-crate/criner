@@ -75,9 +75,9 @@ pub async fn fetch(
                 use std::iter::FromIterator;
                 let connection = db.open_connection()?;
                 let mut guard = connection.lock();
-                let mut transaction = guard.transaction()?;
+                let transaction = guard.transaction()?;
                 store_progress.blocked(None);
-                let crates_lut = {
+                let mut crates_lut = {
                     let mut statement =
                         new_key_value_query(CratesTree::table_name(), &transaction)?;
                     let iter = key_value_iter::<model::Crate>(&mut statement)?.flat_map(Result::ok);
@@ -100,19 +100,31 @@ pub async fn fetch(
                         version.key_buf(&mut key_buf);
                         statement.execute(params![&key_buf, rmp_serde::to_vec(&version)?])?;
                         new_crate_versions += 1;
-                        // {
-                        //     key_buf.clear();
-                        //     version.key_buf(&mut key_buf);
-                        //     versions.insert(&key_buf, &version)?;
-                        //     new_crate_versions += 1;
-                        // }
-                        // key_buf.clear();
-                        // Crate::key_from_version_buf(&version, &mut key_buf);
-                        // if krate.upsert(&key_buf, &version)?.versions.len() == 1 {
-                        //     new_crates += 1;
-                        // }
+
+                        key_buf.clear();
+                        model::Crate::key_from_version_buf(&version, &mut key_buf);
+                        if crates_lut
+                            .entry(key_buf.to_owned())
+                            .or_default()
+                            .merge_mut(&version)
+                            .versions
+                            .len()
+                            == 1
+                        {
+                            new_crates += 1;
+                        }
 
                         store_progress.set((versions_stored + 1) as u32);
+                    }
+                }
+                transaction.commit()?;
+
+                let transaction = guard.transaction()?;
+                {
+                    let mut statement =
+                        new_key_value_insertion(CratesTree::table_name(), &transaction)?;
+                    for (key, value) in crates_lut.into_iter() {
+                        statement.execute(params![key, rmp_serde::to_vec(&value)?])?;
                     }
                 }
                 transaction.commit()?;

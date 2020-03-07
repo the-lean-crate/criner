@@ -53,3 +53,13 @@ impl Merge<model::CrateVersion> for model::Crate {
         self
     }
 }
+
+impl model::Crate {
+    pub fn merge_mut(&mut self, other: &CrateVersion) -> &mut model::Crate {
+        if !self.versions.contains(&other.version) {
+            self.versions.push(other.version.to_owned());
+        }
+        self.versions.sort();
+        self
+    }
+}
