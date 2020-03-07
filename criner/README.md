@@ -2,7 +2,6 @@
 
 ## Tasks
 
-* [ ] too much CPU time to check all crates for tasks
 * [x] export all data into a flattened queryable sqlite database
 * [x] also write data to sqlite when fetching
   * [ ] experiment with SQLITE Pragmas: performance(journal_mode, journal_size, synchronous=0), read_uncommitted

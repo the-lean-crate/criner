@@ -5,7 +5,7 @@ use crate::{
     Result,
 };
 use rusqlite::{params, OptionalExtension, NO_PARAMS};
-use std::time::SystemTime;
+use std::time::{Duration, SystemTime};
 
 /// Required as we send futures to threads. The type system can't statically prove that in fact
 /// these connections will only ever be created while already in the thread they should execute on.
@@ -202,28 +202,43 @@ pub trait TreeAccess {
 }
 
 fn retry_on_db_lock<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
-    let max_wait_ms = 1000;
-    let mut attempt = 0;
+    use crate::Error;
+    use rusqlite::ffi::Error as SqliteFFIError;
+    use rusqlite::ffi::ErrorCode as SqliteFFIErrorCode;
+    use rusqlite::Error as SqliteError;
+    let max_wait_ms = Duration::from_secs(10);
+    let mut total_wait_time = Duration::default();
+    let mut wait_for = Duration::from_millis(1);
     loop {
-        attempt += 1;
+        total_wait_time += wait_for;
         match f() {
             Ok(v) => return Ok(v),
             Err(
                 err
                 @
-                crate::Error::Rusqlite(rusqlite::Error::SqliteFailure(
-                    rusqlite::ffi::Error {
-                        code: rusqlite::ffi::ErrorCode::DatabaseBusy,
-                        extended_code: 5,
+                Error::Rusqlite(SqliteError::SqliteFailure(
+                    SqliteFFIError {
+                        code: SqliteFFIErrorCode::DatabaseBusy,
+                        extended_code: _,
                     },
                     _,
                 )),
             ) => {
-                if attempt == max_wait_ms {
+                if total_wait_time >= max_wait_ms {
+                    log::warn!(
+                        "Giving up to wait for {:?} after {:?})",
+                        err,
+                        total_wait_time
+                    );
                     return Err(err);
                 }
-                log::warn!("Waiting 1ms for {:?} (attempt {})", err, attempt);
-                std::thread::sleep(std::time::Duration::from_millis(1));
+                log::warn!(
+                    "Waiting 1ms for {:?} (total wait time {:?})",
+                    err,
+                    total_wait_time
+                );
+                std::thread::sleep(wait_for);
+                wait_for *= 2;
             }
             Err(err) => return Err(err),
         }
