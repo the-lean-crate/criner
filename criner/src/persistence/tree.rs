@@ -14,7 +14,7 @@ pub type ThreadSafeConnection = std::sync::Arc<parking_lot::Mutex<rusqlite::Conn
 
 pub fn new_value_query<'conn>(
     table_name: &str,
-    connection: &'conn mut rusqlite::Connection,
+    connection: &'conn rusqlite::Connection,
 ) -> Result<rusqlite::Statement<'conn>> {
     Ok(connection.prepare(&format!(
         "SELECT data FROM {} ORDER BY _rowid_ DESC",
@@ -24,10 +24,20 @@ pub fn new_value_query<'conn>(
 
 pub fn new_key_value_query<'conn>(
     table_name: &str,
-    connection: &'conn mut rusqlite::Connection,
+    connection: &'conn rusqlite::Connection,
 ) -> Result<rusqlite::Statement<'conn>> {
     Ok(connection.prepare(&format!(
         "SELECT key,data FROM {} ORDER BY _rowid_ ASC",
+        table_name
+    ))?)
+}
+
+pub fn new_key_value_insertion<'conn>(
+    table_name: &str,
+    connection: &'conn rusqlite::Connection,
+) -> Result<rusqlite::Statement<'conn>> {
+    Ok(connection.prepare(&format!(
+        "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
         table_name
     ))?)
 }
@@ -42,6 +52,21 @@ where
         .query_map(NO_PARAMS, |r| {
             r.get::<_, Vec<u8>>(0)
                 .map(|v| StorageItem::from(v.as_slice()))
+        })?
+        .map(|r| r.map_err(Into::into)))
+}
+
+pub fn key_value_iter<'stm, 'conn, StorageItem>(
+    statement: &'stm mut rusqlite::Statement<'conn>,
+) -> Result<impl Iterator<Item = Result<(String, StorageItem)>> + 'stm>
+where
+    StorageItem: for<'a> From<&'a [u8]>,
+{
+    Ok(statement
+        .query_map(NO_PARAMS, |r| {
+            let key = r.get::<_, String>(0)?;
+            let data = r.get::<_, Vec<u8>>(1)?;
+            Ok((key, StorageItem::from(data.as_slice())))
         })?
         .map(|r| r.map_err(Into::into)))
 }

@@ -1,11 +1,14 @@
+use crate::persistence::{key_value_iter, new_key_value_query, CratesTree};
 use crate::{
     error::{Error, Result},
-    model::{Crate, CrateVersion},
-    persistence::{self, Keyed, TreeAccess},
+    model,
+    persistence::{self, new_key_value_insertion, CrateVersionsTree, Keyed, TreeAccess},
     utils::*,
 };
 use crates_index_diff::Index;
 use futures::task::Spawn;
+use rusqlite::params;
+use std::collections::BTreeMap;
 use std::{
     path::Path,
     time::{Duration, SystemTime},
@@ -69,37 +72,51 @@ pub async fn fetch(
             let db = db.clone();
             let index_path = crates_io_path.as_ref().to_path_buf();
             move || {
+                use std::iter::FromIterator;
                 let connection = db.open_connection()?;
-                let versions = persistence::CrateVersionsTree {
-                    inner: connection.clone(),
-                };
-                let krate = persistence::CratesTree {
-                    inner: connection.clone(),
+                let mut guard = connection.lock();
+                let mut transaction = guard.transaction()?;
+                store_progress.blocked(None);
+                let crates_lut = {
+                    let mut statement =
+                        new_key_value_query(CratesTree::table_name(), &transaction)?;
+                    let iter = key_value_iter::<model::Crate>(&mut statement)?.flat_map(Result::ok);
+                    BTreeMap::from_iter(iter)
                 };
 
                 let mut key_buf = String::new();
                 let crate_versions_len = crate_versions.len();
                 let mut new_crate_versions = 0;
                 let mut new_crates = 0;
-                for (versions_stored, version) in crate_versions
-                    .into_iter()
-                    .map(CrateVersion::from)
-                    .enumerate()
                 {
+                    let mut statement =
+                        new_key_value_insertion(CrateVersionsTree::table_name(), &transaction)?;
+                    for (versions_stored, version) in crate_versions
+                        .into_iter()
+                        .map(model::CrateVersion::from)
+                        .enumerate()
                     {
                         key_buf.clear();
                         version.key_buf(&mut key_buf);
-                        versions.insert(&key_buf, &version)?;
+                        statement.execute(params![&key_buf, rmp_serde::to_vec(&version)?])?;
                         new_crate_versions += 1;
-                    }
-                    key_buf.clear();
-                    Crate::key_from_version_buf(&version, &mut key_buf);
-                    if krate.upsert(&key_buf, &version)?.versions.len() == 1 {
-                        new_crates += 1;
-                    }
+                        // {
+                        //     key_buf.clear();
+                        //     version.key_buf(&mut key_buf);
+                        //     versions.insert(&key_buf, &version)?;
+                        //     new_crate_versions += 1;
+                        // }
+                        // key_buf.clear();
+                        // Crate::key_from_version_buf(&version, &mut key_buf);
+                        // if krate.upsert(&key_buf, &version)?.versions.len() == 1 {
+                        //     new_crates += 1;
+                        // }
 
-                    store_progress.set((versions_stored + 1) as u32);
+                        store_progress.set((versions_stored + 1) as u32);
+                    }
                 }
+                transaction.commit()?;
+
                 Index::from_path_or_cloned(index_path)?
                     .set_last_seen_reference(last_seen_git_object)?;
                 db.open_context()?.update_today(|c| {
