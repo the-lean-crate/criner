@@ -5,6 +5,7 @@ use crate::{
     Result,
 };
 use rusqlite::{params, OptionalExtension, NO_PARAMS};
+use serde::export::PhantomData;
 use std::time::SystemTime;
 
 /// Required as we send futures to threads. The type system can't statically prove that in fact
@@ -31,14 +32,23 @@ where
         })
     }
 }
-// impl<'stm, T> IterValues<'stm, T> {
-//     pub fn new<StorageItem>(
-//         table_name: &str,
-//         connection: &'stm mut rusqlite::Connection,
-//     ) -> IterValues<'stm, StorageItem> {
-//         unimplemented!()
-//     }
-// }
+impl<'stm, T> IterValues<'stm, T> {
+    pub fn new_statement(
+        table_name: &str,
+        connection: &'stm mut rusqlite::Connection,
+    ) -> Result<rusqlite::Statement<'stm>> {
+        Ok(connection.prepare(&format!(
+            "SELECT data FROM {} ORDER BY _rowid_ DESC",
+            table_name
+        ))?)
+    }
+    pub fn new<StorageItem>(rows: rusqlite::Rows<'stm>) -> IterValues<'stm, StorageItem> {
+        IterValues {
+            rows,
+            _phantom: PhantomData::default(),
+        }
+    }
+}
 
 pub trait TreeAccess {
     type StorageItem: serde::Serialize + for<'a> From<&'a [u8]> + Default + From<Self::InsertItem>;
