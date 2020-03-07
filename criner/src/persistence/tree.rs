@@ -5,7 +5,6 @@ use crate::{
     Result,
 };
 use rusqlite::{params, OptionalExtension, NO_PARAMS};
-use serde::export::PhantomData;
 use std::time::SystemTime;
 
 /// Required as we send futures to threads. The type system can't statically prove that in fact
@@ -13,25 +12,6 @@ use std::time::SystemTime;
 /// Also no one can prevent futures from being resumed in after having been send to a different thread.
 pub type ThreadSafeConnection = std::sync::Arc<parking_lot::Mutex<rusqlite::Connection>>;
 
-pub struct IterValues<'stm, StorageItem> {
-    rows: rusqlite::Rows<'stm>,
-    _phantom: std::marker::PhantomData<StorageItem>,
-}
-
-impl<'stm, StorageItem> Iterator for IterValues<'stm, StorageItem>
-where
-    StorageItem: for<'a> From<&'a [u8]>,
-{
-    type Item = Result<StorageItem>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.rows.next().transpose().map(|res| {
-            res.and_then(|r| r.get::<_, Vec<u8>>(0))
-                .map_err(Into::into)
-                .map(|v| StorageItem::from(&v))
-        })
-    }
-}
 pub fn new_value_query<'stm>(
     table_name: &str,
     connection: &'stm mut rusqlite::Connection,
@@ -42,9 +22,9 @@ pub fn new_value_query<'stm>(
     ))?)
 }
 
-pub fn value_iter<'conn, StorageItem>(
-    statement: &'conn mut rusqlite::Statement<'conn>,
-) -> Result<impl Iterator<Item = Result<StorageItem>> + 'conn>
+pub fn value_iter<'stm, 'conn, StorageItem>(
+    statement: &'stm mut rusqlite::Statement<'conn>,
+) -> Result<impl Iterator<Item = Result<StorageItem>> + 'stm>
 where
     StorageItem: for<'a> From<&'a [u8]>,
 {
@@ -54,14 +34,6 @@ where
                 .map(|v| StorageItem::from(v.as_slice()))
         })?
         .map(|r| r.map_err(Into::into)))
-}
-impl<'stm, T> IterValues<'stm, T> {
-    pub fn from_rows(rows: rusqlite::Rows<'stm>) -> IterValues<'stm, T> {
-        IterValues {
-            rows,
-            _phantom: PhantomData::default(),
-        }
-    }
 }
 
 pub trait TreeAccess {

@@ -3,13 +3,12 @@ use crate::{
     engine::work,
     error::Result,
     model::CrateVersion,
-    persistence::{Db, IterValues, Keyed, TreeAccess},
+    persistence::{Db, Keyed, TreeAccess},
 };
 use futures::{
     task::{Spawn, SpawnExt},
     FutureExt,
 };
-use rusqlite::NO_PARAMS;
 use std::{path::PathBuf, time::SystemTime};
 
 pub async fn process(
