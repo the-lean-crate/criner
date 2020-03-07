@@ -21,13 +21,14 @@ impl<'stm, StorageItem> Iterator for IterValues<'stm, StorageItem>
 where
     StorageItem: for<'a> From<&'a [u8]>,
 {
-    type Item = StorageItem;
+    type Item = Result<StorageItem>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.rows
-            .next()
-            .unwrap_or(None)
-            .and_then(|r| r.get::<_, Vec<u8>>(0).ok().map(|v| Self::Item::from(&v)))
+        self.rows.next().transpose().map(|res| {
+            res.and_then(|r| r.get::<_, Vec<u8>>(0))
+                .map_err(Into::into)
+                .map(|v| StorageItem::from(&v))
+        })
     }
 }
 // impl<'stm, T> IterValues<'stm, T> {
