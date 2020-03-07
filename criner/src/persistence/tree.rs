@@ -32,17 +32,17 @@ where
         })
     }
 }
+pub fn new_value_query<'stm>(
+    table_name: &str,
+    connection: &'stm mut rusqlite::Connection,
+) -> Result<rusqlite::Statement<'stm>> {
+    Ok(connection.prepare(&format!(
+        "SELECT data FROM {} ORDER BY _rowid_ DESC",
+        table_name
+    ))?)
+}
 impl<'stm, T> IterValues<'stm, T> {
-    pub fn new_statement(
-        table_name: &str,
-        connection: &'stm mut rusqlite::Connection,
-    ) -> Result<rusqlite::Statement<'stm>> {
-        Ok(connection.prepare(&format!(
-            "SELECT data FROM {} ORDER BY _rowid_ DESC",
-            table_name
-        ))?)
-    }
-    pub fn from_rows<StorageItem>(rows: rusqlite::Rows<'stm>) -> IterValues<'stm, StorageItem> {
+    pub fn from_rows(rows: rusqlite::Rows<'stm>) -> IterValues<'stm, T> {
         IterValues {
             rows,
             _phantom: PhantomData::default(),

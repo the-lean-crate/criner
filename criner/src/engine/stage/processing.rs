@@ -1,4 +1,4 @@
-use crate::persistence::CrateVersionsTree;
+use crate::persistence::{new_value_query, CrateVersionsTree};
 use crate::{
     engine::work,
     error::Result,
@@ -69,12 +69,12 @@ pub async fn process(
 
     let versions = db.open_crate_versions()?;
     let num_versions = versions.count();
+
     let connection = versions.into_connection();
     let mut guard = connection.lock();
-    let mut statement =
-        IterValues::<CrateVersion>::new_statement(CrateVersionsTree::table_name(), &mut *guard)?;
+    let mut statement = new_value_query(CrateVersionsTree::table_name(), &mut *guard)?;
     let rows = statement.query(NO_PARAMS)?;
-    let iter = IterValues::<CrateVersion>::from_rows::<CrateVersion>(rows);
+    let iter = IterValues::<CrateVersion>::from_rows(rows);
 
     progress.init(Some(num_versions as u32), Some("crate versions"));
     let tasks = db.open_tasks()?;
