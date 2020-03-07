@@ -210,9 +210,8 @@ fn context_stream(db: &Db, start_of_computation: SystemTime) -> impl futures::St
         let db = db.clone();
         move |_| {
             db.open_context()
-                .unwrap()
-                .most_recent()
                 .ok()
+                .and_then(|c| c.most_recent().ok())
                 .flatten()
                 .map(|(_, c): (_, model::Context)| {
                     let lines = vec![
