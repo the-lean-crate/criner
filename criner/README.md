@@ -16,6 +16,8 @@
 * futures::ThreadPools - panicking futures crash only one thread
 * long-running futures need error and potentially panic recovery. Futures has a panick catcher that could be useful.
 * async_std channel blocks if there is no receiver, which can definitely bite you if your processors are down. Also I don't know why this is desirable behaviour.
+* sqlite needs a lot of massaging to work acceptably in concurrent applications. Takeaway: WAL_mode, and when writting, always use immediate transactions
+  when writing. Retry yourself while waiting and set a busy handler which waits.
 
 ### When migrating to Sqlite
 

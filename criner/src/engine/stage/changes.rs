@@ -77,9 +77,9 @@ pub async fn fetch(
                 use std::iter::FromIterator;
                 let connection = db.open_connection()?;
                 let mut guard = connection.lock();
-                let transaction = guard.transaction()?;
-                store_progress.blocked(None);
                 let mut crates_lut = {
+                    let transaction = guard.transaction()?;
+                    store_progress.blocked(None);
                     let mut statement =
                         new_key_value_query(CratesTree::table_name(), &transaction)?;
                     let iter = key_value_iter::<model::Crate>(&mut statement)?.flat_map(Result::ok);
@@ -90,6 +90,8 @@ pub async fn fetch(
                 let crate_versions_len = crate_versions.len();
                 let mut new_crate_versions = 0;
                 let mut new_crates = 0;
+                let transaction =
+                    guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
                 {
                     let mut statement =
                         new_key_value_insertion(CrateVersionsTree::table_name(), &transaction)?;
