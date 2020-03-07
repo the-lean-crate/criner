@@ -12,6 +12,33 @@ use std::time::SystemTime;
 /// Also no one can prevent futures from being resumed in after having been send to a different thread.
 pub type ThreadSafeConnection = std::sync::Arc<parking_lot::Mutex<rusqlite::Connection>>;
 
+pub struct IterValues<'stm, StorageItem> {
+    rows: rusqlite::Rows<'stm>,
+    _phantom: std::marker::PhantomData<StorageItem>,
+}
+
+impl<'stm, StorageItem> Iterator for IterValues<'stm, StorageItem>
+where
+    StorageItem: for<'a> From<&'a [u8]>,
+{
+    type Item = StorageItem;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.rows
+            .next()
+            .unwrap_or(None)
+            .and_then(|r| r.get::<_, Vec<u8>>(0).ok().map(|v| Self::Item::from(&v)))
+    }
+}
+// impl<'stm, T> IterValues<'stm, T> {
+//     pub fn new<StorageItem>(
+//         table_name: &str,
+//         connection: &'stm mut rusqlite::Connection,
+//     ) -> IterValues<'stm, StorageItem> {
+//         unimplemented!()
+//     }
+// }
+
 pub trait TreeAccess {
     type StorageItem: serde::Serialize + for<'a> From<&'a [u8]> + Default + From<Self::InsertItem>;
     type InsertItem: Clone;
