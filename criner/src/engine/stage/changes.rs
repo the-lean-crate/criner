@@ -87,6 +87,7 @@ pub async fn fetch(
                 let crate_versions_len = crate_versions.len();
                 let mut new_crate_versions = 0;
                 let mut new_crates = 0;
+                store_progress.blocked(None);
                 let transaction = connection
                     .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
                 {
@@ -119,8 +120,11 @@ pub async fn fetch(
                     }
                 }
 
+                store_progress.blocked(None);
                 transaction.commit()?;
+
                 let transaction = {
+                    store_progress.blocked(None);
                     let mut t = connection
                         .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
                     t.set_drop_behavior(rusqlite::DropBehavior::Commit);
@@ -129,10 +133,13 @@ pub async fn fetch(
                 {
                     let mut statement =
                         new_key_value_insertion(CratesTree::table_name(), &transaction)?;
-                    for (key, value) in crates_lut.into_iter() {
+                    store_progress.init(Some(crates_lut.len() as u32), Some("crates"));
+                    for (cid, (key, value)) in crates_lut.into_iter().enumerate() {
                         statement.execute(params![key, rmp_serde::to_vec(&value)?])?;
+                        store_progress.set((cid + 1) as u32);
                     }
                 }
+                store_progress.blocked(None);
                 transaction.commit()?;
 
                 Index::from_path_or_cloned(index_path)?
