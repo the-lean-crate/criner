@@ -43,7 +43,10 @@ impl Crate {
 impl Keyed for TaskResult {
     fn key_buf(&self, buf: &mut String) {
         match self {
-            TaskResult::Download { kind, .. } => buf.push_str(kind),
+            TaskResult::Download { kind, .. } => {
+                buf.push(KEY_SEP_CHAR);
+                buf.push_str(kind)
+            }
             TaskResult::None | TaskResult::ExplodedCrate { .. } => {}
         }
     }
@@ -52,7 +55,6 @@ impl Keyed for TaskResult {
 impl TaskResult {
     pub fn fq_key(&self, crate_name: &str, crate_version: &str, task: &Task, buf: &mut String) {
         task.fq_key(crate_name, crate_version, buf);
-        buf.push(KEY_SEP_CHAR);
         self.key_buf(buf);
     }
 }
