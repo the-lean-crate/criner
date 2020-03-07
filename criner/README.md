@@ -15,7 +15,7 @@
 
 * futures::ThreadPools - panicking futures crash only one thread
 * long-running futures need error and potentially panic recovery. Futures has a panick catcher that could be useful.
-* async_std channel blocks if there is no receiver, which can definitely byte you if your processors are down.
+* async_std channel blocks if there is no receiver, which can definitely bite you if your processors are down. Also I don't know why this is desirable behaviour.
 
 ### When migrating to Sqlite
 

@@ -126,7 +126,8 @@ pub trait TreeAccess {
     ) -> Result<Self::StorageItem> {
         retry_on_db_busy(|| {
             let mut guard = self.connection().lock();
-            let transaction = guard.savepoint()?;
+            let transaction =
+                guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
             let new_value = transaction
                 .query_row(
                     &format!(
@@ -159,7 +160,8 @@ pub trait TreeAccess {
     fn upsert(&self, key: impl AsRef<str>, item: &Self::InsertItem) -> Result<Self::StorageItem> {
         retry_on_db_busy(|| {
             let mut guard = self.connection().lock();
-            let transaction = guard.savepoint()?;
+            let transaction =
+                guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
 
             let new_value = {
                 let maybe_vec = transaction
@@ -211,7 +213,7 @@ fn retry_on_db_busy<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
     use rusqlite::ffi::ErrorCode as SqliteFFIErrorCode;
     use rusqlite::Error as SqliteError;
 
-    let max_wait_ms = Duration::from_secs(10);
+    let max_wait_ms = Duration::from_secs(100);
     let mut total_wait_time = Duration::default();
     let mut wait_for = Duration::from_millis(1);
     loop {
