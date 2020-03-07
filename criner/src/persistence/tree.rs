@@ -99,22 +99,20 @@ pub trait TreeAccess {
     }
 
     fn get(&self, key: impl AsRef<str>) -> Result<Option<Self::StorageItem>> {
-        retry_on_db_busy(|| {
-            Ok(self
-                .connection()
-                .lock()
-                .query_row(
-                    &format!(
-                        "SELECT data FROM {} WHERE key = '{}'",
-                        Self::table_name(),
-                        key.as_ref()
-                    ),
-                    NO_PARAMS,
-                    |r| r.get::<_, Vec<u8>>(0),
-                )
-                .optional()?
-                .map(|d| Self::StorageItem::from(d.as_slice())))
-        })
+        Ok(self
+            .connection()
+            .lock()
+            .query_row(
+                &format!(
+                    "SELECT data FROM {} WHERE key = '{}'",
+                    Self::table_name(),
+                    key.as_ref()
+                ),
+                NO_PARAMS,
+                |r| r.get::<_, Vec<u8>>(0),
+            )
+            .optional()?
+            .map(|d| Self::StorageItem::from(d.as_slice())))
     }
 
     /// Update an existing item, or create it as default, returning the stored item
@@ -124,11 +122,44 @@ pub trait TreeAccess {
         key: impl AsRef<str>,
         f: impl Fn(Self::StorageItem) -> Self::StorageItem,
     ) -> Result<Self::StorageItem> {
-        retry_on_db_busy(|| {
-            let mut guard = self.connection().lock();
-            let transaction =
-                guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
-            let new_value = transaction
+        let mut guard = self.connection().lock();
+        let transaction =
+            guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+        let new_value = transaction
+            .query_row(
+                &format!(
+                    "SELECT data FROM {} WHERE key = '{}'",
+                    Self::table_name(),
+                    key.as_ref()
+                ),
+                NO_PARAMS,
+                |r| r.get::<_, Vec<u8>>(0),
+            )
+            .optional()?
+            .map_or_else(
+                || f(Self::StorageItem::default()),
+                |d| f(d.as_slice().into()),
+            );
+        transaction.execute(
+            &format!(
+                "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
+                Self::table_name()
+            ),
+            params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
+        )?;
+        transaction.commit()?;
+
+        Ok(new_value)
+    }
+
+    /// Similar to 'update', but provides full control over the default and allows deletion
+    fn upsert(&self, key: impl AsRef<str>, item: &Self::InsertItem) -> Result<Self::StorageItem> {
+        let mut guard = self.connection().lock();
+        let transaction =
+            guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+
+        let new_value = {
+            let maybe_vec = transaction
                 .query_row(
                     &format!(
                         "SELECT data FROM {} WHERE key = '{}'",
@@ -138,68 +169,29 @@ pub trait TreeAccess {
                     NO_PARAMS,
                     |r| r.get::<_, Vec<u8>>(0),
                 )
-                .optional()?
-                .map_or_else(
-                    || f(Self::StorageItem::default()),
-                    |d| f(d.as_slice().into()),
-                );
-            transaction.execute(
-                &format!(
-                    "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
-                    Self::table_name()
-                ),
-                params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
-            )?;
-            transaction.commit()?;
-
-            Ok(new_value)
-        })
-    }
-
-    /// Similar to 'update', but provides full control over the default and allows deletion
-    fn upsert(&self, key: impl AsRef<str>, item: &Self::InsertItem) -> Result<Self::StorageItem> {
-        retry_on_db_busy(|| {
-            let mut guard = self.connection().lock();
-            let transaction =
-                guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
-
-            let new_value = {
-                let maybe_vec = transaction
-                    .query_row(
-                        &format!(
-                            "SELECT data FROM {} WHERE key = '{}'",
-                            Self::table_name(),
-                            key.as_ref()
-                        ),
-                        NO_PARAMS,
-                        |r| r.get::<_, Vec<u8>>(0),
-                    )
-                    .optional()?;
-                Self::merge(item, maybe_vec.map(|v| v.as_slice().into()))
-            };
-            transaction.execute(
-                &format!(
-                    "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
-                    Self::table_name()
-                ),
-                params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
-            )?;
-            transaction.commit()?;
-            Ok(new_value)
-        })
+                .optional()?;
+            Self::merge(item, maybe_vec.map(|v| v.as_slice().into()))
+        };
+        transaction.execute(
+            &format!(
+                "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
+                Self::table_name()
+            ),
+            params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
+        )?;
+        transaction.commit()?;
+        Ok(new_value)
     }
 
     fn insert(&self, key: impl AsRef<str>, v: &Self::InsertItem) -> Result<()> {
-        retry_on_db_busy(|| {
-            self.connection().lock().execute(
-                &format!(
-                    "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
-                    Self::table_name()
-                ),
-                params![key.as_ref(), rmp_serde::to_vec(&Self::merge(v, None))?],
-            )?;
-            Ok(())
-        })
+        self.connection().lock().execute(
+            &format!(
+                "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
+                Self::table_name()
+            ),
+            params![key.as_ref(), rmp_serde::to_vec(&Self::merge(v, None))?],
+        )?;
+        Ok(())
     }
 }
 
@@ -207,6 +199,8 @@ pub fn commit_transaction_with_retry(t: rusqlite::Transaction) -> Result<()> {
     retry_on_db_busy(|| t.execute_batch("COMMIT").map_err(Into::into))
 }
 
+// NOTE: It looks like we don't hit this anymore thanks to immediate mode writes…
+// It's a bit sad that deferred doesn't work as expected, but fails permanently.
 fn retry_on_db_busy<T>(mut f: impl FnMut() -> Result<T>) -> Result<T> {
     use crate::Error;
     use rusqlite::ffi::Error as SqliteFFIError;
