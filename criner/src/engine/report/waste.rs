@@ -9,13 +9,27 @@ pub enum Report {
     None,
 }
 
+impl From<TaskResult> for Report {
+    fn from(_result: TaskResult) -> Report {
+        Report::None
+    }
+}
+
 #[async_trait]
 impl super::generic::Aggregate for Report {
-    fn aggregate(self, other: Self) -> Self {
+    fn merge(self, other: Self) -> Self {
         other
     }
 
-    async fn complete(self, _out_dir: PathBuf, _progress: prodash::tree::Item) -> Result<()> {
+    async fn complete_all(self, _out_dir: PathBuf, _progress: prodash::tree::Item) -> Result<()> {
+        Ok(())
+    }
+    async fn complete_crate(
+        &mut self,
+        _out_dir: &Path,
+        _crate_name: &str,
+        _progress: &mut prodash::tree::Item,
+    ) -> Result<()> {
         Ok(())
     }
 }
@@ -65,10 +79,13 @@ impl super::generic::Generator for Generator {
         out: &Path,
         _crate_name: &str,
         _crate_version: &str,
-        _result: TaskResult,
-        _report: Report,
+        result: TaskResult,
+        _report: &Report,
+        _progress: &mut prodash::tree::Item,
     ) -> Result<Self::Report> {
         use async_std::prelude::*;
+        let report = Report::from(result);
+
         async_std::fs::OpenOptions::new()
             .truncate(true)
             .write(true)
@@ -78,6 +95,6 @@ impl super::generic::Generator for Generator {
             .write_all("hello world".as_bytes())
             .await
             .map_err(crate::Error::from)?;
-        Ok(Report::None)
+        Ok(report)
     }
 }

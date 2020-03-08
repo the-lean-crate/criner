@@ -9,13 +9,19 @@ use std::path::{Path, PathBuf};
 
 #[async_trait]
 pub trait Aggregate {
-    fn aggregate(self, other: Self) -> Self;
-    async fn complete(self, out_dir: PathBuf, progress: prodash::tree::Item) -> Result<()>;
+    fn merge(self, other: Self) -> Self;
+    async fn complete_all(self, out_dir: PathBuf, progress: prodash::tree::Item) -> Result<()>;
+    async fn complete_crate(
+        &mut self,
+        out_dir: &Path,
+        crate_name: &str,
+        progress: &mut prodash::tree::Item,
+    ) -> Result<()>;
 }
 
 #[async_trait]
 pub trait Generator {
-    type Report: Aggregate + Default + Send;
+    type Report: Aggregate + Default + Send + Sync;
     type DBResult: Send;
 
     fn name() -> &'static str;
@@ -51,13 +57,13 @@ pub trait Generator {
             count += 1;
             progress.set(count);
             match result {
-                Ok(new_report) => report = report.aggregate(new_report),
+                Ok(new_report) => report = report.merge(new_report),
                 Err(err) => {
                     progress.fail(format!("report failed: {}", err));
                 }
             };
         }
-        report.complete(out_dir, progress).await?;
+        report.complete_all(out_dir, progress).await?;
         Ok(())
     }
 
@@ -66,7 +72,8 @@ pub trait Generator {
         crate_name: &str,
         crate_version: &str,
         result: Self::DBResult,
-        _report: Self::Report,
+        _report: &Self::Report,
+        progress: &mut prodash::tree::Item,
     ) -> Result<Self::Report>;
 
     async fn write_files(
@@ -100,20 +107,29 @@ pub trait Generator {
                         if let Some(result) =
                             Self::get_result(connection.clone(), &name, &version, &mut key_buf)?
                         {
-                            let out_file = output_file_html(out_dir.as_ref(), &name, &version);
+                            let out_file = output_file_html(&out_dir, &name, &version);
                             async_std::fs::create_dir_all(
                                 out_file.parent().expect("parent dir for file"),
                             )
                             .await?;
-                            report = Self::generate_single_file(
-                                &out_file, &name, &version, result, report,
+                            let new_report = Self::generate_single_file(
+                                &out_file,
+                                &name,
+                                &version,
+                                result,
+                                &report,
+                                &mut progress,
                             )
                             .await?;
+                            report = report.merge(new_report);
 
                             results_to_update.push(reports_key);
                         }
                     }
                 }
+                report
+                    .complete_crate(&out_dir, &name, &mut progress)
+                    .await?;
             }
         }
 
