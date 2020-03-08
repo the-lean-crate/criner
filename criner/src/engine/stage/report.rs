@@ -24,8 +24,6 @@ pub async fn generate(
         .parent()
         .expect("assets directory to be in criner.db")
         .join("reports");
-    let waste_report_dir = output_dir.join("waste");
-    std::fs::create_dir_all(&waste_report_dir)?;
     let num_crates = krates.count() as u32;
     progress.init(Some(num_crates), Some("crates"));
 
@@ -38,10 +36,17 @@ pub async fn generate(
         }
         (rx_result, tx)
     };
+
+    let waste_report_dir = output_dir.join(report::waste::Generator::name());
+    std::fs::create_dir_all(&waste_report_dir)?;
     let merge_reports = pool.spawn_with_handle(
-        report::waste::Generator::merge_reports(progress.add_child("report aggregator"), rx_result)
-            .map(|_| ())
-            .boxed(),
+        report::waste::Generator::merge_reports(
+            waste_report_dir.clone(),
+            progress.add_child("report aggregator"),
+            rx_result,
+        )
+        .map(|_| ())
+        .boxed(),
     )?;
     let mut connection = krates.connection().lock();
     let mut statement =

@@ -7,8 +7,10 @@ use async_trait::async_trait;
 use rusqlite::{params, TransactionBehavior};
 use std::path::{Path, PathBuf};
 
+#[async_trait]
 pub trait Aggregate {
     fn aggregate(self, other: Self) -> Self;
+    async fn complete(self, out_dir: PathBuf) -> Result<()>;
 }
 
 #[async_trait]
@@ -21,6 +23,7 @@ pub trait Generator {
     fn fq_result_key(crate_name: &str, crate_version: &str, key_buf: &mut String);
 
     async fn merge_reports(
+        out_dir: PathBuf,
         mut progress: prodash::tree::Item,
         reports: async_std::sync::Receiver<Result<Self::Report>>,
     ) -> Result<()> {
@@ -37,6 +40,7 @@ pub trait Generator {
                 }
             };
         }
+        report.complete(out_dir).await?;
         Ok(())
     }
 

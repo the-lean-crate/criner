@@ -1,8 +1,6 @@
-use crate::error::Result;
-use crate::model::TaskResult;
-use crate::persistence::Db;
+use crate::{error::Result, model::TaskResult, persistence::Db};
 use async_trait::async_trait;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub struct Generator;
 
@@ -10,9 +8,14 @@ pub enum Report {
     None,
 }
 
+#[async_trait]
 impl super::generic::Aggregate for Report {
     fn aggregate(self, other: Self) -> Self {
         other
+    }
+
+    async fn complete(self, _out_dir: PathBuf) -> Result<()> {
+        Ok(())
     }
 }
 
