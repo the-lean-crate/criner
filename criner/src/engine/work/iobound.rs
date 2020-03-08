@@ -1,13 +1,17 @@
 use crate::{
     error::{Error, Result},
-    model, persistence,
-    persistence::TableAccess,
+    model,
+    model::Task,
+    persistence::{self, TableAccess},
 };
 use bytesize::ByteSize;
-use std::{path::Path, path::PathBuf, time::SystemTime};
+use std::{
+    path::{Path, PathBuf},
+    time::Duration,
+    time::SystemTime,
+};
 use tokio::io::AsyncWriteExt;
 
-use crate::model::Task;
 use async_trait::async_trait;
 
 struct ProcessingState {
@@ -32,8 +36,13 @@ impl Agent {
         db: &persistence::Db,
         channel: async_std::sync::Sender<super::cpubound::ExtractRequest>,
     ) -> Result<Agent> {
+        let max_observed_crate_size = 40_000;
+        let slowest_supported_download_speed_in_kb_per_s = 10;
         let client = reqwest::ClientBuilder::new()
-            .connect_timeout(std::time::Duration::from_secs(120))
+            .connect_timeout(Duration::from_secs(120))
+            .timeout(Duration::from_secs(
+                max_observed_crate_size / slowest_supported_download_speed_in_kb_per_s,
+            ))
             .gzip(true)
             .build()?;
 
