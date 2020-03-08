@@ -20,7 +20,7 @@ pub trait Generator {
     fn name() -> &'static str;
     fn version() -> &'static str;
 
-    fn fq_result_key(&self, crate_name: &str, crate_version: &str, key_buf: &mut String);
+    fn fq_result_key(crate_name: &str, crate_version: &str, key_buf: &mut String);
 
     async fn merge_reports(
         mut progress: prodash::tree::Item,
@@ -43,14 +43,12 @@ pub trait Generator {
     }
 
     async fn generate_single_file(
-        &mut self,
         db: &persistence::Db,
         out: &Path,
         result: model::TaskResult,
     ) -> Result<Self::Report>;
 
     async fn write_files(
-        &mut self,
         db: persistence::Db,
         out_dir: PathBuf,
         krates: Vec<(String, Vec<u8>)>,
@@ -83,7 +81,7 @@ pub trait Generator {
                     if !reports.is_done(&key_buf) {
                         let reports_key = key_buf.clone();
                         key_buf.clear();
-                        self.fq_result_key(&name, &version, &mut key_buf);
+                        Self::fq_result_key(&name, &version, &mut key_buf);
                         if let Some(result) = results.get(&key_buf)? {
                             let out_file = output_file_html(out_dir.as_ref(), &name, &version);
                             async_std::fs::create_dir_all(
@@ -91,7 +89,7 @@ pub trait Generator {
                             )
                             .await?;
                             report = report.aggregate(
-                                self.generate_single_file(&db, &out_file, result).await?,
+                                Self::generate_single_file(&db, &out_file, result).await?,
                             );
 
                             results_to_update.push(reports_key);
