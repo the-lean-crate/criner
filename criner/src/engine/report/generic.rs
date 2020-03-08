@@ -21,6 +21,15 @@ pub trait Generator {
     fn version() -> &'static str;
 
     fn fq_result_key(crate_name: &str, crate_version: &str, key_buf: &mut String);
+    fn fq_report_key(crate_name: &str, crate_version: &str, key_buf: &mut String) {
+        ReportsTree::key_buf(
+            crate_name,
+            crate_version,
+            Self::name(),
+            Self::version(),
+            key_buf,
+        );
+    }
 
     async fn merge_reports(
         out_dir: PathBuf,
@@ -73,13 +82,7 @@ pub trait Generator {
                     progress.set((vid + 1) as u32);
 
                     key_buf.clear();
-                    ReportsTree::key_buf(
-                        &name,
-                        &version,
-                        Self::name(),
-                        Self::version(),
-                        &mut key_buf,
-                    );
+                    Self::fq_report_key(&name, &version, &mut key_buf);
 
                     if !reports.is_done(&key_buf) {
                         let reports_key = key_buf.clone();
