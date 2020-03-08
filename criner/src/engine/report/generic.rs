@@ -44,6 +44,7 @@ pub trait Generator {
         db: &persistence::Db,
         out: &Path,
         result: model::TaskResult,
+        _report: Self::Report,
     ) -> Result<Self::Report>;
 
     async fn write_files(
@@ -86,9 +87,8 @@ pub trait Generator {
                                 out_file.parent().expect("parent dir for file"),
                             )
                             .await?;
-                            report = report.aggregate(
-                                Self::generate_single_file(&db, &out_file, result).await?,
-                            );
+                            report =
+                                Self::generate_single_file(&db, &out_file, result, report).await?;
 
                             results_to_update.push(reports_key);
                         }

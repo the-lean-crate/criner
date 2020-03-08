@@ -22,6 +22,8 @@ impl Default for Report {
     }
 }
 
+// NOTE: When multiple reports should be combined, this must become a compound generator which combines
+// multiple implementations into one, statically.
 #[async_trait]
 impl super::generic::Generator for Generator {
     type Report = Report;
@@ -47,6 +49,7 @@ impl super::generic::Generator for Generator {
         _db: &Db,
         out: &Path,
         _result: TaskResult,
+        _report: Report,
     ) -> Result<Self::Report> {
         use async_std::prelude::*;
         async_std::fs::OpenOptions::new()
