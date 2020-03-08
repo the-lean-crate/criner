@@ -234,7 +234,6 @@ fn retry_on_db_busy<T>(
     let mut total_wait_time = Duration::default();
     let mut wait_for = Duration::from_millis(1);
     loop {
-        total_wait_time += wait_for;
         match f() {
             Ok(v) => return Ok(v),
             Err(
@@ -266,6 +265,7 @@ fn retry_on_db_busy<T>(
                     p.blocked("wait for write lock", Some(SystemTime::now().add(wait_for)))
                 });
                 std::thread::sleep(wait_for);
+                total_wait_time += wait_for;
                 wait_for *= 2;
             }
             Err(err) => return Err(err),
