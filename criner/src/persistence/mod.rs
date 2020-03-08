@@ -7,7 +7,6 @@ pub use keyed::*;
 
 mod serde;
 mod table;
-use crate::persistence::ThreadSafeConnection;
 pub use table::*;
 
 #[derive(Clone)]

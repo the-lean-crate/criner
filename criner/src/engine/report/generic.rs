@@ -1,7 +1,7 @@
 use crate::{
     error::Result,
     model, persistence,
-    persistence::{new_key_insertion, ReportsTree, TableAccess},
+    persistence::{new_key_insertion, ReportsTree},
 };
 use async_trait::async_trait;
 use rusqlite::{params, TransactionBehavior};
@@ -16,6 +16,7 @@ pub trait Aggregate {
 #[async_trait]
 pub trait Generator {
     type Report: Aggregate + Default + Send;
+    type DBResult: Send;
 
     fn name() -> &'static str;
     fn version() -> &'static str;
@@ -30,6 +31,13 @@ pub trait Generator {
             key_buf,
         );
     }
+
+    fn get_result(
+        connection: persistence::ThreadSafeConnection,
+        crate_name: &str,
+        crate_version: &str,
+        key_buf: &mut String,
+    ) -> Result<Option<Self::DBResult>>;
 
     async fn merge_reports(
         out_dir: PathBuf,
@@ -54,9 +62,8 @@ pub trait Generator {
     }
 
     async fn generate_single_file(
-        db: &persistence::Db,
         out: &Path,
-        result: model::TaskResult,
+        result: Self::DBResult,
         _report: Self::Report,
     ) -> Result<Self::Report>;
 
@@ -69,7 +76,7 @@ pub trait Generator {
         let mut report = Self::Report::default();
         let mut results_to_update = Vec::new();
         {
-            let results = db.open_results()?;
+            let connection = db.open_connection()?;
             let reports = db.open_reports()?;
             let mut key_buf = String::with_capacity(32);
             // delaying writes works because we don't have overlap on work
@@ -87,15 +94,16 @@ pub trait Generator {
                     if !reports.is_done(&key_buf) {
                         let reports_key = key_buf.clone();
                         key_buf.clear();
-                        Self::fq_result_key(&name, &version, &mut key_buf);
-                        if let Some(result) = results.get(&key_buf)? {
+
+                        if let Some(result) =
+                            Self::get_result(connection.clone(), &name, &version, &mut key_buf)?
+                        {
                             let out_file = output_file_html(out_dir.as_ref(), &name, &version);
                             async_std::fs::create_dir_all(
                                 out_file.parent().expect("parent dir for file"),
                             )
                             .await?;
-                            report =
-                                Self::generate_single_file(&db, &out_file, result, report).await?;
+                            report = Self::generate_single_file(&out_file, result, report).await?;
 
                             results_to_update.push(reports_key);
                         }
