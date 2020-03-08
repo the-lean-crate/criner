@@ -314,6 +314,7 @@ impl ReportsTree {
     pub fn table_name() -> &'static str {
         "report_done"
     }
+
     pub fn key_buf(
         crate_name: &str,
         crate_version: &str,
@@ -329,6 +330,7 @@ impl ReportsTree {
         buf.push(KEY_SEP_CHAR);
         buf.push_str(report_version);
     }
+
     pub fn is_done(&self, key: impl AsRef<str>) -> bool {
         self.inner
             .lock()
@@ -339,11 +341,12 @@ impl ReportsTree {
                     key.as_ref()
                 ),
                 NO_PARAMS,
-                |r| r.get::<_, String>(0),
+                |_r| Ok(()),
             )
             .optional()
             .ok()
-            .map_or(false, |_| true)
+            .unwrap_or_default()
+            .map_or(false, |_: ()| true)
     }
 }
 
