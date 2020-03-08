@@ -63,6 +63,8 @@ pub trait Generator {
 
     async fn generate_single_file(
         out: &Path,
+        crate_name: &str,
+        crate_version: &str,
         result: Self::DBResult,
         _report: Self::Report,
     ) -> Result<Self::Report>;
@@ -103,7 +105,10 @@ pub trait Generator {
                                 out_file.parent().expect("parent dir for file"),
                             )
                             .await?;
-                            report = Self::generate_single_file(&out_file, result, report).await?;
+                            report = Self::generate_single_file(
+                                &out_file, &name, &version, result, report,
+                            )
+                            .await?;
 
                             results_to_update.push(reports_key);
                         }

@@ -63,6 +63,8 @@ impl super::generic::Generator for Generator {
 
     async fn generate_single_file(
         out: &Path,
+        _crate_name: &str,
+        _crate_version: &str,
         _result: TaskResult,
         _report: Report,
     ) -> Result<Self::Report> {
