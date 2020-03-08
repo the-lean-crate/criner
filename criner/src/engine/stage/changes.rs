@@ -1,8 +1,8 @@
-use crate::persistence::{key_value_iter, new_key_value_query, CratesTree};
+use crate::persistence::{key_value_iter, new_key_value_query_old_to_new, CrateTable};
 use crate::{
     error::{Error, Result},
     model,
-    persistence::{self, new_key_value_insertion, CrateVersionsTree, Keyed, TreeAccess},
+    persistence::{self, new_key_value_insertion, CrateVersionTable, Keyed, TableAccess},
     utils::*,
 };
 use crates_index_diff::Index;
@@ -78,7 +78,7 @@ pub async fn fetch(
                     let transaction = connection.transaction()?;
                     store_progress.blocked("caching crates", None);
                     let mut statement =
-                        new_key_value_query(CratesTree::table_name(), &transaction)?;
+                        new_key_value_query_old_to_new(CrateTable::table_name(), &transaction)?;
                     let iter = key_value_iter::<model::Crate>(&mut statement)?.flat_map(Result::ok);
                     BTreeMap::from_iter(iter)
                 };
@@ -92,7 +92,7 @@ pub async fn fetch(
                     .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
                 {
                     let mut statement =
-                        new_key_value_insertion(CrateVersionsTree::table_name(), &transaction)?;
+                        new_key_value_insertion(CrateVersionTable::table_name(), &transaction)?;
                     for (versions_stored, version) in crate_versions
                         .into_iter()
                         .map(model::CrateVersion::from)
@@ -132,7 +132,7 @@ pub async fn fetch(
                 };
                 {
                     let mut statement =
-                        new_key_value_insertion(CratesTree::table_name(), &transaction)?;
+                        new_key_value_insertion(CrateTable::table_name(), &transaction)?;
                     store_progress.init(Some(crates_lut.len() as u32), Some("crates"));
                     for (cid, (key, value)) in crates_lut.into_iter().enumerate() {
                         statement.execute(params![key, rmp_serde::to_vec(&value)?])?;

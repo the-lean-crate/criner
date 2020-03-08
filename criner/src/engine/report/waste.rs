@@ -1,4 +1,4 @@
-use crate::persistence::{new_key_insertion, ReportsTree, TreeAccess};
+use crate::persistence::{new_key_insertion, ReportsTree, TableAccess};
 use crate::{error::Result, model, persistence};
 use rusqlite::{params, TransactionBehavior};
 use std::path::{Path, PathBuf};

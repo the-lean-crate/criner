@@ -1,4 +1,4 @@
-use crate::persistence::{TaskResultTree, TreeAccess};
+use crate::persistence::{TableAccess, TaskResultTable};
 use rusqlite::{params, NO_PARAMS};
 use std::path::Path;
 
@@ -7,7 +7,7 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
     let db = crate::persistence::Db::open(&db_path)?;
     let mut connection = db.open_connection_no_async()?;
     let mut keys = Vec::<String>::new();
-    let table_name = TaskResultTree::table_name();
+    let table_name = TaskResultTable::table_name();
     {
         log::info!("begin iteration");
         let mut statement = connection.prepare(&format!("SELECT key FROM {}", table_name))?;

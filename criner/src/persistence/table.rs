@@ -13,7 +13,7 @@ use std::time::{Duration, SystemTime};
 /// Also no one can prevent futures from being resumed in after having been send to a different thread.
 pub type ThreadSafeConnection = std::sync::Arc<parking_lot::Mutex<rusqlite::Connection>>;
 
-pub fn new_value_query<'conn>(
+pub fn new_value_query_recent_first<'conn>(
     table_name: &str,
     connection: &'conn rusqlite::Connection,
 ) -> Result<rusqlite::Statement<'conn>> {
@@ -23,7 +23,7 @@ pub fn new_value_query<'conn>(
     ))?)
 }
 
-pub fn new_key_value_query<'conn>(
+pub fn new_key_value_query_old_to_new<'conn>(
     table_name: &str,
     connection: &'conn rusqlite::Connection,
 ) -> Result<rusqlite::Statement<'conn>> {
@@ -79,7 +79,7 @@ where
         .map(|r| r.map_err(Into::into)))
 }
 
-pub trait TreeAccess {
+pub trait TableAccess {
     type StorageItem: serde::Serialize + for<'a> From<&'a [u8]> + Default + From<Self::InsertItem>;
     type InsertItem: Clone;
 
@@ -273,11 +273,11 @@ fn retry_on_db_busy<T>(
     }
 }
 
-pub struct TasksTree {
+pub struct TaskTable {
     pub(crate) inner: ThreadSafeConnection,
 }
 
-impl TreeAccess for TasksTree {
+impl TableAccess for TaskTable {
     type StorageItem = Task;
     type InsertItem = Task;
 
@@ -347,11 +347,11 @@ impl ReportsTree {
     }
 }
 
-pub struct TaskResultTree {
+pub struct TaskResultTable {
     pub(crate) inner: ThreadSafeConnection,
 }
 
-impl TreeAccess for TaskResultTree {
+impl TableAccess for TaskResultTable {
     type StorageItem = TaskResult;
     type InsertItem = TaskResult;
 
@@ -366,11 +366,11 @@ impl TreeAccess for TaskResultTree {
     }
 }
 
-pub struct ContextTree {
+pub struct MetaTable {
     pub(crate) inner: ThreadSafeConnection,
 }
 
-impl TreeAccess for ContextTree {
+impl TableAccess for MetaTable {
     type StorageItem = Context;
     type InsertItem = Context;
 
@@ -389,7 +389,7 @@ impl TreeAccess for ContextTree {
     }
 }
 
-impl ContextTree {
+impl MetaTable {
     pub fn update_today(&self, f: impl Fn(&mut Context)) -> Result<Context> {
         self.update(None, Context::default().key(), |mut c| {
             f(&mut c);
@@ -413,11 +413,11 @@ impl ContextTree {
 }
 
 #[derive(Clone)]
-pub struct CratesTree {
+pub struct CrateTable {
     pub(crate) inner: ThreadSafeConnection,
 }
 
-impl TreeAccess for CratesTree {
+impl TableAccess for CrateTable {
     type StorageItem = Crate;
     type InsertItem = CrateVersion;
 
@@ -437,11 +437,11 @@ impl TreeAccess for CratesTree {
 }
 
 #[derive(Clone)]
-pub struct CrateVersionsTree {
+pub struct CrateVersionTable {
     pub(crate) inner: ThreadSafeConnection,
 }
 
-impl TreeAccess for CrateVersionsTree {
+impl TableAccess for CrateVersionTable {
     type StorageItem = CrateVersion;
     type InsertItem = CrateVersion;
 

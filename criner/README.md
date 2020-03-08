@@ -2,9 +2,6 @@
 
 ## Tasks
 
-* [x] export all data into a flattened queryable sqlite database
-* [x] also write data to sqlite when fetching
-  * [ ] experiment with SQLITE Pragmas: performance(journal_mode, journal_size, synchronous=0), read_uncommitted
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down
    * Futures has a wrapper to catch panics, even though we don't use it yet. A panic only brings down the future that panics, not the entire program.
 * [ ] Graceful shutdown on Ctrl+C
@@ -27,7 +24,7 @@
     design inspired by sled. To alleviate, the whole application must embrace Sqlite and work with statements directly.
   * Working with the lifetimes associated with transactions is a necessary evil, but it is painful too when trying to refactor anything! I just don't understand
     anymore what it tries to do, and have the feeling the compiler is confused itself (as in theory, there is no issue).
-* sled databases are about 4 times bigger than an Sqlite database with the same content
+* sled databases are about 4 times bigger than an Sqlite database with the same content, and it would read about 1.2GB of a 14GB database at startup.
 * sled is easy to handle in a threaded/concurrent environment, but iteration isn't possible across awaits as it's not sync
   * Sqlite is not sync nor is it send, so it needs more treatment before it can be used with spawened futures
 * Zero-copy is straigforward with Sled as it provides IVec structs, which are handles into an LRU which is the backing store.

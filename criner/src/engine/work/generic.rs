@@ -1,7 +1,7 @@
 use crate::{
     error::{Error, Result},
     model, persistence,
-    persistence::TreeAccess,
+    persistence::TableAccess,
 };
 use async_trait::async_trait;
 

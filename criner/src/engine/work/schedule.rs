@@ -3,7 +3,7 @@ use crate::{
     engine::work::cpubound,
     error::Result,
     model, persistence,
-    persistence::{TasksTree, TreeAccess},
+    persistence::{TableAccess, TaskTable},
 };
 use std::time::SystemTime;
 
@@ -25,7 +25,7 @@ pub enum AsyncResult {
 }
 
 pub async fn tasks(
-    tasks: &persistence::TasksTree,
+    tasks: &persistence::TaskTable,
     krate: &model::CrateVersion,
     mut progress: prodash::tree::Item,
     _mode: Scheduling,
@@ -91,7 +91,7 @@ pub async fn tasks(
 }
 
 fn task_or_default(
-    tasks: &TasksTree,
+    tasks: &TaskTable,
     key_buf: &mut String,
     crate_version: &model::CrateVersion,
     make_task: impl FnOnce() -> model::Task,

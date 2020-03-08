@@ -1,8 +1,8 @@
-use crate::persistence::new_key_value_query;
+use crate::persistence::new_key_value_query_old_to_new;
 use crate::{
     engine::{report, work},
     error::Result,
-    persistence::{self, TreeAccess},
+    persistence::{self, TableAccess},
     utils::check,
 };
 use futures::{task::Spawn, task::SpawnExt, FutureExt};
@@ -45,7 +45,7 @@ pub async fn generate(
     )?;
     let mut connection = krates.connection().lock();
     let mut statement =
-        new_key_value_query(persistence::CratesTree::table_name(), &mut *connection)?;
+        new_key_value_query_old_to_new(persistence::CrateTable::table_name(), &mut *connection)?;
     let mut rows = statement.query(NO_PARAMS)?;
     let mut chunk = Vec::<(String, Vec<u8>)>::with_capacity(chunk_size);
     let mut cid = 0;

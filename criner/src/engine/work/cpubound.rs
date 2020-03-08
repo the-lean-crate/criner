@@ -8,7 +8,7 @@ struct ProcessingState {
 }
 pub struct Agent {
     asset_dir: PathBuf,
-    results: persistence::TaskResultTree,
+    results: persistence::TaskResultTable,
     state: Option<ProcessingState>,
 }
 
@@ -109,12 +109,12 @@ pub fn default_persisted_extraction_task() -> model::Task {
 }
 
 fn extract_crate(
-    results: &persistence::TaskResultTree,
+    results: &persistence::TaskResultTable,
     key: &str,
     progress: &mut prodash::tree::Item,
     downloaded_crate: PathBuf,
 ) -> Result<()> {
-    use persistence::TreeAccess;
+    use persistence::TableAccess;
     let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new(File::open(
         downloaded_crate,
     )?))?);

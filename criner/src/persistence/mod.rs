@@ -6,9 +6,9 @@ mod merge;
 pub use keyed::*;
 
 mod serde;
-mod tree;
+mod table;
 use crate::persistence::ThreadSafeConnection;
-pub use tree::*;
+pub use table::*;
 
 #[derive(Clone)]
 pub struct Db {
@@ -61,28 +61,28 @@ impl Db {
         Ok(connection)
     }
 
-    pub fn open_crate_versions(&self) -> Result<CrateVersionsTree> {
-        Ok(CrateVersionsTree {
+    pub fn open_crate_versions(&self) -> Result<CrateVersionTable> {
+        Ok(CrateVersionTable {
             inner: self.open_connection()?,
         })
     }
-    pub fn open_crates(&self) -> Result<CratesTree> {
-        Ok(CratesTree {
+    pub fn open_crates(&self) -> Result<CrateTable> {
+        Ok(CrateTable {
             inner: self.open_connection()?,
         })
     }
-    pub fn open_tasks(&self) -> Result<TasksTree> {
-        Ok(TasksTree {
+    pub fn open_tasks(&self) -> Result<TaskTable> {
+        Ok(TaskTable {
             inner: self.open_connection()?,
         })
     }
-    pub fn open_results(&self) -> Result<TaskResultTree> {
-        Ok(TaskResultTree {
+    pub fn open_results(&self) -> Result<TaskResultTable> {
+        Ok(TaskResultTable {
             inner: self.open_connection()?,
         })
     }
-    pub fn open_context(&self) -> Result<ContextTree> {
-        Ok(ContextTree {
+    pub fn open_context(&self) -> Result<MetaTable> {
+        Ok(MetaTable {
             inner: self.open_connection()?,
         })
     }

@@ -1,7 +1,7 @@
 use crate::{
     error::{Error, Result},
     model, persistence,
-    persistence::TreeAccess,
+    persistence::TableAccess,
 };
 use bytesize::ByteSize;
 use std::{path::Path, path::PathBuf, time::SystemTime};
@@ -20,7 +20,7 @@ struct ProcessingState {
 pub struct Agent {
     asset_dir: PathBuf,
     client: reqwest::Client,
-    results: persistence::TaskResultTree,
+    results: persistence::TaskResultTable,
     channel: async_std::sync::Sender<super::cpubound::ExtractRequest>,
     state: Option<ProcessingState>,
     extraction_request: Option<super::cpubound::ExtractRequest>,
@@ -167,7 +167,7 @@ pub fn default_persisted_download_task() -> model::Task {
 async fn download_file_and_store_result(
     progress: &mut prodash::tree::Item,
     key: &str,
-    results: &persistence::TaskResultTree,
+    results: &persistence::TaskResultTable,
     client: &reqwest::Client,
     kind: &str,
     url: &str,
