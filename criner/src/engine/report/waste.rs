@@ -14,7 +14,7 @@ impl super::generic::Aggregate for Report {
         other
     }
 
-    async fn complete(self, _out_dir: PathBuf) -> Result<()> {
+    async fn complete(self, _out_dir: PathBuf, _progress: prodash::tree::Item) -> Result<()> {
         Ok(())
     }
 }

@@ -10,7 +10,7 @@ use std::path::{Path, PathBuf};
 #[async_trait]
 pub trait Aggregate {
     fn aggregate(self, other: Self) -> Self;
-    async fn complete(self, out_dir: PathBuf) -> Result<()>;
+    async fn complete(self, out_dir: PathBuf, progress: prodash::tree::Item) -> Result<()>;
 }
 
 #[async_trait]
@@ -40,7 +40,7 @@ pub trait Generator {
                 }
             };
         }
-        report.complete(out_dir).await?;
+        report.complete(out_dir, progress).await?;
         Ok(())
     }
 
