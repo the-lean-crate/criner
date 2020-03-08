@@ -17,7 +17,7 @@ pub async fn generate(
     cpu_o_bound_processors: u32,
     pool: impl Spawn + Clone + Send + 'static + Sync,
 ) -> Result<()> {
-    use report::Generator;
+    use report::generic::Generator;
     let krates = db.open_crates()?;
     let chunk_size = 500;
     let output_dir = assets_dir

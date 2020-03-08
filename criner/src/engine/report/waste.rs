@@ -10,7 +10,7 @@ pub enum Report {
     None,
 }
 
-impl super::Aggregate for Report {
+impl super::generic::Aggregate for Report {
     fn aggregate(self, other: Self) -> Self {
         other
     }
@@ -23,7 +23,7 @@ impl Default for Report {
 }
 
 #[async_trait]
-impl super::Generator for Generator {
+impl super::generic::Generator for Generator {
     type Report = Report;
 
     fn name() -> &'static str {
