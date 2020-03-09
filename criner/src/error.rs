@@ -67,5 +67,9 @@ quick_error! {
             from()
             cause(err)
         }
+        GlobSet(err: globset::Error) {
+            from()
+            cause(err)
+        }
     }
 }

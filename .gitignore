@@ -20,3 +20,4 @@ criner/Cargo.lock
 /index-bare/
 /criner.db/
 /*.sqlite
+/criner/tests/fixtures/extracted/
