@@ -4,17 +4,19 @@ use crate::{
 };
 use async_trait::async_trait;
 use serde_derive::Deserialize;
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum GlobKind {
     Include,
+    #[allow(dead_code)]
     Exclude,
 }
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum Severity {
+    #[allow(dead_code)]
     Info,
     Warn,
 }
@@ -60,50 +62,52 @@ fn tar_path_to_path(bytes: &[u8]) -> &Path {
     &Path::new(tar_path_to_utf8_str(bytes))
 }
 
+fn tar_path_to_path_no_strip(bytes: &[u8]) -> &Path {
+    &Path::new(std::str::from_utf8(bytes).expect("valid utf8 paths in crate archive"))
+}
+
 // NOTE: Actually there only seem to be files in these archives, but let's be safe
 // There are definitely no directories
 fn entry_is_file(entry_type: u8) -> bool {
     tar::EntryType::new(entry_type).is_file()
 }
 
-fn apply_globset_to_tarfiles<'entries>(
-    entries: &'entries [impl std::borrow::Borrow<TarHeader>],
+fn split_to_matched_and_unmatched<'entries>(
+    entries: Vec<TarHeader>,
     globset: &globset::GlobSet,
-) -> Vec<&'entries TarHeader> {
-    entries
-        .iter()
+) -> (Vec<TarHeader>, Vec<TarHeader>) {
+    let mut unmatched = Vec::new();
+    let matched = entries
+        .into_iter()
         .filter_map(|e| {
-            let e = e.borrow();
-            if entry_is_file(e.entry_type) && globset.is_match(tar_path_to_utf8_str(&e.path)) {
+            if globset.is_match(tar_path_to_utf8_str(&e.path)) {
                 Some(e)
             } else {
+                unmatched.push(e);
                 None
             }
         })
-        .collect()
+        .collect();
+    (matched, unmatched)
 }
 
-fn expand_files_to_directories(mut entries: Vec<&TarHeader>) -> Vec<&TarHeader> {
-    let mut directories = BTreeMap::new();
-    for e in &entries {
+fn directories_of(entries: &[TarHeader]) -> Vec<TarHeader> {
+    let mut directories = BTreeSet::new();
+    for e in entries {
         if entry_is_file(e.entry_type) {
-            if let Some(parent) = tar_path_to_path(&e.path).parent() {
-                directories
-                    .entry(parent.clone())
-                    .or_insert_with(|| TarHeader {
-                        path: parent
-                            .to_str()
-                            .expect("utf8 strings only")
-                            .as_bytes()
-                            .to_owned(),
-                        size: 0,
-                        entry_type: tar::EntryType::Directory.as_byte(),
-                    });
+            if let Some(parent) = tar_path_to_path_no_strip(&e.path).parent() {
+                directories.insert(parent);
             }
         }
     }
-    entries.extend(directories.into_iter().map(|(_k, v)| v));
-    entries
+    directories
+        .into_iter()
+        .map(|k| TarHeader {
+            path: k.to_str().expect("utf8 paths").as_bytes().to_owned(),
+            size: 0,
+            entry_type: tar::EntryType::Directory.as_byte(),
+        })
+        .collect()
 }
 
 fn globset_from(patterns: &[String]) -> Result<globset::GlobSet> {
@@ -112,6 +116,13 @@ fn globset_from(patterns: &[String]) -> Result<globset::GlobSet> {
         builder.add(globset::Glob::new(pattern)?);
     }
     builder.build().map_err(Into::into)
+}
+
+fn split_by_matching_directories(
+    entries: Vec<TarHeader>,
+    directories: &[TarHeader],
+) -> Vec<TarHeader> {
+    unimplemented!();
 }
 
 impl Report {
@@ -138,22 +149,34 @@ impl Report {
             entries.iter().map(|e| e.size).sum::<u64>(),
         )
     }
-
     fn compute_includes(
         entries: Vec<TarHeader>,
-        include_patterns: Vec<String>,
+        _include_patterns: Vec<String>,
         exclude_patterns: Vec<String>,
     ) -> (Option<Fix>, Vec<TarHeader>) {
-        let include_patterns =
-            globset_from(&include_patterns).expect("only valid include globs in Cargo.toml");
-        let exclude_patterns =
+        let fix = Fix {
+            kind: GlobKind::Include,
+            description: (
+                Severity::Warn,
+                "Excludes are ignored if includes are given.".to_string(),
+            ),
+            globs: vec![],
+        };
+        let exclude_globs =
             globset_from(&exclude_patterns).expect("only valid exclude globs in Cargo.toml");
-        let included_entries =
-            expand_files_to_directories(apply_globset_to_tarfiles(&entries, &include_patterns));
-        let entries_that_should_be_excluded =
-            apply_globset_to_tarfiles(&included_entries, &exclude_patterns);
-        dbg!(entries_that_should_be_excluded);
-        unimplemented!()
+        let directories = directories_of(&entries);
+
+        let (mut entries_that_should_be_excluded, remaining_entries) =
+            split_to_matched_and_unmatched(entries, &exclude_globs);
+        let (directories_that_should_be_excluded, _remaining_directories) =
+            split_to_matched_and_unmatched(directories, &exclude_globs);
+
+        let entries_that_should_be_excluded_by_directory =
+            split_by_matching_directories(remaining_entries, &directories_that_should_be_excluded);
+        entries_that_should_be_excluded
+            .extend(entries_that_should_be_excluded_by_directory.into_iter());
+
+        (Some(fix), entries_that_should_be_excluded)
     }
 }
 
