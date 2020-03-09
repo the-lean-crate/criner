@@ -4,6 +4,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use serde_derive::Deserialize;
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 #[derive(PartialEq, Eq, Debug)]
@@ -59,8 +60,58 @@ fn tar_path_to_path(bytes: &[u8]) -> &Path {
     &Path::new(tar_path_to_utf8_str(bytes))
 }
 
-fn is_tar_file(entry_type: u8) -> bool {
+// NOTE: Actually there only seem to be files in these archives, but let's be safe
+// There are definitely no directories
+fn entry_is_file(entry_type: u8) -> bool {
     tar::EntryType::new(entry_type).is_file()
+}
+
+fn apply_globset_to_tarfiles<'entries>(
+    entries: &'entries [impl std::borrow::Borrow<TarHeader>],
+    globset: &globset::GlobSet,
+) -> Vec<&'entries TarHeader> {
+    entries
+        .iter()
+        .filter_map(|e| {
+            let e = e.borrow();
+            if entry_is_file(e.entry_type) && globset.is_match(tar_path_to_utf8_str(&e.path)) {
+                Some(e)
+            } else {
+                None
+            }
+        })
+        .collect()
+}
+
+fn expand_files_to_directories(mut entries: Vec<&TarHeader>) -> Vec<&TarHeader> {
+    let mut directories = BTreeMap::new();
+    for e in &entries {
+        if entry_is_file(e.entry_type) {
+            if let Some(parent) = tar_path_to_path(&e.path).parent() {
+                directories
+                    .entry(parent.clone())
+                    .or_insert_with(|| TarHeader {
+                        path: parent
+                            .to_str()
+                            .expect("utf8 strings only")
+                            .as_bytes()
+                            .to_owned(),
+                        size: 0,
+                        entry_type: tar::EntryType::Directory.as_byte(),
+                    });
+            }
+        }
+    }
+    entries.extend(directories.into_iter().map(|(_k, v)| v));
+    entries
+}
+
+fn globset_from(patterns: &[String]) -> Result<globset::GlobSet> {
+    let mut builder = globset::GlobSetBuilder::new();
+    for pattern in patterns {
+        builder.add(globset::Glob::new(pattern)?);
+    }
+    builder.build().map_err(Into::into)
 }
 
 impl Report {
@@ -88,56 +139,21 @@ impl Report {
         )
     }
 
-    fn globset_from(patterns: &[String]) -> Result<globset::GlobSet> {
-        let mut builder = globset::GlobSetBuilder::new();
-        for pattern in patterns {
-            builder.add(globset::Glob::new(pattern)?);
-        }
-        builder.build().map_err(Into::into)
-    }
-
     fn compute_includes(
         entries: Vec<TarHeader>,
         include_patterns: Vec<String>,
         exclude_patterns: Vec<String>,
     ) -> (Option<Fix>, Vec<TarHeader>) {
-        dbg!(&exclude_patterns);
         let include_patterns =
-            Self::globset_from(&include_patterns).expect("only valid include globs in Cargo.toml");
+            globset_from(&include_patterns).expect("only valid include globs in Cargo.toml");
         let exclude_patterns =
-            Self::globset_from(&exclude_patterns).expect("only valid exclude globs in Cargo.toml");
-        let included_files = Report::apply_globset_to_tarfiles(&entries, &include_patterns);
-        let files_that_should_be_excluded =
-            Report::apply_globset_to_utf8_str(&included_files, &exclude_patterns);
-        dbg!(&included_files);
-        dbg!(files_that_should_be_excluded);
+            globset_from(&exclude_patterns).expect("only valid exclude globs in Cargo.toml");
+        let included_entries =
+            expand_files_to_directories(apply_globset_to_tarfiles(&entries, &include_patterns));
+        let entries_that_should_be_excluded =
+            apply_globset_to_tarfiles(&included_entries, &exclude_patterns);
+        dbg!(entries_that_should_be_excluded);
         unimplemented!()
-    }
-
-    fn apply_globset_to_utf8_str<'files>(
-        files: &'files [&str],
-        globset: &globset::GlobSet,
-    ) -> Vec<&'files str> {
-        files
-            .iter()
-            .cloned()
-            .filter(|p| globset.is_match(p))
-            .collect()
-    }
-    fn apply_globset_to_tarfiles<'entries>(
-        entries: &'entries [TarHeader],
-        globset: &globset::GlobSet,
-    ) -> Vec<&'entries str> {
-        entries
-            .iter()
-            .filter_map(|e| {
-                if is_tar_file(e.entry_type) && globset.is_match(tar_path_to_utf8_str(&e.path)) {
-                    Some(tar_path_to_utf8_str(&e.path))
-                } else {
-                    None
-                }
-            })
-            .collect()
     }
 }
 
