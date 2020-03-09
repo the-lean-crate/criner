@@ -110,10 +110,10 @@ fn directories_of(entries: &[TarHeader]) -> Vec<TarHeader> {
         .collect()
 }
 
-fn globset_from(patterns: &[String]) -> Result<globset::GlobSet> {
+fn globset_from(patterns: impl IntoIterator<Item = impl AsRef<str>>) -> Result<globset::GlobSet> {
     let mut builder = globset::GlobSetBuilder::new();
-    for pattern in patterns {
-        builder.add(globset::Glob::new(pattern)?);
+    for pattern in patterns.into_iter() {
+        builder.add(globset::Glob::new(pattern.as_ref())?);
     }
     builder.build().map_err(Into::into)
 }
@@ -122,7 +122,14 @@ fn split_by_matching_directories(
     entries: Vec<TarHeader>,
     directories: &[TarHeader],
 ) -> Vec<TarHeader> {
-    unimplemented!();
+    // Shortcut: we assume '/' as path separator, which is true for all paths in crates.io except for 214 :D - it's OK to not find things in that case.
+    let globs = globset_from(directories.iter().map(|e| {
+        let mut s = tar_path_to_utf8_str(&e.path).to_string();
+        s.push_str("/**");
+        s
+    }))
+    .expect("always valid globs from directories");
+    split_to_matched_and_unmatched(entries, &globs).0
 }
 
 impl Report {
@@ -170,7 +177,6 @@ impl Report {
             split_to_matched_and_unmatched(entries, &exclude_globs);
         let (directories_that_should_be_excluded, _remaining_directories) =
             split_to_matched_and_unmatched(directories, &exclude_globs);
-
         let entries_that_should_be_excluded_by_directory =
             split_by_matching_directories(remaining_entries, &directories_that_should_be_excluded);
         entries_that_should_be_excluded
@@ -194,10 +200,10 @@ impl From<TaskResult> for Report {
                     (Some(includes), Some(excludes)) => {
                         Self::compute_includes(entries_meta_data, includes, excludes)
                     }
-                    (Some(includes), None) => unimplemented!(
+                    (Some(_includes), None) => unimplemented!(
                         "allow everything, assuming they know what they are doing, but flag tests"
                     ),
-                    (None, Some(excludes)) => unimplemented!("check for accidental includes"),
+                    (None, Some(_excludes)) => unimplemented!("check for accidental includes"),
                     (None, None) => unimplemented!("flag everything that isn't standard includes"),
                 };
                 let (wasted_files, wasted_bytes) = Self::counts_from(wasted_files);
@@ -241,7 +247,7 @@ impl Default for Report {
 
 #[cfg(test)]
 mod from_extract_crate {
-    use super::Report;
+    use super::{Fix, GlobKind, Report, Severity};
     use crate::model::TaskResult;
 
     const GNIR: &[u8] =
@@ -259,9 +265,13 @@ mod from_extract_crate {
             Report::Version {
                 total_size_in_bytes: 15216510,
                 total_files: 382,
-                wasted_bytes: 0,
-                wasted_files: 0,
-                suggested_fix: None
+                wasted_bytes: 813680,
+                wasted_files: 23,
+                suggested_fix: Some(Fix {
+                    kind: GlobKind::Include,
+                    description: (Severity::Warn, "Excludes are ignored if includes are given".into()),
+                    globs: vec![]
+                })
             },
             "correct size and assume people are aware if includes are present, but excludes must be expressed as includes as they are mutually exclusive"
         );
