@@ -11,6 +11,10 @@ pub type Patterns = Vec<String>;
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum Fix {
+    NewInclude {
+        include: Patterns,
+        has_build_script: bool,
+    },
     RemoveExcludeAndUseInclude {
         include_added: Patterns,
         include: Patterns,
@@ -23,6 +27,7 @@ pub enum Fix {
 struct Package {
     include: Option<Vec<String>>,
     exclude: Option<Vec<String>>,
+    build: Option<String>,
 }
 #[derive(Deserialize)]
 struct CargoConfig {
@@ -99,6 +104,10 @@ fn directories_of(entries: &[TarHeader]) -> Vec<TarHeader> {
             entry_type: tar::EntryType::Directory.as_byte(),
         })
         .collect()
+}
+
+fn standard_include_patterns() -> &'static [&'static str] {
+    &["foo"]
 }
 
 fn globset_from(patterns: impl IntoIterator<Item = impl AsRef<str>>) -> Result<globset::GlobSet> {
@@ -181,6 +190,15 @@ impl Report {
             entries.iter().map(|e| e.size).sum::<u64>(),
         )
     }
+
+    fn standard_includes(
+        _entries: Vec<TarHeader>,
+        _build: Option<String>,
+    ) -> (Option<Fix>, Vec<TarHeader>) {
+        let _include_patterns = standard_include_patterns();
+        unimplemented!("standard includes");
+    }
+
     fn compute_includes_from_includes_and_excludes(
         entries: Vec<TarHeader>,
         include_patterns: Vec<String>,
@@ -229,20 +247,23 @@ impl From<TaskResult> for Report {
                 let total_size_in_bytes = entries_meta_data.iter().map(|e| e.size).sum();
                 let total_files = entries_meta_data.len() as u64;
                 let package = Self::package_from_entries(&selected_entries);
-                let (suggested_fix, wasted_files) = match (package.include, package.exclude) {
-                    (Some(includes), Some(excludes)) => {
-                        Self::compute_includes_from_includes_and_excludes(
-                            entries_meta_data,
-                            includes,
-                            excludes,
-                        )
-                    }
-                    (Some(_includes), None) => unimplemented!(
+                let (suggested_fix, wasted_files) =
+                    match (package.include, package.exclude, package.build) {
+                        (Some(includes), Some(excludes), _build_script_does_not_matter) => {
+                            Self::compute_includes_from_includes_and_excludes(
+                                entries_meta_data,
+                                includes,
+                                excludes,
+                            )
+                        }
+                        (Some(_includes), None, _build) => unimplemented!(
                         "allow everything, assuming they know what they are doing, but flag tests"
                     ),
-                    (None, Some(_excludes)) => unimplemented!("check for accidental includes"),
-                    (None, None) => unimplemented!("flag everything that isn't standard includes"),
-                };
+                        (None, Some(_excludes), _build) => {
+                            unimplemented!("check for accidental includes")
+                        }
+                        (None, None, build) => Self::standard_includes(entries_meta_data, build),
+                    };
                 let (wasted_files, wasted_bytes) = Self::counts_from(wasted_files);
                 Report::Version {
                     total_size_in_bytes,
@@ -322,7 +343,7 @@ mod from_extract_crate {
                 total_files: 479,
                 wasted_files: 0,
                 wasted_bytes: 0,
-                suggested_fix: None
+                suggested_fix: Some(Fix::NewInclude {include: vec![], has_build_script: true})
             },
             "build.rs is used but there are a bunch of extra directories that can be ignored and are not needed by the build, no manual includes/excludes"
         );
@@ -339,7 +360,7 @@ mod from_extract_crate {
                 wasted_bytes: 0,
                 suggested_fix: None
             },
-            "build.rs + excludes in Cargo.toml - this leaves a chance for accidental includes for which we provide an updated exclude list"
+            "build.rs + excludes in Cargo.toml - this leaves a chance for accidental includes for which we provide an updated include list"
         );
     }
 }
