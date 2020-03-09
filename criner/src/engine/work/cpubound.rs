@@ -45,16 +45,13 @@ impl crate::engine::work::generic::Processor for Agent {
                 dummy_task.fq_key(&crate_name, &crate_version, out_key);
 
                 let downloaded_crate = {
-                    let crate_version_dir = super::iobound::crate_version_dir(
-                        &self.asset_dir,
-                        &crate_name,
-                        &crate_version,
-                    );
+                    let crate_dir = super::iobound::crate_dir(&self.asset_dir, &crate_name);
                     super::iobound::download_file_path(
+                        &crate_dir,
+                        &crate_version,
                         &download_task.process,
                         &download_task.version,
                         "crate",
-                        &crate_version_dir,
                     )
                 };
                 let dummy_result = model::TaskResult::ExplodedCrate {

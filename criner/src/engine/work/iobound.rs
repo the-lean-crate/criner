@@ -17,7 +17,6 @@ use async_trait::async_trait;
 struct ProcessingState {
     url: String,
     kind: &'static str,
-    base_dir: PathBuf,
     out_file: PathBuf,
     key: String,
 }
@@ -88,13 +87,17 @@ impl crate::engine::work::generic::Processor for Agent {
                 };
                 let mut key = String::with_capacity(out_key.len() * 2);
                 task_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut key);
-                let base_dir = crate_version_dir(&self.asset_dir, &crate_name, &crate_version);
-                let out_file =
-                    download_file_path(&dummy_task.process, &dummy_task.version, kind, &base_dir);
+                let base_dir = crate_dir(&self.asset_dir, &crate_name);
+                let out_file = download_file_path(
+                    &base_dir,
+                    &crate_version,
+                    &dummy_task.process,
+                    &dummy_task.version,
+                    kind,
+                );
                 self.state = Some(ProcessingState {
                     url,
                     kind,
-                    base_dir,
                     out_file,
                     key,
                 });
@@ -136,7 +139,6 @@ impl crate::engine::work::generic::Processor for Agent {
         let ProcessingState {
             url,
             kind,
-            base_dir,
             out_file,
             key,
         } = self.state.take().expect("initialized state");
@@ -147,7 +149,6 @@ impl crate::engine::work::generic::Processor for Agent {
             &self.client,
             kind,
             &url,
-            base_dir,
             out_file,
         )
         .await
@@ -180,7 +181,6 @@ async fn download_file_and_store_result(
     client: &reqwest::Client,
     kind: &str,
     url: &str,
-    base_dir: PathBuf,
     out_file: PathBuf,
 ) -> Result<()> {
     progress.blocked("fetch HEAD", None);
@@ -196,7 +196,7 @@ async fn download_file_and_store_result(
     ));
 
     let mut bytes_received = 0;
-    tokio::fs::create_dir_all(&base_dir).await?;
+    tokio::fs::create_dir_all(&out_file.parent().expect("parent directory")).await?;
     let mut out = tokio::fs::OpenOptions::new()
         .create(true)
         .truncate(true)
@@ -230,16 +230,32 @@ async fn download_file_and_store_result(
     Ok(())
 }
 
-pub fn download_file_path(process: &str, version: &str, kind: &str, base_dir: &Path) -> PathBuf {
+pub fn download_file_path(
+    base_dir: &Path,
+    crate_version: &str,
+    process: &str,
+    version: &str,
+    kind: &str,
+) -> PathBuf {
     base_dir.join(format!(
-        "{process}{sep}{version}.{kind}",
+        "{crate_version}-{process}{sep}{version}.{kind}",
         process = process,
         sep = crate::persistence::KEY_SEP_CHAR,
         version = version,
-        kind = kind
+        kind = kind,
+        crate_version = crate_version
     ))
 }
 
-pub fn crate_version_dir(assets_dir: &Path, crate_name: &str, crate_version: &str) -> PathBuf {
-    assets_dir.join(crate_name).join(crate_version)
+pub fn crate_dir(assets_dir: &Path, crate_name: &str) -> PathBuf {
+    // we can safely assume ascii here - otherwise we panic
+    let crate_path = match crate_name.len() {
+        1 => Path::new("1").join(crate_name),
+        2 => Path::new("2").join(crate_name),
+        3 => Path::new("3").join(&crate_name[..1]),
+        _ => Path::new(&crate_name[..2])
+            .join(&crate_name[2..4])
+            .join(crate_name),
+    };
+    assets_dir.join(crate_path)
 }
