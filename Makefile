@@ -6,7 +6,7 @@ help:  ## Display this help
 
 EXECUTABLE = target/debug/criner
 RUST_SRC_FILES = $(shell find src -name "*.rs")
-bare_index_path = tests/fixtures/index-bare
+bare_index_path = index-bare
 
 $(bare_index_path):
 	mkdir -p $(dir $@)
