@@ -21,7 +21,7 @@ pub trait Aggregate {
 
 #[async_trait]
 pub trait Generator {
-    type Report: Aggregate + Default + Send + Sync;
+    type Report: Aggregate + Send + Sync;
     type DBResult: Send;
 
     fn name() -> &'static str;
@@ -48,22 +48,25 @@ pub trait Generator {
     async fn merge_reports(
         out_dir: PathBuf,
         mut progress: prodash::tree::Item,
-        reports: async_std::sync::Receiver<Result<Self::Report>>,
+        reports: async_std::sync::Receiver<Result<Option<Self::Report>>>,
     ) -> Result<()> {
         progress.init(None, Some("reports"));
-        let mut report = Self::Report::default();
+        let mut report = None;
         let mut count = 0;
         while let Some(result) = reports.recv().await {
             count += 1;
             progress.set(count);
             match result {
-                Ok(new_report) => report = report.merge(new_report),
+                Ok(Some(new_report)) => report = report.map(|r: Self::Report| r.merge(new_report)),
+                Ok(None) => {}
                 Err(err) => {
                     progress.fail(format!("report failed: {}", err));
                 }
             };
         }
-        report.complete_all(out_dir, progress).await?;
+        if let Some(report) = report {
+            report.complete_all(out_dir, progress).await?;
+        }
         Ok(())
     }
 
@@ -72,7 +75,7 @@ pub trait Generator {
         crate_name: &str,
         crate_version: &str,
         result: Self::DBResult,
-        _report: &Self::Report,
+        _report: Option<&Self::Report>,
         progress: &mut prodash::tree::Item,
     ) -> Result<Self::Report>;
 
@@ -81,8 +84,8 @@ pub trait Generator {
         out_dir: PathBuf,
         krates: Vec<(String, Vec<u8>)>,
         mut progress: prodash::tree::Item,
-    ) -> Result<Self::Report> {
-        let mut report = Self::Report::default();
+    ) -> Result<Option<Self::Report>> {
+        let mut report = None;
         let mut results_to_update = Vec::new();
         {
             let connection = db.open_connection()?;
@@ -117,19 +120,24 @@ pub trait Generator {
                                 &name,
                                 &version,
                                 result,
-                                &report,
+                                report.as_ref(),
                                 &mut progress,
                             )
                             .await?;
-                            report = report.merge(new_report);
+                            report = report.map(|r| r.merge(new_report));
 
                             results_to_update.push(reports_key);
                         }
                     }
                 }
-                report
-                    .complete_crate(&out_dir, &name, &mut progress)
-                    .await?;
+                report = if let Some(mut report) = report {
+                    report
+                        .complete_crate(&out_dir, &name, &mut progress)
+                        .await?;
+                    Some(report)
+                } else {
+                    None
+                };
             }
         }
 
