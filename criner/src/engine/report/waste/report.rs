@@ -229,20 +229,40 @@ fn simplify_standard_includes(
     out_patterns
 }
 
-impl Report {
-    fn package_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> Package {
-        entries
-            .iter()
-            .find_map(|(h, v)| {
-                if tar_path_to_path(&h.path).ends_with("Cargo.toml") {
-                    Some(
-                        toml::from_slice::<CargoConfig>(&v)
-                            .expect("valid Cargo.toml format")
-                            .package,
-                    )
+fn find_in_entries<'buffer>(
+    entries_with_buffer: &'buffer [(TarHeader, Vec<u8>)],
+    entries: &[TarHeader],
+    name: &str,
+) -> Option<(TarHeader, Option<&'buffer [u8]>)> {
+    entries_with_buffer
+        .iter()
+        .find_map(|(h, v)| {
+            if tar_path_to_path(&h.path).ends_with(name) {
+                Some((h.clone(), Some(v.as_slice())))
+            } else {
+                None
+            }
+        })
+        .or_else(|| {
+            entries.iter().find_map(|e| {
+                if tar_path_to_path(&e.path).ends_with(name) {
+                    Some((e.clone(), None))
                 } else {
                     None
                 }
+            })
+        })
+}
+
+impl Report {
+    fn package_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> Package {
+        find_in_entries(entries, &[], "Cargo.toml")
+            .and_then(|(_e, v)| {
+                v.map(|v| {
+                    toml::from_slice::<CargoConfig>(&v)
+                        .expect("valid Cargo.toml format")
+                        .package
+                })
             })
             .expect("Cargo.toml to always be present in the exploded crate")
     }
