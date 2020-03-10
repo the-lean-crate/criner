@@ -11,6 +11,10 @@ pub type Patterns = Vec<String>;
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum Fix {
+    EnrichedExclude {
+        exclude: Patterns,
+        exclude_added: Patterns,
+    },
     NewInclude {
         include: Patterns,
         has_build_script: bool,
@@ -107,6 +111,45 @@ fn directories_of(entries: &[TarHeader]) -> Vec<TarHeader> {
         .collect()
 }
 
+fn standard_exclude_patterns() -> &'static [&'static str] {
+    &[
+        "**/*.jpg",
+        "**/*.jpeg",
+        "**/*.jpeg",
+        "**/*.png",
+        "**/*.gif",
+        "**/*.bmp",
+        "**/doc/*",
+        "**/docs/*",
+        "**/benches/*",
+        "**/benchmark/*",
+        "**/benchmarks/*",
+        "**/test/*",
+        "**/tests/*",
+        "**/testing/*",
+        "**/spec/*",
+        "**/specs/*",
+        "**/*_test.*",
+        "**/*_tests.*",
+        "**/*_spec.*",
+        "**/*_specs.*",
+        "**/example/*",
+        "**/examples/*",
+        "**/target/*",
+        "**/build/*",
+        "**/out/*",
+        "**/tmp/*",
+        "**/lib/*",
+        "**/etc/*",
+        "**/testdata/*",
+        "**/samples/*",
+        "**/assets/*",
+        "**/maps/*",
+        "**/media/*",
+        "**/fixtures/*",
+        "**/node_modules/*",
+    ]
+}
 fn standard_include_patterns() -> &'static [&'static str] {
     &[
         "src/**/*",
@@ -126,12 +169,14 @@ fn standard_include_patterns() -> &'static [&'static str] {
     ]
 }
 
-fn globset_from(patterns: impl IntoIterator<Item = impl AsRef<str>>) -> Result<globset::GlobSet> {
+fn globset_from(patterns: impl IntoIterator<Item = impl AsRef<str>>) -> globset::GlobSet {
     let mut builder = globset::GlobSetBuilder::new();
     for pattern in patterns.into_iter() {
-        builder.add(globset::Glob::new(pattern.as_ref())?);
+        builder.add(make_glob(pattern.as_ref()));
     }
-    builder.build().map_err(Into::into)
+    builder
+        .build()
+        .expect("multiple globs to always fit into a globset")
 }
 
 fn split_by_matching_directories(
@@ -143,8 +188,7 @@ fn split_by_matching_directories(
         let mut s = tar_path_to_utf8_str(&e.path).to_string();
         s.push_str("/**");
         s
-    }))
-    .expect("always valid globs from directories");
+    }));
     split_to_matched_and_unmatched(entries, &globs)
 }
 
@@ -178,7 +222,7 @@ fn find_include_patterns_that_incorporate_exclude_patterns(
     let mut removed_include_patterns = Vec::new();
     let mut new_include_patterns = Vec::with_capacity(include_patterns.len());
     for pattern in include_patterns {
-        let glob = globset::Glob::new(&pattern).expect("valid include patterns");
+        let glob = make_glob(&pattern);
         let matcher = glob.compile_matcher();
         if entries_to_exclude
             .iter()
@@ -203,6 +247,15 @@ fn find_include_patterns_that_incorporate_exclude_patterns(
         added_include_patterns,
         removed_include_patterns,
     )
+}
+
+fn make_glob(pattern: &str) -> globset::Glob {
+    globset::GlobBuilder::new(pattern)
+        .literal_separator(false)
+        .case_insensitive(false)
+        .backslash_escape(true) // most paths in crates.io are forward slashes, there are only 214 or so with backslashes
+        .build()
+        .expect("valid include patterns")
 }
 
 fn simplify_standard_includes(
@@ -255,6 +308,41 @@ fn find_in_entries<'buffer>(
         })
 }
 
+fn simplify_standard_excludes_and_match_against_standard_includes(
+    mut potential_waste: Vec<TarHeader>,
+    mut existing_exclude: Patterns,
+) -> (Vec<TarHeader>, Patterns, Patterns) {
+    let actual_waste = Vec::new();
+    let initial_exclude_len = existing_exclude.len();
+    let include_globs = globset_from(standard_include_patterns());
+    let exclude = standard_exclude_patterns();
+    for exclude_pattern in exclude {
+        let exclude_glob = make_glob(exclude_pattern).compile_matcher();
+        if potential_waste
+            .iter()
+            .any(|e| exclude_glob.is_match(tar_path_to_utf8_str(&e.path)))
+        {
+            if potential_waste
+                .iter()
+                .any(|e| include_globs.is_match(tar_path_to_utf8_str(&e.path)))
+            {
+                potential_waste.retain(|e| !exclude_glob.is_match(tar_path_to_utf8_str(&e.path)));
+                if potential_waste.is_empty() {
+                    break;
+                }
+            } else {
+                existing_exclude.push(exclude_pattern.to_string());
+            }
+        }
+    }
+
+    let new_excludes = existing_exclude
+        .get(initial_exclude_len..)
+        .map(|v| v.to_vec())
+        .unwrap_or_else(Vec::new);
+    (actual_waste, existing_exclude, new_excludes)
+}
+
 impl Report {
     fn package_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> Package {
         find_in_entries(entries, &[], "Cargo.toml")
@@ -278,16 +366,16 @@ impl Report {
     fn standard_includes(
         entries: Vec<TarHeader>,
         entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
-        build: Option<String>,
+        buildscript_name: Option<String>,
     ) -> (Option<Fix>, Vec<TarHeader>) {
         let include_patterns = standard_include_patterns();
         let maybe_build_script = find_in_entries(
             &entries_with_buffer,
             &entries,
-            &build.unwrap_or_else(|| "build.rs".to_owned()),
+            &buildscript_name.unwrap_or_else(|| "build.rs".to_owned()),
         )
         .map(|(entry, _buf)| tar_path_to_utf8_str(&entry.path).to_owned());
-        let include_globs = globset_from(include_patterns).expect("always valid include patterns");
+        let include_globs = globset_from(include_patterns);
         let (included_entries, excluded_entries) =
             split_to_matched_and_unmatched(entries, &include_globs);
 
@@ -311,11 +399,10 @@ impl Report {
 
     fn compute_includes_from_includes_and_excludes(
         entries: Vec<TarHeader>,
-        include_patterns: Vec<String>,
-        exclude_patterns: Vec<String>,
+        include: Patterns,
+        exclude: Patterns,
     ) -> (Option<Fix>, Vec<TarHeader>) {
-        let exclude_globs =
-            globset_from(&exclude_patterns).expect("only valid exclude globs in Cargo.toml");
+        let exclude_globs = globset_from(&exclude);
         let directories = directories_of(&entries);
 
         let (mut entries_that_should_be_excluded, remaining_entries) =
@@ -334,7 +421,7 @@ impl Report {
                 find_include_patterns_that_incorporate_exclude_patterns(
                     &entries_that_should_be_excluded,
                     &remaining_entries,
-                    include_patterns,
+                    include,
                 );
             Fix::RemoveExcludeAndUseInclude {
                 include_added,
@@ -344,6 +431,32 @@ impl Report {
         };
 
         (Some(fix), entries_that_should_be_excluded)
+    }
+
+    fn enrich_excludes(
+        entries: Vec<TarHeader>,
+        exclude: Patterns,
+        buildscript_name: Option<String>,
+    ) -> (Option<Fix>, Vec<TarHeader>) {
+        let standard_excludes = standard_exclude_patterns();
+        let exclude_globs = globset_from(standard_excludes);
+        let (potential_waste, _remaining) = split_to_matched_and_unmatched(entries, &exclude_globs);
+        let (wasted_files, exclude, exclude_added) =
+            simplify_standard_excludes_and_match_against_standard_includes(
+                potential_waste,
+                exclude,
+            );
+        if wasted_files.is_empty() {
+            (None, Vec::new())
+        } else {
+            (
+                Some(Fix::EnrichedExclude {
+                    exclude,
+                    exclude_added,
+                }),
+                wasted_files,
+            )
+        }
     }
 }
 
@@ -369,8 +482,8 @@ impl From<TaskResult> for Report {
                         (Some(_includes), None, _build) => unimplemented!(
                         "allow everything, assuming they know what they are doing, but flag tests"
                     ),
-                        (None, Some(_excludes), _build) => {
-                            unimplemented!("check for accidental includes")
+                        (None, Some(excludes), build) => {
+                            Self::enrich_excludes(entries_meta_data, excludes, build)
                         }
                         (None, None, build) => {
                             Self::standard_includes(entries_meta_data, selected_entries, build)
@@ -460,6 +573,7 @@ mod from_extract_crate {
     #[test]
     fn mozjs() {
         // todo: filter tests, benches, examples, image file formats, docs, allow everything in src/ , but be aware of tests/specs, implicit imports Cargo.* being explicit
+        // todo: check lw-webdriver-0.1.5/ for binaries
         assert_eq!(
             Report::from(TaskResult::from(MOZJS)),
             Report::Version {

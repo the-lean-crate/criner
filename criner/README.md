@@ -8,6 +8,11 @@
 * [ ] Graceful shutdown on Ctrl+C
   * The current implementation relies on the database to handle aborted writes, and is no problem for that reason. However, it would be nice to have
     A well-behaving program.
+    
+## Limitations of Waste Reporting
+
+* does only know about the presence of build scripts, but doesn't understand them
+* does not know about included blobs and strings using `include_str!` and `include_bytes!`
 
 ## Lessons learned
 
