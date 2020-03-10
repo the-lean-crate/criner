@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use std::path::Path;
 
 mod report;
-pub use report::Report;
+pub use report::*;
 
 pub struct Generator;
 
@@ -66,3 +66,6 @@ impl super::generic::Generator for Generator {
         Ok(report)
     }
 }
+
+#[cfg(test)]
+mod report_from_extract_crate_test;

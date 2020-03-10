@@ -2,11 +2,11 @@ use super::{Fix, Report};
 use crate::model::TaskResult;
 
 const GNIR: &[u8] =
-    include_bytes!("../../../../../tests/fixtures/gnir-0.14.0-alpha3-extract_crate-1.0.0.bin");
+    include_bytes!("../../../../tests/fixtures/gnir-0.14.0-alpha3-extract_crate-1.0.0.bin");
 const SOVRIN: &[u8] =
-    include_bytes!("../../../../../tests/fixtures/sovrin-client.0.1.0-179-extract_crate-1.0.0.bin");
+    include_bytes!("../../../../tests/fixtures/sovrin-client.0.1.0-179-extract_crate-1.0.0.bin");
 const MOZJS: &[u8] =
-    include_bytes!("../../../../../tests/fixtures/mozjs_sys-0.67.1-extract_crate-1.0.0.bin");
+    include_bytes!("../../../../tests/fixtures/mozjs_sys-0.67.1-extract_crate-1.0.0.bin");
 
 #[test]
 fn gnir() {

@@ -537,6 +537,3 @@ impl Default for Report {
         Report::None
     }
 }
-
-#[cfg(test)]
-mod from_extract_crate_test;
