@@ -68,4 +68,4 @@ impl super::generic::Generator for Generator {
 }
 
 #[cfg(test)]
-mod report_from_extract_crate_test;
+mod report_test;
