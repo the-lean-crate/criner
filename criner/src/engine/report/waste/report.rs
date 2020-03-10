@@ -14,6 +14,7 @@ pub enum Fix {
     EnrichedExclude {
         exclude: Patterns,
         exclude_added: Patterns,
+        has_build_script: bool,
     },
     NewInclude {
         include: Patterns,
@@ -435,9 +436,16 @@ impl Report {
 
     fn enrich_excludes(
         entries: Vec<TarHeader>,
+        entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
         exclude: Patterns,
         buildscript_name: Option<String>,
     ) -> (Option<Fix>, Vec<TarHeader>) {
+        let has_build_script = find_in_entries(
+            &entries_with_buffer,
+            &entries,
+            &buildscript_name.unwrap_or_else(|| "build.rs".into()),
+        )
+        .is_some();
         let standard_excludes = standard_exclude_patterns();
         let exclude_globs = globset_from(standard_excludes);
         let (potential_waste, _remaining) = split_to_matched_and_unmatched(entries, &exclude_globs);
@@ -453,6 +461,7 @@ impl Report {
                 Some(Fix::EnrichedExclude {
                     exclude,
                     exclude_added,
+                    has_build_script,
                 }),
                 wasted_files,
             )
@@ -482,9 +491,12 @@ impl From<TaskResult> for Report {
                         (Some(_includes), None, _build) => unimplemented!(
                         "allow everything, assuming they know what they are doing, but flag tests"
                     ),
-                        (None, Some(excludes), build) => {
-                            Self::enrich_excludes(entries_meta_data, excludes, build)
-                        }
+                        (None, Some(excludes), build) => Self::enrich_excludes(
+                            entries_meta_data,
+                            selected_entries,
+                            excludes,
+                            build,
+                        ),
                         (None, None, build) => {
                             Self::standard_includes(entries_meta_data, selected_entries, build)
                         }
