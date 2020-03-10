@@ -2,7 +2,7 @@
 
 ## Tasks
 
-* [ ] investigate if negation patterns (-> `!foo.rs`) can be used and to what extent.
+* [ ] Use negation patterns where possible - useful for excluding unwanted tests, and for handling exclude-include crates
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down
    * Futures has a wrapper to catch panics, even though we don't use it yet. A panic only brings down the future that panics, not the entire program.
 * [ ] Graceful shutdown on Ctrl+C

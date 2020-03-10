@@ -90,16 +90,16 @@ pub async fn non_blocking(
                         assets_dir.clone(),
                         startup_time,
                     )
+                    .await?;
+                    stage::report::generate(
+                        db.clone(),
+                        progress.add_child("Reports"),
+                        assets_dir.clone(),
+                        deadline,
+                        cpu_o_bound_processors,
+                        pool.clone(),
+                    )
                     .await
-                    // stage::report::generate(
-                    //     db.clone(),
-                    //     progress.add_child("Reports"),
-                    //     assets_dir.clone(),
-                    //     deadline,
-                    //     cpu_o_bound_processors,
-                    //     pool.clone(),
-                    // )
-                    // .await
                 }
             }
         },
