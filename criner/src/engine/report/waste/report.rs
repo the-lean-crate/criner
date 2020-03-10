@@ -209,12 +209,13 @@ fn simplify_standard_includes(
     includes: &'static [&'static str],
     entries: &[TarHeader],
 ) -> Patterns {
+    let is_recursive_glob = |p: &str| p.contains("**");
     let mut out_patterns: Vec<_> = includes
         .iter()
-        .filter(|p| p.contains("**"))
+        .filter(|p| is_recursive_glob(*p))
         .map(|p| p.to_string())
         .collect();
-    for pattern in includes.iter().filter(|p| !p.contains("**")) {
+    for pattern in includes.iter().filter(|p| !is_recursive_glob(p)) {
         let matcher = globset::Glob::new(pattern)
             .expect("valid pattern")
             .compile_matcher();
