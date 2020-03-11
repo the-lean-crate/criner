@@ -73,6 +73,8 @@ impl std::ops::AddAssign for VersionInfo {
     }
 }
 
+pub type Dict<T> = BTreeMap<String, T>;
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum Report {
     Version {
@@ -87,17 +89,17 @@ pub enum Report {
         crate_name: String,
         total_size_in_bytes: u64,
         total_files: u64,
-        info_by_version: BTreeMap<String, VersionInfo>,
-        wasted_by_extension: BTreeMap<String, AggregateFileInfo>,
+        info_by_version: Dict<VersionInfo>,
+        wasted_by_extension: Dict<AggregateFileInfo>,
     },
 }
 
 const NO_EXT_MARKER: &str = "<NO_EXT>";
 
 fn merge_vec_into_map_by_extension(
-    initial: BTreeMap<String, AggregateFileInfo>,
+    initial: Dict<AggregateFileInfo>,
     from: Vec<WastedFile>,
-) -> BTreeMap<String, AggregateFileInfo> {
+) -> Dict<AggregateFileInfo> {
     from.into_iter().fold(initial, |mut m, e| {
         let entry = m
             .entry(
@@ -113,14 +115,14 @@ fn merge_vec_into_map_by_extension(
     })
 }
 
-fn into_map_by_extension(from: Vec<WastedFile>) -> BTreeMap<String, AggregateFileInfo> {
+fn into_map_by_extension(from: Vec<WastedFile>) -> Dict<AggregateFileInfo> {
     merge_vec_into_map_by_extension(BTreeMap::new(), from)
 }
 
-fn merge_map_into_map<T: std::ops::AddAssign + Default>(
-    lhs: BTreeMap<String, T>,
-    rhs: BTreeMap<String, T>,
-) -> BTreeMap<String, T> {
+fn merge_map_into_map<T>(lhs: Dict<T>, rhs: Dict<T>) -> Dict<T>
+where
+    T: std::ops::AddAssign + Default,
+{
     rhs.into_iter().fold(lhs, |mut m, (k, v)| {
         let entry = m.entry(k).or_insert_with(Default::default);
         entry.add_assign(v);
