@@ -5,6 +5,7 @@ use crate::{
 use async_trait::async_trait;
 use serde_derive::Deserialize;
 use std::collections::BTreeSet;
+use std::ops::AddAssign;
 use std::{
     collections::BTreeMap,
     path::{Path, PathBuf},
@@ -57,10 +58,24 @@ pub struct AggregateFileInfo {
     pub total_files: u64,
 }
 
+impl std::ops::AddAssign for AggregateFileInfo {
+    fn add_assign(&mut self, rhs: Self) {
+        self.total_bytes += rhs.total_bytes;
+        self.total_files += rhs.total_files;
+    }
+}
+
 #[derive(Default, Debug, PartialEq, Clone)]
 pub struct VersionInfo {
     pub all: AggregateFileInfo,
     pub waste: AggregateFileInfo,
+}
+
+impl std::ops::AddAssign for VersionInfo {
+    fn add_assign(&mut self, rhs: Self) {
+        self.all += rhs.all;
+        self.waste += rhs.waste;
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -107,29 +122,13 @@ fn into_map_by_extension(from: Vec<WastedFile>) -> BTreeMap<String, AggregateFil
     merge_vec_into_map_by_extension(BTreeMap::new(), from)
 }
 
-// TODO: generalize with what's below
-fn merge_map_into_map_by_extension(
-    lhs: BTreeMap<String, AggregateFileInfo>,
-    rhs: BTreeMap<String, AggregateFileInfo>,
-) -> BTreeMap<String, AggregateFileInfo> {
+fn merge_map_into_map<T: std::ops::AddAssign + Default>(
+    lhs: BTreeMap<String, T>,
+    rhs: BTreeMap<String, T>,
+) -> BTreeMap<String, T> {
     rhs.into_iter().fold(lhs, |mut m, (k, v)| {
         let entry = m.entry(k).or_insert_with(Default::default);
-        entry.total_files += v.total_files;
-        entry.total_bytes += v.total_bytes;
-        m
-    })
-}
-
-fn merge_map_into_info_by_version(
-    lhs: BTreeMap<String, VersionInfo>,
-    rhs: BTreeMap<String, VersionInfo>,
-) -> BTreeMap<String, VersionInfo> {
-    rhs.into_iter().fold(lhs, |mut m, (k, v)| {
-        let entry = m.entry(k).or_insert_with(Default::default);
-        entry.all.total_files += v.all.total_files;
-        entry.all.total_bytes += v.all.total_bytes;
-        entry.waste.total_files += v.waste.total_files;
-        entry.waste.total_bytes += v.waste.total_bytes;
+        entry.add_assign(v);
         m
     })
 }
@@ -209,7 +208,7 @@ impl crate::engine::report::generic::Aggregate for Report {
                 crate_name: lhs_crate_name,
                 total_size_in_bytes: lhs_tsb + rhs_tsb,
                 total_files: lhs_tf + rhs_tf,
-                info_by_version: merge_map_into_info_by_version(
+                info_by_version: merge_map_into_map(
                     info_by_version,
                     version_to_new_version_map(crate_version, rhs_tsb, rhs_tf, &wasted_files),
                 ),
@@ -237,8 +236,8 @@ impl crate::engine::report::generic::Aggregate for Report {
                 crate_name: lhs_crate_name,
                 total_size_in_bytes: lhs_tsb + rhs_tsb,
                 total_files: lhs_tf + rhs_tf,
-                info_by_version: merge_map_into_info_by_version(lhs_ibv, rhs_ibv),
-                wasted_by_extension: merge_map_into_map_by_extension(lhs_wbe, rhs_wbe),
+                info_by_version: merge_map_into_map(lhs_ibv, rhs_ibv),
+                wasted_by_extension: merge_map_into_map(lhs_wbe, rhs_wbe),
             },
             (version @ Version { .. }, krate @ Crate { .. }) => krate.merge(version),
         }
