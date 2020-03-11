@@ -5,7 +5,6 @@ use crate::{
 use async_trait::async_trait;
 use serde_derive::Deserialize;
 use std::collections::BTreeSet;
-use std::ops::AddAssign;
 use std::{
     collections::BTreeMap,
     path::{Path, PathBuf},
@@ -53,24 +52,10 @@ pub struct AggregateFileInfo {
     pub total_files: u64,
 }
 
-impl std::ops::AddAssign for AggregateFileInfo {
-    fn add_assign(&mut self, rhs: Self) {
-        self.total_bytes += rhs.total_bytes;
-        self.total_files += rhs.total_files;
-    }
-}
-
 #[derive(Default, Debug, PartialEq, Clone)]
 pub struct VersionInfo {
     pub all: AggregateFileInfo,
     pub waste: AggregateFileInfo,
-}
-
-impl std::ops::AddAssign for VersionInfo {
-    fn add_assign(&mut self, rhs: Self) {
-        self.all += rhs.all;
-        self.waste += rhs.waste;
-    }
 }
 
 pub type Dict<T> = BTreeMap<String, T>;
@@ -94,91 +79,110 @@ pub enum Report {
     },
 }
 
-const NO_EXT_MARKER: &str = "<NO_EXT>";
+mod merge {
+    use super::{AggregateFileInfo, Dict, Report, VersionInfo, WastedFile};
+    use std::{collections::BTreeMap, path::PathBuf};
 
-fn merge_vec_into_map_by_extension(
-    initial: Dict<AggregateFileInfo>,
-    from: Vec<WastedFile>,
-) -> Dict<AggregateFileInfo> {
-    from.into_iter().fold(initial, |mut m, e| {
-        let entry = m
-            .entry(
-                PathBuf::from(e.0)
-                    .extension()
-                    .and_then(|oss| oss.to_str().map(|s| s.to_string()))
-                    .unwrap_or_else(|| NO_EXT_MARKER.to_string()),
-            )
-            .or_insert_with(Default::default);
-        entry.total_bytes += e.1;
-        entry.total_files += 1;
-        m
-    })
-}
+    impl std::ops::AddAssign for AggregateFileInfo {
+        fn add_assign(&mut self, rhs: Self) {
+            self.total_bytes += rhs.total_bytes;
+            self.total_files += rhs.total_files;
+        }
+    }
 
-fn into_map_by_extension(from: Vec<WastedFile>) -> Dict<AggregateFileInfo> {
-    merge_vec_into_map_by_extension(BTreeMap::new(), from)
-}
+    impl std::ops::AddAssign for VersionInfo {
+        fn add_assign(&mut self, rhs: Self) {
+            self.all += rhs.all;
+            self.waste += rhs.waste;
+        }
+    }
 
-fn merge_map_into_map<T>(lhs: Dict<T>, rhs: Dict<T>) -> Dict<T>
-where
-    T: std::ops::AddAssign + Default,
-{
-    rhs.into_iter().fold(lhs, |mut m, (k, v)| {
-        let entry = m.entry(k).or_insert_with(Default::default);
-        entry.add_assign(v);
-        m
-    })
-}
+    const NO_EXT_MARKER: &str = "<NO_EXT>";
 
-fn byte_count(files: &[WastedFile]) -> u64 {
-    files.iter().map(|e| e.1).sum::<u64>()
-}
+    pub fn merge_vec_into_map_by_extension(
+        initial: Dict<AggregateFileInfo>,
+        from: Vec<WastedFile>,
+    ) -> Dict<AggregateFileInfo> {
+        from.into_iter().fold(initial, |mut m, e| {
+            let entry = m
+                .entry(
+                    PathBuf::from(e.0)
+                        .extension()
+                        .and_then(|oss| oss.to_str().map(|s| s.to_string()))
+                        .unwrap_or_else(|| NO_EXT_MARKER.to_string()),
+                )
+                .or_insert_with(Default::default);
+            entry.total_bytes += e.1;
+            entry.total_files += 1;
+            m
+        })
+    }
 
-fn version_to_new_version_map(
-    crate_version: String,
-    total_size_in_bytes: u64,
-    total_files: u64,
-    wasted_files: &[WastedFile],
-) -> BTreeMap<String, VersionInfo> {
-    let mut m = BTreeMap::new();
-    m.insert(
-        crate_version,
-        VersionInfo {
-            all: AggregateFileInfo {
-                total_bytes: total_size_in_bytes,
-                total_files,
-            },
-            waste: AggregateFileInfo {
-                total_bytes: byte_count(&wasted_files),
-                total_files: wasted_files.len() as u64,
-            },
-        },
-    );
-    m
-}
+    pub fn into_map_by_extension(from: Vec<WastedFile>) -> Dict<AggregateFileInfo> {
+        merge_vec_into_map_by_extension(BTreeMap::new(), from)
+    }
 
-fn crate_from_version(version: Report) -> Report {
-    match version {
-        Report::Version {
-            crate_name,
+    pub fn merge_map_into_map<T>(lhs: Dict<T>, rhs: Dict<T>) -> Dict<T>
+    where
+        T: std::ops::AddAssign + Default,
+    {
+        rhs.into_iter().fold(lhs, |mut m, (k, v)| {
+            let entry = m.entry(k).or_insert_with(Default::default);
+            entry.add_assign(v);
+            m
+        })
+    }
+
+    pub fn byte_count(files: &[WastedFile]) -> u64 {
+        files.iter().map(|e| e.1).sum::<u64>()
+    }
+
+    pub fn version_to_new_version_map(
+        crate_version: String,
+        total_size_in_bytes: u64,
+        total_files: u64,
+        wasted_files: &[WastedFile],
+    ) -> Dict<VersionInfo> {
+        let mut m = BTreeMap::new();
+        m.insert(
             crate_version,
-            total_size_in_bytes,
-            total_files,
-            wasted_files,
-            suggested_fix: _,
-        } => Report::Crate {
-            crate_name,
-            info_by_version: version_to_new_version_map(
+            VersionInfo {
+                all: AggregateFileInfo {
+                    total_bytes: total_size_in_bytes,
+                    total_files,
+                },
+                waste: AggregateFileInfo {
+                    total_bytes: byte_count(&wasted_files),
+                    total_files: wasted_files.len() as u64,
+                },
+            },
+        );
+        m
+    }
+
+    pub fn crate_from_version(version: Report) -> Report {
+        match version {
+            Report::Version {
+                crate_name,
                 crate_version,
                 total_size_in_bytes,
                 total_files,
-                &wasted_files,
-            ),
-            total_size_in_bytes,
-            total_files,
-            wasted_by_extension: into_map_by_extension(wasted_files),
-        },
-        _ => unreachable!("must only be called with version variant"),
+                wasted_files,
+                suggested_fix: _,
+            } => Report::Crate {
+                crate_name,
+                info_by_version: version_to_new_version_map(
+                    crate_version,
+                    total_size_in_bytes,
+                    total_files,
+                    &wasted_files,
+                ),
+                total_size_in_bytes,
+                total_files,
+                wasted_by_extension: into_map_by_extension(wasted_files),
+            },
+            _ => unreachable!("must only be called with version variant"),
+        }
     }
 }
 
@@ -187,7 +191,9 @@ impl crate::engine::report::generic::Aggregate for Report {
     fn merge(self, other: Self) -> Self {
         use Report::*;
         match (self, other) {
-            (lhs @ Version { .. }, rhs @ Version { .. }) => crate_from_version(lhs).merge(rhs),
+            (lhs @ Version { .. }, rhs @ Version { .. }) => {
+                merge::crate_from_version(lhs).merge(rhs)
+            }
             (version @ Version { .. }, krate @ Crate { .. }) => krate.merge(version),
             (
                 Crate {
@@ -209,11 +215,16 @@ impl crate::engine::report::generic::Aggregate for Report {
                 crate_name: lhs_crate_name,
                 total_size_in_bytes: lhs_tsb + rhs_tsb,
                 total_files: lhs_tf + rhs_tf,
-                info_by_version: merge_map_into_map(
+                info_by_version: merge::merge_map_into_map(
                     info_by_version,
-                    version_to_new_version_map(crate_version, rhs_tsb, rhs_tf, &wasted_files),
+                    merge::version_to_new_version_map(
+                        crate_version,
+                        rhs_tsb,
+                        rhs_tf,
+                        &wasted_files,
+                    ),
                 ),
-                wasted_by_extension: merge_vec_into_map_by_extension(
+                wasted_by_extension: merge::merge_vec_into_map_by_extension(
                     wasted_by_extension,
                     wasted_files,
                 ),
@@ -237,8 +248,8 @@ impl crate::engine::report::generic::Aggregate for Report {
                 crate_name: lhs_crate_name,
                 total_size_in_bytes: lhs_tsb + rhs_tsb,
                 total_files: lhs_tf + rhs_tf,
-                info_by_version: merge_map_into_map(lhs_ibv, rhs_ibv),
-                wasted_by_extension: merge_map_into_map(lhs_wbe, rhs_wbe),
+                info_by_version: merge::merge_map_into_map(lhs_ibv, rhs_ibv),
+                wasted_by_extension: merge::merge_map_into_map(lhs_wbe, rhs_wbe),
             },
         }
     }
