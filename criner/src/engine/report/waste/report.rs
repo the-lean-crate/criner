@@ -12,7 +12,7 @@ use std::{
 
 pub type Patterns = Vec<String>;
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub enum Fix {
     EnrichedInclude {
         include: Patterns,
@@ -51,13 +51,13 @@ struct CargoConfig {
 
 type WastedFile = (String, u64);
 
-#[derive(Debug, PartialEq)]
+#[derive(Default, Debug, PartialEq, Clone)]
 pub struct ExtensionInfo {
     pub total_bytes: u64,
     pub total_files: u64,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Report {
     Version {
         total_size_in_bytes: u64,
@@ -72,8 +72,41 @@ pub enum Report {
     },
 }
 
-fn into_map_by_extension(_from: Vec<WastedFile>) -> BTreeMap<String, ExtensionInfo> {
-    unimplemented!("vec to map")
+const NO_EXT_MARKER: &str = "<NO_EXT>";
+
+fn merge_vec_into_map_by_extension(
+    initial: BTreeMap<String, ExtensionInfo>,
+    from: Vec<WastedFile>,
+) -> BTreeMap<String, ExtensionInfo> {
+    from.into_iter().fold(initial, |mut m, e| {
+        let entry = m
+            .entry(
+                PathBuf::from(e.0)
+                    .extension()
+                    .and_then(|oss| oss.to_str().map(|s| s.to_string()))
+                    .unwrap_or_else(|| NO_EXT_MARKER.to_string()),
+            )
+            .or_insert_with(Default::default);
+        entry.total_bytes += e.1;
+        entry.total_files += 1;
+        m
+    })
+}
+
+fn into_map_by_extension(from: Vec<WastedFile>) -> BTreeMap<String, ExtensionInfo> {
+    merge_vec_into_map_by_extension(BTreeMap::new(), from)
+}
+
+fn merge_map_into_map_by_extension(
+    lhs: BTreeMap<String, ExtensionInfo>,
+    rhs: BTreeMap<String, ExtensionInfo>,
+) -> BTreeMap<String, ExtensionInfo> {
+    rhs.into_iter().fold(lhs, |mut m, (k, v)| {
+        let entry = m.entry(k).or_insert_with(Default::default);
+        entry.total_files += v.total_files;
+        entry.total_bytes += v.total_bytes;
+        m
+    })
 }
 
 #[async_trait]
@@ -95,8 +128,42 @@ impl crate::engine::report::generic::Aggregate for Report {
                 wasted_by_extension: into_map_by_extension(wasted_files),
             }
             .merge(rhs),
-            (Crate { .. }, Version { .. }) => unimplemented!("Crate + Version"),
-            (Crate { .. }, Crate { .. }) => unimplemented!("Crate + Crate"),
+            (
+                Crate {
+                    total_size_in_bytes: lhs_tsb,
+                    total_files: lhs_tf,
+                    wasted_by_extension,
+                },
+                Version {
+                    total_size_in_bytes: rhs_tsb,
+                    total_files: rhs_tf,
+                    wasted_files,
+                    ..
+                },
+            ) => Crate {
+                total_size_in_bytes: lhs_tsb + rhs_tsb,
+                total_files: lhs_tf + rhs_tf,
+                wasted_by_extension: merge_vec_into_map_by_extension(
+                    wasted_by_extension,
+                    wasted_files,
+                ),
+            },
+            (
+                Crate {
+                    total_size_in_bytes: lhs_tsb,
+                    total_files: lhs_tf,
+                    wasted_by_extension: lhs_wbe,
+                },
+                Crate {
+                    total_size_in_bytes: rhs_tsb,
+                    total_files: rhs_tf,
+                    wasted_by_extension: rhs_wbe,
+                },
+            ) => Crate {
+                total_size_in_bytes: lhs_tsb + rhs_tsb,
+                total_files: lhs_tf + rhs_tf,
+                wasted_by_extension: merge_map_into_map_by_extension(lhs_wbe, rhs_wbe),
+            },
             (version @ Version { .. }, krate @ Crate { .. }) => krate.merge(version),
         }
     }

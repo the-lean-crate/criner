@@ -1,3 +1,99 @@
+mod merge {
+    use super::super::{ExtensionInfo, Fix, Report};
+    use crate::engine::report::generic::Aggregate;
+    use common_macros::b_tree_map;
+
+    #[test]
+    fn crate_version_and_version_crate() {
+        let version = Report::Version {
+            total_size_in_bytes: 1,
+            total_files: 4,
+            wasted_files: vec![("a.a".into(), 20)],
+            suggested_fix: Some(Fix::RemoveExclude),
+        };
+
+        let krate = Report::Crate {
+            total_size_in_bytes: 3,
+            total_files: 9,
+            wasted_by_extension: b_tree_map! {
+                "a".into()  => ExtensionInfo {total_files: 2, total_bytes: 60},
+                "b".into()  => ExtensionInfo {total_files: 3, total_bytes: 80},
+                "c".into()  => ExtensionInfo {total_files: 1, total_bytes: 90},
+            },
+        };
+        assert_eq!(version.clone().merge(krate.clone()), krate.merge(version));
+    }
+
+    #[test]
+    fn crate_and_crate() {
+        assert_eq!(
+            Report::Crate {
+                total_size_in_bytes: 3,
+                total_files: 9,
+                wasted_by_extension: b_tree_map! {
+                    "a".into()  => ExtensionInfo {total_files: 1, total_bytes: 10},
+                    "b".into()  => ExtensionInfo {total_files: 2, total_bytes: 20},
+                    "c".into()  => ExtensionInfo {total_files: 3, total_bytes: 30},
+                },
+            }
+            .merge(Report::Crate {
+                total_size_in_bytes: 9,
+                total_files: 3,
+                wasted_by_extension: b_tree_map! {
+                    "a".into()  => ExtensionInfo {total_files: 3, total_bytes: 30},
+                    "b".into()  => ExtensionInfo {total_files: 2, total_bytes: 20},
+                    "d".into()  => ExtensionInfo {total_files: 1, total_bytes: 10},
+                },
+            }),
+            Report::Crate {
+                total_size_in_bytes: 12,
+                total_files: 12,
+                wasted_by_extension: b_tree_map! {
+                    "a".into()  => ExtensionInfo {total_files: 4, total_bytes: 40},
+                    "b".into()  => ExtensionInfo {total_files: 4, total_bytes: 40},
+                    "c".into()  => ExtensionInfo {total_files: 3, total_bytes: 30},
+                    "d".into()  => ExtensionInfo {total_files: 1, total_bytes: 10},
+                },
+            }
+        );
+    }
+
+    #[test]
+    fn two_versions() {
+        assert_eq!(
+            Report::Version {
+                total_size_in_bytes: 1,
+                total_files: 4,
+                wasted_files: vec![
+                    ("a.a".into(), 20),
+                    ("b/a.b".into(), 20),
+                    ("c/a.b".into(), 10)
+                ],
+                suggested_fix: Some(Fix::RemoveExclude)
+            }
+            .merge(Report::Version {
+                total_size_in_bytes: 2,
+                total_files: 5,
+                wasted_files: vec![
+                    ("a.a".into(), 40),
+                    ("c/a.b".into(), 50),
+                    ("d/a.c".into(), 90)
+                ],
+                suggested_fix: None
+            }),
+            Report::Crate {
+                total_size_in_bytes: 3,
+                total_files: 9,
+                wasted_by_extension: b_tree_map! {
+                    "a".into()  => ExtensionInfo {total_files: 2, total_bytes: 60},
+                    "b".into()  => ExtensionInfo {total_files: 3, total_bytes: 80},
+                    "c".into()  => ExtensionInfo {total_files: 1, total_bytes: 90},
+                },
+            }
+        );
+    }
+}
+
 mod from_extracted_crate {
     use super::super::{Fix, Report};
     use crate::model::TaskResult;
