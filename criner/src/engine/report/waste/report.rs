@@ -155,34 +155,38 @@ fn version_to_new_version_map(
     m
 }
 
+fn crate_from_version(version: Report) -> Report {
+    match version {
+        Report::Version {
+            crate_name,
+            crate_version,
+            total_size_in_bytes,
+            total_files,
+            wasted_files,
+            suggested_fix: _,
+        } => Report::Crate {
+            crate_name,
+            info_by_version: version_to_new_version_map(
+                crate_version,
+                total_size_in_bytes,
+                total_files,
+                &wasted_files,
+            ),
+            total_size_in_bytes,
+            total_files,
+            wasted_by_extension: into_map_by_extension(wasted_files),
+        },
+        _ => unreachable!("must only be called with version variant"),
+    }
+}
+
 #[async_trait]
 impl crate::engine::report::generic::Aggregate for Report {
     fn merge(self, other: Self) -> Self {
         use Report::*;
         match (self, other) {
-            (
-                Version {
-                    crate_name,
-                    crate_version,
-                    total_size_in_bytes,
-                    total_files,
-                    wasted_files,
-                    suggested_fix: _,
-                },
-                rhs @ Version { .. },
-            ) => Report::Crate {
-                crate_name,
-                info_by_version: version_to_new_version_map(
-                    crate_version,
-                    total_size_in_bytes,
-                    total_files,
-                    &wasted_files,
-                ),
-                total_size_in_bytes,
-                total_files,
-                wasted_by_extension: into_map_by_extension(wasted_files),
-            }
-            .merge(rhs),
+            (lhs @ Version { .. }, rhs @ Version { .. }) => crate_from_version(lhs).merge(rhs),
+            (version @ Version { .. }, krate @ Crate { .. }) => krate.merge(version),
             (
                 Crate {
                     crate_name: lhs_crate_name,
@@ -234,7 +238,6 @@ impl crate::engine::report::generic::Aggregate for Report {
                 info_by_version: merge_map_into_map(lhs_ibv, rhs_ibv),
                 wasted_by_extension: merge_map_into_map(lhs_wbe, rhs_wbe),
             },
-            (version @ Version { .. }, krate @ Crate { .. }) => krate.merge(version),
         }
     }
 
