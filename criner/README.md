@@ -2,6 +2,7 @@
 
 ## Tasks
 
+* [ ] Add schedule WAL truncation every few minutes to avoid WALs getting huge and slowing down all gets (autocheckpoint is too passive for criner)
 * [ ] Look at build scripts and extract 'rerun-if-changed' and other strings that might indicate file usage
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down
    * Futures has a wrapper to catch panics, even though we don't use it yet. A panic only brings down the future that panics, not the entire program.

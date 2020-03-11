@@ -4,11 +4,41 @@ mod from_extracted_crate {
 
     const GNIR: &[u8] =
         include_bytes!("../../../../tests/fixtures/gnir-0.14.0-alpha3-extract_crate-1.0.0.bin");
-    const SOVRIN: &[u8] =
-        include_bytes!("../../../../tests/fixtures/sovrin-client.0.1.0-179-extract_crate-1.0.0.bin");
+    const SOVRIN: &[u8] = include_bytes!(
+        "../../../../tests/fixtures/sovrin-client.0.1.0-179-extract_crate-1.0.0.bin"
+    );
     const MOZJS: &[u8] =
         include_bytes!("../../../../tests/fixtures/mozjs_sys-0.67.1-extract_crate-1.0.0.bin");
+    const COOKIE_FACTORY: &[u8] =
+        include_bytes!("../../../../tests/fixtures/cookie_factory-0.3.1-extract_crate-0.3.1.bin");
 
+    #[test]
+    fn cookie_factory() {
+        assert_eq!(
+            Report::from(TaskResult::from(COOKIE_FACTORY)),
+            Report::Version {
+                total_size_in_bytes: 74569,
+                total_files: 15,
+                wasted_files: vec![(".cargo_vcs_info.json".into(), 74)],
+                suggested_fix: Some(Fix::EnrichedInclude {
+                    include: [
+                        "LICENSE",
+                        "README.md",
+                        ".gitignore",
+                        "src/*.rs",
+                        "src/combinator/*.rs",
+                        "example/*.rs"
+                    ]
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect(),
+                    include_added: vec![],
+                    include_removed: vec!["Cargo.toml".into()],
+                    has_build_script: true
+                })
+            }
+        );
+    }
     #[test]
     fn gnir() {
         assert_eq!(

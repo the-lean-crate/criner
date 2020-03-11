@@ -11,6 +11,12 @@ pub type Patterns = Vec<String>;
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum Fix {
+    EnrichedInclude {
+        include: Patterns,
+        include_added: Patterns,
+        include_removed: Patterns,
+        has_build_script: bool,
+    },
     EnrichedExclude {
         exclude: Patterns,
         exclude_added: Patterns,
@@ -309,38 +315,51 @@ fn find_in_entries<'buffer>(
         })
 }
 
-fn simplify_standard_excludes_and_match_against_standard_includes(
-    mut potential_waste: Vec<TarHeader>,
-    mut existing_exclude: Patterns,
+fn matches_in_set_a_but_not_in_set_b(
+    mut initial_a: Patterns,
+    set_a: &[&'static str],
+    set_b: &globset::GlobSet,
+    mut entries: Vec<TarHeader>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
-    let initial_exclude_len = existing_exclude.len();
-    let include_globs = globset_from(standard_include_patterns());
-    let exclude = standard_exclude_patterns();
-    for exclude_pattern in exclude {
+    let set_a_len = initial_a.len();
+    for exclude_pattern in set_a {
         let exclude_glob = make_glob(exclude_pattern).compile_matcher();
-        if potential_waste
+        if entries
             .iter()
             .any(|e| exclude_glob.is_match(tar_path_to_utf8_str(&e.path)))
         {
-            if potential_waste
+            if entries
                 .iter()
-                .any(|e| include_globs.is_match(tar_path_to_utf8_str(&e.path)))
+                .any(|e| set_b.is_match(tar_path_to_utf8_str(&e.path)))
             {
-                potential_waste.retain(|e| !exclude_glob.is_match(tar_path_to_utf8_str(&e.path)));
-                if potential_waste.is_empty() {
+                entries.retain(|e| !exclude_glob.is_match(tar_path_to_utf8_str(&e.path)));
+                if entries.is_empty() {
                     break;
                 }
             } else {
-                existing_exclude.push(exclude_pattern.to_string());
+                initial_a.push(exclude_pattern.to_string());
             }
         }
     }
 
-    let new_excludes = existing_exclude
-        .get(initial_exclude_len..)
+    let new_excludes = initial_a
+        .get(set_a_len..)
         .map(|v| v.to_vec())
         .unwrap_or_else(Vec::new);
-    (potential_waste, existing_exclude, new_excludes)
+    (entries, initial_a, new_excludes)
+}
+
+fn simplify_standard_excludes_and_match_against_standard_includes(
+    potential_waste: Vec<TarHeader>,
+    existing_exclude: Patterns,
+) -> (Vec<TarHeader>, Patterns, Patterns) {
+    let include_globs = globset_from(standard_include_patterns());
+    matches_in_set_a_but_not_in_set_b(
+        existing_exclude,
+        standard_exclude_patterns(),
+        &include_globs,
+        potential_waste,
+    )
 }
 
 impl Report {
@@ -433,6 +452,46 @@ impl Report {
         (Some(fix), entries_that_should_be_excluded)
     }
 
+    fn enrich_includes(
+        entries: Vec<TarHeader>,
+        entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
+        mut include: Patterns,
+        buildscript_name: Option<String>,
+    ) -> (Option<Fix>, Vec<TarHeader>) {
+        let mut include_removed = Vec::new();
+        let has_build_script = find_in_entries(
+            &entries_with_buffer,
+            &entries,
+            &buildscript_name.unwrap_or_else(|| "Cargo.toml".into()),
+        )
+        .is_some();
+        filter_implicit_includes(&mut include, &mut include_removed);
+        let include_globs = globset_from(&include);
+        let (unmatched_files, include, include_added) = matches_in_set_a_but_not_in_set_b(
+            include,
+            standard_include_patterns(),
+            &include_globs,
+            entries,
+        );
+
+        let include_globs = globset_from(&include);
+        let (_remaining_files, wasted_files) =
+            split_to_matched_and_unmatched(unmatched_files, &include_globs);
+        if wasted_files.is_empty() {
+            (None, Vec::new())
+        } else {
+            (
+                Some(Fix::EnrichedInclude {
+                    include,
+                    include_removed,
+                    include_added,
+                    has_build_script,
+                }),
+                wasted_files,
+            )
+        }
+    }
+
     fn enrich_excludes(
         entries: Vec<TarHeader>,
         entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
@@ -487,9 +546,12 @@ impl From<TaskResult> for Report {
                                 excludes,
                             )
                         }
-                        (Some(_includes), None, _build) => unimplemented!(
-                        "allow everything, assuming they know what they are doing, but flag tests"
-                    ),
+                        (Some(includes), None, build) => Self::enrich_includes(
+                            entries_meta_data,
+                            selected_entries,
+                            includes,
+                            build,
+                        ),
                         (None, Some(excludes), build) => Self::enrich_excludes(
                             entries_meta_data,
                             selected_entries,
