@@ -1,19 +1,23 @@
 use super::super::{Fix, Report};
 use crate::model::TaskResult;
+use std::path::Path;
 
-const GNIR: &[u8] =
-    include_bytes!("../../../../../tests/fixtures/gnir-0.14.0-alpha3-extract_crate-1.0.0.bin");
-const SOVRIN: &[u8] =
-    include_bytes!("../../../../../tests/fixtures/sovrin-client.0.1.0-179-extract_crate-1.0.0.bin");
-const MOZJS: &[u8] =
-    include_bytes!("../../../../../tests/fixtures/mozjs_sys-0.67.1-extract_crate-1.0.0.bin");
-const COOKIE_FACTORY: &[u8] =
-    include_bytes!("../../../../../tests/fixtures/cookie_factory-0.3.1-extract_crate-0.3.1.bin");
+fn task_result(path: impl AsRef<Path>) -> TaskResult {
+    TaskResult::from(
+        std::fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join(path))
+            .unwrap()
+            .as_slice(),
+    )
+}
 
 #[test]
 fn cookie_factory() {
     assert_eq!(
-        Report::from_result("a", "1", TaskResult::from(COOKIE_FACTORY)),
+        Report::from_result(
+            "a",
+            "1",
+            task_result("tests/fixtures/cookie_factory-0.3.1-extract_crate-0.3.1.bin")
+        ),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -43,7 +47,7 @@ fn cookie_factory() {
 #[test]
 fn gnir() {
     assert_eq!(
-        Report::from_result("a", "1", TaskResult::from(GNIR)),
+        Report::from_result("a", "1", task_result("tests/fixtures/gnir-0.14.0-alpha3-extract_crate-1.0.0.bin")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -63,7 +67,7 @@ fn gnir() {
 #[test]
 fn sovrin_client() {
     assert_eq!(
-        Report::from_result("a", "1", TaskResult::from(SOVRIN)),
+        Report::from_result("a", "1", task_result("tests/fixtures/sovrin-client.0.1.0-179-extract_crate-1.0.0.bin")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -80,7 +84,7 @@ fn sovrin_client() {
 fn mozjs() {
     // todo: check lw-webdriver-0.1.5/ for binaries
     assert_eq!(
-        Report::from_result("a", "1", TaskResult::from(MOZJS)),
+        Report::from_result("a", "1", task_result("tests/fixtures/mozjs_sys-0.67.1-extract_crate-1.0.0.bin")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),

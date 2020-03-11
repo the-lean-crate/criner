@@ -45,12 +45,7 @@ struct Package {
     build: Option<String>,
 }
 
-#[derive(Default, Deserialize)]
-struct CargoConfig {
-    package: Option<Package>,
-}
-
-type WastedFile = (String, u64);
+pub type WastedFile = (String, u64);
 
 #[derive(Default, Debug, PartialEq, Clone)]
 pub struct AggregateFileInfo {
@@ -562,6 +557,11 @@ fn simplify_standard_excludes_and_match_against_standard_includes(
 
 impl Report {
     fn package_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> Package {
+        #[derive(Default, Deserialize)]
+        struct CargoConfig {
+            package: Option<Package>,
+        }
+
         find_in_entries(entries, &[], "Cargo.toml")
             .and_then(|(_e, v)| {
                 v.and_then(|v| {
