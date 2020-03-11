@@ -64,9 +64,17 @@ pub enum SubCommands {
         #[structopt(long, short = "f", default_value = "60s")]
         fetch_every: humantime::Duration,
 
+        /// If set, the amount of times the fetch stage will run. If set to 0, it will never run.
+        #[structopt(long, short = "F")]
+        fetch_at_most: Option<usize>,
+
         /// The time between each processing run, specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
         #[structopt(long, short = "p", default_value = "60s")]
         process_and_report_every: humantime::Duration,
+
+        /// If set, the amount of times the process & reporting stage will run. If set to 0, they will never run.
+        #[structopt(long, short = "P")]
+        process_and_report_at_most: Option<usize>,
 
         /// Path to the possibly existing database. It's used to persist all mining results.
         db_path: PathBuf,
@@ -90,4 +98,24 @@ pub enum SubCommands {
     /// A special purpose command only to be executed in special circumstances
     #[structopt(display_order = 9)]
     Migrate,
+}
+
+impl Default for SubCommands {
+    fn default() -> Self {
+        SubCommands::Mine {
+            no_gui: false,
+            fps: 3.0,
+            progress_message_scrollback_buffer_size: 100,
+            io_bound_processors: 5,
+            cpu_bound_processors: 2,
+            cpu_o_bound_processors: 10,
+            repository: None,
+            time_limit: None,
+            fetch_every: std::time::Duration::from_secs(60).into(),
+            fetch_at_most: None,
+            process_and_report_every: std::time::Duration::from_secs(60).into(),
+            process_and_report_at_most: None,
+            db_path: PathBuf::from("criner.db"),
+        }
+    }
 }

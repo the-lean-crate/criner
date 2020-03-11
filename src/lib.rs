@@ -1,25 +1,12 @@
-use std::{ops::Add, path::PathBuf};
+use std::ops::Add;
 
 mod args;
 pub mod error;
 pub use args::*;
-use std::time::Duration;
 
 pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
     use SubCommands::*;
-    let cmd = args.sub.unwrap_or_else(|| SubCommands::Mine {
-        no_gui: false,
-        fps: 3.0,
-        progress_message_scrollback_buffer_size: 100,
-        io_bound_processors: 5,
-        cpu_bound_processors: 2,
-        cpu_o_bound_processors: 10,
-        repository: None,
-        time_limit: None,
-        fetch_every: Duration::from_secs(60).into(),
-        process_and_report_every: Duration::from_secs(60).into(),
-        db_path: PathBuf::from("criner.db"),
-    });
+    let cmd = args.sub.unwrap_or_default();
     match cmd {
         #[cfg(feature = "migration")]
         Migrate => criner::migration::migrate("./criner.db"),
@@ -38,7 +25,9 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             no_gui,
             progress_message_scrollback_buffer_size,
             fetch_every,
+            fetch_at_most,
             process_and_report_every,
+            process_and_report_at_most,
         } => criner::run::blocking(
             db_path,
             repository
@@ -47,8 +36,14 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             io_bound_processors,
             cpu_bound_processors,
             cpu_o_bound_processors,
-            fetch_every.into(),
-            process_and_report_every.into(),
+            criner::run::StageRunSettings {
+                every: fetch_every.into(),
+                at_most: fetch_at_most,
+            },
+            criner::run::StageRunSettings {
+                every: process_and_report_every.into(),
+                at_most: process_and_report_at_most,
+            },
             criner::prodash::TreeOptions {
                 message_buffer_capacity: progress_message_scrollback_buffer_size,
                 ..criner::prodash::TreeOptions::default()
