@@ -5,7 +5,10 @@ use crate::{
 use async_trait::async_trait;
 use serde_derive::Deserialize;
 use std::collections::BTreeSet;
-use std::path::{Path, PathBuf};
+use std::{
+    collections::BTreeMap,
+    path::{Path, PathBuf},
+};
 
 pub type Patterns = Vec<String>;
 
@@ -48,15 +51,67 @@ struct CargoConfig {
 
 type WastedFile = (String, u64);
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(Debug, PartialEq)]
+pub struct ExtensionInfo {
+    pub total_bytes: u64,
+    pub total_files: u64,
+}
+
+#[derive(Debug, PartialEq)]
 pub enum Report {
-    None,
     Version {
         total_size_in_bytes: u64,
         total_files: u64,
         wasted_files: Vec<WastedFile>,
         suggested_fix: Option<Fix>,
     },
+    Crate {
+        total_size_in_bytes: u64,
+        total_files: u64,
+        wasted_by_extension: BTreeMap<String, ExtensionInfo>,
+    },
+}
+
+fn into_map_by_extension(_from: Vec<WastedFile>) -> BTreeMap<String, ExtensionInfo> {
+    unimplemented!("vec to map")
+}
+
+#[async_trait]
+impl crate::engine::report::generic::Aggregate for Report {
+    fn merge(self, other: Self) -> Self {
+        use Report::*;
+        match (self, other) {
+            (
+                Version {
+                    total_size_in_bytes,
+                    total_files,
+                    wasted_files,
+                    ..
+                },
+                rhs @ Version { .. },
+            ) => Report::Crate {
+                total_size_in_bytes,
+                total_files,
+                wasted_by_extension: into_map_by_extension(wasted_files),
+            }
+            .merge(rhs),
+            (Crate { .. }, Version { .. }) => unimplemented!("Crate + Version"),
+            (Crate { .. }, Crate { .. }) => unimplemented!("Crate + Crate"),
+            (version @ Version { .. }, krate @ Crate { .. }) => krate.merge(version),
+        }
+    }
+
+    async fn complete_all(self, _out_dir: PathBuf, _progress: prodash::tree::Item) -> Result<()> {
+        Ok(())
+    }
+    async fn complete_crate(
+        &mut self,
+        _out_dir: &Path,
+        _crate_name: &str,
+        _progress: &mut prodash::tree::Item,
+    ) -> Result<()> {
+        Ok(())
+    }
 }
 
 fn tar_path_to_utf8_str(mut bytes: &[u8]) -> &str {
@@ -573,30 +628,5 @@ impl From<TaskResult> for Report {
             }
             _ => unreachable!("need caller to assure we get exploded crates only"),
         }
-    }
-}
-
-#[async_trait]
-impl crate::engine::report::generic::Aggregate for Report {
-    fn merge(self, other: Self) -> Self {
-        other
-    }
-
-    async fn complete_all(self, _out_dir: PathBuf, _progress: prodash::tree::Item) -> Result<()> {
-        Ok(())
-    }
-    async fn complete_crate(
-        &mut self,
-        _out_dir: &Path,
-        _crate_name: &str,
-        _progress: &mut prodash::tree::Item,
-    ) -> Result<()> {
-        Ok(())
-    }
-}
-
-impl Default for Report {
-    fn default() -> Self {
-        Report::None
     }
 }
