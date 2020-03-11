@@ -34,15 +34,16 @@ pub enum Fix {
     RemoveExclude,
 }
 
-#[derive(Deserialize)]
+#[derive(Default, Deserialize)]
 struct Package {
     include: Option<Vec<String>>,
     exclude: Option<Vec<String>>,
     build: Option<String>,
 }
-#[derive(Deserialize)]
+
+#[derive(Default, Deserialize)]
 struct CargoConfig {
-    package: Package,
+    package: Option<Package>,
 }
 
 type WastedFile = (String, u64);
@@ -366,13 +367,13 @@ impl Report {
     fn package_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> Package {
         find_in_entries(entries, &[], "Cargo.toml")
             .and_then(|(_e, v)| {
-                v.map(|v| {
+                v.and_then(|v| {
                     toml::from_slice::<CargoConfig>(&v)
-                        .expect("valid Cargo.toml format")
+                        .unwrap_or_default() // some Cargo.toml files have build: true, which doesn't parse for us. TODO: maybe parse manually
                         .package
                 })
             })
-            .expect("Cargo.toml to always be present in the exploded crate")
+            .unwrap_or_default()
     }
 
     fn convert_to_wasted_files(entries: Vec<TarHeader>) -> Vec<WastedFile> {

@@ -46,6 +46,9 @@ where
                 err, interval_s, iteration
             ))
         }
+        if iteration == max_iterations {
+            return Ok(());
+        }
         wait_with_progress(interval_s, make_progress(), deadline).await?;
     }
 }
