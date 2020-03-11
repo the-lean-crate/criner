@@ -75,7 +75,7 @@ pub trait Generator {
         crate_name: &str,
         crate_version: &str,
         result: Self::DBResult,
-        _report: Option<&Self::Report>,
+        _previous_report: Option<&Self::Report>,
         progress: &mut prodash::tree::Item,
     ) -> Result<Self::Report>;
 
