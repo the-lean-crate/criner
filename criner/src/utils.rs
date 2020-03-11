@@ -25,6 +25,7 @@ pub async fn repeat_every_s<MakeFut, MakeProgress, Fut, T>(
     interval_s: u32,
     mut make_progress: MakeProgress,
     deadline: Option<SystemTime>,
+    at_most: Option<usize>,
     mut make_future: MakeFut,
 ) -> Result<()>
 where
@@ -32,11 +33,17 @@ where
     MakeFut: FnMut() -> Fut,
     MakeProgress: FnMut() -> prodash::tree::Item,
 {
+    let max_iterations = at_most.unwrap_or(std::usize::MAX);
+    let mut iteration = 0;
     loop {
+        if iteration == max_iterations {
+            return Ok(());
+        }
+        iteration += 1;
         if let Err(err) = make_future().await {
             make_progress().fail(format!(
-                "{} : ignored by repeat_every({}s,…)",
-                err, interval_s
+                "{} : ignored by repeat_every({}s,…) iteration {}",
+                err, interval_s, iteration
             ))
         }
         wait_with_progress(interval_s, make_progress(), deadline).await?;

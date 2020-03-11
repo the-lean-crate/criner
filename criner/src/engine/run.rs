@@ -11,10 +11,20 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-pub struct Context {
-    pub db: Db,
-    pub progress: prodash::tree::Item,
-    pub deadline: Option<SystemTime>,
+pub struct StageRunSettings {
+    /// Wait for the given duration after the stage ran
+    pub every: Duration,
+    /// If None, run the stage indefinitely. Otherwise run it the given amount of times. Some(0) disables the stage.
+    pub at_most: Option<usize>,
+}
+
+impl From<Duration> for StageRunSettings {
+    fn from(duration: Duration) -> Self {
+        StageRunSettings {
+            every: duration,
+            at_most: None,
+        }
+    }
 }
 
 /// Runs the statistics and mining engine.
@@ -29,8 +39,8 @@ pub async fn non_blocking(
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
-    fetch_every: Duration,
-    process_and_report_every: Duration,
+    fetch_settings: impl Into<StageRunSettings>,
+    process_and_report_settings: impl Into<StageRunSettings>,
     assets_dir: PathBuf,
     pool: impl Spawn + Clone + Send + 'static + Sync,
     tokio: tokio::runtime::Handle,
@@ -38,14 +48,16 @@ pub async fn non_blocking(
     check(deadline)?;
     let startup_time = SystemTime::now();
 
+    let settings = fetch_settings.into();
     pool.spawn(
         repeat_every_s(
-            fetch_every.as_secs() as u32,
+            settings.every.as_secs() as u32,
             {
                 let p = progress.clone();
                 move || p.add_child("Fetch Timer")
             },
             deadline,
+            settings.at_most,
             {
                 let db = db.clone();
                 let progress = progress.clone();
@@ -64,13 +76,15 @@ pub async fn non_blocking(
         .map(|_| ()),
     )?;
 
+    let settings = process_and_report_settings.into();
     repeat_every_s(
-        process_and_report_every.as_secs() as u32,
+        settings.every.as_secs() as u32,
         {
             let p = progress.clone();
             move || p.add_child("Processing Timer")
         },
         deadline,
+        settings.at_most,
         {
             move || {
                 let progress = progress.clone();
@@ -115,8 +129,8 @@ pub fn blocking(
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
-    fetch_every: Duration,
-    process_and_report_every: Duration,
+    fetch_settings: impl Into<StageRunSettings>,
+    process_and_report_settings: impl Into<StageRunSettings>,
     root: prodash::Tree,
     gui: Option<prodash::tui::TuiOptions>,
 ) -> Result<()> {
@@ -153,8 +167,8 @@ pub fn blocking(
         io_bound_processors,
         cpu_bound_processors,
         cpu_o_bound_processors,
-        fetch_every,
-        process_and_report_every,
+        fetch_settings,
+        process_and_report_settings,
         assets_dir,
         task_pool.clone(),
         tokio_rt.handle().clone(),
