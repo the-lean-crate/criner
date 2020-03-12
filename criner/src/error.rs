@@ -71,5 +71,9 @@ quick_error! {
             from()
             cause(err)
         }
+        Horrorshow(err: horrorshow::Error) {
+            from()
+            cause(err)
+        }
     }
 }

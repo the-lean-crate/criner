@@ -298,6 +298,7 @@ dependencies = [
  "futures",
  "futures-timer 3.0.2",
  "globset",
+ "horrorshow",
  "http",
  "humantime 2.0.0",
  "jwalk",
@@ -696,6 +697,12 @@ checksum = "1010591b26bbfe835e9faeabeb11866061cc7dcebffd56ad7d0942d0e61aefd8"
 dependencies = [
  "libc",
 ]
+
+[[package]]
+name = "horrorshow"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5193e1f03dbec996948ec08831d3a0df72225fc7fab5efc90ebd9bdd9b70504d"
 
 [[package]]
 name = "http"

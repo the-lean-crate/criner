@@ -1,3 +1,4 @@
+mod html;
 mod merge;
 mod result;
 

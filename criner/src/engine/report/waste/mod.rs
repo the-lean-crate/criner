@@ -51,7 +51,11 @@ impl super::generic::Generator for Generator {
         _progress: &mut prodash::tree::Item,
     ) -> Result<Self::Report> {
         use async_std::prelude::*;
+        use horrorshow::Template;
+
         let report = Report::from_result(crate_name, crate_version, result);
+        let mut buf = String::new();
+        report.clone().write_to_string(&mut buf)?;
 
         async_std::fs::OpenOptions::new()
             .truncate(true)
@@ -59,7 +63,7 @@ impl super::generic::Generator for Generator {
             .create(true)
             .open(out)
             .await?
-            .write_all("hello world".as_bytes())
+            .write_all(buf.as_bytes())
             .await
             .map_err(crate::Error::from)?;
         Ok(report)
