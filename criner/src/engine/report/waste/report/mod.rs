@@ -121,24 +121,27 @@ impl crate::engine::report::generic::Aggregate for Report {
                     wasted_files,
                     suggested_fix: _,
                 },
-            ) => Crate {
-                crate_name: lhs_crate_name,
-                total_size_in_bytes: lhs_tsb + rhs_tsb,
-                total_files: lhs_tf + rhs_tf,
-                info_by_version: merge::merge_map_into_map(
-                    info_by_version,
-                    merge::version_to_new_version_map(
-                        crate_version,
-                        rhs_tsb,
-                        rhs_tf,
-                        &wasted_files,
+            ) => {
+                assert_eq!(lhs_crate_name, rhs_crate_name, "We dont have to support merging different crate versions into a crate of another name");
+                Crate {
+                    crate_name: lhs_crate_name,
+                    total_size_in_bytes: lhs_tsb + rhs_tsb,
+                    total_files: lhs_tf + rhs_tf,
+                    info_by_version: merge::map_into_map(
+                        info_by_version,
+                        merge::version_to_new_version_map(
+                            crate_version,
+                            rhs_tsb,
+                            rhs_tf,
+                            &wasted_files,
+                        ),
                     ),
-                ),
-                wasted_by_extension: merge::merge_vec_into_map_by_extension(
-                    wasted_by_extension,
-                    wasted_files,
-                ),
-            },
+                    wasted_by_extension: merge::vec_into_map_by_extension(
+                        wasted_by_extension,
+                        wasted_files,
+                    ),
+                }
+            }
             (
                 Crate {
                     crate_name: lhs_crate_name,
@@ -169,14 +172,30 @@ impl crate::engine::report::generic::Aggregate for Report {
                         crate_name: lhs_crate_name,
                         total_size_in_bytes: lhs_tsb + rhs_tsb,
                         total_files: lhs_tf + rhs_tf,
-                        info_by_version: merge::merge_map_into_map(lhs_ibv, rhs_ibv),
-                        wasted_by_extension: merge::merge_map_into_map(lhs_wbe, rhs_wbe),
+                        info_by_version: merge::map_into_map(lhs_ibv, rhs_ibv),
+                        wasted_by_extension: merge::map_into_map(lhs_wbe, rhs_wbe),
                     }
                 }
             }
-            (CrateCollection { .. }, CrateCollection { .. }) => {
-                unimplemented!("collection with collection")
-            }
+            (
+                CrateCollection {
+                    total_size_in_bytes: lhs_tsb,
+                    total_files: lhs_tf,
+                    info_by_crate: lhs_ibc,
+                    wasted_by_extension: lhs_wbe,
+                },
+                CrateCollection {
+                    total_size_in_bytes: rhs_tsb,
+                    total_files: rhs_tf,
+                    info_by_crate: rhs_ibc,
+                    wasted_by_extension: rhs_wbe,
+                },
+            ) => CrateCollection {
+                total_size_in_bytes: lhs_tsb + rhs_tsb,
+                total_files: lhs_tf + rhs_tf,
+                info_by_crate: merge::map_into_map(lhs_ibc, rhs_ibc),
+                wasted_by_extension: merge::map_into_map(lhs_wbe, rhs_wbe),
+            },
             (
                 CrateCollection {
                     total_size_in_bytes: lhs_tsb,
@@ -194,8 +213,8 @@ impl crate::engine::report::generic::Aggregate for Report {
             ) => CrateCollection {
                 total_size_in_bytes: lhs_tsb + rhs_tsb,
                 total_files: lhs_tf + rhs_tf,
-                wasted_by_extension: merge::merge_map_into_map(lhs_wbe, rhs_wbe),
-                info_by_crate: merge::merge_map_into_map(
+                wasted_by_extension: merge::map_into_map(lhs_wbe, rhs_wbe),
+                info_by_crate: merge::map_into_map(
                     info_by_crate,
                     merge::crate_info_from_version_info(crate_name, info_by_version),
                 ),

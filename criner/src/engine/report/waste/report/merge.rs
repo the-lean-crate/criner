@@ -19,7 +19,7 @@ impl std::ops::AddAssign for VersionInfo {
 
 const NO_EXT_MARKER: &str = "<NO_EXT>";
 
-pub fn merge_vec_into_map_by_extension(
+pub fn vec_into_map_by_extension(
     initial: Dict<AggregateFileInfo>,
     from: Vec<WastedFile>,
 ) -> Dict<AggregateFileInfo> {
@@ -39,10 +39,10 @@ pub fn merge_vec_into_map_by_extension(
 }
 
 pub fn into_map_by_extension(from: Vec<WastedFile>) -> Dict<AggregateFileInfo> {
-    merge_vec_into_map_by_extension(BTreeMap::new(), from)
+    vec_into_map_by_extension(BTreeMap::new(), from)
 }
 
-pub fn merge_map_into_map<T>(lhs: Dict<T>, rhs: Dict<T>) -> Dict<T>
+pub fn map_into_map<T>(lhs: Dict<T>, rhs: Dict<T>) -> Dict<T>
 where
     T: std::ops::AddAssign + Default,
 {
