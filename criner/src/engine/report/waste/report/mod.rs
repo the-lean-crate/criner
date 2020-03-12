@@ -116,27 +116,44 @@ impl crate::engine::report::generic::Aggregate for Report {
                     total_size_in_bytes: rhs_tsb,
                     total_files: rhs_tf,
                     wasted_files,
-                    suggested_fix: _,
+                    suggested_fix,
                 },
             ) => {
-                assert_eq!(lhs_crate_name, rhs_crate_name, "We dont have to support merging different crate versions into a crate of another name");
-                Crate {
-                    crate_name: lhs_crate_name,
-                    total_size_in_bytes: lhs_tsb + rhs_tsb,
-                    total_files: lhs_tf + rhs_tf,
-                    info_by_version: merge::map_into_map(
-                        info_by_version,
-                        merge::version_to_new_version_map(
-                            crate_version,
-                            rhs_tsb,
-                            rhs_tf,
-                            &wasted_files,
+                if lhs_crate_name == rhs_crate_name {
+                    Crate {
+                        crate_name: lhs_crate_name,
+                        total_size_in_bytes: lhs_tsb + rhs_tsb,
+                        total_files: lhs_tf + rhs_tf,
+                        info_by_version: merge::map_into_map(
+                            info_by_version,
+                            merge::version_to_new_version_map(
+                                crate_version,
+                                rhs_tsb,
+                                rhs_tf,
+                                &wasted_files,
+                            ),
                         ),
-                    ),
-                    wasted_by_extension: merge::vec_into_map_by_extension(
+                        wasted_by_extension: merge::vec_into_map_by_extension(
+                            wasted_by_extension,
+                            wasted_files,
+                        ),
+                    }
+                } else {
+                    merge::collection_from_crate(
+                        lhs_crate_name,
+                        lhs_tsb,
+                        lhs_tf,
+                        info_by_version,
                         wasted_by_extension,
+                    )
+                    .merge(Version {
+                        crate_name: rhs_crate_name,
+                        crate_version,
+                        total_size_in_bytes: rhs_tsb,
+                        total_files: rhs_tf,
                         wasted_files,
-                    ),
+                        suggested_fix,
+                    })
                 }
             }
             (
@@ -231,7 +248,7 @@ impl crate::engine::report::generic::Aggregate for Report {
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Option<Self> {
-        if let Some(path) = self.path_to_previous_state(out_dir) {
+        if let Some(path) = self.path_to_storage_location(out_dir) {
             progress.blocked("loading previous waste report from disk", None);
             // TODO: check how big these files get and consider doing a blocking streaming read to avoid memory spike
             tokio::fs::read(path)
@@ -247,7 +264,7 @@ impl crate::engine::report::generic::Aggregate for Report {
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Result<()> {
-        if let Some(path) = self.path_to_previous_state(out_dir) {
+        if let Some(path) = self.path_to_storage_location(out_dir) {
             progress.blocked("storing current waste report to disk", None);
             let data = rmp_serde::to_vec(self)?;
             // TODO: see above, check for memory spikes
@@ -258,15 +275,12 @@ impl crate::engine::report::generic::Aggregate for Report {
 }
 
 impl Report {
-    fn path_to_previous_state(&self, out_dir: &Path) -> Option<PathBuf> {
+    fn path_to_storage_location(&self, out_dir: &Path) -> Option<PathBuf> {
         use crate::engine::report::generic::Generator;
         use Report::*;
         match self {
-            Version { .. } => {
-                unreachable!("we don't expect to ever need to cache versions, this is unintended")
-            }
-            Crate { crate_name, .. } => Some(crate_name.as_str()),
-            CrateCollection { .. } => Some("crates-io"),
+            Version { crate_name, .. } | Crate { crate_name, .. } => Some(crate_name.as_str()),
+            CrateCollection { .. } => Some("__top-level-report__"),
         }
         .map(|prefix| {
             out_dir.join(format!(
