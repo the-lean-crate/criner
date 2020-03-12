@@ -72,7 +72,13 @@ pub trait Generator {
             };
         }
         if let Some(mut report) = report {
+            let previous_report = report.load_previous_state(&out_dir, &mut progress).await;
+            report = match previous_report {
+                Some(previous_report) => previous_report.merge(report),
+                None => report,
+            };
             report.complete(&out_dir, &mut progress).await?;
+            report.store_current_state(&out_dir, &mut progress).await?;
         }
         Ok(())
     }
