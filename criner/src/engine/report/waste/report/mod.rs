@@ -250,7 +250,6 @@ impl crate::engine::report::generic::Aggregate for Report {
     ) -> Option<Self> {
         if let Some(path) = self.path_to_storage_location(out_dir) {
             progress.blocked("loading previous waste report from disk", None);
-            // TODO: check how big these files get and consider doing a blocking streaming read to avoid memory spike
             async_std::fs::read(path)
                 .await
                 .ok()
@@ -269,7 +268,6 @@ impl crate::engine::report::generic::Aggregate for Report {
             .expect("a path for every occasion");
         progress.blocked("storing current waste report to disk", None);
         let data = rmp_serde::to_vec(self)?;
-        // TODO: see above, check for memory spikes
         async_std::fs::write(path, data).await.map_err(Into::into)
     }
 }

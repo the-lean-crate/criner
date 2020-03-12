@@ -76,8 +76,7 @@ pub async fn generate(
     }
     drop(tx);
     progress.set(num_crates);
-    // TODO: Call function to generate top-level report
-    let _report = merge_reports.await;
+    merge_reports.await;
     progress.done("Generating and merging waste report done");
     Ok(())
 }
