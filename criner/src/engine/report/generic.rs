@@ -8,14 +8,27 @@ use rusqlite::{params, TransactionBehavior};
 use std::path::{Path, PathBuf};
 
 #[async_trait]
-pub trait Aggregate {
+pub trait Aggregate
+where
+    Self: Sized,
+{
     fn merge(self, other: Self) -> Self;
     async fn complete(&mut self, out_dir: &Path, progress: &mut prodash::tree::Item) -> Result<()>;
+    async fn load_previous_state(
+        &mut self,
+        out_dir: &Path,
+        progress: &mut prodash::tree::Item,
+    ) -> Option<Self>;
+    async fn store_current_state(
+        &mut self,
+        out_dir: &Path,
+        progress: &mut prodash::tree::Item,
+    ) -> Result<()>;
 }
 
 #[async_trait]
 pub trait Generator {
-    type Report: Aggregate + Send + Sync;
+    type Report: Aggregate + Send + Sync + Clone;
     type DBResult: Send;
 
     fn name() -> &'static str;
@@ -125,7 +138,21 @@ pub trait Generator {
                     }
                 }
                 crate_report = if let Some(mut crate_report) = crate_report {
-                    crate_report.complete(&out_dir, &mut progress).await?;
+                    match crate_report
+                        .load_previous_state(&out_dir, &mut progress)
+                        .await
+                    {
+                        Some(previous_state) => {
+                            let mut absolute_state = previous_state.merge(crate_report.clone());
+                            absolute_state.complete(&out_dir, &mut progress).await?;
+                            absolute_state
+                                .store_current_state(&out_dir, &mut progress)
+                                .await?;
+                        }
+                        None => {
+                            crate_report.complete(&out_dir, &mut progress).await?;
+                        }
+                    }
                     Some(crate_report)
                 } else {
                     None

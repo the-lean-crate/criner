@@ -226,6 +226,20 @@ impl crate::engine::report::generic::Aggregate for Report {
     ) -> Result<()> {
         Ok(())
     }
+    async fn load_previous_state(
+        &mut self,
+        out_dir: &Path,
+        progress: &mut prodash::tree::Item,
+    ) -> Option<Self> {
+        None
+    }
+    async fn store_current_state(
+        &mut self,
+        out_dir: &Path,
+        progress: &mut prodash::tree::Item,
+    ) -> Result<()> {
+        Ok(())
+    }
 }
 
 impl Report {
