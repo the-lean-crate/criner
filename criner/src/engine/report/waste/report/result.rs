@@ -328,7 +328,14 @@ impl Report {
     pub(crate) fn convert_to_wasted_files(entries: Vec<TarHeader>) -> Vec<WastedFile> {
         entries
             .into_iter()
-            .map(|e| (tar_path_to_utf8_str(&e.path).to_owned(), e.size))
+            .filter_map(|e| {
+                let path = tar_path_to_utf8_str(&e.path);
+                if path != ".cargo_vcs_info.json" {
+                    Some((path.to_owned(), e.size))
+                } else {
+                    None
+                }
+            })
             .collect()
     }
 

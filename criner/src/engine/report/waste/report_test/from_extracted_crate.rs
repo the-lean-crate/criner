@@ -23,7 +23,7 @@ fn cookie_factory() {
             crate_version: "1".to_string(),
             total_size_in_bytes: 74569,
             total_files: 15,
-            wasted_files: vec![(".cargo_vcs_info.json".into(), 74)],
+            wasted_files: vec![],
             suggested_fix: Some(Fix::EnrichedInclude {
                 include: [
                     "LICENSE",
