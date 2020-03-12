@@ -69,7 +69,6 @@ pub trait Generator {
         crate_name: &str,
         crate_version: &str,
         result: Self::DBResult,
-        _previous_report: Option<&Self::Report>,
         progress: &mut prodash::tree::Item,
     ) -> Result<Self::Report>;
 
@@ -79,7 +78,7 @@ pub trait Generator {
         krates: Vec<(String, Vec<u8>)>,
         mut progress: prodash::tree::Item,
     ) -> Result<Option<Self::Report>> {
-        let mut report = None;
+        let mut chunk_report = None;
         let mut results_to_update = Vec::new();
         {
             let connection = db.open_connection()?;
@@ -91,6 +90,7 @@ pub trait Generator {
                 progress.init(Some(c.versions.len() as u32), Some("versions"));
                 progress.set_name(&name);
 
+                let mut crate_report = None;
                 for (vid, version) in c.versions.iter().enumerate() {
                     progress.set((vid + 1) as u32);
 
@@ -109,27 +109,30 @@ pub trait Generator {
                                 out_file.parent().expect("parent dir for file"),
                             )
                             .await?;
-                            let new_report = Self::generate_single_file(
+                            let version_report = Self::generate_single_file(
                                 &out_file,
                                 &name,
                                 &version,
                                 result,
-                                report.as_ref(),
                                 &mut progress,
                             )
                             .await?;
-                            report = report.map(|r| r.merge(new_report));
+                            crate_report =
+                                crate_report.map(|r: Self::Report| r.merge(version_report));
 
                             results_to_update.push(reports_key);
                         }
                     }
                 }
-                report = if let Some(mut report) = report {
-                    report.complete(&out_dir, &mut progress).await?;
-                    Some(report)
+                crate_report = if let Some(mut crate_report) = crate_report {
+                    crate_report.complete(&out_dir, &mut progress).await?;
+                    Some(crate_report)
                 } else {
                     None
                 };
+                chunk_report = chunk_report.and_then(|chunk_report: Self::Report| {
+                    crate_report.map(|crate_report| chunk_report.merge(crate_report))
+                });
             }
         }
 
@@ -151,7 +154,7 @@ pub trait Generator {
             }
             transaction.commit()?;
         }
-        Ok(report)
+        Ok(chunk_report)
     }
 }
 

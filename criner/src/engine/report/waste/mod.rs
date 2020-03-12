@@ -48,7 +48,6 @@ impl super::generic::Generator for Generator {
         crate_name: &str,
         crate_version: &str,
         result: TaskResult,
-        _previous_report: Option<&Report>,
         _progress: &mut prodash::tree::Item,
     ) -> Result<Self::Report> {
         use async_std::prelude::*;
