@@ -60,6 +60,8 @@ pub struct VersionInfo {
     pub waste: AggregateFileInfo,
 }
 
+pub type AggregateVersionInfo = VersionInfo;
+
 pub type Dict<T> = BTreeMap<String, T>;
 
 #[derive(Debug, PartialEq, Clone)]
@@ -79,6 +81,12 @@ pub enum Report {
         info_by_version: Dict<VersionInfo>,
         wasted_by_extension: Dict<AggregateFileInfo>,
     },
+    CrateCollection {
+        total_size_in_bytes: u64,
+        total_files: u64,
+        info_by_crate: Dict<AggregateVersionInfo>,
+        wasted_by_extension: Dict<AggregateFileInfo>,
+    },
 }
 
 #[async_trait]
@@ -90,6 +98,13 @@ impl crate::engine::report::generic::Aggregate for Report {
                 merge::crate_from_version(lhs).merge(rhs)
             }
             (version @ Version { .. }, krate @ Crate { .. }) => krate.merge(version),
+            (version @ Version { .. }, collection @ CrateCollection { .. }) => {
+                collection.merge(version)
+            }
+            (collection @ CrateCollection { .. }, version @ Version { .. }) => {
+                collection.merge(merge::crate_from_version(version))
+            }
+            (krate @ Crate { .. }, collection @ CrateCollection { .. }) => collection.merge(krate),
             (
                 Crate {
                     crate_name: lhs_crate_name,
@@ -139,12 +154,51 @@ impl crate::engine::report::generic::Aggregate for Report {
                     info_by_version: rhs_ibv,
                     wasted_by_extension: rhs_wbe,
                 },
-            ) => Crate {
-                crate_name: lhs_crate_name,
+            ) => {
+                if lhs_crate_name != rhs_crate_name {
+                    merge::collection_from_crate(lhs_crate_name, lhs_tsb, lhs_tf, lhs_ibv, lhs_wbe)
+                        .merge(Crate {
+                            crate_name: rhs_crate_name,
+                            total_size_in_bytes: rhs_tsb,
+                            total_files: rhs_tf,
+                            info_by_version: rhs_ibv,
+                            wasted_by_extension: rhs_wbe,
+                        })
+                } else {
+                    Crate {
+                        crate_name: lhs_crate_name,
+                        total_size_in_bytes: lhs_tsb + rhs_tsb,
+                        total_files: lhs_tf + rhs_tf,
+                        info_by_version: merge::merge_map_into_map(lhs_ibv, rhs_ibv),
+                        wasted_by_extension: merge::merge_map_into_map(lhs_wbe, rhs_wbe),
+                    }
+                }
+            }
+            (lhs @ CrateCollection { .. }, rhs @ CrateCollection { .. }) => {
+                unimplemented!("collection with collection")
+            }
+            (
+                CrateCollection {
+                    total_size_in_bytes: lhs_tsb,
+                    total_files: lhs_tf,
+                    info_by_crate,
+                    wasted_by_extension: lhs_wbe,
+                },
+                Crate {
+                    crate_name,
+                    total_size_in_bytes: rhs_tsb,
+                    total_files: rhs_tf,
+                    info_by_version,
+                    wasted_by_extension: rhs_wbe,
+                },
+            ) => CrateCollection {
                 total_size_in_bytes: lhs_tsb + rhs_tsb,
                 total_files: lhs_tf + rhs_tf,
-                info_by_version: merge::merge_map_into_map(lhs_ibv, rhs_ibv),
                 wasted_by_extension: merge::merge_map_into_map(lhs_wbe, rhs_wbe),
+                info_by_crate: merge::merge_map_into_map(
+                    info_by_crate,
+                    merge::crate_info_from_version_info(crate_name, info_by_version),
+                ),
             },
         }
     }

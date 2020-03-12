@@ -1,4 +1,6 @@
 use super::{AggregateFileInfo, Dict, Report, VersionInfo, WastedFile};
+use crate::engine::report::waste::AggregateVersionInfo;
+use std::ops::AddAssign;
 use std::{collections::BTreeMap, path::PathBuf};
 
 impl std::ops::AddAssign for AggregateFileInfo {
@@ -76,6 +78,38 @@ pub fn version_to_new_version_map(
         },
     );
     m
+}
+
+pub fn crate_info_from_version_info(
+    crate_name: String,
+    info_by_version: Dict<VersionInfo>,
+) -> Dict<AggregateVersionInfo> {
+    let v = info_by_version
+        .into_iter()
+        .fold(AggregateVersionInfo::default(), |mut a, (_, v)| {
+            a.waste.add_assign(v.waste);
+            a.all.add_assign(v.all);
+            a
+        });
+
+    let mut m = BTreeMap::new();
+    m.insert(crate_name, v);
+    m
+}
+
+pub fn collection_from_crate(
+    crate_name: String,
+    total_size_in_bytes: u64,
+    total_files: u64,
+    info_by_version: Dict<VersionInfo>,
+    wasted_by_extension: Dict<AggregateFileInfo>,
+) -> Report {
+    Report::CrateCollection {
+        total_size_in_bytes,
+        total_files,
+        info_by_crate: crate_info_from_version_info(crate_name, info_by_version),
+        wasted_by_extension,
+    }
 }
 
 pub fn crate_from_version(version: Report) -> Report {
