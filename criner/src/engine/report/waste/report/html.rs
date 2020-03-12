@@ -1,4 +1,5 @@
 use super::Report;
+use bytesize::ByteSize;
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 
 impl RenderOnce for Report {
@@ -28,18 +29,21 @@ impl RenderOnce for Report {
                             }
                             section {
                                 h3: "total uncompressed bytes";
-                                p: total_size_in_bytes
+                                p: format!("{}", ByteSize(total_size_in_bytes))
                             }
                             section {
                                 h3: "total files";
                                 p: total_files
                             }
-                            section {
-                                h3: "wasted files";
-                                ol(id="count") {
-                                    // You can embed for loops, while loops, and if statements.
-                                    @ for (path, size) in wasted_files {
-                                        li : format_args!("{} : {}", path, bytesize::ByteSize(size))
+                            @ if !wasted_files.is_empty() {
+                                section {
+                                    h3: format!("{} wasted files", wasted_files.len());
+                                    p: format!("total waste: {}", wasted_files.iter().map(|(_, s)| s).sum::<u64>());
+                                    ol(id="count") {
+                                        // You can embed for loops, while loops, and if statements.
+                                        @ for (path, size) in wasted_files {
+                                            li : format_args!("{} : {}", path, ByteSize(size))
+                                        }
                                     }
                                 }
                             }
