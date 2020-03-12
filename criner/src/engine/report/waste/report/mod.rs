@@ -174,7 +174,7 @@ impl crate::engine::report::generic::Aggregate for Report {
                     }
                 }
             }
-            (lhs @ CrateCollection { .. }, rhs @ CrateCollection { .. }) => {
+            (CrateCollection { .. }, CrateCollection { .. }) => {
                 unimplemented!("collection with collection")
             }
             (

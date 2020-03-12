@@ -91,6 +91,71 @@ fn crate_and_crate_of_different_name() {
 }
 
 #[test]
+fn two_crate_collections() {
+    let lhs_collection = Report::CrateCollection {
+        total_size_in_bytes: 12,
+        total_files: 10,
+        info_by_crate: b_tree_map! {
+            "a".into() => VersionInfo {
+                all: AggregateFileInfo { total_files: 4, total_bytes: 1},
+                waste: AggregateFileInfo { total_files: 3, total_bytes: 50},
+            },
+        },
+        wasted_by_extension: b_tree_map! {
+            "a".into()  => AggregateFileInfo {total_files: 4, total_bytes: 40},
+            "b".into()  => AggregateFileInfo {total_files: 4, total_bytes: 40},
+            "c".into()  => AggregateFileInfo {total_files: 3, total_bytes: 30},
+            "d".into()  => AggregateFileInfo {total_files: 1, total_bytes: 10},
+        },
+    };
+    let rhs_collection = Report::CrateCollection {
+        total_size_in_bytes: 12,
+        total_files: 10,
+        info_by_crate: b_tree_map! {
+            "a".into() => VersionInfo {
+                all: AggregateFileInfo { total_files: 40, total_bytes: 10},
+                waste: AggregateFileInfo { total_files: 30, total_bytes: 500},
+            },
+            "b".into() => VersionInfo {
+                all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
+                waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
+            },
+        },
+        wasted_by_extension: b_tree_map! {
+            "a".into()  => AggregateFileInfo {total_files: 4, total_bytes: 40},
+            "b".into()  => AggregateFileInfo {total_files: 4, total_bytes: 40},
+            "c".into()  => AggregateFileInfo {total_files: 3, total_bytes: 30},
+            "d".into()  => AggregateFileInfo {total_files: 1, total_bytes: 10},
+            "e".into()  => AggregateFileInfo {total_files: 4, total_bytes: 2},
+        },
+    };
+    assert_eq!(
+        lhs_collection.merge(rhs_collection),
+        Report::CrateCollection {
+            total_size_in_bytes: 24,
+            total_files: 20,
+            info_by_crate: b_tree_map! {
+                "a".into() => VersionInfo {
+                    all: AggregateFileInfo { total_files: 40+4, total_bytes: 10 +1},
+                    waste: AggregateFileInfo { total_files: 30+3, total_bytes: 500+50},
+                },
+                "b".into() => VersionInfo {
+                    all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
+                    waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
+                }
+            },
+            wasted_by_extension: b_tree_map! {
+                "a".into()  => AggregateFileInfo {total_files: 4*2, total_bytes: 40*2},
+                "b".into()  => AggregateFileInfo {total_files: 4*2, total_bytes: 40*2},
+                "c".into()  => AggregateFileInfo {total_files: 3*2, total_bytes: 30*2},
+                "d".into()  => AggregateFileInfo {total_files: 1*2, total_bytes: 10*2},
+                "e".into()  => AggregateFileInfo {total_files: 4, total_bytes: 2},
+            },
+        }
+    );
+}
+
+#[test]
 fn crate_and_crate_of_same_name() {
     assert_eq!(
         Report::Crate {
