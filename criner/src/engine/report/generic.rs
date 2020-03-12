@@ -58,13 +58,18 @@ pub trait Generator {
         reports: async_std::sync::Receiver<Result<Option<Self::Report>>>,
     ) -> Result<()> {
         progress.init(None, Some("reports"));
-        let mut report = None;
+        let mut report = None::<Self::Report>;
         let mut count = 0;
         while let Some(result) = reports.recv().await {
             count += 1;
             progress.set(count);
             match result {
-                Ok(Some(new_report)) => report = report.map(|r: Self::Report| r.merge(new_report)),
+                Ok(Some(new_report)) => {
+                    report = Some(match report {
+                        Some(report) => report.merge(new_report),
+                        None => new_report,
+                    })
+                }
                 Ok(None) => {}
                 Err(err) => {
                     progress.fail(format!("report failed: {}", err));
@@ -97,7 +102,7 @@ pub trait Generator {
         krates: Vec<(String, Vec<u8>)>,
         mut progress: prodash::tree::Item,
     ) -> Result<Option<Self::Report>> {
-        let mut chunk_report = None;
+        let mut chunk_report = None::<Self::Report>;
         let mut results_to_update = Vec::new();
         {
             let connection = db.open_connection()?;
@@ -109,7 +114,7 @@ pub trait Generator {
                 progress.init(Some(c.versions.len() as u32), Some("versions"));
                 progress.set_name(&name);
 
-                let mut crate_report = None;
+                let mut crate_report = None::<Self::Report>;
                 for (vid, version) in c.versions.iter().enumerate() {
                     progress.set((vid + 1) as u32);
 
@@ -136,14 +141,16 @@ pub trait Generator {
                                 &mut progress,
                             )
                             .await?;
-                            crate_report =
-                                crate_report.map(|r: Self::Report| r.merge(version_report));
+                            crate_report = Some(match crate_report {
+                                Some(crate_report) => crate_report.merge(version_report),
+                                None => version_report,
+                            });
 
                             results_to_update.push(reports_key);
                         }
                     }
                 }
-                crate_report = if let Some(mut crate_report) = crate_report {
+                if let Some(mut crate_report) = crate_report {
                     let cache_dir = crate_dir(&out_dir, &name);
                     let previous_state = crate_report
                         .load_previous_state(&cache_dir, &mut progress)
@@ -163,13 +170,11 @@ pub trait Generator {
                                 .await?;
                         }
                     }
-                    Some(crate_report)
-                } else {
-                    None
-                };
-                chunk_report = chunk_report.and_then(|chunk_report: Self::Report| {
-                    crate_report.map(|crate_report| chunk_report.merge(crate_report))
-                });
+                    chunk_report = Some(match chunk_report {
+                        Some(chunk_report) => chunk_report.merge(crate_report),
+                        None => crate_report,
+                    });
+                }
             }
         }
 
