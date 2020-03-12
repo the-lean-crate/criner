@@ -144,21 +144,22 @@ pub trait Generator {
                     }
                 }
                 crate_report = if let Some(mut crate_report) = crate_report {
+                    let cache_dir = crate_dir(&out_dir, &name);
                     let previous_state = crate_report
-                        .load_previous_state(&out_dir, &mut progress)
+                        .load_previous_state(&cache_dir, &mut progress)
                         .await;
                     match previous_state {
                         Some(previous_state) => {
                             let mut absolute_state = previous_state.merge(crate_report.clone());
-                            absolute_state.complete(&out_dir, &mut progress).await?;
+                            absolute_state.complete(&cache_dir, &mut progress).await?;
                             absolute_state
-                                .store_current_state(&out_dir, &mut progress)
+                                .store_current_state(&cache_dir, &mut progress)
                                 .await?;
                         }
                         None => {
-                            crate_report.complete(&out_dir, &mut progress).await?;
+                            crate_report.complete(&cache_dir, &mut progress).await?;
                             crate_report
-                                .store_current_state(&out_dir, &mut progress)
+                                .store_current_state(&cache_dir, &mut progress)
                                 .await?;
                         }
                     }
@@ -194,6 +195,10 @@ pub trait Generator {
     }
 }
 
-fn output_file_html(base: &Path, name: &str, version: &str) -> PathBuf {
-    base.join(name).join(version).join("index.html")
+fn crate_dir(base: &Path, crate_name: &str) -> PathBuf {
+    base.join(crate_name)
+}
+
+fn output_file_html(base: &Path, crate_name: &str, version: &str) -> PathBuf {
+    crate_dir(base, crate_name).join(version).join("index.html")
 }
