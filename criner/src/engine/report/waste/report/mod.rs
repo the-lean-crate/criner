@@ -251,7 +251,7 @@ impl crate::engine::report::generic::Aggregate for Report {
         if let Some(path) = self.path_to_storage_location(out_dir) {
             progress.blocked("loading previous waste report from disk", None);
             // TODO: check how big these files get and consider doing a blocking streaming read to avoid memory spike
-            tokio::fs::read(path)
+            async_std::fs::read(path)
                 .await
                 .ok()
                 .and_then(|v| rmp_serde::from_read(v.as_slice()).ok())
@@ -264,13 +264,13 @@ impl crate::engine::report::generic::Aggregate for Report {
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Result<()> {
-        if let Some(path) = self.path_to_storage_location(out_dir) {
-            progress.blocked("storing current waste report to disk", None);
-            let data = rmp_serde::to_vec(self)?;
-            // TODO: see above, check for memory spikes
-            tokio::fs::write(path, data).await?;
-        }
-        Ok(())
+        let path = self
+            .path_to_storage_location(out_dir)
+            .expect("a path for every occasion");
+        progress.blocked("storing current waste report to disk", None);
+        let data = rmp_serde::to_vec(self)?;
+        // TODO: see above, check for memory spikes
+        async_std::fs::write(path, data).await.map_err(Into::into)
     }
 }
 
@@ -278,18 +278,16 @@ impl Report {
     fn path_to_storage_location(&self, out_dir: &Path) -> Option<PathBuf> {
         use crate::engine::report::generic::Generator;
         use Report::*;
-        match self {
-            Version { crate_name, .. } | Crate { crate_name, .. } => Some(crate_name.as_str()),
-            CrateCollection { .. } => Some("__top-level-report__"),
-        }
-        .map(|prefix| {
-            out_dir.join(format!(
-                "{}-{}-{}.rmp",
-                prefix,
-                super::Generator::name(),
-                super::Generator::version()
-            ))
-        })
+        let prefix = match self {
+            Version { crate_name, .. } | Crate { crate_name, .. } => crate_name.as_str(),
+            CrateCollection { .. } => "__top-level-report__",
+        };
+        Some(out_dir.join(format!(
+            "{}-{}-{}.rmp",
+            prefix,
+            super::Generator::name(),
+            super::Generator::version()
+        )))
     }
     pub fn from_result(crate_name: &str, crate_version: &str, result: TaskResult) -> Report {
         match result {
