@@ -38,7 +38,7 @@ impl RenderOnce for Report {
                             @ if !wasted_files.is_empty() {
                                 section {
                                     h3: format!("{} wasted files", wasted_files.len());
-                                    p: format!("total waste: {}", wasted_files.iter().map(|(_, s)| s).sum::<u64>());
+                                    p: format!("total waste: {}", ByteSize(wasted_files.iter().map(|(_, s)| s).sum::<u64>()));
                                     ol(id="count") {
                                         // You can embed for loops, while loops, and if statements.
                                         @ for (path, size) in wasted_files {
