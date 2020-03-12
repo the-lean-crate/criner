@@ -7,10 +7,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use serde_derive::Deserialize;
-use std::{
-    collections::BTreeMap,
-    path::{Path, PathBuf},
-};
+use std::{collections::BTreeMap, path::Path};
 
 pub type Patterns = Vec<String>;
 
@@ -222,13 +219,9 @@ impl crate::engine::report::generic::Aggregate for Report {
         }
     }
 
-    async fn complete_all(self, _out_dir: PathBuf, _progress: prodash::tree::Item) -> Result<()> {
-        Ok(())
-    }
-    async fn complete_crate(
+    async fn complete(
         &mut self,
         _out_dir: &Path,
-        _crate_name: &str,
         _progress: &mut prodash::tree::Item,
     ) -> Result<()> {
         Ok(())

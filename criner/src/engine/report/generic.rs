@@ -10,13 +10,7 @@ use std::path::{Path, PathBuf};
 #[async_trait]
 pub trait Aggregate {
     fn merge(self, other: Self) -> Self;
-    async fn complete_all(self, out_dir: PathBuf, progress: prodash::tree::Item) -> Result<()>;
-    async fn complete_crate(
-        &mut self,
-        out_dir: &Path,
-        crate_name: &str,
-        progress: &mut prodash::tree::Item,
-    ) -> Result<()>;
+    async fn complete(&mut self, out_dir: &Path, progress: &mut prodash::tree::Item) -> Result<()>;
 }
 
 #[async_trait]
@@ -64,8 +58,8 @@ pub trait Generator {
                 }
             };
         }
-        if let Some(report) = report {
-            report.complete_all(out_dir, progress).await?;
+        if let Some(mut report) = report {
+            report.complete(&out_dir, &mut progress).await?;
         }
         Ok(())
     }
@@ -131,9 +125,7 @@ pub trait Generator {
                     }
                 }
                 report = if let Some(mut report) = report {
-                    report
-                        .complete_crate(&out_dir, &name, &mut progress)
-                        .await?;
+                    report.complete(&out_dir, &mut progress).await?;
                     Some(report)
                 } else {
                     None
