@@ -105,8 +105,12 @@ fn standard_include_patterns() -> &'static [&'static str] {
     &[
         "src/**/*",
         "Cargo.*",
+        "authors",
+        "AUTHORS",
         "license.*",
+        "license-*",
         "LICENSE.*",
+        "LICENSE-*",
         "license",
         "LICENSE",
         "readme.*",
