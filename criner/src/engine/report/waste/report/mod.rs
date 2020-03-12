@@ -6,12 +6,12 @@ use crate::{
     Result,
 };
 use async_trait::async_trait;
-use serde_derive::Deserialize;
-use std::{collections::BTreeMap, path::Path};
+use serde_derive::{Deserialize, Serialize};
+use std::{collections::BTreeMap, path::Path, path::PathBuf};
 
 pub type Patterns = Vec<String>;
 
-#[derive(PartialEq, Eq, Debug, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone, Deserialize, Serialize)]
 pub enum Fix {
     EnrichedInclude {
         include: Patterns,
@@ -45,13 +45,13 @@ pub struct Package {
 
 pub type WastedFile = (String, u64);
 
-#[derive(Default, Debug, PartialEq, Clone)]
+#[derive(Default, Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub struct AggregateFileInfo {
     pub total_bytes: u64,
     pub total_files: u64,
 }
 
-#[derive(Default, Debug, PartialEq, Clone)]
+#[derive(Default, Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub struct VersionInfo {
     pub all: AggregateFileInfo,
     pub waste: AggregateFileInfo,
@@ -61,7 +61,7 @@ pub type AggregateVersionInfo = VersionInfo;
 
 pub type Dict<T> = BTreeMap<String, T>;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
 pub enum Report {
     Version {
         crate_name: String,
@@ -227,22 +227,56 @@ impl crate::engine::report::generic::Aggregate for Report {
         Ok(())
     }
     async fn load_previous_state(
-        &mut self,
+        &self,
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Option<Self> {
-        None
+        if let Some(path) = self.path_to_previous_state(out_dir) {
+            progress.blocked("loading previous waste report from disk", None);
+            // TODO: check how big these files get and consider doing a blocking streaming read to avoid memory spike
+            tokio::fs::read(path)
+                .await
+                .ok()
+                .and_then(|v| rmp_serde::from_read(v.as_slice()).ok())
+        } else {
+            None
+        }
     }
     async fn store_current_state(
-        &mut self,
+        &self,
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Result<()> {
+        if let Some(path) = self.path_to_previous_state(out_dir) {
+            progress.blocked("storing current waste report to disk", None);
+            let data = rmp_serde::to_vec(self)?;
+            // TODO: see above, check for memory spikes
+            tokio::fs::write(path, data).await?;
+        }
         Ok(())
     }
 }
 
 impl Report {
+    fn path_to_previous_state(&self, out_dir: &Path) -> Option<PathBuf> {
+        use crate::engine::report::generic::Generator;
+        use Report::*;
+        match self {
+            Version { .. } => {
+                unreachable!("we don't expect to ever need to cache versions, this is unintended")
+            }
+            Crate { crate_name, .. } => Some(crate_name.as_str()),
+            CrateCollection { .. } => Some("crates-io"),
+        }
+        .map(|prefix| {
+            out_dir.join(format!(
+                "{}-{}-{}.rmp",
+                prefix,
+                super::Generator::name(),
+                super::Generator::version()
+            ))
+        })
+    }
     pub fn from_result(crate_name: &str, crate_version: &str, result: TaskResult) -> Report {
         match result {
             TaskResult::ExplodedCrate {
