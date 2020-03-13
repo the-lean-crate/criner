@@ -50,11 +50,11 @@ pub async fn generate(
     let mut statement =
         new_key_value_query_old_to_new(persistence::CrateTable::table_name(), &mut *connection)?;
     let mut rows = statement.query(NO_PARAMS)?;
-    let mut chunk = Vec::<(String, Vec<u8>)>::with_capacity(chunk_size);
+    let mut chunk = Vec::<(String, Vec<u8>)>::with_capacity(chunk_size as usize);
     let mut cid = 0;
     while let Some(r) = rows.next()? {
         chunk.push((r.get(0)?, r.get(1)?));
-        if chunk.len() == chunk_size {
+        if chunk.len() == chunk_size as usize {
             cid += 1;
             check(deadline.clone())?;
             progress.set((cid * chunk_size) as u32);
@@ -69,7 +69,7 @@ pub async fn generate(
                 .boxed(),
             )
             .await;
-            chunk = Vec::with_capacity(chunk_size);
+            chunk = Vec::with_capacity(chunk_size as usize);
         }
     }
     drop(tx);

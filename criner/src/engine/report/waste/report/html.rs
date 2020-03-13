@@ -80,7 +80,7 @@ fn child_items_section(
                     li {
                         h3 {
                             a(href=&name) {
-                                name
+                                : name
                             }
                         }
                         : info_section(info);
