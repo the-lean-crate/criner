@@ -57,7 +57,6 @@ pub trait Generator {
         mut progress: prodash::tree::Item,
         reports: async_std::sync::Receiver<Result<Option<Self::Report>>>,
     ) -> Result<()> {
-        progress.init(None, Some("reports"));
         let mut report = None::<Self::Report>;
         let mut count = 0;
         while let Some(result) = reports.recv().await {

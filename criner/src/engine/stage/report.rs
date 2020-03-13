@@ -39,15 +39,13 @@ pub async fn generate(
 
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
     std::fs::create_dir_all(&waste_report_dir)?;
-    let merge_reports = pool.spawn_with_handle(
-        report::waste::Generator::merge_reports(
-            waste_report_dir.clone(),
-            progress.add_child("report aggregator"),
-            rx_result,
-        )
-        .map(|_| ())
-        .boxed(),
-    )?;
+    let merge_reports = pool.spawn_with_handle({
+        let mut merge_progress = progress.add_child("report aggregator");
+        merge_progress.init(Some(num_crates / chunk_size), Some("Reports"));
+        report::waste::Generator::merge_reports(waste_report_dir.clone(), merge_progress, rx_result)
+            .map(|_| ())
+            .boxed()
+    })?;
     let mut connection = krates.connection().lock();
     let mut statement =
         new_key_value_query_old_to_new(persistence::CrateTable::table_name(), &mut *connection)?;
