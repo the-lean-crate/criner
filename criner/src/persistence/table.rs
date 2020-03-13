@@ -108,10 +108,21 @@ pub trait TableAccess {
     fn into_connection(self) -> ThreadSafeConnection;
 
     fn count(&self) -> u64 {
+        self.count_filtered(None)
+    }
+
+    fn count_filtered(&self, glob: Option<&str>) -> u64 {
         self.connection()
             .lock()
             .query_row(
-                &format!("SELECT COUNT(*) FROM {}", Self::table_name()),
+                &format!(
+                    "SELECT COUNT(*) FROM {} {}",
+                    Self::table_name(),
+                    match glob {
+                        Some(glob) => format!("where key glob \"{}\"", glob),
+                        None => "".into(),
+                    }
+                ),
                 NO_PARAMS,
                 |r| r.get::<_, i64>(0),
             )

@@ -20,12 +20,13 @@ pub async fn generate(
 ) -> Result<()> {
     use report::generic::Generator;
     let krates = db.open_crates()?;
-    let chunk_size = 500;
     let output_dir = assets_dir
         .parent()
         .expect("assets directory to be in criner.db")
         .join("reports");
-    let num_crates = krates.count() as u32;
+    let glob_str = glob.as_ref().map(|s| s.as_str());
+    let num_crates = krates.count_filtered(glob_str.clone()) as u32;
+    let chunk_size = 500.min(num_crates);
     progress.init(Some(num_crates), Some("crates"));
 
     let (rx_result, tx) = {
@@ -40,7 +41,7 @@ pub async fn generate(
 
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
     async_std::fs::create_dir_all(&waste_report_dir).await?;
-    let cache_dir = match glob {
+    let cache_dir = match glob.as_ref() {
         Some(_) => None,
         None => {
             let cd = waste_report_dir.join("cache");
@@ -63,7 +64,7 @@ pub async fn generate(
     let mut connection = krates.connection().lock();
     let mut statement = new_key_value_query_old_to_new_filtered(
         persistence::CrateTable::table_name(),
-        glob.as_ref().map(|s| s.as_str()),
+        glob_str,
         &mut *connection,
     )?;
     let mut rows = statement.query(NO_PARAMS)?;

@@ -55,7 +55,7 @@ fn page_footer() -> impl Render {
     html! {
         footer {
             p {
-                : "Created by";
+                : "Created by ";
                 a(href="https://github.com/Byron/"): "Byron";
             }
             p {
