@@ -65,11 +65,16 @@ fn page_footer() -> impl Render {
     }
 }
 
-fn child_items_section(info_by_child: Dict<VersionInfo>) -> Box<dyn RenderBox> {
+fn child_items_section(
+    title: impl Into<String>,
+    info_by_child: Dict<VersionInfo>,
+) -> Box<dyn RenderBox> {
+    let title = title.into();
     let mut sorted: Vec<_> = Vec::from_iter(info_by_child.into_iter());
     sorted.sort_by_key(|(_, e)| e.waste.total_bytes);
     box_html! {
         section {
+            h1: title;
             ol {
                 @ for (name, info) in sorted.into_iter().rev() {
                     li {
@@ -91,6 +96,7 @@ fn by_extension_section(wasted_by_extension: Dict<AggregateFileInfo>) -> Box<dyn
     sorted.sort_by_key(|(_, e)| e.total_bytes);
     box_html! {
         section {
+            h1: "Waste by Extension";
             ol {
                 @ for (name, info) in sorted.into_iter().rev() {
                     li {
@@ -165,8 +171,8 @@ impl RenderOnce for Report {
                         article {
                             : title_section(crate_name);
                             : total_section(total_size_in_bytes, total_files);
-                            : child_items_section(info_by_version);
                             : by_extension_section(wasted_by_extension);
+                            : child_items_section("Versions", info_by_version);
                         }
                     }
                     : page_footer();
@@ -185,8 +191,8 @@ impl RenderOnce for Report {
                         article {
                             : title_section(title);
                             : total_section(total_size_in_bytes, total_files);
-                            : child_items_section(info_by_crate);
                             : by_extension_section(wasted_by_extension);
+                            : child_items_section("Crates", info_by_crate);
                         }
                     }
                     : page_footer();
