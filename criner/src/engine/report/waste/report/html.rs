@@ -4,6 +4,8 @@ use bytesize::ByteSize;
 use horrorshow::{box_html, html, Render, RenderBox, RenderOnce, TemplateBuffer};
 use std::iter::FromIterator;
 
+// TODO: fix these unnecessary clones while maintaining composability
+
 fn total_section(bytes: u64, files: u64) -> Box<dyn Render> {
     box_html! {
         section {
