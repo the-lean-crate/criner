@@ -1,4 +1,5 @@
 use super::{Dict, Report, VersionInfo};
+use crate::engine::report::waste::AggregateFileInfo;
 use bytesize::ByteSize;
 use horrorshow::{box_html, html, Render, RenderBox, RenderOnce, TemplateBuffer};
 
@@ -61,14 +62,33 @@ fn page_footer() -> impl Render {
     }
 }
 
-fn child_items(info_by_child: Dict<VersionInfo>) -> Box<dyn RenderBox> {
+fn child_items_section(info_by_child: Dict<VersionInfo>) -> Box<dyn RenderBox> {
     box_html! {
         section {
             ol {
                 @ for (name, info) in info_by_child.into_iter() {
                     li {
-                        h3: name;
+                        h3 {
+                            a(href=&name) {
+                                name
+                            }
+                        }
                         : info_section(info);
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn by_extension_section(wasted_by_extension: Dict<AggregateFileInfo>) -> Box<dyn RenderBox> {
+    box_html! {
+        section {
+            ol {
+                @ for (name, info) in wasted_by_extension.into_iter() {
+                    li {
+                        h3: format!("*.{}", name);
+                        p: format!("{} waste in {} files", ByteSize(info.total_bytes), info.total_files);
                     }
                 }
             }
@@ -130,7 +150,7 @@ impl RenderOnce for Report {
                 total_size_in_bytes,
                 total_files,
                 info_by_version,
-                wasted_by_extension: _,
+                wasted_by_extension,
             } => {
                 tmpl << html! {
                     : page_head(crate_name.clone());
@@ -138,7 +158,8 @@ impl RenderOnce for Report {
                         article {
                             : title_section(crate_name);
                             : total_section(total_size_in_bytes, total_files);
-                            : child_items(info_by_version);
+                            : child_items_section(info_by_version);
+                            : by_extension_section(wasted_by_extension);
                         }
                     }
                     : page_footer();
@@ -148,7 +169,7 @@ impl RenderOnce for Report {
                 total_size_in_bytes,
                 total_files,
                 info_by_crate,
-                wasted_by_extension: _,
+                wasted_by_extension,
             } => {
                 let title = "crates.io";
                 tmpl << html! {
@@ -157,7 +178,8 @@ impl RenderOnce for Report {
                         article {
                             : title_section(title);
                             : total_section(total_size_in_bytes, total_files);
-                            : child_items(info_by_crate);
+                            : child_items_section(info_by_crate);
+                            : by_extension_section(wasted_by_extension);
                         }
                     }
                     : page_footer();
