@@ -40,7 +40,8 @@ pub async fn non_blocking(
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
     fetch_settings: impl Into<StageRunSettings>,
-    process_and_report_settings: impl Into<StageRunSettings>,
+    process_settings: impl Into<StageRunSettings>,
+    report_settings: impl Into<StageRunSettings>,
     assets_dir: PathBuf,
     pool: impl Spawn + Clone + Send + 'static + Sync,
     tokio: tokio::runtime::Handle,
@@ -76,7 +77,7 @@ pub async fn non_blocking(
         .map(|_| ()),
     )?;
 
-    let settings = process_and_report_settings.into();
+    let settings = process_settings.into();
     repeat_every_s(
         settings.every.as_secs() as u32,
         {
@@ -86,35 +87,51 @@ pub async fn non_blocking(
         deadline,
         settings.at_most,
         {
+            let progress = progress.clone();
+            let db = db.clone();
+            let assets_dir = assets_dir.clone();
+            let pool = pool.clone();
+            let tokio = tokio.clone();
             move || {
-                let progress = progress.clone();
-                let db = db.clone();
-                let assets_dir = assets_dir.clone();
-                let pool = pool.clone();
-                let tokio = tokio.clone();
-                async move {
-                    stage::processing::process(
-                        db.clone(),
-                        progress.add_child("Process Crate Versions"),
-                        io_bound_processors,
-                        cpu_bound_processors,
-                        progress.add_child("Downloads"),
-                        tokio.clone(),
-                        pool.clone(),
-                        assets_dir.clone(),
-                        startup_time,
-                    )
-                    .await?;
-                    stage::report::generate(
-                        db.clone(),
-                        progress.add_child("Reports"),
-                        assets_dir.clone(),
-                        deadline,
-                        cpu_o_bound_processors,
-                        pool.clone(),
-                    )
-                    .await
-                }
+                stage::processing::process(
+                    db.clone(),
+                    progress.add_child("Process Crate Versions"),
+                    io_bound_processors,
+                    cpu_bound_processors,
+                    progress.add_child("Downloads"),
+                    tokio.clone(),
+                    pool.clone(),
+                    assets_dir.clone(),
+                    startup_time,
+                )
+            }
+        },
+    )
+    .await?;
+
+    let settings = report_settings.into();
+    repeat_every_s(
+        settings.every.as_secs() as u32,
+        {
+            let p = progress.clone();
+            move || p.add_child("Reporting Timer")
+        },
+        deadline,
+        settings.at_most,
+        {
+            let progress = progress.clone();
+            let db = db.clone();
+            let assets_dir = assets_dir.clone();
+            let pool = pool.clone();
+            move || {
+                stage::report::generate(
+                    db.clone(),
+                    progress.add_child("Reports"),
+                    assets_dir.clone(),
+                    deadline,
+                    cpu_o_bound_processors,
+                    pool.clone(),
+                )
             }
         },
     )
@@ -130,7 +147,8 @@ pub fn blocking(
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
     fetch_settings: impl Into<StageRunSettings>,
-    process_and_report_settings: impl Into<StageRunSettings>,
+    process_settings: impl Into<StageRunSettings>,
+    report_settings: impl Into<StageRunSettings>,
     root: prodash::Tree,
     gui: Option<prodash::tui::TuiOptions>,
 ) -> Result<()> {
@@ -168,7 +186,8 @@ pub fn blocking(
         cpu_bound_processors,
         cpu_o_bound_processors,
         fetch_settings,
-        process_and_report_settings,
+        process_settings,
+        report_settings,
         assets_dir,
         task_pool.clone(),
         tokio_rt.handle().clone(),

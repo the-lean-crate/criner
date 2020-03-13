@@ -26,8 +26,10 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             progress_message_scrollback_buffer_size,
             fetch_every,
             fetch_at_most,
-            process_and_report_every,
-            process_and_report_at_most,
+            process_every,
+            process_at_most,
+            report_every,
+            report_at_most,
         } => criner::run::blocking(
             db_path,
             repository
@@ -41,8 +43,12 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
                 at_most: fetch_at_most,
             },
             criner::run::StageRunSettings {
-                every: process_and_report_every.into(),
-                at_most: process_and_report_at_most,
+                every: process_every.into(),
+                at_most: process_at_most,
+            },
+            criner::run::StageRunSettings {
+                every: report_every.into(),
+                at_most: report_at_most,
             },
             criner::prodash::TreeOptions {
                 message_buffer_capacity: progress_message_scrollback_buffer_size,
