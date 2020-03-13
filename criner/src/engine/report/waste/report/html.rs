@@ -65,16 +65,26 @@ fn page_footer() -> impl Render {
     }
 }
 
+#[derive(Clone, Copy)]
+enum SortOrder {
+    Name,
+    Waste,
+}
+
 fn child_items_section(
     title: impl Into<String>,
     info_by_child: Dict<VersionInfo>,
     prefix: String,
     suffix: impl Into<String>,
+    order: SortOrder,
 ) -> Box<dyn RenderBox> {
     let title = title.into();
     let suffix = suffix.into();
     let mut sorted: Vec<_> = Vec::from_iter(info_by_child.into_iter());
-    sorted.sort_by_key(|(_, e)| e.waste.total_bytes);
+    sorted.sort_by(|(ln, le), (rn, re)| match order {
+        SortOrder::Name => ln.cmp(rn),
+        SortOrder::Waste => le.waste.total_bytes.cmp(&re.waste.total_bytes),
+    });
     box_html! {
         section {
             h1: title;
@@ -175,7 +185,7 @@ impl RenderOnce for Report {
                             : title_section(crate_name.clone());
                             : total_section(total_size_in_bytes, total_files);
                             : by_extension_section(wasted_by_extension);
-                            : child_items_section("Versions", info_by_version, format!("{}/", crate_name), ".html");
+                            : child_items_section("Versions", info_by_version, format!("{}/", crate_name), ".html", SortOrder::Name);
                         }
                     }
                     : page_footer();
@@ -206,7 +216,7 @@ impl RenderOnce for Report {
                                 h3: format!("{} wasted in {} files", ByteSize(waste_in_bytes), wasted_files_count);
                             }
                             : by_extension_section(wasted_by_extension);
-                            : child_items_section("Crates", info_by_crate, no_prefix, no_suffix);
+                            : child_items_section("Crates", info_by_crate, no_prefix, no_suffix, SortOrder::Waste);
                         }
                     }
                     : page_footer();
