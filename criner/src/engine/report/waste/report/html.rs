@@ -35,6 +35,16 @@ impl RenderOnce for Report {
                                 h3: "total files";
                                 p: total_files
                             }
+                            @ if suggested_fix.is_some() {
+                                section {
+                                    h3: "Fix";
+                                    section {
+                                        |t| write!(t, "{:#?}", suggested_fix.unwrap())
+                                    }
+                                }
+                            } else {
+                                p: "Perfectly lean!"
+                            }
                             @ if !wasted_files.is_empty() {
                                 section {
                                     h3: format!("{} wasted files", wasted_files.len());
@@ -46,16 +56,6 @@ impl RenderOnce for Report {
                                         }
                                     }
                                 }
-                            }
-                            @ if suggested_fix.is_some() {
-                                section {
-                                    h3: "Fix";
-                                    section {
-                                        |t| write!(t, "{:#?}", suggested_fix.unwrap())
-                                    }
-                                }
-                            } else {
-                                p: "Perfectly lean!"
                             }
                         }
                     }
