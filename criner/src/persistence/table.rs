@@ -23,14 +23,26 @@ pub fn new_value_query_recent_first<'conn>(
     ))?)
 }
 
+pub fn new_key_value_query_old_to_new_filtered<'conn>(
+    table_name: &str,
+    glob: Option<&str>,
+    connection: &'conn rusqlite::Connection,
+) -> Result<rusqlite::Statement<'conn>> {
+    Ok(connection.prepare(&format!(
+        "SELECT key,data FROM {} {} ORDER BY _rowid_ ASC",
+        table_name,
+        match glob {
+            Some(glob) => format!("where key glob \"{}\"", glob),
+            None => "".into(),
+        }
+    ))?)
+}
+
 pub fn new_key_value_query_old_to_new<'conn>(
     table_name: &str,
     connection: &'conn rusqlite::Connection,
 ) -> Result<rusqlite::Statement<'conn>> {
-    Ok(connection.prepare(&format!(
-        "SELECT key,data FROM {} ORDER BY _rowid_ ASC",
-        table_name
-    ))?)
+    new_key_value_query_old_to_new_filtered(table_name, None, connection)
 }
 
 pub fn new_key_value_insertion<'conn>(

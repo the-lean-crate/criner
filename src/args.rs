@@ -53,7 +53,7 @@ pub enum SubCommands {
         cpu_bound_processors: u32,
 
         /// Path to the possibly existing crates.io repository clone. If unset, it will be cloned to a temporary spot.
-        #[structopt(short = "g", long, name = "REPO")]
+        #[structopt(short = "c", long, name = "REPO")]
         repository: Option<PathBuf>,
 
         /// The amount of time we can take for the computation. Specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
@@ -83,6 +83,12 @@ pub enum SubCommands {
         /// If set, the amount of times the reporting stage will run. If set to 0, they will never run.
         #[structopt(long, short = "R")]
         report_at_most: Option<usize>,
+
+        /// If set, the reporting stage will only iterate over crates that match the given standard unix glob.
+        ///
+        /// moz* would match only crates starting with 'moz' for example.
+        #[structopt(long, short = "g")]
+        glob: Option<String>,
 
         /// Path to the possibly existing database. It's used to persist all mining results.
         db_path: PathBuf,
@@ -126,6 +132,7 @@ impl Default for SubCommands {
             report_every: std::time::Duration::from_secs(60).into(),
             report_at_most: None,
             db_path: PathBuf::from("criner.db"),
+            glob: None,
         }
     }
 }

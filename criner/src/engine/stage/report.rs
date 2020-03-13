@@ -1,4 +1,4 @@
-use crate::persistence::new_key_value_query_old_to_new;
+use crate::persistence::{new_key_value_query_old_to_new_filtered};
 use crate::{
     engine::{report, work},
     error::Result,
@@ -13,6 +13,7 @@ pub async fn generate(
     db: persistence::Db,
     mut progress: prodash::tree::Item,
     assets_dir: PathBuf,
+    glob: Option<String>,
     deadline: Option<SystemTime>,
     cpu_o_bound_processors: u32,
     pool: impl Spawn + Clone + Send + 'static + Sync,
@@ -38,7 +39,7 @@ pub async fn generate(
     };
 
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
-    std::fs::create_dir_all(&waste_report_dir)?;
+    async_std::fs::create_dir_all(&waste_report_dir).await?;
     let merge_reports = pool.spawn_with_handle({
         let mut merge_progress = progress.add_child("report aggregator");
         merge_progress.init(Some(num_crates / chunk_size), Some("Reports"));
@@ -47,8 +48,11 @@ pub async fn generate(
             .boxed()
     })?;
     let mut connection = krates.connection().lock();
-    let mut statement =
-        new_key_value_query_old_to_new(persistence::CrateTable::table_name(), &mut *connection)?;
+    let mut statement = new_key_value_query_old_to_new_filtered(
+        persistence::CrateTable::table_name(),
+        glob.as_ref().map(|s| s.as_str()),
+        &mut *connection,
+    )?;
     let mut rows = statement.query(NO_PARAMS)?;
     let mut chunk = Vec::<(String, Vec<u8>)>::with_capacity(chunk_size as usize);
     let mut cid = 0;

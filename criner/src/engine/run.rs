@@ -18,13 +18,10 @@ pub struct StageRunSettings {
     pub at_most: Option<usize>,
 }
 
-impl From<Duration> for StageRunSettings {
-    fn from(duration: Duration) -> Self {
-        StageRunSettings {
-            every: duration,
-            at_most: None,
-        }
-    }
+/// Like `StageRunSettings`, but also provides a glob pattern
+pub struct GlobStageRunSettings {
+    pub glob: Option<String>,
+    pub run: StageRunSettings,
 }
 
 /// Runs the statistics and mining engine.
@@ -39,9 +36,9 @@ pub async fn non_blocking(
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
-    fetch_settings: impl Into<StageRunSettings>,
-    process_settings: impl Into<StageRunSettings>,
-    report_settings: impl Into<StageRunSettings>,
+    fetch_settings: StageRunSettings,
+    process_settings: StageRunSettings,
+    report_settings: GlobStageRunSettings,
     assets_dir: PathBuf,
     pool: impl Spawn + Clone + Send + 'static + Sync,
     tokio: tokio::runtime::Handle,
@@ -49,16 +46,16 @@ pub async fn non_blocking(
     check(deadline)?;
     let startup_time = SystemTime::now();
 
-    let settings = fetch_settings.into();
+    let run = fetch_settings;
     pool.spawn(
         repeat_every_s(
-            settings.every.as_secs() as u32,
+            run.every.as_secs() as u32,
             {
                 let p = progress.clone();
                 move || p.add_child("Fetch Timer")
             },
             deadline,
-            settings.at_most,
+            run.at_most,
             {
                 let db = db.clone();
                 let progress = progress.clone();
@@ -77,15 +74,15 @@ pub async fn non_blocking(
         .map(|_| ()),
     )?;
 
-    let settings = process_settings.into();
+    let run = process_settings;
     repeat_every_s(
-        settings.every.as_secs() as u32,
+        run.every.as_secs() as u32,
         {
             let p = progress.clone();
             move || p.add_child("Processing Timer")
         },
         deadline,
-        settings.at_most,
+        run.at_most,
         {
             let progress = progress.clone();
             let db = db.clone();
@@ -109,25 +106,27 @@ pub async fn non_blocking(
     )
     .await?;
 
-    let settings = report_settings.into();
+    let stage = report_settings;
     repeat_every_s(
-        settings.every.as_secs() as u32,
+        stage.run.every.as_secs() as u32,
         {
             let p = progress.clone();
             move || p.add_child("Reporting Timer")
         },
         deadline,
-        settings.at_most,
+        stage.run.at_most,
         {
             let progress = progress.clone();
             let db = db.clone();
             let assets_dir = assets_dir.clone();
             let pool = pool.clone();
+            let glob = stage.glob;
             move || {
                 stage::report::generate(
                     db.clone(),
                     progress.add_child("Reports"),
                     assets_dir.clone(),
+                    glob.clone(),
                     deadline,
                     cpu_o_bound_processors,
                     pool.clone(),
@@ -146,9 +145,9 @@ pub fn blocking(
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
-    fetch_settings: impl Into<StageRunSettings>,
-    process_settings: impl Into<StageRunSettings>,
-    report_settings: impl Into<StageRunSettings>,
+    fetch_settings: StageRunSettings,
+    process_settings: StageRunSettings,
+    report_settings: GlobStageRunSettings,
     root: prodash::Tree,
     gui: Option<prodash::tui::TuiOptions>,
 ) -> Result<()> {

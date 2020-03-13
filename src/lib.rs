@@ -30,6 +30,7 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             process_at_most,
             report_every,
             report_at_most,
+            glob,
         } => criner::run::blocking(
             db_path,
             repository
@@ -46,9 +47,12 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
                 every: process_every.into(),
                 at_most: process_at_most,
             },
-            criner::run::StageRunSettings {
-                every: report_every.into(),
-                at_most: report_at_most,
+            criner::run::GlobStageRunSettings {
+                run: criner::run::StageRunSettings {
+                    every: report_every.into(),
+                    at_most: report_at_most,
+                },
+                glob,
             },
             criner::prodash::TreeOptions {
                 message_buffer_capacity: progress_message_scrollback_buffer_size,
