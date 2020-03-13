@@ -111,6 +111,8 @@ pub trait Generator {
             // delaying writes works because we don't have overlap on work
             for (name, krate) in krates.into_iter() {
                 let c: model::Crate = krate.as_slice().into();
+                let crate_dir = crate_dir(&out_dir, &name);
+                async_std::fs::create_dir_all(&crate_dir).await?;
                 progress.init(Some(c.versions.len() as u32), Some("versions"));
                 progress.set_name(&name);
 
@@ -128,11 +130,7 @@ pub trait Generator {
                         if let Some(result) =
                             Self::get_result(connection.clone(), &name, &version, &mut key_buf)?
                         {
-                            let out_file = output_file_html(&out_dir, &name, &version);
-                            async_std::fs::create_dir_all(
-                                out_file.parent().expect("parent dir for file"),
-                            )
-                            .await?;
+                            let out_file = output_file_html(&crate_dir, &version);
                             let version_report = Self::generate_single_file(
                                 &out_file,
                                 &name,
@@ -151,22 +149,21 @@ pub trait Generator {
                     }
                 }
                 if let Some(mut crate_report) = crate_report {
-                    let cache_dir = crate_dir(&out_dir, &name);
                     let previous_state = crate_report
-                        .load_previous_state(&cache_dir, &mut progress)
+                        .load_previous_state(&crate_dir, &mut progress)
                         .await;
                     match previous_state {
                         Some(previous_state) => {
                             let mut absolute_state = previous_state.merge(crate_report.clone());
-                            absolute_state.complete(&cache_dir, &mut progress).await?;
+                            absolute_state.complete(&crate_dir, &mut progress).await?;
                             absolute_state
-                                .store_current_state(&cache_dir, &mut progress)
+                                .store_current_state(&crate_dir, &mut progress)
                                 .await?;
                         }
                         None => {
-                            crate_report.complete(&cache_dir, &mut progress).await?;
+                            crate_report.complete(&crate_dir, &mut progress).await?;
                             crate_report
-                                .store_current_state(&cache_dir, &mut progress)
+                                .store_current_state(&crate_dir, &mut progress)
                                 .await?;
                         }
                     }
@@ -204,6 +201,6 @@ fn crate_dir(base: &Path, crate_name: &str) -> PathBuf {
     base.join(crate_name)
 }
 
-fn output_file_html(base: &Path, crate_name: &str, version: &str) -> PathBuf {
-    crate_dir(base, crate_name).join(version).join("index.html")
+fn output_file_html(crate_dir: &Path, version: &str) -> PathBuf {
+    crate_dir.join(version)
 }
