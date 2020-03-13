@@ -1,4 +1,4 @@
-use super::Report;
+use super::{Dict, Report, VersionInfo};
 use bytesize::ByteSize;
 use horrorshow::{box_html, html, Render, RenderBox, RenderOnce, TemplateBuffer};
 
@@ -15,7 +15,8 @@ fn total_section(bytes: u64, files: u64) -> Box<dyn Render> {
     }
 }
 
-fn title_section(title: String) -> Box<dyn RenderBox> {
+fn title_section(title: impl Into<String>) -> Box<dyn RenderBox> {
+    let title = title.into();
     box_html! {
         head {
             title: title
@@ -23,10 +24,54 @@ fn title_section(title: String) -> Box<dyn RenderBox> {
     }
 }
 
-fn page_head(title: String) -> Box<dyn RenderBox> {
+fn page_head(title: impl Into<String>) -> Box<dyn RenderBox> {
+    let title = title.into();
     box_html! {
         head {
             title: title
+        }
+    }
+}
+
+fn info_section(info: VersionInfo) -> Box<dyn RenderBox> {
+    let VersionInfo { all, waste } = info;
+    box_html! {
+        section {
+            h3: "Total";
+            p: format!("{} total in {} files", ByteSize(all.total_bytes), all.total_files);
+        }
+        section {
+            h3: "Waste";
+            p: format!("{} wasted in {} files", ByteSize(waste.total_bytes), waste.total_files);
+        }
+    }
+}
+
+fn page_footer() -> impl Render {
+    html! {
+        footer {
+            p {
+                : "Created by";
+                a(href="https://github.com/Byron/"): "Byron";
+            }
+            p {
+                a(href="https://github.com/crates-io/criner/issues/new"): "Provide feedback";
+            }
+        }
+    }
+}
+
+fn child_items(info_by_child: Dict<VersionInfo>) -> Box<dyn RenderBox> {
+    box_html! {
+        section {
+            ol {
+                @ for (name, info) in info_by_child.into_iter() {
+                    li {
+                        h3: name;
+                        : info_section(info);
+                    }
+                }
+            }
         }
     }
 }
@@ -67,7 +112,7 @@ impl RenderOnce for Report {
                                 section {
                                     h3: format!("{} wasted files", wasted_files.len());
                                     p: format!("total waste: {}", ByteSize(wasted_files.iter().map(|(_, s)| s).sum::<u64>()));
-                                    ol(id="count") {
+                                    ol {
                                         // You can embed for loops, while loops, and if statements.
                                         @ for (path, size) in wasted_files {
                                             li : format_args!("{} : {}", path, ByteSize(size))
@@ -77,13 +122,14 @@ impl RenderOnce for Report {
                             }
                         }
                     }
+                    : page_footer();
                 }
             }
             Crate {
                 crate_name,
                 total_size_in_bytes,
                 total_files,
-                info_by_version: _,
+                info_by_version,
                 wasted_by_extension: _,
             } => {
                 tmpl << html! {
@@ -92,11 +138,31 @@ impl RenderOnce for Report {
                         article {
                             : title_section(crate_name);
                             : total_section(total_size_in_bytes, total_files);
+                            : child_items(info_by_version);
                         }
                     }
+                    : page_footer();
                 }
             }
-            CrateCollection { .. } => unimplemented!("html crate collection"),
+            CrateCollection {
+                total_size_in_bytes,
+                total_files,
+                info_by_crate,
+                wasted_by_extension: _,
+            } => {
+                let title = "crates.io";
+                tmpl << html! {
+                    : page_head(title);
+                    body {
+                        article {
+                            : title_section(title);
+                            : total_section(total_size_in_bytes, total_files);
+                            : child_items(info_by_crate);
+                        }
+                    }
+                    : page_footer();
+                }
+            }
         }
     }
 }
