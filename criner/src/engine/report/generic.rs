@@ -54,6 +54,7 @@ pub trait Generator {
 
     async fn merge_reports(
         out_dir: PathBuf,
+        cache_dir: Option<PathBuf>,
         mut progress: prodash::tree::Item,
         reports: async_std::sync::Receiver<Result<Option<Self::Report>>>,
     ) -> Result<()> {
@@ -76,13 +77,18 @@ pub trait Generator {
             };
         }
         if let Some(mut report) = report {
-            let previous_report = report.load_previous_state(&out_dir, &mut progress).await;
+            let previous_report = match cache_dir.as_ref() {
+                Some(cd) => report.load_previous_state(&cd, &mut progress).await,
+                None => None,
+            };
             report = match previous_report {
                 Some(previous_report) => previous_report.merge(report),
                 None => report,
             };
             report.complete(&out_dir, &mut progress).await?;
-            report.store_current_state(&out_dir, &mut progress).await?;
+            if let Some(cd) = cache_dir {
+                report.store_current_state(&cd, &mut progress).await?;
+            }
         }
         Ok(())
     }
@@ -98,6 +104,7 @@ pub trait Generator {
     async fn write_files(
         db: persistence::Db,
         out_dir: PathBuf,
+        cache_dir: Option<PathBuf>,
         krates: Vec<(String, Vec<u8>)>,
         mut progress: prodash::tree::Item,
     ) -> Result<Option<Self::Report>> {
@@ -148,22 +155,25 @@ pub trait Generator {
                     }
                 }
                 if let Some(mut crate_report) = crate_report {
-                    let previous_state = crate_report
-                        .load_previous_state(&crate_dir, &mut progress)
-                        .await;
+                    let previous_state = match cache_dir.as_ref() {
+                        Some(cd) => crate_report.load_previous_state(&cd, &mut progress).await,
+                        None => None,
+                    };
                     match previous_state {
                         Some(previous_state) => {
                             let mut absolute_state = previous_state.merge(crate_report.clone());
                             absolute_state.complete(&crate_dir, &mut progress).await?;
-                            absolute_state
-                                .store_current_state(&crate_dir, &mut progress)
-                                .await?;
+                            if let Some(cd) = cache_dir.as_ref() {
+                                absolute_state
+                                    .store_current_state(&cd, &mut progress)
+                                    .await?;
+                            };
                         }
                         None => {
                             crate_report.complete(&crate_dir, &mut progress).await?;
-                            crate_report
-                                .store_current_state(&crate_dir, &mut progress)
-                                .await?;
+                            if let Some(cd) = cache_dir.as_ref() {
+                                crate_report.store_current_state(&cd, &mut progress).await?;
+                            }
                         }
                     }
                     chunk_report = Some(match chunk_report {

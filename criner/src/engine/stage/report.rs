@@ -1,4 +1,4 @@
-use crate::persistence::{new_key_value_query_old_to_new_filtered};
+use crate::persistence::new_key_value_query_old_to_new_filtered;
 use crate::{
     engine::{report, work},
     error::Result,
@@ -40,12 +40,25 @@ pub async fn generate(
 
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
     async_std::fs::create_dir_all(&waste_report_dir).await?;
+    let cache_dir = match glob {
+        Some(_) => None,
+        None => {
+            let cd = waste_report_dir.join("cache");
+            async_std::fs::create_dir_all(&cd).await?;
+            Some(cd)
+        }
+    };
     let merge_reports = pool.spawn_with_handle({
         let mut merge_progress = progress.add_child("report aggregator");
         merge_progress.init(Some(num_crates / chunk_size), Some("Reports"));
-        report::waste::Generator::merge_reports(waste_report_dir.clone(), merge_progress, rx_result)
-            .map(|_| ())
-            .boxed()
+        report::waste::Generator::merge_reports(
+            waste_report_dir.clone(),
+            cache_dir.clone(),
+            merge_progress,
+            rx_result,
+        )
+        .map(|_| ())
+        .boxed()
     })?;
     let mut connection = krates.connection().lock();
     let mut statement = new_key_value_query_old_to_new_filtered(
@@ -67,6 +80,7 @@ pub async fn generate(
                 report::waste::Generator::write_files(
                     db.clone(),
                     waste_report_dir.clone(),
+                    cache_dir.clone(),
                     chunk,
                     progress.add_child(""),
                 )
