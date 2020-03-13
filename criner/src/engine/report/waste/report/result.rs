@@ -406,11 +406,12 @@ impl Report {
             if include_added.is_empty() && include_removed.is_empty() {
                 None
             } else {
-            Some(Fix::RemoveExcludeAndUseInclude {
-                include_added,
-                include,
-                include_removed,
-            })}
+                Some(Fix::RemoveExcludeAndUseInclude {
+                    include_added,
+                    include,
+                    include_removed,
+                })
+            }
         };
 
         (fix, entries_that_should_be_excluded)
@@ -448,12 +449,13 @@ impl Report {
                 if include_removed.is_empty() && include_added.is_empty() {
                     None
                 } else {
-                Some(Fix::EnrichedInclude {
-                    include,
-                    include_removed,
-                    include_added,
-                    has_build_script,
-                })},
+                    Some(Fix::EnrichedInclude {
+                        include,
+                        include_removed,
+                        include_added,
+                        has_build_script,
+                    })
+                },
                 wasted_files,
             )
         }
@@ -484,13 +486,14 @@ impl Report {
         } else {
             (
                 if exclude_added.is_empty() {
-                   None
+                    None
                 } else {
-                Some(Fix::EnrichedExclude {
-                    exclude,
-                    exclude_added,
-                    has_build_script,
-                })},
+                    Some(Fix::EnrichedExclude {
+                        exclude,
+                        exclude_added,
+                        has_build_script,
+                    })
+                },
                 wasted_files,
             )
         }

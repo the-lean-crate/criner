@@ -1,6 +1,35 @@
 use super::Report;
 use bytesize::ByteSize;
-use horrorshow::{html, RenderOnce, TemplateBuffer};
+use horrorshow::{box_html, html, Render, RenderBox, RenderOnce, TemplateBuffer};
+
+fn total_section(bytes: u64, files: u64) -> Box<dyn Render> {
+    box_html! {
+        section {
+            h3: "total uncompressed bytes";
+            p: format!("{}", ByteSize(bytes))
+        }
+        section {
+            h3: "total files";
+            p: files
+        }
+    }
+}
+
+fn title_section(title: String) -> Box<dyn RenderBox> {
+    box_html! {
+        head {
+            title: title
+        }
+    }
+}
+
+fn page_head(title: String) -> Box<dyn RenderBox> {
+    box_html! {
+        head {
+            title: title
+        }
+    }
+}
 
 impl RenderOnce for Report {
     fn render_once(self, tmpl: &mut TemplateBuffer<'_>)
@@ -19,22 +48,11 @@ impl RenderOnce for Report {
             } => {
                 let title = format!("{}:{}", crate_name, crate_version);
                 tmpl << html! {
-                    head {
-                        title: &title
-                    }
+                    : page_head(title.clone());
                     body {
                         article {
-                            header {
-                                h1 : title
-                            }
-                            section {
-                                h3: "total uncompressed bytes";
-                                p: format!("{}", ByteSize(total_size_in_bytes))
-                            }
-                            section {
-                                h3: "total files";
-                                p: total_files
-                            }
+                            : title_section(title);
+                            : total_section(total_size_in_bytes, total_files);
                             @ if suggested_fix.is_some() {
                                 section {
                                     h3: "Fix";
@@ -61,7 +79,23 @@ impl RenderOnce for Report {
                     }
                 }
             }
-            Crate { .. } => unimplemented!("html crate"),
+            Crate {
+                crate_name,
+                total_size_in_bytes,
+                total_files,
+                info_by_version: _,
+                wasted_by_extension: _,
+            } => {
+                tmpl << html! {
+                    : page_head(crate_name.clone());
+                    body {
+                        article {
+                            : title_section(crate_name);
+                            : total_section(total_size_in_bytes, total_files);
+                        }
+                    }
+                }
+            }
             CrateCollection { .. } => unimplemented!("html crate collection"),
         }
     }
