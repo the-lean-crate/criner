@@ -68,6 +68,7 @@ fn page_footer() -> impl Render {
 fn child_items_section(
     title: impl Into<String>,
     info_by_child: Dict<VersionInfo>,
+    prefix: String,
 ) -> Box<dyn RenderBox> {
     let title = title.into();
     let mut sorted: Vec<_> = Vec::from_iter(info_by_child.into_iter());
@@ -79,7 +80,7 @@ fn child_items_section(
                 @ for (name, info) in sorted.into_iter().rev() {
                     li {
                         h3 {
-                            a(href=&name) {
+                            a(href=format!("{}{}", prefix, name)) {
                                 : name
                             }
                         }
@@ -169,10 +170,10 @@ impl RenderOnce for Report {
                     : page_head(crate_name.clone());
                     body {
                         article {
-                            : title_section(crate_name);
+                            : title_section(crate_name.clone());
                             : total_section(total_size_in_bytes, total_files);
                             : by_extension_section(wasted_by_extension);
-                            : child_items_section("Versions", info_by_version);
+                            : child_items_section("Versions", info_by_version, format!("{}/", crate_name));
                         }
                     }
                     : page_footer();
@@ -185,6 +186,7 @@ impl RenderOnce for Report {
                 wasted_by_extension,
             } => {
                 let title = "crates.io";
+                let no_prefix = String::new();
                 let (waste_in_bytes, wasted_files_count) =
                     wasted_by_extension
                         .iter()
@@ -201,7 +203,7 @@ impl RenderOnce for Report {
                                 h3: format!("{} wasted in {} files", ByteSize(waste_in_bytes), wasted_files_count);
                             }
                             : by_extension_section(wasted_by_extension);
-                            : child_items_section("Crates", info_by_crate);
+                            : child_items_section("Crates", info_by_crate, no_prefix);
                         }
                     }
                     : page_footer();

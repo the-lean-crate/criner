@@ -201,5 +201,5 @@ fn crate_dir(base: &Path, crate_name: &str) -> PathBuf {
 }
 
 fn output_file_html(crate_dir: &Path, version: &str) -> PathBuf {
-    crate_dir.join(version)
+    crate_dir.join(format!("{}.html", version))
 }
