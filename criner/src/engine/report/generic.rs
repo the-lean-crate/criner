@@ -129,7 +129,11 @@ pub trait Generator {
                     key_buf.clear();
                     Self::fq_report_key(&name, &version, &mut key_buf);
 
-                    if !reports.is_done(&key_buf) {
+                    // If we have no cache, assume we are globbed (yes, I know…sigh), so always produce reports
+                    // but don't invalidate data in caches by reading or writing them. Mostly used for testing
+                    // as it creates a sub-report, every time without having to fiddle with the
+                    // reports_done marker table.
+                    if cache_dir.is_none() || !reports.is_done(&key_buf) {
                         let reports_key = key_buf.clone();
                         key_buf.clear();
 
