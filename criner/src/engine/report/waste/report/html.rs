@@ -185,12 +185,21 @@ impl RenderOnce for Report {
                 wasted_by_extension,
             } => {
                 let title = "crates.io";
+                let (waste_in_bytes, wasted_files_count) =
+                    wasted_by_extension
+                        .iter()
+                        .fold((0, 0), |(waste_bytes, waste_files), e| {
+                            (waste_bytes + e.1.total_bytes, waste_files + e.1.total_files)
+                        });
                 tmpl << html! {
                     : page_head(title);
                     body {
                         article {
                             : title_section(title);
                             : total_section(total_size_in_bytes, total_files);
+                            section {
+                                h3: format!("{} wasted in {} files", ByteSize(waste_in_bytes), wasted_files_count);
+                            }
                             : by_extension_section(wasted_by_extension);
                             : child_items_section("Crates", info_by_crate);
                         }
