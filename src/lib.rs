@@ -3,6 +3,7 @@ use std::ops::Add;
 mod args;
 pub mod error;
 pub use args::*;
+use std::time::Duration;
 
 pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
     use SubCommands::*;
@@ -26,9 +27,8 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             progress_message_scrollback_buffer_size,
             fetch_every,
             fetch_at_most,
-            process_every,
             process_at_most,
-            report_every,
+            report_and_process_every,
             report_at_most,
             glob,
         } => criner::run::blocking(
@@ -44,12 +44,12 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
                 at_most: fetch_at_most,
             },
             criner::run::StageRunSettings {
-                every: process_every.into(),
+                every: Duration::default(),
                 at_most: process_at_most,
             },
             criner::run::GlobStageRunSettings {
                 run: criner::run::StageRunSettings {
-                    every: report_every.into(),
+                    every: report_and_process_every.into(),
                     at_most: report_at_most,
                 },
                 glob,
