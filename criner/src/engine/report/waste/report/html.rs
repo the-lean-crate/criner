@@ -2,6 +2,7 @@ use super::{Dict, Report, VersionInfo};
 use crate::engine::report::waste::AggregateFileInfo;
 use bytesize::ByteSize;
 use horrorshow::{box_html, html, Render, RenderBox, RenderOnce, TemplateBuffer};
+use std::iter::FromIterator;
 
 fn total_section(bytes: u64, files: u64) -> Box<dyn Render> {
     box_html! {
@@ -63,10 +64,12 @@ fn page_footer() -> impl Render {
 }
 
 fn child_items_section(info_by_child: Dict<VersionInfo>) -> Box<dyn RenderBox> {
+    let mut sorted: Vec<_> = Vec::from_iter(info_by_child.into_iter());
+    sorted.sort_by_key(|(_, e)| e.waste.total_bytes);
     box_html! {
         section {
             ol {
-                @ for (name, info) in info_by_child.into_iter() {
+                @ for (name, info) in sorted.into_iter().rev() {
                     li {
                         h3 {
                             a(href=&name) {
@@ -82,10 +85,12 @@ fn child_items_section(info_by_child: Dict<VersionInfo>) -> Box<dyn RenderBox> {
 }
 
 fn by_extension_section(wasted_by_extension: Dict<AggregateFileInfo>) -> Box<dyn RenderBox> {
+    let mut sorted: Vec<_> = Vec::from_iter(wasted_by_extension.into_iter());
+    sorted.sort_by_key(|(_, e)| e.total_bytes);
     box_html! {
         section {
             ol {
-                @ for (name, info) in wasted_by_extension.into_iter() {
+                @ for (name, info) in sorted.into_iter().rev() {
                     li {
                         h3: format!("*.{}", name);
                         p: format!("{} waste in {} files", ByteSize(info.total_bytes), info.total_files);
@@ -108,9 +113,10 @@ impl RenderOnce for Report {
                 crate_version,
                 total_files,
                 total_size_in_bytes,
-                wasted_files,
+                mut wasted_files,
                 suggested_fix,
             } => {
+                wasted_files.sort_by_key(|(_, s)| *s);
                 let title = format!("{}:{}", crate_name, crate_version);
                 tmpl << html! {
                     : page_head(title.clone());
@@ -131,10 +137,9 @@ impl RenderOnce for Report {
                             @ if !wasted_files.is_empty() {
                                 section {
                                     h3: format!("{} wasted files", wasted_files.len());
-                                    p: format!("total waste: {}", ByteSize(wasted_files.iter().map(|(_, s)| s).sum::<u64>()));
+                                    p: format!("total waste: {}", ByteSize(wasted_files.iter().map(|(_, s)| *s).sum::<u64>()));
                                     ol {
-                                        // You can embed for loops, while loops, and if statements.
-                                        @ for (path, size) in wasted_files {
+                                        @ for (path, size) in wasted_files.into_iter().rev() {
                                             li : format_args!("{} : {}", path, ByteSize(size))
                                         }
                                     }
