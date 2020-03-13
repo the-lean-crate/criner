@@ -395,7 +395,7 @@ impl Report {
             .extend(entries_that_should_be_excluded_by_directory.into_iter());
 
         let fix = if entries_that_should_be_excluded.is_empty() {
-            Fix::RemoveExclude
+            Some(Fix::RemoveExclude)
         } else {
             let (include, include_added, include_removed) =
                 find_include_patterns_that_incorporate_exclude_patterns(
@@ -403,14 +403,17 @@ impl Report {
                     &remaining_entries,
                     include,
                 );
-            Fix::RemoveExcludeAndUseInclude {
+            if include_added.is_empty() && include_removed.is_empty() {
+                None
+            } else {
+            Some(Fix::RemoveExcludeAndUseInclude {
                 include_added,
                 include,
                 include_removed,
-            }
+            })}
         };
 
-        (Some(fix), entries_that_should_be_excluded)
+        (fix, entries_that_should_be_excluded)
     }
 
     pub(crate) fn enrich_includes(
@@ -442,12 +445,15 @@ impl Report {
             (None, Vec::new())
         } else {
             (
+                if include_removed.is_empty() && include_added.is_empty() {
+                    None
+                } else {
                 Some(Fix::EnrichedInclude {
                     include,
                     include_removed,
                     include_added,
                     has_build_script,
-                }),
+                })},
                 wasted_files,
             )
         }
@@ -477,11 +483,14 @@ impl Report {
             (None, Vec::new())
         } else {
             (
+                if exclude_added.is_empty() {
+                   None
+                } else {
                 Some(Fix::EnrichedExclude {
                     exclude,
                     exclude_added,
                     has_build_script,
-                }),
+                })},
                 wasted_files,
             )
         }
