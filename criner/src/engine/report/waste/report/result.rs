@@ -148,7 +148,7 @@ fn split_by_matching_directories(
     split_to_matched_and_unmatched(entries, &globs)
 }
 
-fn filter_implicit_includes(
+fn remove_implicit_includes(
     include_patterns: &mut Patterns,
     mut removed_include_patterns: impl AsMut<Patterns>,
 ) {
@@ -197,7 +197,7 @@ fn find_include_patterns_that_incorporate_exclude_patterns(
         }
     }
 
-    filter_implicit_includes(&mut new_include_patterns, &mut removed_include_patterns);
+    remove_implicit_includes(&mut new_include_patterns, &mut removed_include_patterns);
     (
         new_include_patterns,
         added_include_patterns,
@@ -235,7 +235,7 @@ fn simplify_standard_includes(
                 .map(|e| tar_path_to_utf8_str(&e.path).to_owned()),
         );
     }
-    filter_implicit_includes(&mut out_patterns, Vec::new());
+    remove_implicit_includes(&mut out_patterns, Vec::new());
     out_patterns
 }
 
@@ -490,39 +490,26 @@ impl Report {
     }
 
     pub(crate) fn enrich_includes(
-        entries: Vec<TarHeader>,
+        _entries: Vec<TarHeader>,
         mut include: Patterns,
+        _compile_time_include: Option<Patterns>,
         has_build_script: bool,
     ) -> (Option<Fix>, Vec<TarHeader>) {
         let mut include_removed = Vec::new();
-        filter_implicit_includes(&mut include, &mut include_removed);
-        let (unmatched_files, include, include_added) = matches_in_set_a_but_not_in_set_b(
-            include.clone(),
-            standard_include_patterns(),
-            &include,
-            entries,
-        );
+        remove_implicit_includes(&mut include, &mut include_removed);
 
-        let include_globs = globset_from(&include);
-        let (_remaining_files, wasted_files) =
-            split_to_matched_and_unmatched(unmatched_files, &include_globs);
-        if wasted_files.is_empty() {
-            (None, Vec::new())
-        } else {
-            (
-                if include_removed.is_empty() && include_added.is_empty() {
-                    None
-                } else {
-                    Some(Fix::EnrichedInclude {
-                        include,
-                        include_removed,
-                        include_added,
-                        has_build_script,
-                    })
-                },
-                wasted_files,
-            )
-        }
+        (
+            if include_removed.is_empty() {
+                None
+            } else {
+                Some(Fix::ImprovedInclude {
+                    include,
+                    include_removed,
+                    has_build_script,
+                })
+            },
+            Vec::new(),
+        )
     }
 
     pub(crate) fn enrich_excludes(

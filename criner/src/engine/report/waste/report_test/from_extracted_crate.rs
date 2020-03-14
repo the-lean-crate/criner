@@ -47,7 +47,7 @@ fn cookie_factory() {
             total_size_in_bytes: 74569,
             total_files: 15,
             wasted_files: vec![],
-            suggested_fix: Some(Fix::EnrichedInclude {
+            suggested_fix: Some(Fix::ImprovedInclude {
                 include: [
                     "LICENSE",
                     "README.md",
@@ -59,7 +59,6 @@ fn cookie_factory() {
                 .iter()
                 .map(|s| s.to_string())
                 .collect(),
-                include_added: vec![],
                 include_removed: vec!["Cargo.toml".into()],
                 has_build_script: true
             })
