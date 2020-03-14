@@ -383,6 +383,24 @@ fn included_paths_of(file: Option<(TarHeader, Option<&[u8]>)>) -> Vec<String> {
         .unwrap_or_default()
 }
 
+fn build_script_paths(build: Option<(TarHeader, Option<&[u8]>)>) -> Vec<String> {
+    build
+        .and_then(|(header, maybe_data)| maybe_data.map(|d| (header, d)))
+        .map(|(_, data)| {
+            let re = regex::bytes::Regex::new(r##""cargo:rerun-if-changed=(?P<path>.+?)""##)
+                .expect("valid statically known regex");
+            re.captures_iter(data)
+                .filter_map(|cap| {
+                    let possible_filename = std::str::from_utf8(&cap["path"]).expect("utf8 path");
+                    globset::Glob::new(possible_filename)
+                        .ok()
+                        .map(|_| possible_filename.to_owned())
+                })
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
 fn potential_negated_includes(entries: Vec<TarHeader>) -> Option<PotentialWaste> {
     let (entries_we_would_remove, _) =
         split_to_matched_and_unmatched(entries, &globset_from(standard_exclude_patterns()));
@@ -583,19 +601,25 @@ impl Report {
         Option<String>,
     ) {
         // TODO: use actual names from package
+        let build_script_name = package.build.or_else(|| Some("build.rs".to_owned()));
         let compile_time_includes = {
-            let lib_file = find_in_entries(&entries_with_buffer, &entries, "lib.rs");
-            let main_file = find_in_entries(&entries_with_buffer, &entries, "main.rs");
-            let lib_includes = included_paths_of(lib_file);
-            let mut main_includes = included_paths_of(main_file);
+            let lib_includes =
+                included_paths_of(find_in_entries(&entries_with_buffer, &entries, "lib.rs"));
+            let mut main_includes =
+                included_paths_of(find_in_entries(&entries_with_buffer, &entries, "main.rs"));
             main_includes.extend(lib_includes.into_iter());
+
+            if let Some(build_path) = build_script_name.as_ref() {
+                let maybe_data = find_in_entries(&entries_with_buffer, &entries, build_path);
+                main_includes.extend(build_script_paths(maybe_data));
+            }
+
             if main_includes.is_empty() {
                 None
             } else {
                 Some(main_includes)
             }
         };
-        let build_script_name = package.build.or_else(|| Some("build.rs".to_owned()));
 
         (
             package.include,
