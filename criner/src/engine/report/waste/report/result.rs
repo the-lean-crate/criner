@@ -11,13 +11,17 @@ lazy_static! {
         regex::bytes::Regex::new(r##""cargo:rerun-if-changed=(?P<path>.+?)""##)
             .expect("valid statically known regex");
     static ref STANDARD_EXCLUDES_GLOBSET: globset::GlobSet =
-        globset_from(standard_exclude_patterns());
-    static ref STANDARD_EXCLUDE_GLOBS: Vec<(&'static str, globset::GlobMatcher)> =
+        globset_from_patterns(standard_exclude_patterns());
+    static ref STANDARD_EXCLUDE_MATCHERS: Vec<(&'static str, globset::GlobMatcher)> =
         standard_exclude_patterns()
             .iter()
             .cloned()
             .map(|p| (p, make_glob(p).compile_matcher()))
             .collect();
+    static ref STANDARD_INCLUDE_GLOBS: Vec<globset::Glob> = standard_include_patterns()
+        .iter()
+        .map(|p| make_glob(p))
+        .collect();
 }
 
 pub fn tar_path_to_utf8_str(mut bytes: &[u8]) -> &str {
@@ -143,8 +147,26 @@ fn standard_include_patterns() -> &'static [&'static str] {
     ]
 }
 
-pub fn globset_from(patterns: impl IntoIterator<Item = impl AsRef<str>>) -> globset::GlobSet {
+pub fn globset_from_patterns(
+    patterns: impl IntoIterator<Item = impl AsRef<str>>,
+) -> globset::GlobSet {
     let mut builder = globset::GlobSetBuilder::new();
+    for pattern in patterns.into_iter() {
+        builder.add(make_glob(pattern.as_ref()));
+    }
+    builder
+        .build()
+        .expect("multiple globs to always fit into a globset")
+}
+
+pub fn globset_from_globs_and_patterns(
+    globs: &[globset::Glob],
+    patterns: impl IntoIterator<Item = impl AsRef<str>>,
+) -> globset::GlobSet {
+    let mut builder = globset::GlobSetBuilder::new();
+    for glob in globs.iter() {
+        builder.add(glob.clone());
+    }
     for pattern in patterns.into_iter() {
         builder.add(make_glob(pattern.as_ref()));
     }
@@ -158,7 +180,7 @@ fn split_by_matching_directories(
     directories: &[TarHeader],
 ) -> (Vec<TarHeader>, Vec<TarHeader>) {
     // Shortcut: we assume '/' as path separator, which is true for all paths in crates.io except for 214 :D - it's OK to not find things in that case.
-    let globs = globset_from(directories.iter().map(|e| {
+    let globs = globset_from_patterns(directories.iter().map(|e| {
         let mut s = tar_path_to_utf8_str(&e.path).to_string();
         s.push_str("/**");
         s
@@ -243,9 +265,7 @@ fn simplify_standard_includes(
         .map(|p| p.to_string())
         .collect();
     for pattern in includes.iter().filter(|p| !is_recursive_glob(p)) {
-        let matcher = globset::Glob::new(pattern)
-            .expect("valid pattern")
-            .compile_matcher();
+        let matcher = make_glob(pattern).compile_matcher();
         out_patterns.extend(
             entries
                 .iter()
@@ -285,10 +305,9 @@ fn find_in_entries<'buffer>(
 fn matches_in_set_a_but_not_in_set_b(
     mut patterns_to_amend: Patterns,
     set_a: &[(&str, globset::GlobMatcher)],
-    set_b_patterns: impl IntoIterator<Item = impl AsRef<str>>,
+    set_b: &globset::GlobSet,
     mut entries: Vec<TarHeader>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
-    let set_b = globset_from(set_b_patterns);
     let set_a_len = patterns_to_amend.len();
     for (pattern_a, glob_a) in set_a {
         if entries
@@ -370,14 +389,14 @@ fn simplify_standard_excludes_and_match_against_standard_includes(
     compile_time_include: Option<Patterns>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
     let compile_time_include = compile_time_include.unwrap_or_default();
-    let include_iter = standard_include_patterns()
-        .iter()
-        .cloned()
-        .chain(compile_time_include.iter().map(|s| s.as_str()));
+    let include_iter = globset_from_globs_and_patterns(
+        &STANDARD_INCLUDE_GLOBS,
+        compile_time_include.iter().map(|s| s.as_str()),
+    );
     matches_in_set_a_but_not_in_set_b(
         existing_exclude,
-        &STANDARD_EXCLUDE_GLOBS,
-        include_iter,
+        &STANDARD_EXCLUDE_MATCHERS,
+        &include_iter,
         potential_waste,
     )
 }
@@ -419,7 +438,7 @@ fn potential_negated_includes(entries: Vec<TarHeader>) -> Option<PotentialWaste>
     let (entries_we_would_remove, _) =
         split_to_matched_and_unmatched(entries, &STANDARD_EXCLUDES_GLOBSET);
     let mut potential_negated_excludes = Vec::new();
-    for (pattern, exclude) in STANDARD_EXCLUDE_GLOBS.iter() {
+    for (pattern, exclude) in STANDARD_EXCLUDE_MATCHERS.iter() {
         if entries_we_would_remove
             .iter()
             .any(|e| exclude.is_match(tar_path_to_utf8_str(&e.path)))
@@ -477,11 +496,10 @@ impl Report {
     ) -> (Option<Fix>, Vec<TarHeader>) {
         let compile_time_include = compile_time_include.unwrap_or_default();
         let potential = potential_negated_includes(entries.clone());
-        let include_patterns = standard_include_patterns()
-            .iter()
-            .cloned()
-            .chain(compile_time_include.iter().map(|s| s.as_str()));
-        let include_globs = globset_from(include_patterns);
+        let include_globs = globset_from_globs_and_patterns(
+            &STANDARD_INCLUDE_GLOBS,
+            compile_time_include.iter().map(|s| s.as_str()),
+        );
         let (included_entries, excluded_entries) =
             split_to_matched_and_unmatched(entries, &include_globs);
 
@@ -511,7 +529,7 @@ impl Report {
         include: Patterns,
         exclude: Patterns,
     ) -> (Option<Fix>, Vec<TarHeader>) {
-        let exclude_globs = globset_from(&exclude);
+        let exclude_globs = globset_from_patterns(&exclude);
         let directories = directories_of(&entries);
 
         let (mut entries_that_should_be_excluded, remaining_entries) =

@@ -19,7 +19,8 @@ const INTERESTING_PATTERNS: &[&'static str] = &["Cargo.*", "build.rs", "**/lib.r
 impl Agent {
     pub fn new(asset_dir: PathBuf, db: &persistence::Db) -> Result<Agent> {
         let results = db.open_results()?;
-        let interesting_files = super::super::report::waste::globset_from(INTERESTING_PATTERNS);
+        let interesting_files =
+            super::super::report::waste::globset_from_patterns(INTERESTING_PATTERNS);
         Ok(Agent {
             asset_dir,
             results,

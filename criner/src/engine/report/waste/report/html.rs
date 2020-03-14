@@ -111,9 +111,13 @@ fn by_extension_section(wasted_by_extension: Dict<AggregateFileInfo>) -> Box<dyn
     let skip_info = if sorted.len() > top_list {
         Some((
             sorted.len() - top_list,
-            sorted.iter().rev().skip(top_list).fold((0, 0), |(tf, tb), e| {
-                (tf + e.1.total_files, tb + e.1.total_bytes)
-            }),
+            sorted
+                .iter()
+                .rev()
+                .skip(top_list)
+                .fold((0, 0), |(tf, tb), e| {
+                    (tf + e.1.total_files, tb + e.1.total_bytes)
+                }),
         ))
     } else {
         None
