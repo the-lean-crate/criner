@@ -1,4 +1,5 @@
 use super::{Fix, Package, Patterns, Report, TarHeader, WastedFile};
+use std::path::PathBuf;
 use std::{collections::BTreeSet, path::Path};
 
 pub fn tar_path_to_utf8_str(mut bytes: &[u8]) -> &str {
@@ -297,22 +298,74 @@ fn matches_in_set_a_but_not_in_set_b(
     (entries, initial_a, new_excludes)
 }
 
+/// Takes something like "src/deep/lib.rs" and "../data/foo.bin" and turns it into "src/data/foo.bin", replicating
+/// the way include_str/bytes interprets include paths. Thus it makes these paths relative to the crate, instead of
+/// relative to the source file they are included in.
+fn to_crate_relative_path(
+    source_file_path: impl AsRef<Path>,
+    relative_path: impl AsRef<Path>,
+) -> String {
+    use std::path::Component::*;
+    let relative_path = relative_path.as_ref();
+    let source_path = source_file_path
+        .as_ref()
+        .parent()
+        .expect("directory containing the file");
+    let leading_parent_path_components = relative_path
+        .components()
+        .take_while(|c| match c {
+            ParentDir | CurDir => true,
+            _ => false,
+        })
+        .filter(|c| match c {
+            ParentDir => true,
+            _ => false,
+        })
+        .count();
+    let components_to_take_from_relative_path = relative_path
+        .components()
+        .filter(|c| match c {
+            CurDir => false,
+            _ => true,
+        })
+        .skip(leading_parent_path_components);
+    let components_to_take = source_path
+        .components()
+        .count()
+        .saturating_sub(leading_parent_path_components);
+    source_path
+        .components()
+        .take(components_to_take)
+        .chain(components_to_take_from_relative_path)
+        .fold(PathBuf::new(), |mut p, c| {
+            p.push(c);
+            p
+        })
+        .to_str()
+        .expect("utf8 only")
+        .to_string()
+}
+
 fn simplify_standard_excludes_and_match_against_standard_includes(
     potential_waste: Vec<TarHeader>,
     existing_exclude: Patterns,
     lib_file: Option<(TarHeader, Option<&[u8]>)>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
-    let lib_includes: Vec<_> = lib_file.and_then(|(_header, maybe_data)| maybe_data).map(|data|  {
-        let re = regex::bytes::Regex::new(r##"include_(str|bytes)!\("(?P<include>.+?)"\)"##)
-            .expect("valid statically known regex");
-        re.captures_iter(data)
-            .map(|cap| {
-                std::str::from_utf8(&cap["include"])
-                    .expect("utf8 path")
-                    .to_string()
-            })
-            .collect()
-    }).unwrap_or_default();
+    let lib_includes: Vec<_> = lib_file
+        .and_then(|(header, maybe_data)| maybe_data.map(|d| (header, d)))
+        .map(|(header, data)| {
+            let re = regex::bytes::Regex::new(r##"include_(str|bytes)!\("(?P<include>.+?)"\)"##)
+                .expect("valid statically known regex");
+            re.captures_iter(data)
+                .map(|cap| {
+                    to_crate_relative_path(
+                        tar_path_to_utf8_str(&header.path),
+                        std::str::from_utf8(&cap["include"]).expect("utf8 path"),
+                    )
+                })
+                .collect()
+        })
+        .unwrap_or_default();
 
     let include_globs = globset_from(
         standard_include_patterns()
