@@ -350,8 +350,9 @@ fn to_crate_relative_path(
 fn simplify_standard_excludes_and_match_against_standard_includes(
     potential_waste: Vec<TarHeader>,
     existing_exclude: Patterns,
-    compile_time_include: Patterns,
+    compile_time_include: Option<Patterns>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
+    let compile_time_include = compile_time_include.unwrap_or_default();
     let include_iter = standard_include_patterns()
         .iter()
         .cloned()
@@ -418,13 +419,19 @@ impl Report {
         entries: Vec<TarHeader>,
         _entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
         build_script_name: Option<String>,
+        compile_time_include: Option<Patterns>,
     ) -> (Option<Fix>, Vec<TarHeader>) {
-        let include_patterns = standard_include_patterns();
+        let compile_time_include = compile_time_include.unwrap_or_default();
+        let include_patterns = standard_include_patterns()
+            .iter()
+            .cloned()
+            .chain(compile_time_include.iter().map(|s| s.as_str()));
         let include_globs = globset_from(include_patterns);
         let (included_entries, excluded_entries) =
             split_to_matched_and_unmatched(entries, &include_globs);
 
-        let mut include_patterns = simplify_standard_includes(include_patterns, &included_entries);
+        let mut include_patterns =
+            simplify_standard_includes(standard_include_patterns(), &included_entries);
         let has_build_script = match build_script_name {
             Some(build_script_name) => {
                 include_patterns.push(build_script_name);
@@ -432,6 +439,7 @@ impl Report {
             }
             None => false,
         };
+        include_patterns.extend(compile_time_include.into_iter());
 
         (
             Some(Fix::NewInclude {
@@ -533,7 +541,7 @@ impl Report {
             simplify_standard_excludes_and_match_against_standard_includes(
                 potential_waste,
                 exclude,
-                compile_time_include.unwrap_or_default(),
+                compile_time_include,
             );
         if wasted_files.is_empty() {
             (None, Vec::new())

@@ -344,11 +344,14 @@ impl Report {
                                 build_script_name.is_some(),
                             )
                         }
-                        (None, None, build_script_name, _) => Self::standard_includes(
-                            entries_meta_data,
-                            selected_entries,
-                            build_script_name,
-                        ),
+                        (None, None, build_script_name, compile_time_includes) => {
+                            Self::standard_includes(
+                                entries_meta_data,
+                                selected_entries,
+                                build_script_name,
+                                compile_time_includes,
+                            )
+                        }
                     };
                 let wasted_files = Self::convert_to_wasted_files(wasted_files);
                 Report::Version {
