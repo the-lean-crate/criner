@@ -307,6 +307,7 @@ dependencies = [
  "parking_lot",
  "prodash",
  "quick-error",
+ "regex",
  "reqwest",
  "rmp-serde",
  "rmpv",

@@ -300,8 +300,26 @@ fn matches_in_set_a_but_not_in_set_b(
 fn simplify_standard_excludes_and_match_against_standard_includes(
     potential_waste: Vec<TarHeader>,
     existing_exclude: Patterns,
+    lib_file: Option<(TarHeader, Option<&[u8]>)>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
-    let include_globs = globset_from(standard_include_patterns());
+    let lib_includes: Vec<_> = lib_file.and_then(|(_header, maybe_data)| maybe_data).map(|data|  {
+        let re = regex::bytes::Regex::new(r##"include_(str|bytes)!\("(?P<include>.+?)"\)"##)
+            .expect("valid statically known regex");
+        re.captures_iter(data)
+            .map(|cap| {
+                std::str::from_utf8(&cap["include"])
+                    .expect("utf8 path")
+                    .to_string()
+            })
+            .collect()
+    }).unwrap_or_default();
+
+    let include_globs = globset_from(
+        standard_include_patterns()
+            .iter()
+            .cloned()
+            .chain(lib_includes.iter().map(|s| s.as_str())),
+    );
     matches_in_set_a_but_not_in_set_b(
         existing_exclude,
         standard_exclude_patterns(),
@@ -473,6 +491,7 @@ impl Report {
             &buildscript_name.unwrap_or_else(|| "build.rs".into()),
         )
         .is_some();
+        let lib_file = find_in_entries(&entries_with_buffer, &entries, "lib.rs");
         let standard_excludes = standard_exclude_patterns();
         let exclude_globs = globset_from(standard_excludes);
         let (potential_waste, _remaining) = split_to_matched_and_unmatched(entries, &exclude_globs);
@@ -480,6 +499,7 @@ impl Report {
             simplify_standard_excludes_and_match_against_standard_includes(
                 potential_waste,
                 exclude,
+                lib_file,
             );
         if wasted_files.is_empty() {
             (None, Vec::new())

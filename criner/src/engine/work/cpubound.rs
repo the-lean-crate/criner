@@ -14,12 +14,7 @@ pub struct Agent {
     state: Option<ProcessingState>,
 }
 
-const INTERESTING_PATTERNS: &[&'static str] = &[
-    "Cargo.*",
-    "build.rs",
-    "**/lib.rs",
-    "**/main.rs",
-];
+const INTERESTING_PATTERNS: &[&'static str] = &["Cargo.*", "build.rs", "**/lib.rs", "**/main.rs"];
 
 impl Agent {
     pub fn new(asset_dir: PathBuf, db: &persistence::Db) -> Result<Agent> {
