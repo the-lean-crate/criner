@@ -19,7 +19,7 @@ pub enum SubCommands {
         no_gui: bool,
 
         /// The amount of frames to show per second
-        #[structopt(long, name = "frames-per-second", default_value = "3.0")]
+        #[structopt(long, name = "frames-per-second", default_value = "6.0")]
         fps: f32,
 
         /// The amount of progress messages to keep in a ring buffer.
@@ -118,7 +118,7 @@ impl Default for SubCommands {
     fn default() -> Self {
         SubCommands::Mine {
             no_gui: false,
-            fps: 3.0,
+            fps: 6.0,
             progress_message_scrollback_buffer_size: 100,
             io_bound_processors: 5,
             cpu_bound_processors: 2,
