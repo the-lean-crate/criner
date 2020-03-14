@@ -311,7 +311,7 @@ impl Report {
                 let total_size_in_bytes = entries_meta_data.iter().map(|e| e.size).sum();
                 let total_files = entries_meta_data.len() as u64;
                 let package = Self::package_from_entries(&selected_entries);
-                let (includes, excludes, has_build_script, has_compile_time_includes) =
+                let (includes, excludes, build_script_name, has_compile_time_includes) =
                     Self::package_into_includes_excludes(
                         package,
                         &selected_entries,
@@ -320,7 +320,7 @@ impl Report {
                 let (suggested_fix, wasted_files) = match (
                     includes,
                     excludes,
-                    has_build_script,
+                    build_script_name,
                     has_compile_time_includes,
                 ) {
                     (Some(includes), Some(excludes), _presence_of_build_script_not_relevant, _) => {
@@ -330,22 +330,22 @@ impl Report {
                             excludes,
                         )
                     }
-                    (Some(includes), None, has_build_script, _) => Self::enrich_includes(
+                    (Some(includes), None, build_script_name, _) => Self::enrich_includes(
                         entries_meta_data,
                         selected_entries,
                         includes,
-                        has_build_script,
+                        build_script_name.is_some(),
                     ),
-                    (None, Some(excludes), has_build_script, _) => Self::enrich_excludes(
+                    (None, Some(excludes), build_script_name, _) => Self::enrich_excludes(
                         entries_meta_data,
                         selected_entries,
                         excludes,
-                        has_build_script,
+                        build_script_name.is_some(),
                     ),
-                    (None, None, has_build_script, _) => Self::standard_includes(
+                    (None, None, build_script_name, _) => Self::standard_includes(
                         entries_meta_data,
                         selected_entries,
-                        has_build_script,
+                        build_script_name,
                     ),
                 };
                 let wasted_files = Self::convert_to_wasted_files(wasted_files);

@@ -411,22 +411,16 @@ impl Report {
 
     pub(crate) fn standard_includes(
         entries: Vec<TarHeader>,
-        entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
-        has_build_script:bool,
+        _entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
+        build_script_name: Option<String>,
     ) -> (Option<Fix>, Vec<TarHeader>) {
         let include_patterns = standard_include_patterns();
-        let maybe_build_script = find_in_entries(
-            &entries_with_buffer,
-            &entries,
-            &buildscript_name.unwrap_or_else(|| "build.rs".to_owned()),
-        )
-        .map(|(entry, _buf)| tar_path_to_utf8_str(&entry.path).to_owned());
         let include_globs = globset_from(include_patterns);
         let (included_entries, excluded_entries) =
             split_to_matched_and_unmatched(entries, &include_globs);
 
         let mut include_patterns = simplify_standard_includes(include_patterns, &included_entries);
-        let has_build_script = match maybe_build_script {
+        let has_build_script = match build_script_name {
             Some(build_script_name) => {
                 include_patterns.push(build_script_name);
                 true
@@ -522,7 +516,7 @@ impl Report {
 
     pub(crate) fn enrich_excludes(
         entries: Vec<TarHeader>,
-        entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
+        _entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
         exclude: Patterns,
         has_build_script: bool,
     ) -> (Option<Fix>, Vec<TarHeader>) {
@@ -556,7 +550,7 @@ impl Report {
         package: Package,
         entries_with_buffer: &[(TarHeader, Vec<u8>)],
         entries: &[TarHeader],
-    ) -> (Option<Patterns>, Option<Patterns>, bool, bool) {
+    ) -> (Option<Patterns>, Option<Patterns>, Option<String>, bool) {
         // TODO: use actual names from package
         let compile_time_includes = {
             let lib_file = find_in_entries(&entries_with_buffer, &entries, "lib.rs");
@@ -566,12 +560,7 @@ impl Report {
             main_includes.extend(lib_includes.into_iter());
             main_includes
         };
-        let has_build_script = find_in_entries(
-            &entries_with_buffer,
-            &entries,
-            &package.build.unwrap_or_else(|| "build.rs".to_owned()),
-        )
-        .is_some();
+        let build_script_name = package.build.or_else(|| Some("build.rs".to_owned()));
 
         let has_compile_time_includes = !compile_time_includes.is_empty();
         (
@@ -590,7 +579,7 @@ impl Report {
                 }
             },
             package.exclude,
-            has_build_script,
+            build_script_name,
             has_compile_time_includes,
         )
     }
