@@ -47,66 +47,60 @@ pub async fn non_blocking(
     let startup_time = SystemTime::now();
 
     let run = fetch_settings;
-    pool.spawn(
-        repeat_every_s(
-            run.every.as_secs() as u32,
-            {
-                let p = progress.clone();
-                move || p.add_child("Fetch Timer")
-            },
-            deadline,
-            run.at_most,
-            {
-                let db = db.clone();
-                let progress = progress.clone();
-                let pool = pool.clone();
-                move || {
-                    stage::changes::fetch(
-                        crates_io_path.clone(),
-                        pool.clone(),
-                        db.clone(),
-                        progress.add_child("crates.io refresh"),
-                        deadline,
-                    )
-                }
-            },
-        )
-        .map(|_| ()),
-    )?;
+    let fetch_handle = pool.spawn_with_handle(repeat_every_s(
+        run.every.as_secs() as u32,
+        {
+            let p = progress.clone();
+            move || p.add_child("Fetch Timer")
+        },
+        deadline,
+        run.at_most,
+        {
+            let db = db.clone();
+            let progress = progress.clone();
+            let pool = pool.clone();
+            move || {
+                stage::changes::fetch(
+                    crates_io_path.clone(),
+                    pool.clone(),
+                    db.clone(),
+                    progress.add_child("crates.io refresh"),
+                    deadline,
+                )
+            }
+        },
+    ))?;
 
     let stage = process_settings;
-    pool.spawn(
-        repeat_every_s(
-            stage.every.as_secs() as u32,
-            {
-                let p = progress.clone();
-                move || p.add_child("Reporting Timer")
-            },
-            deadline,
-            stage.at_most,
-            {
-                let progress = progress.clone();
-                let db = db.clone();
-                let assets_dir = assets_dir.clone();
-                let pool = pool.clone();
-                let tokio = tokio.clone();
-                move || {
-                    stage::processing::process(
-                        db.clone(),
-                        progress.add_child("Process Crate Versions"),
-                        io_bound_processors,
-                        cpu_bound_processors,
-                        progress.add_child("Downloads"),
-                        tokio.clone(),
-                        pool.clone(),
-                        assets_dir.clone(),
-                        startup_time,
-                    )
-                }
-            },
-        )
-        .map(|_| ()),
-    )?;
+    let processing_handle = pool.spawn_with_handle(repeat_every_s(
+        stage.every.as_secs() as u32,
+        {
+            let p = progress.clone();
+            move || p.add_child("Reporting Timer")
+        },
+        deadline,
+        stage.at_most,
+        {
+            let progress = progress.clone();
+            let db = db.clone();
+            let assets_dir = assets_dir.clone();
+            let pool = pool.clone();
+            let tokio = tokio.clone();
+            move || {
+                stage::processing::process(
+                    db.clone(),
+                    progress.add_child("Process Crate Versions"),
+                    io_bound_processors,
+                    cpu_bound_processors,
+                    progress.add_child("Downloads"),
+                    tokio.clone(),
+                    pool.clone(),
+                    assets_dir.clone(),
+                    startup_time,
+                )
+            }
+        },
+    ))?;
 
     let stage = report_settings;
     repeat_every_s(
@@ -136,7 +130,9 @@ pub async fn non_blocking(
             }
         },
     )
-    .await
+    .await?;
+    fetch_handle.await?;
+    processing_handle.await
 }
 
 /// For convenience, run the engine and block until done.
