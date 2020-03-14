@@ -351,9 +351,27 @@ fn simplify_standard_excludes_and_match_against_standard_includes(
     potential_waste: Vec<TarHeader>,
     existing_exclude: Patterns,
     lib_file: Option<(TarHeader, Option<&[u8]>)>,
+    main_file: Option<(TarHeader, Option<&[u8]>)>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
-    let lib_includes: Vec<_> = lib_file
-        .and_then(|(header, maybe_data)| maybe_data.map(|d| (header, d)))
+    let lib_includes = included_paths_of(lib_file);
+    let main_includes = included_paths_of(main_file);
+
+    let include_patterns_iter = standard_include_patterns().iter().cloned().chain(
+        lib_includes
+            .iter()
+            .chain(&main_includes)
+            .map(|s| s.as_str()),
+    );
+    matches_in_set_a_but_not_in_set_b(
+        existing_exclude,
+        standard_exclude_patterns(),
+        include_patterns_iter,
+        potential_waste,
+    )
+}
+
+fn included_paths_of(file: Option<(TarHeader, Option<&[u8]>)>) -> Vec<String> {
+    file.and_then(|(header, maybe_data)| maybe_data.map(|d| (header, d)))
         .map(|(header, data)| {
             let re = regex::bytes::Regex::new(r##"include_(str|bytes)!\("(?P<include>.+?)"\)"##)
                 .expect("valid statically known regex");
@@ -366,18 +384,7 @@ fn simplify_standard_excludes_and_match_against_standard_includes(
                 })
                 .collect()
         })
-        .unwrap_or_default();
-
-    let include_patterns_iter = standard_include_patterns()
-        .iter()
-        .cloned()
-        .chain(lib_includes.iter().map(|s| s.as_str()));
-    matches_in_set_a_but_not_in_set_b(
-        existing_exclude,
-        standard_exclude_patterns(),
-        include_patterns_iter,
-        potential_waste,
-    )
+        .unwrap_or_default()
 }
 
 impl Report {
@@ -543,6 +550,7 @@ impl Report {
         )
         .is_some();
         let lib_file = find_in_entries(&entries_with_buffer, &entries, "lib.rs");
+        let main_file = find_in_entries(&entries_with_buffer, &entries, "main.rs");
         let standard_excludes = standard_exclude_patterns();
         let exclude_globs = globset_from(standard_excludes);
         let (potential_waste, _remaining) = split_to_matched_and_unmatched(entries, &exclude_globs);
@@ -551,6 +559,7 @@ impl Report {
                 potential_waste,
                 exclude,
                 lib_file,
+                main_file,
             );
         if wasted_files.is_empty() {
             (None, Vec::new())

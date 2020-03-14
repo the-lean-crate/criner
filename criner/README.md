@@ -16,7 +16,9 @@
     
 ## Limitations of Waste Reporting
 
-* does only know about the presence of build scripts, but doesn't understand them
+* only extracts strings and 'rerun-if' directives from build.rs files.
+* It does not know renamed `build.rs`, `lib.rs` or `main.rs` files.
+ * It could learn about renamed files by changing it's algorithm when gathering crate information.
 * does not know about included blobs and strings using `include_str!` and `include_bytes!`
 
 ## Lessons learned
