@@ -265,12 +265,13 @@ fn find_in_entries<'buffer>(
 }
 
 fn matches_in_set_a_but_not_in_set_b(
-    mut initial_a: Patterns,
+    mut patterns_to_amend: Patterns,
     set_a: &[&'static str],
-    set_b: &globset::GlobSet,
+    set_b_patterns: impl IntoIterator<Item = impl AsRef<str>>,
     mut entries: Vec<TarHeader>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
-    let set_a_len = initial_a.len();
+    let set_b = globset_from(set_b_patterns);
+    let set_a_len = patterns_to_amend.len();
     for pattern_a in set_a {
         let glob_a = make_glob(pattern_a).compile_matcher();
         if entries
@@ -286,16 +287,16 @@ fn matches_in_set_a_but_not_in_set_b(
                     break;
                 }
             } else {
-                initial_a.push(pattern_a.to_string());
+                patterns_to_amend.push(pattern_a.to_string());
             }
         }
     }
 
-    let new_excludes = initial_a
+    let new_excludes = patterns_to_amend
         .get(set_a_len..)
         .map(|v| v.to_vec())
         .unwrap_or_else(Vec::new);
-    (entries, initial_a, new_excludes)
+    (entries, patterns_to_amend, new_excludes)
 }
 
 /// Takes something like "src/deep/lib.rs" and "../data/foo.bin" and turns it into "src/data/foo.bin", replicating
@@ -367,16 +368,14 @@ fn simplify_standard_excludes_and_match_against_standard_includes(
         })
         .unwrap_or_default();
 
-    let include_globs = globset_from(
-        standard_include_patterns()
-            .iter()
-            .cloned()
-            .chain(lib_includes.iter().map(|s| s.as_str())),
-    );
+    let include_patterns_iter = standard_include_patterns()
+        .iter()
+        .cloned()
+        .chain(lib_includes.iter().map(|s| s.as_str()));
     matches_in_set_a_but_not_in_set_b(
         existing_exclude,
         standard_exclude_patterns(),
-        &include_globs,
+        include_patterns_iter,
         potential_waste,
     )
 }
@@ -502,11 +501,10 @@ impl Report {
         )
         .is_some();
         filter_implicit_includes(&mut include, &mut include_removed);
-        let include_globs = globset_from(&include);
         let (unmatched_files, include, include_added) = matches_in_set_a_but_not_in_set_b(
-            include,
+            include.clone(),
             standard_include_patterns(),
-            &include_globs,
+            &include,
             entries,
         );
 
