@@ -10,6 +10,8 @@ lazy_static! {
     static ref RERUN_IF_CHANGED: regex::bytes::Regex =
         regex::bytes::Regex::new(r##""cargo:rerun-if-changed=(?P<path>.+?)""##)
             .expect("valid statically known regex");
+    static ref STANDARD_EXCLUDES_GLOBSET: globset::GlobSet =
+        globset_from(standard_exclude_patterns());
 }
 
 pub fn tar_path_to_utf8_str(mut bytes: &[u8]) -> &str {
@@ -410,7 +412,7 @@ fn build_script_paths(build: Option<(TarHeader, Option<&[u8]>)>) -> Vec<String> 
 
 fn potential_negated_includes(entries: Vec<TarHeader>) -> Option<PotentialWaste> {
     let (entries_we_would_remove, _) =
-        split_to_matched_and_unmatched(entries, &globset_from(standard_exclude_patterns()));
+        split_to_matched_and_unmatched(entries, &STANDARD_EXCLUDES_GLOBSET);
     let mut potential_negated_excludes = Vec::new();
     for pattern in standard_exclude_patterns() {
         let glob = make_glob(&pattern);
@@ -570,9 +572,8 @@ impl Report {
         compile_time_include: Option<Patterns>,
         has_build_script: bool,
     ) -> (Option<Fix>, Vec<TarHeader>) {
-        let standard_excludes = standard_exclude_patterns();
-        let exclude_globs = globset_from(standard_excludes);
-        let (potential_waste, _remaining) = split_to_matched_and_unmatched(entries, &exclude_globs);
+        let (potential_waste, _remaining) =
+            split_to_matched_and_unmatched(entries, &STANDARD_EXCLUDES_GLOBSET);
         let (wasted_files, exclude, exclude_added) =
             simplify_standard_excludes_and_match_against_standard_includes(
                 potential_waste,
