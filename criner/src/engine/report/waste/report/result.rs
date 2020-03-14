@@ -350,22 +350,11 @@ fn to_crate_relative_path(
 fn simplify_standard_excludes_and_match_against_standard_includes(
     potential_waste: Vec<TarHeader>,
     existing_exclude: Patterns,
-    lib_file: Option<(TarHeader, Option<&[u8]>)>,
-    main_file: Option<(TarHeader, Option<&[u8]>)>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
-    let lib_includes = included_paths_of(lib_file);
-    let main_includes = included_paths_of(main_file);
-
-    let include_patterns_iter = standard_include_patterns().iter().cloned().chain(
-        lib_includes
-            .iter()
-            .chain(&main_includes)
-            .map(|s| s.as_str()),
-    );
     matches_in_set_a_but_not_in_set_b(
         existing_exclude,
         standard_exclude_patterns(),
-        include_patterns_iter,
+        standard_include_patterns(),
         potential_waste,
     )
 }
@@ -423,7 +412,7 @@ impl Report {
     pub(crate) fn standard_includes(
         entries: Vec<TarHeader>,
         entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
-        buildscript_name: Option<String>,
+        has_build_script:bool,
     ) -> (Option<Fix>, Vec<TarHeader>) {
         let include_patterns = standard_include_patterns();
         let maybe_build_script = find_in_entries(
@@ -496,17 +485,11 @@ impl Report {
 
     pub(crate) fn enrich_includes(
         entries: Vec<TarHeader>,
-        entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
+        _entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
         mut include: Patterns,
-        buildscript_name: Option<String>,
+        has_build_script: bool,
     ) -> (Option<Fix>, Vec<TarHeader>) {
         let mut include_removed = Vec::new();
-        let has_build_script = find_in_entries(
-            &entries_with_buffer,
-            &entries,
-            &buildscript_name.unwrap_or_else(|| "Cargo.toml".into()),
-        )
-        .is_some();
         filter_implicit_includes(&mut include, &mut include_removed);
         let (unmatched_files, include, include_added) = matches_in_set_a_but_not_in_set_b(
             include.clone(),
@@ -541,16 +524,8 @@ impl Report {
         entries: Vec<TarHeader>,
         entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
         exclude: Patterns,
-        buildscript_name: Option<String>,
+        has_build_script: bool,
     ) -> (Option<Fix>, Vec<TarHeader>) {
-        let has_build_script = find_in_entries(
-            &entries_with_buffer,
-            &entries,
-            &buildscript_name.unwrap_or_else(|| "build.rs".into()),
-        )
-        .is_some();
-        let lib_file = find_in_entries(&entries_with_buffer, &entries, "lib.rs");
-        let main_file = find_in_entries(&entries_with_buffer, &entries, "main.rs");
         let standard_excludes = standard_exclude_patterns();
         let exclude_globs = globset_from(standard_excludes);
         let (potential_waste, _remaining) = split_to_matched_and_unmatched(entries, &exclude_globs);
@@ -558,8 +533,6 @@ impl Report {
             simplify_standard_excludes_and_match_against_standard_includes(
                 potential_waste,
                 exclude,
-                lib_file,
-                main_file,
             );
         if wasted_files.is_empty() {
             (None, Vec::new())
@@ -577,5 +550,48 @@ impl Report {
                 wasted_files,
             )
         }
+    }
+
+    pub(crate) fn package_into_includes_excludes(
+        package: Package,
+        entries_with_buffer: &[(TarHeader, Vec<u8>)],
+        entries: &[TarHeader],
+    ) -> (Option<Patterns>, Option<Patterns>, bool, bool) {
+        // TODO: use actual names from package
+        let compile_time_includes = {
+            let lib_file = find_in_entries(&entries_with_buffer, &entries, "lib.rs");
+            let main_file = find_in_entries(&entries_with_buffer, &entries, "main.rs");
+            let lib_includes = included_paths_of(lib_file);
+            let mut main_includes = included_paths_of(main_file);
+            main_includes.extend(lib_includes.into_iter());
+            main_includes
+        };
+        let has_build_script = find_in_entries(
+            &entries_with_buffer,
+            &entries,
+            &package.build.unwrap_or_else(|| "build.rs".to_owned()),
+        )
+        .is_some();
+
+        let has_compile_time_includes = !compile_time_includes.is_empty();
+        (
+            {
+                let inc = match package.include {
+                    Some(mut include) => {
+                        include.extend(compile_time_includes.into_iter());
+                        include
+                    }
+                    None => compile_time_includes,
+                };
+                if inc.is_empty() {
+                    None
+                } else {
+                    Some(inc)
+                }
+            },
+            package.exclude,
+            has_build_script,
+            has_compile_time_includes,
+        )
     }
 }
