@@ -72,8 +72,6 @@ pub async fn process(
 
     let auto_checkpoint_every = 10000;
     let checkpoint_connection = db.open_connection_with_busy_wait()?;
-    let connection = versions.into_connection();
-    let mut guard = connection.lock();
     let mut fetched_versions = 0;
     let mut versions = Vec::with_capacity(auto_checkpoint_every);
     let mut last_elapsed_for_checkpointing = None;
@@ -81,9 +79,10 @@ pub async fn process(
     loop {
         let abort_loop = {
             progress.blocked("fetching chunk of version to schedule", None);
+            let mut connection = db.open_connection_no_async_with_busy_wait()?;
             let mut statement = new_value_query_recent_first(
                 CrateVersionTable::table_name(),
-                &mut *guard,
+                &mut connection,
                 fetched_versions,
                 auto_checkpoint_every,
             )?;

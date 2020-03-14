@@ -68,13 +68,17 @@ pub enum SubCommands {
         #[structopt(long, short = "F")]
         fetch_at_most: Option<usize>,
 
+        /// The time between each processing run, specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
+        #[structopt(long, short = "p", default_value = "60s")]
+        process_every: humantime::Duration,
+
         /// If set, the amount of times the process stage will run. If set to 0, they will never run.
         #[structopt(long, short = "P")]
         process_at_most: Option<usize>,
 
         /// The time between each reporting and processing run, specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
         #[structopt(long, short = "r", default_value = "60s")]
-        report_and_process_every: humantime::Duration,
+        report_every: humantime::Duration,
 
         /// If set, the amount of times the reporting stage will run. If set to 0, they will never run.
         #[structopt(long, short = "R")]
@@ -123,8 +127,9 @@ impl Default for SubCommands {
             time_limit: None,
             fetch_every: std::time::Duration::from_secs(60).into(),
             fetch_at_most: None,
+            process_every: std::time::Duration::from_secs(60).into(),
             process_at_most: None,
-            report_and_process_every: std::time::Duration::from_secs(60).into(),
+            report_every: std::time::Duration::from_secs(60).into(),
             report_at_most: None,
             db_path: PathBuf::from("criner.db"),
             glob: None,

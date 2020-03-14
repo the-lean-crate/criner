@@ -74,6 +74,40 @@ pub async fn non_blocking(
         .map(|_| ()),
     )?;
 
+    let stage = process_settings;
+    pool.spawn(
+        repeat_every_s(
+            stage.every.as_secs() as u32,
+            {
+                let p = progress.clone();
+                move || p.add_child("Reporting Timer")
+            },
+            deadline,
+            stage.at_most,
+            {
+                let progress = progress.clone();
+                let db = db.clone();
+                let assets_dir = assets_dir.clone();
+                let pool = pool.clone();
+                let tokio = tokio.clone();
+                move || {
+                    stage::processing::process(
+                        db.clone(),
+                        progress.add_child("Process Crate Versions"),
+                        io_bound_processors,
+                        cpu_bound_processors,
+                        progress.add_child("Downloads"),
+                        tokio.clone(),
+                        pool.clone(),
+                        assets_dir.clone(),
+                        startup_time,
+                    )
+                }
+            },
+        )
+        .map(|_| ()),
+    )?;
+
     let stage = report_settings;
     repeat_every_s(
         stage.run.every.as_secs() as u32,
@@ -82,54 +116,23 @@ pub async fn non_blocking(
             move || p.add_child("Reporting Timer")
         },
         deadline,
-        stage
-            .run
-            .at_most
-            .and_then(|at_most| process_settings.at_most.map(|am| at_most.max(am)))
-            .or_else(|| process_settings.at_most),
+        stage.run.at_most,
         {
-            let mut process_run_count = 0;
-            let mut report_run_count = 0;
-            let process_max_runs = process_settings.at_most.unwrap_or(std::usize::MAX);
-            let report_max_runs = stage.run.at_most.unwrap_or(std::usize::MAX);
+            let progress = progress.clone();
+            let db = db.clone();
+            let assets_dir = assets_dir.clone();
+            let pool = pool.clone();
+            let glob = stage.glob.clone();
             move || {
-                let progress = progress.clone();
-                let db = db.clone();
-                let assets_dir = assets_dir.clone();
-                let pool = pool.clone();
-                let glob = stage.glob.clone();
-                let tokio = tokio.clone();
-                async move {
-                    if process_run_count < process_max_runs {
-                        process_run_count += 1;
-                        stage::processing::process(
-                            db.clone(),
-                            progress.add_child("Process Crate Versions"),
-                            io_bound_processors,
-                            cpu_bound_processors,
-                            progress.add_child("Downloads"),
-                            tokio.clone(),
-                            pool.clone(),
-                            assets_dir.clone(),
-                            startup_time,
-                        )
-                        .await?;
-                    }
-                    if report_run_count < report_max_runs {
-                        report_run_count += 1;
-                        stage::report::generate(
-                            db.clone(),
-                            progress.add_child("Reports"),
-                            assets_dir.clone(),
-                            glob.clone(),
-                            deadline,
-                            cpu_o_bound_processors,
-                            pool.clone(),
-                        )
-                        .await?;
-                    }
-                    Ok(())
-                }
+                stage::report::generate(
+                    db.clone(),
+                    progress.add_child("Reports"),
+                    assets_dir.clone(),
+                    glob.clone(),
+                    deadline,
+                    cpu_o_bound_processors,
+                    pool.clone(),
+                )
             }
         },
     )
