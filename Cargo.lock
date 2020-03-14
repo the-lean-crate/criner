@@ -302,6 +302,7 @@ dependencies = [
  "http",
  "humantime 2.0.0",
  "jwalk",
+ "lazy_static",
  "libflate",
  "log",
  "parking_lot",

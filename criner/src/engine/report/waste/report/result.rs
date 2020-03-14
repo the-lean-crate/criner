@@ -3,6 +3,15 @@ use crate::engine::report::waste::PotentialWaste;
 use std::path::PathBuf;
 use std::{collections::BTreeSet, path::Path};
 
+lazy_static! {
+    static ref COMPILE_TIME_INCLUDE: regex::bytes::Regex =
+        regex::bytes::Regex::new(r##"include_(str|bytes)!\("(?P<include>.+?)"\)"##)
+            .expect("valid statically known regex");
+    static ref RERUN_IF_CHANGED: regex::bytes::Regex =
+        regex::bytes::Regex::new(r##""cargo:rerun-if-changed=(?P<path>.+?)""##)
+            .expect("valid statically known regex");
+}
+
 pub fn tar_path_to_utf8_str(mut bytes: &[u8]) -> &str {
     // Tar paths include the parent directory, cut it to crate relative paths
     if let Some(pos) = bytes.iter().position(|b| *b == b'/' || *b == b'\\') {
@@ -369,9 +378,8 @@ fn simplify_standard_excludes_and_match_against_standard_includes(
 fn included_paths_of(file: Option<(TarHeader, Option<&[u8]>)>) -> Vec<String> {
     file.and_then(|(header, maybe_data)| maybe_data.map(|d| (header, d)))
         .map(|(header, data)| {
-            let re = regex::bytes::Regex::new(r##"include_(str|bytes)!\("(?P<include>.+?)"\)"##)
-                .expect("valid statically known regex");
-            re.captures_iter(data)
+            COMPILE_TIME_INCLUDE
+                .captures_iter(data)
                 .map(|cap| {
                     to_crate_relative_path(
                         tar_path_to_utf8_str(&header.path),
@@ -387,9 +395,8 @@ fn build_script_paths(build: Option<(TarHeader, Option<&[u8]>)>) -> Vec<String> 
     build
         .and_then(|(header, maybe_data)| maybe_data.map(|d| (header, d)))
         .map(|(_, data)| {
-            let re = regex::bytes::Regex::new(r##""cargo:rerun-if-changed=(?P<path>.+?)""##)
-                .expect("valid statically known regex");
-            re.captures_iter(data)
+            RERUN_IF_CHANGED
+                .captures_iter(data)
                 .filter_map(|cap| {
                     let possible_filename = std::str::from_utf8(&cap["path"]).expect("utf8 path");
                     globset::Glob::new(possible_filename)
