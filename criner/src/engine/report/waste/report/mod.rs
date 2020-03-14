@@ -35,6 +35,7 @@ pub enum Fix {
     },
     NewInclude {
         include: Patterns,
+        potential: Option<PotentialWaste>,
         has_build_script: bool,
     },
     RemoveExcludeAndUseInclude {

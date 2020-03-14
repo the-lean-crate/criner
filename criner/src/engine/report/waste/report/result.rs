@@ -383,6 +383,30 @@ fn included_paths_of(file: Option<(TarHeader, Option<&[u8]>)>) -> Vec<String> {
         .unwrap_or_default()
 }
 
+fn potential_negated_includes(entries: Vec<TarHeader>) -> Option<PotentialWaste> {
+    let (entries_we_would_remove, _) =
+        split_to_matched_and_unmatched(entries, &globset_from(standard_exclude_patterns()));
+    let mut potential_negated_excludes = Vec::new();
+    for pattern in standard_exclude_patterns() {
+        let glob = make_glob(&pattern);
+        let exclude = glob.compile_matcher();
+        if entries_we_would_remove
+            .iter()
+            .any(|e| exclude.is_match(tar_path_to_utf8_str(&e.path)))
+        {
+            potential_negated_excludes.push(format!("!{}", pattern));
+        }
+    }
+    if potential_negated_excludes.is_empty() {
+        None
+    } else {
+        Some(PotentialWaste {
+            patterns_to_fix: potential_negated_excludes,
+            potential_waste: Report::convert_to_wasted_files(entries_we_would_remove),
+        })
+    }
+}
+
 impl Report {
     pub(crate) fn package_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> Package {
         use serde_derive::Deserialize;
@@ -422,6 +446,7 @@ impl Report {
         compile_time_include: Option<Patterns>,
     ) -> (Option<Fix>, Vec<TarHeader>) {
         let compile_time_include = compile_time_include.unwrap_or_default();
+        let potential = potential_negated_includes(entries.clone());
         let include_patterns = standard_include_patterns()
             .iter()
             .cloned()
@@ -444,6 +469,7 @@ impl Report {
         (
             Some(Fix::NewInclude {
                 include: include_patterns,
+                potential,
                 has_build_script,
             }),
             excluded_entries,
@@ -497,19 +523,6 @@ impl Report {
     ) -> (Option<Fix>, Vec<TarHeader>) {
         let mut include_removed = Vec::new();
         remove_implicit_includes(&mut include, &mut include_removed);
-        let (entries_we_would_remove, _) =
-            split_to_matched_and_unmatched(entries, &globset_from(standard_exclude_patterns()));
-        let mut potential_negated_excludes = Vec::new();
-        for pattern in standard_exclude_patterns() {
-            let glob = make_glob(&pattern);
-            let exclude = glob.compile_matcher();
-            if entries_we_would_remove
-                .iter()
-                .any(|e| exclude.is_match(tar_path_to_utf8_str(&e.path)))
-            {
-                potential_negated_excludes.push(format!("!{}", pattern));
-            }
-        }
 
         (
             if include_removed.is_empty() {
@@ -519,14 +532,7 @@ impl Report {
                     include,
                     include_removed,
                     has_build_script,
-                    potential: if potential_negated_excludes.is_empty() {
-                        None
-                    } else {
-                        Some(PotentialWaste {
-                            patterns_to_fix: potential_negated_excludes,
-                            potential_waste: Self::convert_to_wasted_files(entries_we_would_remove),
-                        })
-                    },
+                    potential: potential_negated_includes(entries),
                 })
             },
             Vec::new(),
