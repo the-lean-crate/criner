@@ -2,12 +2,123 @@ use super::super::{Fix, Report};
 use crate::model::TaskResult;
 use std::path::Path;
 
-fn task_result(path: impl AsRef<Path>) -> TaskResult {
+fn task_result(file_name: &str) -> TaskResult {
     TaskResult::from(
-        std::fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join(path))
-            .unwrap()
-            .as_slice(),
+        std::fs::read(
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("tests/fixtures")
+                .join(format!("{}.rmp", file_name)),
+        )
+        .unwrap()
+        .as_slice(),
     )
+}
+
+#[test]
+fn deno_typescript() {
+    assert_eq!(
+        Report::from_result(
+            "a",
+            "1",
+            task_result("deno_typescript-0.36.0-extract_crate-1.0.0")
+        ),
+        Report::Version {
+            crate_name: "a".into(),
+            crate_version: "1".to_string(),
+            total_size_in_bytes: 50091435,
+            total_files: 191,
+            wasted_files: [
+                ("typescript/lib/.gitattributes", 13u64),
+                ("typescript/lib/README.md", 270),
+                ("typescript/lib/cancellationToken.js", 2897),
+                ("typescript/lib/diagnosticMessages.generated.json", 145532),
+                ("typescript/lib/lib.d.ts", 1001),
+                ("typescript/lib/lib.dom.d.ts", 840097),
+                ("typescript/lib/lib.dom.iterable.d.ts", 13832),
+                ("typescript/lib/lib.es2015.collection.d.ts", 2840),
+                ("typescript/lib/lib.es2015.core.d.ts", 19899),
+                ("typescript/lib/lib.es2015.d.ts", 1250),
+                ("typescript/lib/lib.es2015.generator.d.ts", 2561),
+                ("typescript/lib/lib.es2015.iterable.d.ts", 14933),
+                ("typescript/lib/lib.es2015.promise.d.ts", 7229),
+                ("typescript/lib/lib.es2015.proxy.d.ts", 1961),
+                ("typescript/lib/lib.es2015.reflect.d.ts", 1913),
+                ("typescript/lib/lib.es2015.symbol.d.ts", 1657),
+                ("typescript/lib/lib.es2015.symbol.wellknown.d.ts", 10257),
+                ("typescript/lib/lib.es2016.array.include.d.ts", 4870),
+                ("typescript/lib/lib.es2016.d.ts", 937),
+                ("typescript/lib/lib.es2016.full.d.ts", 1040),
+                ("typescript/lib/lib.es2017.d.ts", 1092),
+                ("typescript/lib/lib.es2017.full.d.ts", 1040),
+                ("typescript/lib/lib.es2017.intl.d.ts", 1253),
+                ("typescript/lib/lib.es2017.object.d.ts", 2460),
+                ("typescript/lib/lib.es2017.sharedmemory.d.ts", 6151),
+                ("typescript/lib/lib.es2017.string.d.ts", 2387),
+                ("typescript/lib/lib.es2017.typedarrays.d.ts", 1434),
+                ("typescript/lib/lib.es2018.asyncgenerator.d.ts", 2696),
+                ("typescript/lib/lib.es2018.asynciterable.d.ts", 1755),
+                ("typescript/lib/lib.es2018.d.ts", 1097),
+                ("typescript/lib/lib.es2018.full.d.ts", 1040),
+                ("typescript/lib/lib.es2018.intl.d.ts", 1821),
+                ("typescript/lib/lib.es2018.promise.d.ts", 1361),
+                ("typescript/lib/lib.es2018.regexp.d.ts", 1236),
+                ("typescript/lib/lib.es2019.array.d.ts", 7688),
+                ("typescript/lib/lib.es2019.d.ts", 1044),
+                ("typescript/lib/lib.es2019.full.d.ts", 1041),
+                ("typescript/lib/lib.es2019.object.d.ts", 1488),
+                ("typescript/lib/lib.es2019.string.d.ts", 1341),
+                ("typescript/lib/lib.es2019.symbol.d.ts", 1015),
+                ("typescript/lib/lib.es2020.bigint.d.ts", 30407),
+                ("typescript/lib/lib.es2020.d.ts", 1056),
+                ("typescript/lib/lib.es2020.full.d.ts", 1041),
+                ("typescript/lib/lib.es2020.promise.d.ts", 1877),
+                ("typescript/lib/lib.es2020.string.d.ts", 1246),
+                ("typescript/lib/lib.es2020.symbol.wellknown.d.ts", 1457),
+                ("typescript/lib/lib.es5.d.ts", 204165),
+                ("typescript/lib/lib.es6.d.ts", 1041),
+                ("typescript/lib/lib.esnext.array.d.ts", 7686),
+                ("typescript/lib/lib.esnext.asynciterable.d.ts", 1544),
+                ("typescript/lib/lib.esnext.bigint.d.ts", 30407),
+                ("typescript/lib/lib.esnext.d.ts", 929),
+                ("typescript/lib/lib.esnext.full.d.ts", 1040),
+                ("typescript/lib/lib.esnext.intl.d.ts", 1253),
+                ("typescript/lib/lib.esnext.symbol.d.ts", 1002),
+                ("typescript/lib/lib.scripthost.d.ts", 9462),
+                ("typescript/lib/lib.webworker.d.ts", 253062),
+                ("typescript/lib/lib.webworker.importscripts.d.ts", 1051),
+                ("typescript/lib/protocol.d.ts", 92255),
+                ("typescript/lib/tsc.js", 4672354),
+                ("typescript/lib/tsserver.js", 8667823),
+                ("typescript/lib/tsserverlibrary.d.ts", 448439),
+                ("typescript/lib/tsserverlibrary.js", 8632049),
+                ("typescript/lib/typesMap.json", 16786),
+                ("typescript/lib/typescript.d.ts", 314763),
+                ("typescript/lib/typescript.js", 8096180),
+                ("typescript/lib/typescriptServices.d.ts", 314750),
+                ("typescript/lib/typescriptServices.js", 8096187),
+                ("typescript/lib/typingsInstaller.js", 6187219),
+                ("typescript/lib/watchGuard.js", 1142)
+            ]
+            .iter()
+            .map(|(p, s)| (p.to_string(), *s))
+            .collect(),
+            suggested_fix: Some(Fix::EnrichedExclude {
+                exclude: [
+                    "typescript/tests/*",
+                    "typescript/src/*",
+                    "typescript/scripts/*",
+                    "typescript/doc/*",
+                    "typescript/lib/*/*.json",
+                    "**/lib/*"
+                ]
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
+                exclude_added: vec!["**/lib/*".into()],
+                has_build_script: false
+            })
+        }
+    );
 }
 
 #[test]
@@ -16,7 +127,7 @@ fn cookie_factory() {
         Report::from_result(
             "a",
             "1",
-            task_result("tests/fixtures/cookie_factory-0.3.1-extract_crate-0.3.1.bin")
+            task_result("cookie_factory-0.3.1-extract_crate-0.3.1")
         ),
         Report::Version {
             crate_name: "a".into(),
@@ -47,7 +158,7 @@ fn cookie_factory() {
 #[test]
 fn gnir() {
     assert_eq!(
-        Report::from_result("a", "1", task_result("tests/fixtures/gnir-0.14.0-alpha3-extract_crate-1.0.0.bin")),
+        Report::from_result("a", "1", task_result("gnir-0.14.0-alpha3-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -67,7 +178,7 @@ fn gnir() {
 #[test]
 fn sovrin_client() {
     assert_eq!(
-        Report::from_result("a", "1", task_result("tests/fixtures/sovrin-client.0.1.0-179-extract_crate-1.0.0.bin")),
+        Report::from_result("a", "1", task_result("sovrin-client.0.1.0-179-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -84,7 +195,7 @@ fn sovrin_client() {
 fn mozjs() {
     // todo: check lw-webdriver-0.1.5/ for binaries
     assert_eq!(
-        Report::from_result("a", "1", task_result("tests/fixtures/mozjs_sys-0.67.1-extract_crate-1.0.0.bin")),
+        Report::from_result("a", "1", task_result("mozjs_sys-0.67.1-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
