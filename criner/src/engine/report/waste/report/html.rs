@@ -107,11 +107,22 @@ fn child_items_section(
 fn by_extension_section(wasted_by_extension: Dict<AggregateFileInfo>) -> Box<dyn RenderBox> {
     let mut sorted: Vec<_> = Vec::from_iter(wasted_by_extension.into_iter());
     sorted.sort_by_key(|(_, e)| e.total_bytes);
+    let top_list = 20;
+    let skip_info = if sorted.len() > top_list {
+        Some((
+            sorted.len() - top_list,
+            sorted.iter().skip(top_list).fold((0, 0), |(tf, tb), e| {
+                (tf + e.1.total_files, tb + e.1.total_bytes)
+            }),
+        ))
+    } else {
+        None
+    };
     box_html! {
         section {
             h1: "Waste by Extension";
             ol {
-                @ for (name, info) in sorted.into_iter().rev() {
+                @ for (name, info) in sorted.into_iter().rev().take(top_list) {
                     li {
                         h3 {
                              @ if name.ends_with(NO_EXT_MARKER) {
@@ -123,6 +134,9 @@ fn by_extension_section(wasted_by_extension: Dict<AggregateFileInfo>) -> Box<dyn
                         p: format!("{} waste in {} files", ByteSize(info.total_bytes), info.total_files);
                     }
                 }
+            }
+            @ if let Some((num_skipped, (tf, tb))) = skip_info {
+                p: format!("Skipped {} extensions totalling {} files and {}", num_skipped, tf, ByteSize(tb))
             }
         }
     }
