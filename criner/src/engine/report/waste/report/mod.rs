@@ -15,10 +15,17 @@ pub use result::{globset_from, tar_path_to_utf8_str};
 pub type Patterns = Vec<String>;
 
 #[derive(PartialEq, Eq, Debug, Clone, Deserialize, Serialize)]
+pub struct PotentialWaste {
+    pub patterns_to_fix: Patterns,
+    pub potential_waste: Vec<WastedFile>,
+}
+
+#[derive(PartialEq, Eq, Debug, Clone, Deserialize, Serialize)]
 pub enum Fix {
     ImprovedInclude {
         include: Patterns,
         include_removed: Patterns,
+        potential: Option<PotentialWaste>,
         has_build_script: bool,
     },
     EnrichedExclude {
@@ -328,14 +335,11 @@ impl Report {
                             includes,
                             excludes,
                         ),
-                        (Some(includes), None, build_script_name, compile_time_includes) => {
-                            Self::enrich_includes(
-                                entries_meta_data,
-                                includes,
-                                compile_time_includes,
-                                build_script_name.is_some(),
-                            )
-                        }
+                        (Some(includes), None, build_script_name, _) => Self::enrich_includes(
+                            entries_meta_data,
+                            includes,
+                            build_script_name.is_some(),
+                        ),
                         (None, Some(excludes), build_script_name, compile_time_includes) => {
                             Self::enrich_excludes(
                                 entries_meta_data,

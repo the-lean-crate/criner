@@ -60,6 +60,7 @@ fn cookie_factory() {
                 .map(|s| s.to_string())
                 .collect(),
                 include_removed: vec!["Cargo.toml".into()],
+                potential: None,
                 has_build_script: true
             })
         }

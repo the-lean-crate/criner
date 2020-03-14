@@ -1,4 +1,5 @@
 use super::{Fix, Package, Patterns, Report, TarHeader, WastedFile};
+use crate::engine::report::waste::PotentialWaste;
 use std::path::PathBuf;
 use std::{collections::BTreeSet, path::Path};
 
@@ -179,15 +180,15 @@ fn find_include_patterns_that_incorporate_exclude_patterns(
     let mut new_include_patterns = Vec::with_capacity(include_patterns.len());
     for pattern in include_patterns {
         let glob = make_glob(&pattern);
-        let matcher = glob.compile_matcher();
+        let include = glob.compile_matcher();
         if entries_to_exclude
             .iter()
-            .any(|e| matcher.is_match(tar_path_to_path(&e.path)))
+            .any(|e| include.is_match(tar_path_to_path(&e.path)))
         {
             removed_include_patterns.push(pattern);
             let added_includes: Vec<_> = entries_to_include
                 .iter()
-                .filter(|e| matcher.is_match(tar_path_to_path(&e.path)))
+                .filter(|e| include.is_match(tar_path_to_path(&e.path)))
                 .map(|e| tar_path_to_utf8_str(&e.path).to_string())
                 .collect();
             added_include_patterns.extend(added_includes.clone().into_iter());
@@ -490,13 +491,25 @@ impl Report {
     }
 
     pub(crate) fn enrich_includes(
-        _entries: Vec<TarHeader>,
+        entries: Vec<TarHeader>,
         mut include: Patterns,
-        _compile_time_include: Option<Patterns>,
         has_build_script: bool,
     ) -> (Option<Fix>, Vec<TarHeader>) {
         let mut include_removed = Vec::new();
         remove_implicit_includes(&mut include, &mut include_removed);
+        let (entries_we_would_remove, _) =
+            split_to_matched_and_unmatched(entries, &globset_from(standard_exclude_patterns()));
+        let mut potential_negated_excludes = Vec::new();
+        for pattern in standard_exclude_patterns() {
+            let glob = make_glob(&pattern);
+            let exclude = glob.compile_matcher();
+            if entries_we_would_remove
+                .iter()
+                .any(|e| exclude.is_match(tar_path_to_utf8_str(&e.path)))
+            {
+                potential_negated_excludes.push(format!("!{}", pattern));
+            }
+        }
 
         (
             if include_removed.is_empty() {
@@ -506,6 +519,14 @@ impl Report {
                     include,
                     include_removed,
                     has_build_script,
+                    potential: if potential_negated_excludes.is_empty() {
+                        None
+                    } else {
+                        Some(PotentialWaste {
+                            patterns_to_fix: potential_negated_excludes,
+                            potential_waste: Self::convert_to_wasted_files(entries_we_would_remove),
+                        })
+                    },
                 })
             },
             Vec::new(),
