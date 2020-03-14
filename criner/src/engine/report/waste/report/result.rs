@@ -12,6 +12,12 @@ lazy_static! {
             .expect("valid statically known regex");
     static ref STANDARD_EXCLUDES_GLOBSET: globset::GlobSet =
         globset_from(standard_exclude_patterns());
+    static ref STANDARD_EXCLUDE_GLOBS: Vec<(&'static str, globset::GlobMatcher)> =
+        standard_exclude_patterns()
+            .iter()
+            .cloned()
+            .map(|p| (p, make_glob(p).compile_matcher()))
+            .collect();
 }
 
 pub fn tar_path_to_utf8_str(mut bytes: &[u8]) -> &str {
@@ -278,14 +284,13 @@ fn find_in_entries<'buffer>(
 
 fn matches_in_set_a_but_not_in_set_b(
     mut patterns_to_amend: Patterns,
-    set_a: &[&'static str],
+    set_a: &[(&str, globset::GlobMatcher)],
     set_b_patterns: impl IntoIterator<Item = impl AsRef<str>>,
     mut entries: Vec<TarHeader>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
     let set_b = globset_from(set_b_patterns);
     let set_a_len = patterns_to_amend.len();
-    for pattern_a in set_a {
-        let glob_a = make_glob(pattern_a).compile_matcher();
+    for (pattern_a, glob_a) in set_a {
         if entries
             .iter()
             .any(|e| glob_a.is_match(tar_path_to_utf8_str(&e.path)))
@@ -371,7 +376,7 @@ fn simplify_standard_excludes_and_match_against_standard_includes(
         .chain(compile_time_include.iter().map(|s| s.as_str()));
     matches_in_set_a_but_not_in_set_b(
         existing_exclude,
-        standard_exclude_patterns(),
+        &STANDARD_EXCLUDE_GLOBS,
         include_iter,
         potential_waste,
     )
@@ -414,9 +419,7 @@ fn potential_negated_includes(entries: Vec<TarHeader>) -> Option<PotentialWaste>
     let (entries_we_would_remove, _) =
         split_to_matched_and_unmatched(entries, &STANDARD_EXCLUDES_GLOBSET);
     let mut potential_negated_excludes = Vec::new();
-    for pattern in standard_exclude_patterns() {
-        let glob = make_glob(&pattern);
-        let exclude = glob.compile_matcher();
+    for (pattern, exclude) in STANDARD_EXCLUDE_GLOBS.iter() {
         if entries_we_would_remove
             .iter()
             .any(|e| exclude.is_match(tar_path_to_utf8_str(&e.path)))
