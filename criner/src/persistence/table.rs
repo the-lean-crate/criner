@@ -16,10 +16,12 @@ pub type ThreadSafeConnection = std::sync::Arc<parking_lot::Mutex<rusqlite::Conn
 pub fn new_value_query_recent_first<'conn>(
     table_name: &str,
     connection: &'conn rusqlite::Connection,
+    offset: usize,
+    limit: usize,
 ) -> Result<rusqlite::Statement<'conn>> {
     Ok(connection.prepare(&format!(
-        "SELECT data FROM {} ORDER BY _rowid_ DESC",
-        table_name
+        "SELECT data FROM {} ORDER BY _rowid_ DESC LIMIT {}, {}",
+        table_name, offset, limit
     ))?)
 }
 

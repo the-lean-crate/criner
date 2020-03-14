@@ -68,42 +68,69 @@ pub async fn process(
 
     let versions = db.open_crate_versions()?;
     let num_versions = versions.count();
+    progress.init(Some(num_versions as u32), Some("crate versions"));
 
     let auto_checkpoint_every = 10000;
-    let checkpoint_connection = db.open_connection()?;
+    let checkpoint_connection = db.open_connection_with_busy_wait()?;
     let connection = versions.into_connection();
     let mut guard = connection.lock();
-    let mut statement = new_value_query_recent_first(CrateVersionTable::table_name(), &mut *guard)?;
-    let iter = value_iter::<CrateVersion>(&mut statement)?;
+    let mut fetched_versions = 0;
+    let mut versions = Vec::with_capacity(auto_checkpoint_every);
+    let mut last_elapsed_for_checkpointing = None;
 
-    progress.init(Some(num_versions as u32), Some("crate versions"));
-    let tasks = db.open_tasks()?;
-    let mut vid = 0;
-    for version in iter {
-        let version = version?;
+    loop {
+        let abort_loop = {
+            progress.blocked("fetching chunk of version to schedule", None);
+            let mut statement = new_value_query_recent_first(
+                CrateVersionTable::table_name(),
+                &mut *guard,
+                fetched_versions,
+                auto_checkpoint_every,
+            )?;
+            let iter = value_iter::<CrateVersion>(&mut statement)?;
+            versions.clear();
+            versions.extend(iter);
+            fetched_versions += versions.len();
 
-        progress.set((vid + 1) as u32);
-        progress.blocked("wait for task consumers", None);
-        work::schedule::tasks(
-            &tasks,
-            &version,
-            progress.add_child(format!("schedule {}", version.key())),
-            work::schedule::Scheduling::AtLeastOne,
-            &tx_io,
-            &tx_cpu,
-            startup_time,
-        )
-        .await?;
-        if vid % auto_checkpoint_every == 0 {
-            // We have too many writers which cause the WAL to get so large that all reads are slowing to a crawl
-            // Standard SQLITE autocheckpoints are passive, which are not effective in our case as they never
-            // kick in with too many writers. There is no way to change the autocheckpoint mode to something more suitable… :/
-            progress.blocked("checkpointing database", None);
-            checkpoint_connection
-                .lock()
-                .execute_batch("PRAGMA wal_checkpoint(TRUNCATE)")?;
+            versions.len() != auto_checkpoint_every
+        };
+
+        let tasks = db.open_tasks()?;
+        for (vid, version) in versions.drain(..).enumerate() {
+            let version = version?;
+
+            progress.set((vid + fetched_versions + 1) as u32);
+            progress.blocked("wait for task consumers", None);
+            work::schedule::tasks(
+                &tasks,
+                &version,
+                progress.add_child(format!("schedule {}", version.key())),
+                work::schedule::Scheduling::AtLeastOne,
+                &tx_io,
+                &tx_cpu,
+                startup_time,
+            )
+            .await?;
         }
-        vid += 1;
+
+        // We have too many writers which cause the WAL to get so large that all reads are slowing to a crawl
+        // Standard SQLITE autocheckpoints are passive, which are not effective in our case as they never
+        // kick in with too many writers. There is no way to change the autocheckpoint mode to something more suitable… :/
+        progress.blocked(
+            "checkpointing database",
+            last_elapsed_for_checkpointing
+                .clone()
+                .map(|d| SystemTime::now() + d),
+        );
+        let start = SystemTime::now();
+        checkpoint_connection
+            .lock()
+            .execute_batch("PRAGMA wal_checkpoint(TRUNCATE)")?;
+        last_elapsed_for_checkpointing = Some(SystemTime::now().duration_since(start)?);
+
+        if abort_loop {
+            break;
+        }
     }
     Ok(())
 }

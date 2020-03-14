@@ -5,7 +5,7 @@ use std::path::Path;
 pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
     log::info!("open db");
     let db = crate::persistence::Db::open(&db_path)?;
-    let mut connection = db.open_connection_no_async()?;
+    let mut connection = db.open_connection_no_async_with_busy_wait()?;
     let mut keys = Vec::<String>::new();
     let table_name = TaskResultTable::table_name();
     {

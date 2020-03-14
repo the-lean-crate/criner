@@ -54,7 +54,13 @@ impl Db {
         )))
     }
 
-    pub fn open_connection_no_async(&self) -> Result<rusqlite::Connection> {
+    pub fn open_connection_with_busy_wait(&self) -> Result<ThreadSafeConnection> {
+        let connection = rusqlite::Connection::open(&self.sqlite_path)?;
+        connection.busy_handler(Some(sleeper))?;
+        Ok(std::sync::Arc::new(parking_lot::Mutex::new(connection)))
+    }
+
+    pub fn open_connection_no_async_with_busy_wait(&self) -> Result<rusqlite::Connection> {
         let connection = rusqlite::Connection::open(&self.sqlite_path)?;
         connection.busy_handler(Some(sleeper))?;
         Ok(connection)

@@ -75,5 +75,9 @@ quick_error! {
             from()
             cause(err)
         }
+        SystemTime(err: std::time::SystemTimeError) {
+            from()
+            cause(err)
+        }
     }
 }

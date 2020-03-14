@@ -73,7 +73,7 @@ pub async fn fetch(
             let index_path = crates_io_path.as_ref().to_path_buf();
             move || {
                 use std::iter::FromIterator;
-                let mut connection = db.open_connection_no_async()?;
+                let mut connection = db.open_connection_no_async_with_busy_wait()?;
                 let mut crates_lut = {
                     let transaction = connection.transaction()?;
                     store_progress.blocked("caching crates", None);

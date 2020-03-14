@@ -189,7 +189,7 @@ pub trait Generator {
         }
 
         if !results_to_update.is_empty() {
-            let mut connection = db.open_connection_no_async()?;
+            let mut connection = db.open_connection_no_async_with_busy_wait()?;
             progress.blocked("wait for write lock", None);
             let transaction =
                 connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
