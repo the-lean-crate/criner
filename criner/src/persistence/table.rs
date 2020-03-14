@@ -29,12 +29,17 @@ pub fn new_key_value_query_old_to_new_filtered<'conn>(
     table_name: &str,
     glob: Option<&str>,
     connection: &'conn rusqlite::Connection,
+    chunk: Option<(usize, usize)>,
 ) -> Result<rusqlite::Statement<'conn>> {
     Ok(connection.prepare(&format!(
-        "SELECT key,data FROM {} {} ORDER BY _rowid_ ASC",
+        "SELECT key,data FROM {} {} ORDER BY _rowid_ ASC {}",
         table_name,
         match glob {
             Some(glob) => format!("where key glob \"{}\"", glob),
+            None => "".into(),
+        },
+        match chunk {
+            Some((offset, limit)) => format!("LIMIT {}, {}", offset, limit),
             None => "".into(),
         }
     ))?)
@@ -44,7 +49,7 @@ pub fn new_key_value_query_old_to_new<'conn>(
     table_name: &str,
     connection: &'conn rusqlite::Connection,
 ) -> Result<rusqlite::Statement<'conn>> {
-    new_key_value_query_old_to_new_filtered(table_name, None, connection)
+    new_key_value_query_old_to_new_filtered(table_name, None, connection, None)
 }
 
 pub fn new_key_value_insertion<'conn>(

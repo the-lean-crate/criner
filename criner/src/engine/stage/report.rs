@@ -61,34 +61,51 @@ pub async fn generate(
         .map(|_| ())
         .boxed()
     })?;
-    let mut connection = krates.connection().lock();
-    let mut statement = new_key_value_query_old_to_new_filtered(
-        persistence::CrateTable::table_name(),
-        glob_str,
-        &mut *connection,
-    )?;
-    let mut rows = statement.query(NO_PARAMS)?;
+
+    let mut fetched_crates = 0;
     let mut chunk = Vec::<(String, Vec<u8>)>::with_capacity(chunk_size as usize);
     let mut cid = 0;
-    while let Some(r) = rows.next()? {
-        chunk.push((r.get(0)?, r.get(1)?));
-        if chunk.len() == chunk_size as usize {
-            cid += 1;
-            check(deadline.clone())?;
-            progress.set((cid * chunk_size) as u32);
-            progress.blocked("write crate report", None);
-            tx.send(
-                report::waste::Generator::write_files(
-                    db.clone(),
-                    waste_report_dir.clone(),
-                    cache_dir.clone(),
-                    chunk,
-                    progress.add_child(""),
-                )
-                .boxed(),
+    loop {
+        let abort_loop = {
+            progress.blocked("fetching chunk of crates to schedule", None);
+            let mut connection = db.open_connection_no_async_with_busy_wait()?;
+            let mut statement = new_key_value_query_old_to_new_filtered(
+                persistence::CrateTable::table_name(),
+                glob_str,
+                &mut connection,
+                Some((fetched_crates, chunk_size as usize)),
+            )?;
+
+            chunk.clear();
+            chunk.extend(
+                statement
+                    .query_map(NO_PARAMS, |r| Ok((r.get(0)?, r.get(1)?)))?
+                    .filter_map(|r| r.ok()),
+            );
+            fetched_crates += chunk.len();
+
+            chunk.len() != chunk_size as usize
+        };
+
+        cid += 1;
+        check(deadline.clone())?;
+
+        progress.set((cid * chunk_size) as u32);
+        progress.blocked("write crate report", None);
+        tx.send(
+            report::waste::Generator::write_files(
+                db.clone(),
+                waste_report_dir.clone(),
+                cache_dir.clone(),
+                chunk,
+                progress.add_child(""),
             )
-            .await;
-            chunk = Vec::with_capacity(chunk_size as usize);
+            .boxed(),
+        )
+        .await;
+        chunk = Vec::with_capacity(chunk_size as usize);
+        if abort_loop {
+            break;
         }
     }
     drop(tx);

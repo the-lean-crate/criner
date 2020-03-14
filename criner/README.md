@@ -2,7 +2,6 @@
 
 ## Tasks
 
-* [ ] Look at build scripts and extract 'rerun-if-changed' and other strings that might indicate file usage
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down
    * Futures has a wrapper to catch panics, even though we don't use it yet. A panic only brings down the future that panics, not the entire program.
 * [ ] Graceful shutdown on Ctrl+C
