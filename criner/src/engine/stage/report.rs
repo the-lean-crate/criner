@@ -44,7 +44,7 @@ pub async fn generate(
     let cache_dir = match glob.as_ref() {
         Some(_) => None,
         None => {
-            let cd = waste_report_dir.join("cache");
+            let cd = waste_report_dir.join("__incremental_cache__");
             async_std::fs::create_dir_all(&cd).await?;
             Some(cd)
         }
