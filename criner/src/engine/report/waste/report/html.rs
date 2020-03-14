@@ -1,4 +1,4 @@
-use super::{Dict, Report, VersionInfo};
+use super::{merge::NO_EXT_MARKER, Dict, Report, VersionInfo};
 use crate::engine::report::waste::AggregateFileInfo;
 use bytesize::ByteSize;
 use horrorshow::{box_html, html, Render, RenderBox, RenderOnce, TemplateBuffer};
@@ -113,7 +113,13 @@ fn by_extension_section(wasted_by_extension: Dict<AggregateFileInfo>) -> Box<dyn
             ol {
                 @ for (name, info) in sorted.into_iter().rev() {
                     li {
-                        h3: format!("*.{}", name);
+                        h3 {
+                             @ if name.ends_with(NO_EXT_MARKER) {
+                                : "no extension"
+                               } else {
+                                : &format!("*.{}", name)
+                              }
+                        }
                         p: format!("{} waste in {} files", ByteSize(info.total_bytes), info.total_files);
                     }
                 }

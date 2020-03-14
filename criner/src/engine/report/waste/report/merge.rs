@@ -17,7 +17,7 @@ impl std::ops::AddAssign for VersionInfo {
     }
 }
 
-const NO_EXT_MARKER: &str = "<NO_EXT>";
+pub const NO_EXT_MARKER: &str = "<NO_EXT>";
 
 pub fn vec_into_map_by_extension(
     initial: Dict<AggregateFileInfo>,
