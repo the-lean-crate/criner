@@ -1,3 +1,4 @@
+use crate::engine::report::waste::tar_path_to_utf8_str;
 use crate::{error::Result, model, persistence, Error};
 use async_trait::async_trait;
 use std::{fs::File, io::BufReader, io::Read, path::PathBuf, time::SystemTime};
@@ -9,15 +10,29 @@ struct ProcessingState {
 pub struct Agent {
     asset_dir: PathBuf,
     results: persistence::TaskResultTable,
+    interesting_files: globset::GlobSet,
     state: Option<ProcessingState>,
 }
+
+const INTERESTING_PATTERNS: &[&'static str] = &[
+    "Cargo.*",
+    "readme*",
+    "README*",
+    "license*",
+    "LICENSE*",
+    "build.rs",
+    "**/lib.rs",
+    "**/main.rs",
+];
 
 impl Agent {
     pub fn new(asset_dir: PathBuf, db: &persistence::Db) -> Result<Agent> {
         let results = db.open_results()?;
+        let interesting_files = super::super::report::waste::globset_from(INTERESTING_PATTERNS);
         Ok(Agent {
             asset_dir,
             results,
+            interesting_files,
             state: None,
         })
     }
@@ -83,8 +98,14 @@ impl crate::engine::work::generic::Processor for Agent {
             downloaded_crate,
             key,
         } = self.state.take().expect("state to be set");
-        extract_crate(&self.results, &key, progress, downloaded_crate)
-            .map_err(|err| (err, "Failed to extract crate".into()))
+        extract_crate(
+            &self.results,
+            &key,
+            progress,
+            downloaded_crate,
+            &self.interesting_files,
+        )
+        .map_err(|err| (err, "Failed to extract crate".into()))
     }
 }
 
@@ -110,6 +131,7 @@ fn extract_crate(
     key: &str,
     progress: &mut prodash::tree::Item,
     downloaded_crate: PathBuf,
+    interesting_files: &globset::GlobSet,
 ) -> Result<()> {
     use persistence::TableAccess;
     let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new(File::open(
@@ -125,30 +147,23 @@ fn extract_crate(
         count += 1;
         progress.set(count);
         let mut e: tar::Entry<_> = e?;
-        let path = e.path().ok();
         meta_data.push(model::TarHeader {
             path: e.path_bytes().to_vec(),
             size: e.header().size()?,
             entry_type: e.header().entry_type().as_byte(),
         });
 
-        if let Some(stem_lowercase) = path.and_then(|p| {
-            p.file_stem()
-                .and_then(|stem| stem.to_str().map(str::to_lowercase))
-        }) {
-            let interesting_files = ["cargo", "cargo", "readme", "license", "build"];
-            if interesting_files.contains(&stem_lowercase.as_str()) {
-                file_count += 1;
-                buf.clear();
-                e.read_to_end(&mut buf)?;
-                files.push((
-                    meta_data
-                        .last()
-                        .expect("to have pushed one just now")
-                        .to_owned(),
-                    buf.to_owned().into(),
-                ));
-            }
+        if interesting_files.is_match(tar_path_to_utf8_str(e.path_bytes().as_ref())) {
+            file_count += 1;
+            buf.clear();
+            e.read_to_end(&mut buf)?;
+            files.push((
+                meta_data
+                    .last()
+                    .expect("to have pushed one just now")
+                    .to_owned(),
+                buf.to_owned().into(),
+            ));
         }
     }
     progress.info(format!(

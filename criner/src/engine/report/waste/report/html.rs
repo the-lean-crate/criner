@@ -56,7 +56,7 @@ fn page_footer() -> impl Render {
         footer {
             p {
                 : "Created by ";
-                a(href="https://github.com/Byron/"): "Byron FOO";
+                a(href="https://github.com/Byron/"): "Byron";
             }
             p {
                 a(href="https://github.com/crates-io/criner/issues/new"): "Provide feedback";

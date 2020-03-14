@@ -1,7 +1,7 @@
 use super::{Fix, Package, Patterns, Report, TarHeader, WastedFile};
 use std::{collections::BTreeSet, path::Path};
 
-fn tar_path_to_utf8_str(mut bytes: &[u8]) -> &str {
+pub fn tar_path_to_utf8_str(mut bytes: &[u8]) -> &str {
     // Tar paths include the parent directory, cut it to crate relative paths
     if let Some(pos) = bytes.iter().position(|b| *b == b'/' || *b == b'\\') {
         bytes = bytes.get(pos + 1..).unwrap_or(bytes);
@@ -124,7 +124,7 @@ fn standard_include_patterns() -> &'static [&'static str] {
     ]
 }
 
-fn globset_from(patterns: impl IntoIterator<Item = impl AsRef<str>>) -> globset::GlobSet {
+pub fn globset_from(patterns: impl IntoIterator<Item = impl AsRef<str>>) -> globset::GlobSet {
     let mut builder = globset::GlobSetBuilder::new();
     for pattern in patterns.into_iter() {
         builder.add(make_glob(pattern.as_ref()));

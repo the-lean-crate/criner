@@ -10,6 +10,8 @@ use async_trait::async_trait;
 use serde_derive::{Deserialize, Serialize};
 use std::{collections::BTreeMap, path::Path, path::PathBuf};
 
+pub use result::{globset_from, tar_path_to_utf8_str};
+
 pub type Patterns = Vec<String>;
 
 #[derive(PartialEq, Eq, Debug, Clone, Deserialize, Serialize)]
