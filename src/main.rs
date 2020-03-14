@@ -6,6 +6,8 @@ fn main() -> criner::error::Result<()> {
         if no_gui {
             env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
         }
+    } else {
+        env_logger::init();
     }
     criner_cli::run_blocking(args)
 }
