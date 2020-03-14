@@ -69,6 +69,8 @@ pub async fn process(
     let versions = db.open_crate_versions()?;
     let num_versions = versions.count();
 
+    let auto_checkpoint_every = 10000;
+    let checkpoint_connection = db.open_connection()?;
     let connection = versions.into_connection();
     let mut guard = connection.lock();
     let mut statement = new_value_query_recent_first(CrateVersionTable::table_name(), &mut *guard)?;
@@ -92,6 +94,15 @@ pub async fn process(
             startup_time,
         )
         .await?;
+        if vid % auto_checkpoint_every == 0 {
+            // We have too many writers which cause the WAL to get so large that all reads are slowing to a crawl
+            // Standard SQLITE autocheckpoints are passive, which are not effective in our case as they never
+            // kick in with too many writers. There is no way to change the autocheckpoint mode to something more suitable… :/
+            progress.blocked("checkpointing database", None);
+            checkpoint_connection
+                .lock()
+                .execute_batch("PRAGMA wal_checkpoint(TRUNCATE)")?;
+        }
         vid += 1;
     }
     Ok(())
