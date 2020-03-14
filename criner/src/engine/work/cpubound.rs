@@ -16,10 +16,6 @@ pub struct Agent {
 
 const INTERESTING_PATTERNS: &[&'static str] = &[
     "Cargo.*",
-    "readme*",
-    "README*",
-    "license*",
-    "LICENSE*",
     "build.rs",
     "**/lib.rs",
     "**/main.rs",
