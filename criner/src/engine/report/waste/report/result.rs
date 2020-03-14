@@ -417,7 +417,6 @@ impl Report {
 
     pub(crate) fn standard_includes(
         entries: Vec<TarHeader>,
-        _entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
         build_script_name: Option<String>,
         compile_time_include: Option<Patterns>,
     ) -> (Option<Fix>, Vec<TarHeader>) {
@@ -492,7 +491,6 @@ impl Report {
 
     pub(crate) fn enrich_includes(
         entries: Vec<TarHeader>,
-        _entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
         mut include: Patterns,
         has_build_script: bool,
     ) -> (Option<Fix>, Vec<TarHeader>) {
@@ -529,7 +527,6 @@ impl Report {
 
     pub(crate) fn enrich_excludes(
         entries: Vec<TarHeader>,
-        _entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
         exclude: Patterns,
         compile_time_include: Option<Patterns>,
         has_build_script: bool,

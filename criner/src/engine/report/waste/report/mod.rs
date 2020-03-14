@@ -331,14 +331,12 @@ impl Report {
                         ),
                         (Some(includes), None, build_script_name, _) => Self::enrich_includes(
                             entries_meta_data,
-                            selected_entries,
                             includes,
                             build_script_name.is_some(),
                         ),
                         (None, Some(excludes), build_script_name, compile_time_includes) => {
                             Self::enrich_excludes(
                                 entries_meta_data,
-                                selected_entries,
                                 excludes,
                                 compile_time_includes,
                                 build_script_name.is_some(),
@@ -347,7 +345,6 @@ impl Report {
                         (None, None, build_script_name, compile_time_includes) => {
                             Self::standard_includes(
                                 entries_meta_data,
-                                selected_entries,
                                 build_script_name,
                                 compile_time_includes,
                             )
