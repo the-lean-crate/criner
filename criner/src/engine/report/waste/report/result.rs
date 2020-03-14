@@ -271,22 +271,22 @@ fn matches_in_set_a_but_not_in_set_b(
     mut entries: Vec<TarHeader>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
     let set_a_len = initial_a.len();
-    for exclude_pattern in set_a {
-        let exclude_glob = make_glob(exclude_pattern).compile_matcher();
+    for pattern_a in set_a {
+        let glob_a = make_glob(pattern_a).compile_matcher();
         if entries
             .iter()
-            .any(|e| exclude_glob.is_match(tar_path_to_utf8_str(&e.path)))
+            .any(|e| glob_a.is_match(tar_path_to_utf8_str(&e.path)))
         {
             if entries
                 .iter()
                 .any(|e| set_b.is_match(tar_path_to_utf8_str(&e.path)))
             {
-                entries.retain(|e| !exclude_glob.is_match(tar_path_to_utf8_str(&e.path)));
+                entries.retain(|e| !glob_a.is_match(tar_path_to_utf8_str(&e.path)));
                 if entries.is_empty() {
                     break;
                 }
             } else {
-                initial_a.push(exclude_pattern.to_string());
+                initial_a.push(pattern_a.to_string());
             }
         }
     }
