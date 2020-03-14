@@ -299,6 +299,42 @@ fn matches_in_set_a_but_not_in_set_b(
     (entries, patterns_to_amend, new_excludes)
 }
 
+fn matches_in_set_a_but_not_in_set_b_for_excludes(
+    mut patterns_to_amend: Patterns,
+    set_a: &[&'static str],
+    set_b_patterns: impl IntoIterator<Item = impl AsRef<str>>,
+    mut entries: Vec<TarHeader>,
+) -> (Vec<TarHeader>, Patterns, Patterns) {
+    let set_b_patterns: Vec<_> = set_b_patterns.into_iter().collect();
+    let set_b = globset_from(&set_b_patterns);
+    let set_a_len = patterns_to_amend.len();
+    for pattern_a in set_a {
+        let glob_a = make_glob(pattern_a).compile_matcher();
+        if entries
+            .iter()
+            .any(|e| glob_a.is_match(tar_path_to_utf8_str(&e.path)))
+        {
+            patterns_to_amend.push(pattern_a.to_string());
+        }
+    }
+    let mut matches = Vec::new();
+    let mut match_set = BTreeSet::new();
+    for e in &entries {
+        set_b.matches_into(tar_path_to_utf8_str(&e.path), &mut matches);
+        match_set.extend(matches.drain(..));
+    }
+    entries.retain(|e| !set_b.is_match(tar_path_to_utf8_str(&e.path)));
+    for pattern_idx in match_set.into_iter() {
+        patterns_to_amend.push(format!("!{}", set_b_patterns[pattern_idx].as_ref()));
+    }
+
+    let new_excludes = patterns_to_amend
+        .get(set_a_len..)
+        .map(|v| v.to_vec())
+        .unwrap_or_else(Vec::new);
+    (entries, patterns_to_amend, new_excludes)
+}
+
 /// Takes something like "src/deep/lib.rs" and "../data/foo.bin" and turns it into "src/data/foo.bin", replicating
 /// the way include_str/bytes interprets include paths. Thus it makes these paths relative to the crate, instead of
 /// relative to the source file they are included in.
@@ -372,7 +408,7 @@ fn simplify_standard_excludes_and_match_against_standard_includes(
         .iter()
         .cloned()
         .chain(lib_includes.iter().map(|s| s.as_str()));
-    matches_in_set_a_but_not_in_set_b(
+    matches_in_set_a_but_not_in_set_b_for_excludes(
         existing_exclude,
         standard_exclude_patterns(),
         include_patterns_iter,

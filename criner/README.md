@@ -10,6 +10,10 @@
   * The current implementation relies on the database to handle aborted writes, and is no problem for that reason. However, it would be nice to have
     A well-behaving program.
     
+## How to satisfy the Waste Report
+
+* `include_str!(…)` and 1include_bytes!(…)` should only be in `lib.rs` and `main.rs`, only these are available for introspection.
+    
 ## Limitations of Waste Reporting
 
 * does only know about the presence of build scripts, but doesn't understand them

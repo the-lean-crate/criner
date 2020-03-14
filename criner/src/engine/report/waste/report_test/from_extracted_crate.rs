@@ -93,7 +93,6 @@ fn deno_typescript() {
                 ("typescript/lib/tsserverlibrary.js", 8632049),
                 ("typescript/lib/typesMap.json", 16786),
                 ("typescript/lib/typescript.d.ts", 314763),
-                ("typescript/lib/typescript.js", 8096180),
                 ("typescript/lib/typescriptServices.d.ts", 314750),
                 ("typescript/lib/typescriptServices.js", 8096187),
                 ("typescript/lib/typingsInstaller.js", 6187219),
@@ -109,12 +108,13 @@ fn deno_typescript() {
                     "typescript/scripts/*",
                     "typescript/doc/*",
                     "typescript/lib/*/*.json",
-                    "**/lib/*"
+                    "**/lib/*",
+                    "!typescript/lib/typescript.js"
                 ]
                 .iter()
                 .map(|s| s.to_string())
                 .collect(),
-                exclude_added: vec!["**/lib/*".into()],
+                exclude_added: vec!["**/lib/*".into(), "!typescript/lib/typescript.js".into()],
                 has_build_script: false
             })
         }
