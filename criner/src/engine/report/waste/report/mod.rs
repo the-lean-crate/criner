@@ -311,43 +311,45 @@ impl Report {
                 let total_size_in_bytes = entries_meta_data.iter().map(|e| e.size).sum();
                 let total_files = entries_meta_data.len() as u64;
                 let package = Self::package_from_entries(&selected_entries);
-                let (includes, excludes, build_script_name, has_compile_time_includes) =
+                let (includes, excludes, compile_time_includes, build_script_name) =
                     Self::package_into_includes_excludes(
                         package,
                         &selected_entries,
                         &entries_meta_data,
                     );
-                let (suggested_fix, wasted_files) = match (
-                    includes,
-                    excludes,
-                    build_script_name,
-                    has_compile_time_includes,
-                ) {
-                    (Some(includes), Some(excludes), _presence_of_build_script_not_relevant, _) => {
-                        Self::compute_includes_from_includes_and_excludes(
+                let (suggested_fix, wasted_files) =
+                    match (includes, excludes, build_script_name, compile_time_includes) {
+                        (
+                            Some(includes),
+                            Some(excludes),
+                            _presence_of_build_script_not_relevant,
+                            _,
+                        ) => Self::compute_includes_from_includes_and_excludes(
                             entries_meta_data,
                             includes,
                             excludes,
-                        )
-                    }
-                    (Some(includes), None, build_script_name, _) => Self::enrich_includes(
-                        entries_meta_data,
-                        selected_entries,
-                        includes,
-                        build_script_name.is_some(),
-                    ),
-                    (None, Some(excludes), build_script_name, _) => Self::enrich_excludes(
-                        entries_meta_data,
-                        selected_entries,
-                        excludes,
-                        build_script_name.is_some(),
-                    ),
-                    (None, None, build_script_name, _) => Self::standard_includes(
-                        entries_meta_data,
-                        selected_entries,
-                        build_script_name,
-                    ),
-                };
+                        ),
+                        (Some(includes), None, build_script_name, _) => Self::enrich_includes(
+                            entries_meta_data,
+                            selected_entries,
+                            includes,
+                            build_script_name.is_some(),
+                        ),
+                        (None, Some(excludes), build_script_name, compile_time_includes) => {
+                            Self::enrich_excludes(
+                                entries_meta_data,
+                                selected_entries,
+                                excludes,
+                                compile_time_includes,
+                                build_script_name.is_some(),
+                            )
+                        }
+                        (None, None, build_script_name, _) => Self::standard_includes(
+                            entries_meta_data,
+                            selected_entries,
+                            build_script_name,
+                        ),
+                    };
                 let wasted_files = Self::convert_to_wasted_files(wasted_files);
                 Report::Version {
                     crate_name: crate_name.into(),

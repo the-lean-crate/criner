@@ -350,11 +350,16 @@ fn to_crate_relative_path(
 fn simplify_standard_excludes_and_match_against_standard_includes(
     potential_waste: Vec<TarHeader>,
     existing_exclude: Patterns,
+    compile_time_include: Patterns,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
+    let include_iter = standard_include_patterns()
+        .iter()
+        .cloned()
+        .chain(compile_time_include.iter().map(|s| s.as_str()));
     matches_in_set_a_but_not_in_set_b(
         existing_exclude,
         standard_exclude_patterns(),
-        standard_include_patterns(),
+        include_iter,
         potential_waste,
     )
 }
@@ -518,6 +523,7 @@ impl Report {
         entries: Vec<TarHeader>,
         _entries_with_buffer: Vec<(TarHeader, Vec<u8>)>,
         exclude: Patterns,
+        compile_time_include: Option<Patterns>,
         has_build_script: bool,
     ) -> (Option<Fix>, Vec<TarHeader>) {
         let standard_excludes = standard_exclude_patterns();
@@ -527,6 +533,7 @@ impl Report {
             simplify_standard_excludes_and_match_against_standard_includes(
                 potential_waste,
                 exclude,
+                compile_time_include.unwrap_or_default(),
             );
         if wasted_files.is_empty() {
             (None, Vec::new())
@@ -550,7 +557,12 @@ impl Report {
         package: Package,
         entries_with_buffer: &[(TarHeader, Vec<u8>)],
         entries: &[TarHeader],
-    ) -> (Option<Patterns>, Option<Patterns>, Option<String>, bool) {
+    ) -> (
+        Option<Patterns>,
+        Option<Patterns>,
+        Option<Patterns>,
+        Option<String>,
+    ) {
         // TODO: use actual names from package
         let compile_time_includes = {
             let lib_file = find_in_entries(&entries_with_buffer, &entries, "lib.rs");
@@ -558,29 +570,19 @@ impl Report {
             let lib_includes = included_paths_of(lib_file);
             let mut main_includes = included_paths_of(main_file);
             main_includes.extend(lib_includes.into_iter());
-            main_includes
+            if main_includes.is_empty() {
+                None
+            } else {
+                Some(main_includes)
+            }
         };
         let build_script_name = package.build.or_else(|| Some("build.rs".to_owned()));
 
-        let has_compile_time_includes = !compile_time_includes.is_empty();
         (
-            {
-                let inc = match package.include {
-                    Some(mut include) => {
-                        include.extend(compile_time_includes.into_iter());
-                        include
-                    }
-                    None => compile_time_includes,
-                };
-                if inc.is_empty() {
-                    None
-                } else {
-                    Some(inc)
-                }
-            },
+            package.include,
             package.exclude,
+            compile_time_includes,
             build_script_name,
-            has_compile_time_includes,
         )
     }
 }
