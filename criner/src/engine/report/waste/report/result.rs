@@ -583,11 +583,15 @@ impl Report {
         };
 
         (
-            Some(Fix::NewInclude {
-                include: include_patterns,
-                potential,
-                has_build_script,
-            }),
+            if excluded_entries.is_empty() {
+                None
+            } else {
+                Some(Fix::NewInclude {
+                    include: include_patterns,
+                    potential,
+                    has_build_script,
+                })
+            },
             excluded_entries,
         )
     }

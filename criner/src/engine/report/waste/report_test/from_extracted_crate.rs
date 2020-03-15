@@ -24,16 +24,7 @@ fn curl_sys_get_more_info_from_build_script() {
             total_size_in_bytes: 17442826,
             total_files: 3176,
             wasted_files: vec![],
-            suggested_fix: Some(Fix::NewInclude {
-                include: vec![
-                    "LICENSE".into(),
-                    "**/*.rs".into(),
-                    "curl/*".into(),
-                    "build.rs".into()
-                ],
-                potential: None,
-                has_build_script: true
-            })
+            suggested_fix: None
         }
     );
 }
