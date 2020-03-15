@@ -217,6 +217,17 @@ fn remove_implicit_includes(
     }
 }
 
+/// These input patterns are **file paths**, and we would like to make them into the smallest possible amount of **include patterns**.
+/// These patterns must not accidentally match the 'pattern_to_not_match', as it is the pattern they are supposed to replace.
+/// Note that one could also use negated patterns, so keep the 'pattern to not match', but add a specific negation.
+/// HELP WANTED: This could be done by finding the common ancestors and resolve to patterns that match their children most specifically
+fn turn_file_paths_into_patterns(
+    added_include_patterns: Patterns,
+    _pattern_to_not_match: &str,
+) -> Patterns {
+    added_include_patterns
+}
+
 fn find_include_patterns_that_incorporate_exclude_patterns(
     entries_to_exclude: &[TarHeader],
     entries_to_include: &[TarHeader],
@@ -224,7 +235,7 @@ fn find_include_patterns_that_incorporate_exclude_patterns(
 ) -> (Patterns, Patterns, Patterns) {
     let mut added_include_patterns = Vec::new();
     let mut removed_include_patterns = Vec::new();
-    let mut new_include_patterns = Vec::with_capacity(include_patterns.len());
+    let mut all_include_patterns = Vec::with_capacity(include_patterns.len());
     for pattern in include_patterns {
         let glob = make_glob(&pattern);
         let include = glob.compile_matcher();
@@ -232,22 +243,25 @@ fn find_include_patterns_that_incorporate_exclude_patterns(
             .iter()
             .any(|e| include.is_match(tar_path_to_path(&e.path)))
         {
+            let added_includes = turn_file_paths_into_patterns(
+                entries_to_include
+                    .iter()
+                    .filter(|e| include.is_match(tar_path_to_path(&e.path)))
+                    .map(|e| tar_path_to_utf8_str(&e.path).to_string())
+                    .collect(),
+                &pattern,
+            );
             removed_include_patterns.push(pattern);
-            let added_includes: Vec<_> = entries_to_include
-                .iter()
-                .filter(|e| include.is_match(tar_path_to_path(&e.path)))
-                .map(|e| tar_path_to_utf8_str(&e.path).to_string())
-                .collect();
             added_include_patterns.extend(added_includes.clone().into_iter());
-            new_include_patterns.extend(added_includes.into_iter());
+            all_include_patterns.extend(added_includes.into_iter());
         } else {
-            new_include_patterns.push(pattern);
+            all_include_patterns.push(pattern);
         }
     }
 
-    remove_implicit_includes(&mut new_include_patterns, &mut removed_include_patterns);
+    remove_implicit_includes(&mut all_include_patterns, &mut removed_include_patterns);
     (
-        new_include_patterns,
+        all_include_patterns,
         added_include_patterns,
         removed_include_patterns,
     )

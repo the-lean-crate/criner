@@ -18,6 +18,8 @@
 * It does not know renamed `build.rs`, `lib.rs` or `main.rs` files.
   * It could learn about renamed files by changing it's algorithm when gathering crate information.
 * it does not handle negated include patterns, but it also is not disturbed by them
+* When replacing an exclude which is not specific enough with an include that is, it always resolves to all desirable files and is unable 
+  to generate a glob pattern from that. This can result in many files suggested as include.
 
 
 ## Fun facts
