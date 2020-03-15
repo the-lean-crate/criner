@@ -10,7 +10,6 @@ use async_trait::async_trait;
 use serde_derive::{Deserialize, Serialize};
 use std::{collections::BTreeMap, path::Path, path::PathBuf};
 
-use crate::engine::report::waste::report::merge::fix_to_wasted_files_aggregate;
 pub use result::{globset_from_patterns, tar_path_to_utf8_str};
 
 pub type Patterns = Vec<String>;
@@ -194,7 +193,10 @@ impl crate::engine::report::generic::Aggregate for Report {
                         crate_name: lhs_crate_name,
                         total_size_in_bytes: lhs_tsb + rhs_tsb,
                         total_files: lhs_tf + rhs_tf,
-                        potential_savings: fix_to_wasted_files_aggregate(suggested_fix),
+                        potential_savings: merge::add_optional_aggregate(
+                            potential_savings,
+                            merge::fix_to_wasted_files_aggregate(suggested_fix),
+                        ),
                         info_by_version: merge::map_into_map(
                             info_by_version,
                             merge::version_to_new_version_map(
