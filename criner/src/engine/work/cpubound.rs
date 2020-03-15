@@ -154,6 +154,7 @@ fn extract_crate(
     let mut meta_data = Vec::new();
     let mut meta_count = 0;
     let mut file_count = 0;
+    let mut max_storage_size = [0; 128 * 1024];
     for e in archive.entries()? {
         meta_count += 1;
         progress.set(meta_count);
@@ -170,14 +171,21 @@ fn extract_crate(
             || standard_bin_path.is_match(tar_path_to_utf8_str(e.path_bytes().as_ref()))
         {
             file_count += 1;
-            buf.clear();
-            e.read_to_end(&mut buf)?;
+
+            let slice = if tar_path_to_utf8_str(&e.path_bytes().as_ref()) == "Cargo.toml" {
+                buf.clear();
+                e.read_to_end(&mut buf)?;
+                &buf
+            } else {
+                let bytes_read = e.read(&mut max_storage_size[..])?;
+                &max_storage_size[..bytes_read]
+            };
             files.push((
                 meta_data
                     .last()
                     .expect("to have pushed one just now")
                     .to_owned(),
-                buf.to_owned().into(),
+                slice.to_owned().into(),
             ));
         }
     }

@@ -222,7 +222,9 @@ pub enum TaskResult {
     ExplodedCrate {
         /// Meta data of all entries in the crate
         entries_meta_data: Vec<TarHeader>,
-        /// The actual content of selected files, usually README, License and Cargo.* files
+        /// The actual content of selected files, Cargo.*, build.rs and lib/main
+        /// IMPORTANT: This file may be partial and limited in size unless it is Cargo.toml, which
+        /// is always complete.
         /// Note that these are also present in entries_meta_data.
         selected_entries: Vec<(TarHeader, Vec<u8>)>,
     },
