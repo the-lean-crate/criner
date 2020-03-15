@@ -145,6 +145,13 @@ pub enum Report {
     },
 }
 
+fn remove_implicit_entries(entries: &mut Vec<TarHeader>) {
+    entries.retain(|e| {
+        let p = tar_path_to_utf8_str(&e.path);
+        p != ".cargo_vcs_info.json" && p != "Cargo.toml.orig"
+    });
+}
+
 #[async_trait]
 impl crate::engine::report::generic::Aggregate for Report {
     fn merge(self, other: Self) -> Self {
@@ -361,9 +368,10 @@ impl Report {
     pub fn from_result(crate_name: &str, crate_version: &str, result: TaskResult) -> Report {
         match result {
             TaskResult::ExplodedCrate {
-                entries_meta_data,
+                mut entries_meta_data,
                 selected_entries,
             } => {
+                remove_implicit_entries(&mut entries_meta_data);
                 let total_size_in_bytes = entries_meta_data.iter().map(|e| e.size).sum();
                 let total_files = entries_meta_data.len() as u64;
                 let cargo_config = Self::cargo_config_from_entries(&selected_entries);
