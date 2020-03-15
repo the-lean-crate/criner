@@ -1,13 +1,15 @@
 use super::{CargoConfig, Fix, Patterns, PotentialWaste, Report, TarHeader, WastedFile};
+use std::iter::FromIterator;
 use std::{collections::BTreeSet, path::Path, path::PathBuf};
 
 lazy_static! {
     static ref COMPILE_TIME_INCLUDE: regex::bytes::Regex =
         regex::bytes::Regex::new(r##"include_(str|bytes)!\("(?P<include>.+?)"\)"##)
             .expect("valid statically known regex");
-    static ref RERUN_IF_CHANGED: regex::bytes::Regex =
-        regex::bytes::Regex::new(r##""cargo:rerun-if-changed=(?P<path>.+?)""##)
-            .expect("valid statically known regex");
+    static ref RERUN_IF_CHANGED: regex::bytes::Regex = regex::bytes::Regex::new(
+        r##""cargo:rerun-if-changed=(?P<path>.+?)"|"(?P<path_like>.+?)""##
+    )
+    .expect("valid statically known regex");
     static ref STANDARD_EXCLUDES_GLOBSET: globset::GlobSet =
         globset_from_patterns(standard_exclude_patterns());
     static ref STANDARD_EXCLUDE_MATCHERS: Vec<(&'static str, globset::GlobMatcher)> =
@@ -450,18 +452,42 @@ fn included_paths_of(file: Option<(TarHeader, Option<&[u8]>)>) -> Vec<String> {
         .unwrap_or_default()
 }
 
+/// HELP WANTED find the largest common ancestors (e.g. curl/* for curl/foo/* and curl/bar/*) and return these
+/// instead of the ones they contain. This can help speeding up later use of the patterns, as there are less of them.
+fn optimize_directories(dir_patterns: Vec<String>) -> Vec<String> {
+    dir_patterns
+}
+
 fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)>) -> Vec<String> {
     build
         .and_then(|(header, maybe_data)| maybe_data.map(|d| (header, d)))
         .map(|(_, data)| {
-            RERUN_IF_CHANGED
+            let v: Vec<_> = RERUN_IF_CHANGED
                 .captures_iter(data)
-                .filter_map(|cap| {
-                    let possible_filename = std::str::from_utf8(&cap["path"]).expect("utf8 path");
-                    globset::Glob::new(possible_filename)
-                        .ok()
-                        .map(|_| possible_filename.to_owned())
+                .map(|cap| {
+                    std::str::from_utf8(
+                        cap.name("path")
+                            .or_else(|| cap.name("path_like"))
+                            .expect("one of the two matches")
+                            .as_bytes(),
+                    )
+                    .expect("valid utf8")
+                    .to_string()
                 })
+                .collect();
+            let dirs = BTreeSet::from_iter(v.iter().filter_map(|p| {
+                Path::new(p)
+                    .parent()
+                    .and_then(|p| p.to_str().map(|s| s.to_string()))
+            }));
+            let possible_patterns = if dirs.is_empty() {
+                v
+            } else {
+                optimize_directories(dirs.into_iter().map(|d| format!("{}/*", d)).collect())
+            };
+            possible_patterns
+                .into_iter()
+                .filter_map(|p| globset::Glob::new(&p).ok().map(|_| p))
                 .collect()
         })
         .unwrap_or_default()

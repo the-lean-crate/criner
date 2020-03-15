@@ -15,6 +15,30 @@ fn task_result(file_name: &str) -> TaskResult {
 }
 
 #[test]
+fn curl_sys_get_more_info_from_build_script() {
+    assert_eq!(
+        Report::from_result("a", "1", task_result("curl_sys-0.4.27-extract_crate-1.0.0")),
+        Report::Version {
+            crate_name: "a".into(),
+            crate_version: "1".to_string(),
+            total_size_in_bytes: 17442826,
+            total_files: 3176,
+            wasted_files: vec![],
+            suggested_fix: Some(Fix::NewInclude {
+                include: vec![
+                    "LICENSE".into(),
+                    "**/*.rs".into(),
+                    "curl/*".into(),
+                    "build.rs".into()
+                ],
+                potential: None,
+                has_build_script: true
+            })
+        }
+    );
+}
+
+#[test]
 fn lw_webdriver_with_big_binaries() {
     assert_eq!(
         Report::from_result(
