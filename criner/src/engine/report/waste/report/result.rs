@@ -6,7 +6,7 @@ lazy_static! {
     static ref COMPILE_TIME_INCLUDE: regex::bytes::Regex =
         regex::bytes::Regex::new(r##"include_(str|bytes)!\("(?P<include>.+?)"\)"##)
             .expect("valid statically known regex");
-    static ref RERUN_IF_CHANGED: regex::bytes::Regex = regex::bytes::Regex::new(
+    static ref BUILD_SCRIPT_PATHS: regex::bytes::Regex = regex::bytes::Regex::new(
         r##""cargo:rerun-if-changed=(?P<path>.+?)"|"(?P<path_like>.+?)""##
     )
     .expect("valid statically known regex");
@@ -462,7 +462,7 @@ fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)
     build
         .and_then(|(header, maybe_data)| maybe_data.map(|d| (header, d)))
         .map(|(_, data)| {
-            let v: Vec<_> = RERUN_IF_CHANGED
+            let mut v: Vec<_> = BUILD_SCRIPT_PATHS
                 .captures_iter(data)
                 .map(|cap| {
                     std::str::from_utf8(
@@ -478,9 +478,11 @@ fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)
             let dirs = BTreeSet::from_iter(v.iter().filter_map(|p| {
                 Path::new(p)
                     .parent()
+                    .filter(|p| p.components().count() > 0)
                     .and_then(|p| p.to_str().map(|s| s.to_string()))
             }));
             let possible_patterns = if dirs.is_empty() {
+                v.extend(v.clone().into_iter().map(|p| format!("{}/*", p)));
                 v
             } else {
                 optimize_directories(dirs.into_iter().map(|d| format!("{}/*", d)).collect())

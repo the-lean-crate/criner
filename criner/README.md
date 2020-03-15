@@ -2,6 +2,7 @@
 
 ## Tasks
 
+* [ ] Put potential savings per version on crate level, instead of aggregate.
 * [ ] Count negation patterns in includes and excludes. The latter don't seem to be working, and if nobody is using them, Cargo can either make it work or
       reject them properly. Maybe. Maybe first create an issue for that and see what they think.
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down
@@ -46,7 +47,7 @@ people have better control over the includes they make.
    * …it takes about 10min to extract all 216k crate versions (~42GB on disk) in memory. This time is needed to extract all file meta-data and
      interesting files like Cargo.toml/Cargo.lock, lib.rs and bin.rs and store that data in sqlite. Decompressed that would be 145GB worth of data,
      so it processes about 240MB per second. My feeling is that it bottlenecks on writing the result to SQLite.
-   * it takes about 4min to generate a report for all 216k crate versions, including aggregations for each crate and for crates.io, and write
+   * it takes about 2min 30s to generate a report for all 216k crate versions, including aggregations for each crate and for crates.io, and write
      them to disk. 
 * Both of the above only happen once, as from that point on all else is incremental, reducing the amount of unnecessary work to close to zero.
 

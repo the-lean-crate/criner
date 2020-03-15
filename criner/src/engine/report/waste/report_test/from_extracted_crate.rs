@@ -3377,6 +3377,325 @@ fn curl_sys_get_more_info_from_build_script() {
 }
 
 #[test]
+fn threed_ice_sys_build_script_includes() {
+    assert_eq!(
+        Report::from_result(
+            "a",
+            "1",
+            task_result("threed-ice-sys-0.3.0-extract_crate-1.0.0")
+        ),
+        Report::Version {
+            crate_name: "a".into(),
+            crate_version: "1".to_string(),
+            total_size_in_bytes: 67331006,
+            total_files: 195,
+            wasted_files: [
+                (".gitignore", 18),
+                (".gitmodules", 192),
+                (".travis.yml", 978),
+                ("build.rs", 826),
+                ("tests/fixtures/default/004.flp", 591),
+                ("tests/fixtures/default/004.stk", 948),
+                ("tests/fixtures/invalid/005.flp", 351),
+                ("tests/fixtures/invalid/005.stk", 948),
+                ("tests/support/mod.rs", 1896),
+                ("tests/test_emulator.rs", 4059),
+                ("tests/test_invalid.rs", 866),
+                ("tests/test_stack.rs", 838),
+                ("tests/test_system_matrix.rs", 3183),
+                ("tests/test_system_vector.rs", 2550)
+            ]
+            .iter()
+            .map(|(p, s)| (p.to_string(), *s))
+            .collect(),
+            suggested_fix: Some(Fix::NewInclude {
+                include: vec![
+                    "src/**/*".into(),
+                    "LICENSE.md".into(),
+                    "README.md".into(),
+                    "build/*".into(),
+                    "build.rs".into()
+                ],
+                potential: Some(PotentialWaste {
+                    patterns_to_fix: vec![
+                        "!**/*.bmp".into(),
+                        "!**/doc/*".into(),
+                        "!**/test/*".into(),
+                        "!**/build/*".into(),
+                        "!**/lib/*".into()
+                    ],
+                    potential_waste: [
+                        ("build/Makefile", 462),
+                        ("build/patches/v2.2.5-01-new-bison.patch", 1406),
+                        ("build/patches/v2.2.5-02-reentrant-bison.patch", 10140),
+                        ("build/patches/v2.2.5-03-loose-flex.patch", 722),
+                        ("build/patches/v2.2.5-04-fault-tolerance.patch", 324),
+                        ("build/patches/v2.2.5-05-new-superlu.patch", 750),
+                        ("build/source/.gitignore", 66),
+                        ("build/source/bin/3D-ICE-Client.c", 12782),
+                        ("build/source/bin/3D-ICE-Emulator.c", 7299),
+                        ("build/source/bin/3D-ICE-Server.c", 14245),
+                        ("build/source/bin/core.flp", 1535),
+                        ("build/source/bin/example_steady.stk", 1667),
+                        ("build/source/bin/example_transient.stk", 1643),
+                        ("build/source/bin/Makefile", 3844),
+                        ("build/source/bin/mem.flp", 494),
+                        ("build/source/bison/floorplan_parser.y", 13582),
+                        ("build/source/bison/Makefile", 3215),
+                        ("build/source/bison/stack_description_parser.y", 55076),
+                        ("build/source/CHANGELOG", 6475),
+                        ("build/source/COPYING", 35147),
+                        ("build/source/doc/3D-ICE-ICCAD2010.pdf", 552178),
+                        ("build/source/doc/3D-ICE-THERMINIC2010.pdf", 1030133),
+                        ("build/source/doc/3D-ICE-User_Guide.pdf", 1961248),
+                        ("build/source/doc/Doxyfile", 70922),
+                        ("build/source/doc/img/fig_unit_cell.bmp", 534390),
+                        ("build/source/doc/Makefile", 3132),
+                        ("build/source/flex/floorplan_scanner.l", 6854),
+                        ("build/source/flex/Makefile", 3210),
+                        ("build/source/flex/stack_description_scanner.l", 10665),
+                        ("build/source/include/analysis.h", 7649),
+                        ("build/source/include/channel.h", 10821),
+                        ("build/source/include/die.h", 7152),
+                        ("build/source/include/die_list.h", 3445),
+                        ("build/source/include/dimensions.h", 22513),
+                        ("build/source/include/floorplan.h", 13373),
+                        ("build/source/include/floorplan_element.h", 10346),
+                        ("build/source/include/floorplan_element_list.h", 3529),
+                        ("build/source/include/floorplan_file_parser.h", 4457),
+                        ("build/source/include/floorplan_matrix.h", 7945),
+                        ("build/source/include/heat_sink.h", 9317),
+                        ("build/source/include/ic_element.h", 11032),
+                        ("build/source/include/ic_element_list.h", 3486),
+                        ("build/source/include/inspection_point.h", 11456),
+                        ("build/source/include/inspection_point_list.h", 3522),
+                        ("build/source/include/layer.h", 6759),
+                        ("build/source/include/layer_list.h", 3457),
+                        ("build/source/include/list_template.h", 12205),
+                        ("build/source/include/macros.h", 17851),
+                        ("build/source/include/material.h", 7224),
+                        ("build/source/include/material_list.h", 3475),
+                        ("build/source/include/network_message.h", 7049),
+                        ("build/source/include/network_socket.h", 8016),
+                        ("build/source/include/output.h", 9426),
+                        ("build/source/include/power_grid.h", 7951),
+                        ("build/source/include/powers_queue.h", 8541),
+                        ("build/source/include/stack_description.h", 7167),
+                        ("build/source/include/stack_element.h", 9993),
+                        ("build/source/include/stack_element_list.h", 3505),
+                        ("build/source/include/stack_file_parser.h", 4852),
+                        ("build/source/include/system_matrix.h", 8636),
+                        ("build/source/include/thermal_data.h", 11478),
+                        ("build/source/include/thermal_grid.h", 11664),
+                        ("build/source/include/types.h", 22197),
+                        ("build/source/lib/Makefile", 3179),
+                        ("build/source/Makefile", 3563),
+                        ("build/source/makefile.def", 7373),
+                        ("build/source/README", 3091),
+                        ("build/source/README.md", 704),
+                        ("build/source/sources/analysis.c", 6267),
+                        ("build/source/sources/channel.c", 15512),
+                        ("build/source/sources/die.c", 5881),
+                        ("build/source/sources/die_list.c", 3481),
+                        ("build/source/sources/dimensions.c", 19560),
+                        ("build/source/sources/floorplan.c", 13177),
+                        ("build/source/sources/floorplan_element.c", 8899),
+                        ("build/source/sources/floorplan_element_list.c", 3592),
+                        ("build/source/sources/floorplan_file_parser.c", 4809),
+                        ("build/source/sources/floorplan_matrix.c", 9230),
+                        ("build/source/sources/heat_sink.c", 12050),
+                        ("build/source/sources/ic_element.c", 10324),
+                        ("build/source/sources/ic_element_list.c", 3534),
+                        ("build/source/sources/inspection_point.c", 26849),
+                        ("build/source/sources/inspection_point_list.c", 3595),
+                        ("build/source/sources/layer.c", 5267),
+                        ("build/source/sources/layer_list.c", 3415),
+                        ("build/source/sources/list_template.c", 7909),
+                        ("build/source/sources/Makefile", 3325),
+                        ("build/source/sources/material.c", 5563),
+                        ("build/source/sources/material_list.c", 3444),
+                        ("build/source/sources/network_message.c", 5545),
+                        ("build/source/sources/network_socket.c", 9566),
+                        ("build/source/sources/output.c", 10905),
+                        ("build/source/sources/power_grid.c", 17986),
+                        ("build/source/sources/powers_queue.c", 8179),
+                        ("build/source/sources/stack_description.c", 6205),
+                        ("build/source/sources/stack_element.c", 8976),
+                        ("build/source/sources/stack_element_list.c", 3483),
+                        ("build/source/sources/stack_file_parser.c", 5324),
+                        ("build/source/sources/system_matrix.c", 49129),
+                        ("build/source/sources/thermal_data.c", 13525),
+                        ("build/source/sources/thermal_grid.c", 33684),
+                        ("build/source/test/background.flp", 184),
+                        ("build/source/test/CompareSystemMatrix.c", 7007),
+                        ("build/source/test/CompareTemperatures.c", 8122),
+                        ("build/source/test/four_elements.flp", 1270),
+                        ("build/source/test/four_elements_4rm.flp", 1270),
+                        ("build/source/test/GenerateSystemMatrix.c", 4799),
+                        ("build/source/test/Makefile", 12579),
+                        ("build/source/test/mc2rm/steady/2dies_background.stk", 1055),
+                        (
+                            "build/source/test/mc2rm/steady/2dies_four_elements.stk",
+                            1067
+                        ),
+                        ("build/source/test/mc2rm/steady/output_background.txt", 22),
+                        (
+                            "build/source/test/mc2rm/steady/output_four_elements.txt",
+                            22
+                        ),
+                        ("build/source/test/mc2rm/steady/system_matrix.txt", 5777000),
+                        (
+                            "build/source/test/mc2rm/transient/2dies_background.stk",
+                            1084
+                        ),
+                        (
+                            "build/source/test/mc2rm/transient/2dies_four_elements.stk",
+                            1096
+                        ),
+                        (
+                            "build/source/test/mc2rm/transient/output_background.txt",
+                            2640
+                        ),
+                        (
+                            "build/source/test/mc2rm/transient/output_four_elements.txt",
+                            2640
+                        ),
+                        (
+                            "build/source/test/mc2rm/transient/system_matrix.txt",
+                            5777000
+                        ),
+                        ("build/source/test/mc4rm/steady/2dies_background.stk", 1163),
+                        (
+                            "build/source/test/mc4rm/steady/2dies_four_elements.stk",
+                            1186
+                        ),
+                        ("build/source/test/mc4rm/steady/output_background.txt", 22),
+                        (
+                            "build/source/test/mc4rm/steady/output_four_elements.txt",
+                            22
+                        ),
+                        ("build/source/test/mc4rm/steady/system_matrix.txt", 17444420),
+                        (
+                            "build/source/test/mc4rm/transient/2dies_background.stk",
+                            1193
+                        ),
+                        (
+                            "build/source/test/mc4rm/transient/2dies_four_elements.stk",
+                            1215
+                        ),
+                        (
+                            "build/source/test/mc4rm/transient/output_background.txt",
+                            2640
+                        ),
+                        (
+                            "build/source/test/mc4rm/transient/output_four_elements.txt",
+                            2640
+                        ),
+                        (
+                            "build/source/test/mc4rm/transient/system_matrix.txt",
+                            17444420
+                        ),
+                        ("build/source/test/pf2rm/steady/2dies_background.stk", 964),
+                        (
+                            "build/source/test/pf2rm/steady/2dies_four_elements.stk",
+                            976
+                        ),
+                        ("build/source/test/pf2rm/steady/output_background.txt", 22),
+                        (
+                            "build/source/test/pf2rm/steady/output_four_elements.txt",
+                            22
+                        ),
+                        ("build/source/test/pf2rm/steady/system_matrix.txt", 5517300),
+                        (
+                            "build/source/test/pf2rm/transient/2dies_background.stk",
+                            993
+                        ),
+                        (
+                            "build/source/test/pf2rm/transient/2dies_four_elements.stk",
+                            1005
+                        ),
+                        (
+                            "build/source/test/pf2rm/transient/output_background.txt",
+                            2640
+                        ),
+                        (
+                            "build/source/test/pf2rm/transient/output_four_elements.txt",
+                            2640
+                        ),
+                        (
+                            "build/source/test/pf2rm/transient/system_matrix.txt",
+                            5517300
+                        ),
+                        ("build/source/test/solid/steady/1die_background.stk", 811),
+                        ("build/source/test/solid/steady/1die_four_elements.stk", 820),
+                        ("build/source/test/solid/steady/output_background.txt", 22),
+                        (
+                            "build/source/test/solid/steady/output_four_elements.txt",
+                            22
+                        ),
+                        ("build/source/test/solid/steady/system_matrix.txt", 2363800),
+                        ("build/source/test/solid/transient/1die_background.stk", 838),
+                        (
+                            "build/source/test/solid/transient/1die_four_elements.stk",
+                            847
+                        ),
+                        (
+                            "build/source/test/solid/transient/output_background.txt",
+                            2640
+                        ),
+                        (
+                            "build/source/test/solid/transient/output_four_elements.txt",
+                            2639
+                        ),
+                        (
+                            "build/source/test/solid/transient/system_matrix.txt",
+                            2363800
+                        ),
+                        ("Cargo.toml", 516),
+                        ("LICENSE.md", 2045),
+                        ("README.md", 866),
+                        ("src/analysis.rs", 466),
+                        ("src/channel.rs", 434),
+                        ("src/die.rs", 260),
+                        ("src/die_list.rs", 334),
+                        ("src/dimensions.rs", 1342),
+                        ("src/floorplan.rs", 431),
+                        ("src/floorplan_element.rs", 292),
+                        ("src/floorplan_element_list.rs", 439),
+                        ("src/floorplan_matrix.rs", 503),
+                        ("src/heat_sink.rs", 499),
+                        ("src/ic_element.rs", 325),
+                        ("src/ic_element_list.rs", 383),
+                        ("src/inspection_point.rs", 551),
+                        ("src/inspection_point_list.rs", 431),
+                        ("src/layer.rs", 174),
+                        ("src/layer_list.rs", 350),
+                        ("src/lib.rs", 1304),
+                        ("src/material.rs", 181),
+                        ("src/material_list.rs", 374),
+                        ("src/output.rs", 936),
+                        ("src/power_grid.rs", 962),
+                        ("src/powers_queue.rs", 216),
+                        ("src/stack_description.rs", 639),
+                        ("src/stack_element.rs", 829),
+                        ("src/stack_element_list.rs", 407),
+                        ("src/stack_file_parser.rs", 361),
+                        ("src/system_matrix.rs", 1233),
+                        ("src/thermal_data.rs", 908),
+                        ("src/thermal_grid.rs", 963),
+                        ("src/types.rs", 3734)
+                    ]
+                    .iter()
+                    .map(|(p, s)| (p.to_string(), *s))
+                    .collect()
+                }),
+                has_build_script: true
+            })
+        }
+    );
+}
+
+#[test]
 fn lw_webdriver_with_big_binaries() {
     assert_eq!(
         Report::from_result(
