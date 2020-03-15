@@ -202,6 +202,7 @@ impl crate::engine::report::generic::Aggregate for Report {
                         wasted_by_extension: merge::vec_into_map_by_extension(
                             wasted_by_extension,
                             wasted_files,
+                            suggested_fix,
                         ),
                     }
                 } else {

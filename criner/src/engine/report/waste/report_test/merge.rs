@@ -1,10 +1,11 @@
 use super::super::{AggregateFileInfo, Fix, Report, VersionInfo};
 use crate::engine::report::generic::Aggregate;
+use crate::engine::report::waste::PotentialWaste;
 use common_macros::b_tree_map;
 use std::collections::BTreeMap;
 
 #[test]
-fn crate_version_and_version_crate() {
+fn crate_merging_version_equivalent_to_version_merging_crate() {
     let version = Report::Version {
         crate_name: "a".into(),
         crate_version: "1".into(),
@@ -239,7 +240,14 @@ fn two_versions_of_same_crate() {
                 ("c/a.b".into(), 50),
                 ("d/a.c".into(), 90)
             ],
-            suggested_fix: None
+            suggested_fix: Some(Fix::NewInclude {
+                include: vec![],
+                potential: Some(PotentialWaste {
+                    patterns_to_fix: vec![],
+                    potential_waste: vec![("e/f.g".into(), 100), ("f/a.b".into(), 200)]
+                }),
+                has_build_script: false
+            })
         }),
         Report::Crate {
             crate_name: "a".into(),
@@ -257,8 +265,9 @@ fn two_versions_of_same_crate() {
             },
             wasted_by_extension: b_tree_map! {
                 "a".into()  => AggregateFileInfo {total_files: 2, total_bytes: 60},
-                "b".into()  => AggregateFileInfo {total_files: 3, total_bytes: 80},
+                "b".into()  => AggregateFileInfo {total_files: 4, total_bytes: 280},
                 "c".into()  => AggregateFileInfo {total_files: 1, total_bytes: 90},
+                "g".into()  => AggregateFileInfo {total_files: 1, total_bytes: 100},
             },
         }
     );

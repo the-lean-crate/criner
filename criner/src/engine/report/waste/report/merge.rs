@@ -1,5 +1,5 @@
 use super::{AggregateFileInfo, Dict, Report, VersionInfo, WastedFile};
-use crate::engine::report::waste::AggregateVersionInfo;
+use crate::engine::report::waste::{AggregateVersionInfo, Fix};
 use std::ops::AddAssign;
 use std::{collections::BTreeMap, path::PathBuf};
 
@@ -22,24 +22,38 @@ pub const NO_EXT_MARKER: &str = "<NO_EXT>";
 pub fn vec_into_map_by_extension(
     initial: Dict<AggregateFileInfo>,
     from: Vec<WastedFile>,
+    fix: Option<Fix>,
 ) -> Dict<AggregateFileInfo> {
-    from.into_iter().fold(initial, |mut m, e| {
-        let entry = m
-            .entry(
-                PathBuf::from(e.0)
-                    .extension()
-                    .and_then(|oss| oss.to_str().map(|s| s.to_string()))
-                    .unwrap_or_else(|| NO_EXT_MARKER.to_string()),
-            )
-            .or_insert_with(Default::default);
-        entry.total_bytes += e.1;
-        entry.total_files += 1;
-        m
-    })
+    let possibly_wasted_files = match fix.unwrap_or(Fix::RemoveExclude) {
+        Fix::NewInclude {
+            potential: Some(potential),
+            ..
+        }
+        | Fix::ImprovedInclude {
+            potential: Some(potential),
+            ..
+        } => potential.potential_waste,
+        _ => Vec::new(),
+    };
+    from.into_iter()
+        .chain(possibly_wasted_files)
+        .fold(initial, |mut m, e| {
+            let entry = m
+                .entry(
+                    PathBuf::from(e.0)
+                        .extension()
+                        .and_then(|oss| oss.to_str().map(|s| s.to_string()))
+                        .unwrap_or_else(|| NO_EXT_MARKER.to_string()),
+                )
+                .or_insert_with(Default::default);
+            entry.total_bytes += e.1;
+            entry.total_files += 1;
+            m
+        })
 }
 
-pub fn into_map_by_extension(from: Vec<WastedFile>) -> Dict<AggregateFileInfo> {
-    vec_into_map_by_extension(BTreeMap::new(), from)
+pub fn into_map_by_extension(from: Vec<WastedFile>, fix: Option<Fix>) -> Dict<AggregateFileInfo> {
+    vec_into_map_by_extension(BTreeMap::new(), from, fix)
 }
 
 pub fn map_into_map<T>(lhs: Dict<T>, rhs: Dict<T>) -> Dict<T>
@@ -120,7 +134,7 @@ pub fn crate_from_version(version: Report) -> Report {
             total_size_in_bytes,
             total_files,
             wasted_files,
-            suggested_fix: _,
+            suggested_fix,
         } => Report::Crate {
             crate_name,
             info_by_version: version_to_new_version_map(
@@ -131,7 +145,7 @@ pub fn crate_from_version(version: Report) -> Report {
             ),
             total_size_in_bytes,
             total_files,
-            wasted_by_extension: into_map_by_extension(wasted_files),
+            wasted_by_extension: into_map_by_extension(wasted_files, suggested_fix),
         },
         _ => unreachable!("must only be called with version variant"),
     }
