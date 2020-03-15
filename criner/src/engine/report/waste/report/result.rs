@@ -356,11 +356,15 @@ fn matches_in_set_a_but_not_in_set_b(
         }
     }
 
-    let new_excludes = patterns_to_amend
+    let patterns_in_set_a_which_do_not_match_a_pattern_in_set_b = patterns_to_amend
         .get(set_a_len..)
         .map(|v| v.to_vec())
         .unwrap_or_else(Vec::new);
-    (entries, patterns_to_amend, new_excludes)
+    (
+        entries,
+        patterns_to_amend,
+        patterns_in_set_a_which_do_not_match_a_pattern_in_set_b,
+    )
 }
 
 /// Takes something like "src/deep/lib.rs" and "../data/foo.bin" and turns it into "src/data/foo.bin", replicating
@@ -462,18 +466,18 @@ fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)
         .unwrap_or_default()
 }
 
-fn potential_negated_includes(entries: Vec<TarHeader>) -> Option<PotentialWaste> {
-    let (entries_we_would_remove, _) =
-        split_to_matched_and_unmatched(entries, &STANDARD_EXCLUDES_GLOBSET);
-    let mut potential_negated_excludes = Vec::new();
-    for (pattern, exclude) in STANDARD_EXCLUDE_MATCHERS.iter() {
-        if entries_we_would_remove
-            .iter()
-            .any(|e| exclude.is_match(tar_path_to_utf8_str(&e.path)))
-        {
-            potential_negated_excludes.push(format!("!{}", pattern));
-        }
-    }
+fn potential_negated_includes(
+    entries: Vec<TarHeader>,
+    patters_to_avoid: Option<globset::GlobSet>,
+) -> Option<PotentialWaste> {
+    let (entries_we_would_remove, patterns, _) = matches_in_set_a_but_not_in_set_b(
+        Vec::new(),
+        &STANDARD_EXCLUDE_MATCHERS,
+        &patters_to_avoid.unwrap_or_else(|| globset_from_patterns(&Vec::<&str>::new())),
+        entries,
+    );
+    let potential_negated_excludes: Vec<_> =
+        patterns.into_iter().map(|s| format!("!{}", s)).collect();
     if potential_negated_excludes.is_empty() {
         None
     } else {
@@ -533,12 +537,15 @@ impl Report {
             .iter()
             .map(|s| (s.as_str(), make_glob(s).compile_matcher()))
             .collect();
-        let potential = potential_negated_includes(included_entries.clone());
         let mut include_patterns = simplify_includes(
             STANDARD_INCLUDE_MATCHERS
                 .iter()
                 .chain(compile_time_include_matchers.iter()),
+            included_entries.clone(),
+        );
+        let potential = potential_negated_includes(
             included_entries,
+            Some(globset_from_patterns(&include_patterns)),
         );
         let has_build_script = match build_script_name {
             Some(build_script_name) => {
@@ -598,6 +605,7 @@ impl Report {
         (fix, entries_that_should_be_excluded)
     }
 
+    /// This implementation respects all explicitly given includes but proposes potential excludes based on our exclude list.
     pub(crate) fn enrich_includes(
         entries: Vec<TarHeader>,
         mut include: Patterns,
@@ -614,7 +622,7 @@ impl Report {
                     include,
                     include_removed,
                     has_build_script,
-                    potential: potential_negated_includes(entries),
+                    potential: potential_negated_includes(entries, None),
                 })
             },
             Vec::new(),
