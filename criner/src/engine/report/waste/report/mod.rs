@@ -366,10 +366,10 @@ impl Report {
             } => {
                 let total_size_in_bytes = entries_meta_data.iter().map(|e| e.size).sum();
                 let total_files = entries_meta_data.len() as u64;
-                let package = Self::cargo_config_from_entries(&selected_entries);
+                let cargo_config = Self::cargo_config_from_entries(&selected_entries);
                 let (includes, excludes, compile_time_includes, build_script_name) =
                     Self::package_into_includes_excludes(
-                        package,
+                        cargo_config,
                         &selected_entries,
                         &entries_meta_data,
                     );

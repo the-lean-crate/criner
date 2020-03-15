@@ -20,6 +20,14 @@
 * it does not handle negated include patterns, but it also is not disturbed by them
 
 
+## Fun facts
+
+* On a venerable 5 year old quad-core MBP…
+   * …it takes about 10min to extract all 216k crate versions (~42GB on disk) in memory. This time is needed to extract all file meta-data and
+     interesting files like Cargo.toml/Cargo.lock, lib.rs and bin.rs and store that data in sqlite.
+   * it takes about 4min to generate a report for all 216k crate versions, including aggregations for each crate and for crates.io, and write
+     them to disk. 
+* Both of the above only happen once, as from that point on all else is incremental, reducing the amount of unnecessary work to close to zero.
 
 ## Lessons learned
 

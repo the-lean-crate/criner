@@ -61,7 +61,7 @@ fn cookie_factory() {
                 .collect(),
                 include_removed: vec!["Cargo.toml".into()],
                 potential: None,
-                has_build_script: true
+                has_build_script: false
             })
         }
     );

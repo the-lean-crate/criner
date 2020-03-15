@@ -1,6 +1,4 @@
-use super::{
-    CargoConfig, Fix, PackageSection, Patterns, PotentialWaste, Report, TarHeader, WastedFile,
-};
+use super::{CargoConfig, Fix, Patterns, PotentialWaste, Report, TarHeader, WastedFile};
 use std::{collections::BTreeSet, path::Path, path::PathBuf};
 
 lazy_static! {
@@ -457,9 +455,9 @@ fn potential_negated_includes(entries: Vec<TarHeader>) -> Option<PotentialWaste>
 }
 
 impl Report {
-    pub(crate) fn cargo_config_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> PackageSection {
+    pub(crate) fn cargo_config_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> CargoConfig {
         find_in_entries(entries, &[], "Cargo.toml")
-            .and_then(|(_e, v)| v.and_then(|v| CargoConfig::from(v).package))
+            .and_then(|(_e, v)| v.map(|v| CargoConfig::from(v)))
             .unwrap_or_default()
     }
 
@@ -608,7 +606,7 @@ impl Report {
     }
 
     pub(crate) fn package_into_includes_excludes(
-        package: PackageSection,
+        cargo: CargoConfig,
         entries_with_buffer: &[(TarHeader, Vec<u8>)],
         entries: &[TarHeader],
     ) -> (
@@ -617,6 +615,7 @@ impl Report {
         Option<Patterns>,
         Option<String>,
     ) {
+        let package = cargo.package.unwrap_or_default();
         // TODO: use actual names from package
         let maybe_build_script_name = package.build_script_path().map(|s| s.to_owned());
         let compile_time_includes = {
