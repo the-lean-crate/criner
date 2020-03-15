@@ -570,10 +570,7 @@ impl Report {
                 .chain(compile_time_include_matchers.iter()),
             included_entries.clone(),
         );
-        let potential = potential_negated_includes(
-            included_entries,
-            Some(globset_from_patterns(&include_patterns)),
-        );
+        let potential = potential_negated_includes(included_entries, None);
         let has_build_script = match build_script_name {
             Some(build_script_name) => {
                 include_patterns.push(build_script_name);
@@ -583,7 +580,7 @@ impl Report {
         };
 
         (
-            if excluded_entries.is_empty() {
+            if excluded_entries.is_empty() && potential.is_none() {
                 None
             } else {
                 Some(Fix::NewInclude {
