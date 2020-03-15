@@ -283,7 +283,7 @@ fn find_in_entries<'buffer>(
     entries_with_buffer
         .iter()
         .find_map(|(h, v)| {
-            if tar_path_to_path(&h.path).ends_with(name) {
+            if tar_path_to_utf8_str(&h.path) == name {
                 Some((h.clone(), Some(v.as_slice())))
             } else {
                 None
@@ -291,7 +291,7 @@ fn find_in_entries<'buffer>(
         })
         .or_else(|| {
             entries.iter().find_map(|e| {
-                if tar_path_to_path(&e.path).ends_with(name) {
+                if tar_path_to_utf8_str(&e.path) == name {
                     Some((e.clone(), None))
                 } else {
                     None
@@ -415,7 +415,7 @@ fn included_paths_of(file: Option<(TarHeader, Option<&[u8]>)>) -> Vec<String> {
         .unwrap_or_default()
 }
 
-fn build_script_paths(build: Option<(TarHeader, Option<&[u8]>)>) -> Vec<String> {
+fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)>) -> Vec<String> {
     build
         .and_then(|(header, maybe_data)| maybe_data.map(|d| (header, d)))
         .map(|(_, data)| {
@@ -451,6 +451,24 @@ fn potential_negated_includes(entries: Vec<TarHeader>) -> Option<PotentialWaste>
             patterns_to_fix: potential_negated_excludes,
             potential_waste: Report::convert_to_wasted_files(entries_we_would_remove),
         })
+    }
+}
+
+fn add_to_includes_if_non_default(file_path: &str, include: &mut Patterns) {
+    let recursive_pattern = Path::new(file_path)
+        .parent()
+        .expect("file path as input")
+        .join("**");
+    if !standard_include_patterns()
+        .contains(&recursive_pattern.join("*").to_str().expect("utf8 only"))
+    {
+        include.push(
+            recursive_pattern
+                .join("*.rs")
+                .to_str()
+                .expect("utf 8 only")
+                .to_string(),
+        )
     }
 }
 
@@ -615,28 +633,37 @@ impl Report {
         Option<Patterns>,
         Option<String>,
     ) {
-        let package = cargo.package.unwrap_or_default();
-        // TODO: use actual names from package
-        let maybe_build_script_name = package.build_script_path().map(|s| s.to_owned());
+        let maybe_build_script_name = cargo.build_script_path().map(|s| s.to_owned());
         let compile_time_includes = {
-            let lib_includes =
-                included_paths_of(find_in_entries(&entries_with_buffer, &entries, "lib.rs"));
-            let mut main_includes =
-                included_paths_of(find_in_entries(&entries_with_buffer, &entries, "main.rs"));
-            main_includes.extend(lib_includes.into_iter());
+            let mut includes_parsed_from_files = Vec::new();
+            includes_parsed_from_files.extend(included_paths_of(find_in_entries(
+                &entries_with_buffer,
+                &entries,
+                cargo.lib_path(),
+            )));
+            add_to_includes_if_non_default(cargo.lib_path(), &mut includes_parsed_from_files);
+            for path in cargo.bin_paths() {
+                includes_parsed_from_files.extend(included_paths_of(find_in_entries(
+                    &entries_with_buffer,
+                    &entries,
+                    path,
+                )));
+                add_to_includes_if_non_default(path, &mut includes_parsed_from_files);
+            }
 
             if let Some(build_path) = maybe_build_script_name.as_ref() {
                 let maybe_data = find_in_entries(&entries_with_buffer, &entries, build_path);
-                main_includes.extend(build_script_paths(maybe_data));
+                includes_parsed_from_files.extend(find_paths_mentioned_in_build_script(maybe_data));
             }
 
-            if main_includes.is_empty() {
+            if includes_parsed_from_files.is_empty() {
                 None
             } else {
-                Some(main_includes)
+                Some(includes_parsed_from_files)
             }
         };
 
+        let package = cargo.package.unwrap_or_default();
         (
             package.include,
             package.exclude,

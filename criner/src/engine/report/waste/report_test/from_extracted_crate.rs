@@ -15,6 +15,29 @@ fn task_result(file_name: &str) -> TaskResult {
 }
 
 #[test]
+fn falcon_raptor_typescript() {
+    assert_eq!(
+        Report::from_result(
+            "a",
+            "1",
+            task_result("falcon_raptor-0.4.9-extract_crate-1.0.0")
+        ),
+        Report::Version {
+            crate_name: "a".into(),
+            crate_version: "1".to_string(),
+            total_size_in_bytes: 340522,
+            total_files: 64,
+            wasted_files: vec![(".gitignore".into(), 24)],
+            suggested_fix: Some(Fix::NewInclude {
+                include: vec!["README.md".into(), "lib/**/*.rs".into()],
+                potential: None,
+                has_build_script: false
+            })
+        }
+    );
+}
+
+#[test]
 fn deno_typescript() {
     assert_eq!(
         Report::from_result(
