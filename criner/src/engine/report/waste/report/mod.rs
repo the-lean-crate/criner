@@ -47,10 +47,59 @@ pub enum Fix {
 }
 
 #[derive(Default, Deserialize)]
-pub struct Package {
-    include: Option<Patterns>,
-    exclude: Option<Patterns>,
-    build: Option<String>,
+pub struct CargoConfig {
+    pub package: Option<PackageSection>,
+    pub lib: Option<SectionWithPath>,
+    pub bin: Option<Vec<SectionWithPath>>,
+}
+
+impl CargoConfig {
+    pub fn build_script_path(&self) -> &str {
+        self.package
+            .as_ref()
+            .and_then(|p| p.build_script_path())
+            .unwrap_or("build.rs")
+    }
+    pub fn lib_path(&self) -> &str {
+        self.lib
+            .as_ref()
+            .and_then(|l| l.path.as_ref().map(|s| s.as_str()))
+            .unwrap_or("src/lib.rs")
+    }
+    pub fn bin_paths(&self) -> Vec<&str> {
+        self.bin
+            .as_ref()
+            .map(|l| {
+                l.iter()
+                    .filter_map(|s| s.path.as_ref().map(|s| s.as_str()))
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+}
+
+impl From<&[u8]> for CargoConfig {
+    fn from(v: &[u8]) -> Self {
+        toml::from_slice::<CargoConfig>(v).expect("valid Cargo.toml in packages")
+    }
+}
+
+#[derive(Default, Deserialize)]
+pub struct SectionWithPath {
+    pub path: Option<String>,
+}
+
+#[derive(Default, Deserialize)]
+pub struct PackageSection {
+    pub include: Option<Patterns>,
+    pub exclude: Option<Patterns>,
+    pub build: Option<toml::value::Value>,
+}
+
+impl PackageSection {
+    pub fn build_script_path(&self) -> Option<&str> {
+        self.build.as_ref().and_then(|s| s.as_str())
+    }
 }
 
 pub type WastedFile = (String, u64);

@@ -1,6 +1,7 @@
-use crate::engine::report::waste::tar_path_to_utf8_str;
+use crate::engine::report::waste::{tar_path_to_utf8_str, CargoConfig};
 use crate::{error::Result, model, persistence, Error};
 use async_trait::async_trait;
+use std::io::Seek;
 use std::{fs::File, io::BufReader, io::Read, path::PathBuf, time::SystemTime};
 
 struct ProcessingState {
@@ -10,22 +11,20 @@ struct ProcessingState {
 pub struct Agent {
     asset_dir: PathBuf,
     results: persistence::TaskResultTable,
-    interesting_files: globset::GlobSet,
     state: Option<ProcessingState>,
+    standard_bin_path: globset::GlobMatcher,
 }
-
-const INTERESTING_PATTERNS: &[&'static str] = &["Cargo.*", "build.rs", "**/lib.rs", "**/main.rs"];
 
 impl Agent {
     pub fn new(asset_dir: PathBuf, db: &persistence::Db) -> Result<Agent> {
         let results = db.open_results()?;
-        let interesting_files =
-            super::super::report::waste::globset_from_patterns(INTERESTING_PATTERNS);
         Ok(Agent {
             asset_dir,
             results,
-            interesting_files,
             state: None,
+            standard_bin_path: globset::Glob::new("src/bin/*.rs")
+                .expect("valid statically known glob")
+                .compile_matcher(),
         })
     }
 }
@@ -95,7 +94,7 @@ impl crate::engine::work::generic::Processor for Agent {
             &key,
             progress,
             downloaded_crate,
-            &self.interesting_files,
+            &self.standard_bin_path,
         )
         .map_err(|err| (err, "Failed to extract crate".into()))
     }
@@ -123,21 +122,41 @@ fn extract_crate(
     key: &str,
     progress: &mut prodash::tree::Item,
     downloaded_crate: PathBuf,
-    interesting_files: &globset::GlobSet,
+    standard_bin_path: &globset::GlobMatcher,
 ) -> Result<()> {
     use persistence::TableAccess;
     let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new(File::open(
         downloaded_crate,
     )?))?);
-    let mut meta_data = Vec::new();
-    let mut files = Vec::new();
-    let mut buf = Vec::new();
 
-    let mut count = 0;
+    let mut buf = Vec::new();
+    let mut interesting_paths = vec!["Cargo.toml".to_string(), "Cargo.lock".into()];
+    let mut files = Vec::new();
+    for (eid, e) in archive.entries()?.enumerate() {
+        progress.set(eid as u32);
+        let mut e: tar::Entry<_> = e?;
+        if tar_path_to_utf8_str(e.path_bytes().as_ref()) == "Cargo.toml" {
+            e.read_to_end(&mut buf)?;
+            let config = CargoConfig::from(buf.as_slice());
+            interesting_paths.push(config.build_script_path().to_owned());
+            interesting_paths.push(config.lib_path().to_owned());
+            interesting_paths.extend(config.bin_paths().into_iter().map(|s| s.to_owned()));
+            break;
+        }
+    }
+
+    let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new({
+        let mut file = archive.into_inner().into_inner();
+        file.seek(std::io::SeekFrom::Start(0))?;
+        file
+    }))?);
+
+    let mut meta_data = Vec::new();
+    let mut meta_count = 0;
     let mut file_count = 0;
     for e in archive.entries()? {
-        count += 1;
-        progress.set(count);
+        meta_count += 1;
+        progress.set(meta_count);
         let mut e: tar::Entry<_> = e?;
         meta_data.push(model::TarHeader {
             path: e.path_bytes().to_vec(),
@@ -145,7 +164,11 @@ fn extract_crate(
             entry_type: e.header().entry_type().as_byte(),
         });
 
-        if interesting_files.is_match(tar_path_to_utf8_str(e.path_bytes().as_ref())) {
+        if interesting_paths
+            .iter()
+            .any(|p| p == tar_path_to_utf8_str(e.path_bytes().as_ref()))
+            || standard_bin_path.is_match(tar_path_to_utf8_str(e.path_bytes().as_ref()))
+        {
             file_count += 1;
             buf.clear();
             e.read_to_end(&mut buf)?;
@@ -160,7 +183,7 @@ fn extract_crate(
     }
     progress.info(format!(
         "Recorded {} files and stored {} in full",
-        count, file_count
+        meta_count, file_count
     ));
 
     let task_result = model::TaskResult::ExplodedCrate {

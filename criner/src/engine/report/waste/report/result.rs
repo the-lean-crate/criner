@@ -1,7 +1,7 @@
-use super::{Fix, Package, Patterns, Report, TarHeader, WastedFile};
-use crate::engine::report::waste::PotentialWaste;
-use std::path::PathBuf;
-use std::{collections::BTreeSet, path::Path};
+use super::{
+    CargoConfig, Fix, PackageSection, Patterns, PotentialWaste, Report, TarHeader, WastedFile,
+};
+use std::{collections::BTreeSet, path::Path, path::PathBuf};
 
 lazy_static! {
     static ref COMPILE_TIME_INCLUDE: regex::bytes::Regex =
@@ -457,21 +457,9 @@ fn potential_negated_includes(entries: Vec<TarHeader>) -> Option<PotentialWaste>
 }
 
 impl Report {
-    pub(crate) fn package_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> Package {
-        use serde_derive::Deserialize;
-        #[derive(Default, Deserialize)]
-        struct CargoConfig {
-            package: Option<Package>,
-        }
-
+    pub(crate) fn package_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> PackageSection {
         find_in_entries(entries, &[], "Cargo.toml")
-            .and_then(|(_e, v)| {
-                v.and_then(|v| {
-                    toml::from_slice::<CargoConfig>(&v)
-                        .unwrap_or_default() // some Cargo.toml files have build: true, which doesn't parse for us. TODO: maybe parse manually
-                        .package
-                })
-            })
+            .and_then(|(_e, v)| v.and_then(|v| CargoConfig::from(v).package))
             .unwrap_or_default()
     }
 
@@ -620,7 +608,7 @@ impl Report {
     }
 
     pub(crate) fn package_into_includes_excludes(
-        package: Package,
+        package: PackageSection,
         entries_with_buffer: &[(TarHeader, Vec<u8>)],
         entries: &[TarHeader],
     ) -> (
@@ -630,7 +618,7 @@ impl Report {
         Option<String>,
     ) {
         // TODO: use actual names from package
-        let build_script_name = package.build.or_else(|| Some("build.rs".to_owned()));
+        let maybe_build_script_name = package.build_script_path().map(|s| s.to_owned());
         let compile_time_includes = {
             let lib_includes =
                 included_paths_of(find_in_entries(&entries_with_buffer, &entries, "lib.rs"));
@@ -638,7 +626,7 @@ impl Report {
                 included_paths_of(find_in_entries(&entries_with_buffer, &entries, "main.rs"));
             main_includes.extend(lib_includes.into_iter());
 
-            if let Some(build_path) = build_script_name.as_ref() {
+            if let Some(build_path) = maybe_build_script_name.as_ref() {
                 let maybe_data = find_in_entries(&entries_with_buffer, &entries, build_path);
                 main_includes.extend(build_script_paths(maybe_data));
             }
@@ -654,7 +642,7 @@ impl Report {
             package.include,
             package.exclude,
             compile_time_includes,
-            build_script_name,
+            maybe_build_script_name,
         )
     }
 }
