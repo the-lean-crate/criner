@@ -201,6 +201,7 @@ impl RenderOnce for Report {
                 total_files,
                 info_by_version,
                 wasted_by_extension,
+                potential_savings: _,
             } => {
                 tmpl << html! {
                     : page_head(crate_name.clone());
@@ -220,6 +221,7 @@ impl RenderOnce for Report {
                 total_files,
                 info_by_crate,
                 wasted_by_extension,
+                potential_savings: _,
             } => {
                 let title = "crates.io";
                 let no_prefix = String::new();

@@ -2,15 +2,33 @@
 
 ## Tasks
 
+* [ ] Count negation patterns in includes and excludes. The latter don't seem to be working, and if nobody is using them, Cargo can either make it work or
+      reject them properly. Maybe. Maybe first create an issue for that and see what they think.
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down
    * Futures has a wrapper to catch panics, even though we don't use it yet. A panic only brings down the future that panics, not the entire program.
 * [ ] Graceful shutdown on Ctrl+C
   * The current implementation relies on the database to handle aborted writes, and is no problem for that reason. However, it would be nice to have
     A well-behaving program.
     
-## How to satisfy the Waste Report
+## FAQ
 
-* `include_str!(…)` and 1include_bytes!(…)` should only be in `lib.rs` and `main.rs`, only these are available for introspection.
+### It keeps claiming that my included files are waste !?
+
+It detecs files included via `include_str!(…)` and `include_bytes!(…)`, but only so in in `lib.rs` and `main.rs`, or other binary targets.
+
+### How can I just make it stop complaining ?
+
+Add the `include = […]` that it proposes, possibly altered to your liking and needs. It will still provide you with potential negated include
+patterns to exclude tests, docs.
+
+### What's better, exclude directives or include directives?
+
+The waste report favors include directives, as it will not mark any file as wasted if present, but make recommendations on how to save even more
+by excluding tests, docs and the likes.
+
+When excludes are present, it makes recommendations mandatory, and considers all files that don't are included despites those recommendations to
+be waste. The reason is that whitelists, i.e. include directives, are better supported by cargo due to the presence of negations, so it assumes
+people have better control over the includes they make.
     
 ## Limitations of Waste Reporting
 

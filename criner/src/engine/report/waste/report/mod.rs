@@ -10,6 +10,7 @@ use async_trait::async_trait;
 use serde_derive::{Deserialize, Serialize};
 use std::{collections::BTreeMap, path::Path, path::PathBuf};
 
+use crate::engine::report::waste::report::merge::fix_to_wasted_files_aggregate;
 pub use result::{globset_from_patterns, tar_path_to_utf8_str};
 
 pub type Patterns = Vec<String>;
@@ -136,12 +137,14 @@ pub enum Report {
         total_files: u64,
         info_by_version: Dict<VersionInfo>,
         wasted_by_extension: Dict<AggregateFileInfo>,
+        potential_savings: Option<AggregateFileInfo>,
     },
     CrateCollection {
         total_size_in_bytes: u64,
         total_files: u64,
         info_by_crate: Dict<AggregateVersionInfo>,
         wasted_by_extension: Dict<AggregateFileInfo>,
+        potential_savings: Option<AggregateFileInfo>,
     },
 }
 
@@ -175,6 +178,7 @@ impl crate::engine::report::generic::Aggregate for Report {
                     total_files: lhs_tf,
                     info_by_version,
                     wasted_by_extension,
+                    potential_savings,
                 },
                 Version {
                     crate_name: rhs_crate_name,
@@ -190,6 +194,7 @@ impl crate::engine::report::generic::Aggregate for Report {
                         crate_name: lhs_crate_name,
                         total_size_in_bytes: lhs_tsb + rhs_tsb,
                         total_files: lhs_tf + rhs_tf,
+                        potential_savings: fix_to_wasted_files_aggregate(suggested_fix),
                         info_by_version: merge::map_into_map(
                             info_by_version,
                             merge::version_to_new_version_map(
@@ -202,7 +207,6 @@ impl crate::engine::report::generic::Aggregate for Report {
                         wasted_by_extension: merge::vec_into_map_by_extension(
                             wasted_by_extension,
                             wasted_files,
-                            suggested_fix,
                         ),
                     }
                 } else {
@@ -212,6 +216,7 @@ impl crate::engine::report::generic::Aggregate for Report {
                         lhs_tf,
                         info_by_version,
                         wasted_by_extension,
+                        potential_savings,
                     )
                     .merge(Version {
                         crate_name: rhs_crate_name,
@@ -230,6 +235,7 @@ impl crate::engine::report::generic::Aggregate for Report {
                     total_files: lhs_tf,
                     info_by_version: lhs_ibv,
                     wasted_by_extension: lhs_wbe,
+                    potential_savings: lhs_ps,
                 },
                 Crate {
                     crate_name: rhs_crate_name,
@@ -237,17 +243,26 @@ impl crate::engine::report::generic::Aggregate for Report {
                     total_files: rhs_tf,
                     info_by_version: rhs_ibv,
                     wasted_by_extension: rhs_wbe,
+                    potential_savings: rhs_ps,
                 },
             ) => {
                 if lhs_crate_name != rhs_crate_name {
-                    merge::collection_from_crate(lhs_crate_name, lhs_tsb, lhs_tf, lhs_ibv, lhs_wbe)
-                        .merge(Crate {
-                            crate_name: rhs_crate_name,
-                            total_size_in_bytes: rhs_tsb,
-                            total_files: rhs_tf,
-                            info_by_version: rhs_ibv,
-                            wasted_by_extension: rhs_wbe,
-                        })
+                    merge::collection_from_crate(
+                        lhs_crate_name,
+                        lhs_tsb,
+                        lhs_tf,
+                        lhs_ibv,
+                        lhs_wbe,
+                        lhs_ps,
+                    )
+                    .merge(Crate {
+                        crate_name: rhs_crate_name,
+                        total_size_in_bytes: rhs_tsb,
+                        total_files: rhs_tf,
+                        info_by_version: rhs_ibv,
+                        wasted_by_extension: rhs_wbe,
+                        potential_savings: rhs_ps,
+                    })
                 } else {
                     Crate {
                         crate_name: lhs_crate_name,
@@ -255,6 +270,7 @@ impl crate::engine::report::generic::Aggregate for Report {
                         total_files: lhs_tf + rhs_tf,
                         info_by_version: merge::map_into_map(lhs_ibv, rhs_ibv),
                         wasted_by_extension: merge::map_into_map(lhs_wbe, rhs_wbe),
+                        potential_savings: merge::add_optional_aggregate(lhs_ps, rhs_ps),
                     }
                 }
             }
@@ -264,18 +280,21 @@ impl crate::engine::report::generic::Aggregate for Report {
                     total_files: lhs_tf,
                     info_by_crate: lhs_ibc,
                     wasted_by_extension: lhs_wbe,
+                    potential_savings: lhs_ps,
                 },
                 CrateCollection {
                     total_size_in_bytes: rhs_tsb,
                     total_files: rhs_tf,
                     info_by_crate: rhs_ibc,
                     wasted_by_extension: rhs_wbe,
+                    potential_savings: rhs_ps,
                 },
             ) => CrateCollection {
                 total_size_in_bytes: lhs_tsb + rhs_tsb,
                 total_files: lhs_tf + rhs_tf,
                 info_by_crate: merge::map_into_map(lhs_ibc, rhs_ibc),
                 wasted_by_extension: merge::map_into_map(lhs_wbe, rhs_wbe),
+                potential_savings: merge::add_optional_aggregate(lhs_ps, rhs_ps),
             },
             (
                 CrateCollection {
@@ -283,6 +302,7 @@ impl crate::engine::report::generic::Aggregate for Report {
                     total_files: lhs_tf,
                     info_by_crate,
                     wasted_by_extension: lhs_wbe,
+                    potential_savings: lhs_ps,
                 },
                 Crate {
                     crate_name,
@@ -290,6 +310,7 @@ impl crate::engine::report::generic::Aggregate for Report {
                     total_files: rhs_tf,
                     info_by_version,
                     wasted_by_extension: rhs_wbe,
+                    potential_savings: rhs_ps,
                 },
             ) => CrateCollection {
                 total_size_in_bytes: lhs_tsb + rhs_tsb,
@@ -299,6 +320,7 @@ impl crate::engine::report::generic::Aggregate for Report {
                     info_by_crate,
                     merge::crate_info_from_version_info(crate_name, info_by_version),
                 ),
+                potential_savings: merge::add_optional_aggregate(lhs_ps, rhs_ps),
             },
         }
     }

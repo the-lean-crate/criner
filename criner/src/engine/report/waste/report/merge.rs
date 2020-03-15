@@ -17,14 +17,44 @@ impl std::ops::AddAssign for VersionInfo {
     }
 }
 
+pub fn add_optional_aggregate(
+    lhs: Option<AggregateFileInfo>,
+    rhs: Option<AggregateFileInfo>,
+) -> Option<AggregateFileInfo> {
+    Some(match (lhs, rhs) {
+        (Some(mut lhs), Some(rhs)) => {
+            lhs += rhs;
+            lhs
+        }
+        (Some(v), None) => v,
+        (None, Some(v)) => v,
+        (None, None) => return None,
+    })
+}
+
 pub const NO_EXT_MARKER: &str = "<NO_EXT>";
 
 pub fn vec_into_map_by_extension(
     initial: Dict<AggregateFileInfo>,
     from: Vec<WastedFile>,
-    fix: Option<Fix>,
 ) -> Dict<AggregateFileInfo> {
-    let possibly_wasted_files = match fix.unwrap_or(Fix::RemoveExclude) {
+    from.into_iter().fold(initial, |mut m, e| {
+        let entry = m
+            .entry(
+                PathBuf::from(e.0)
+                    .extension()
+                    .and_then(|oss| oss.to_str().map(|s| s.to_string()))
+                    .unwrap_or_else(|| NO_EXT_MARKER.to_string()),
+            )
+            .or_insert_with(Default::default);
+        entry.total_bytes += e.1;
+        entry.total_files += 1;
+        m
+    })
+}
+
+pub fn fix_to_wasted_files_aggregate(fix: Option<Fix>) -> Option<AggregateFileInfo> {
+    match fix.unwrap_or(Fix::RemoveExclude) {
         Fix::NewInclude {
             potential: Some(potential),
             ..
@@ -32,28 +62,21 @@ pub fn vec_into_map_by_extension(
         | Fix::ImprovedInclude {
             potential: Some(potential),
             ..
-        } => potential.potential_waste,
-        _ => Vec::new(),
-    };
-    from.into_iter()
-        .chain(possibly_wasted_files)
-        .fold(initial, |mut m, e| {
-            let entry = m
-                .entry(
-                    PathBuf::from(e.0)
-                        .extension()
-                        .and_then(|oss| oss.to_str().map(|s| s.to_string()))
-                        .unwrap_or_else(|| NO_EXT_MARKER.to_string()),
-                )
-                .or_insert_with(Default::default);
-            entry.total_bytes += e.1;
-            entry.total_files += 1;
-            m
-        })
+        } => Some(potential.potential_waste),
+        _ => None,
+    }
+    .map(|v| {
+        v.into_iter()
+            .fold(AggregateFileInfo::default(), |mut a, (_, s)| {
+                a.total_files += 1;
+                a.total_bytes += s;
+                a
+            })
+    })
 }
 
-pub fn into_map_by_extension(from: Vec<WastedFile>, fix: Option<Fix>) -> Dict<AggregateFileInfo> {
-    vec_into_map_by_extension(BTreeMap::new(), from, fix)
+pub fn into_map_by_extension(from: Vec<WastedFile>) -> Dict<AggregateFileInfo> {
+    vec_into_map_by_extension(BTreeMap::new(), from)
 }
 
 pub fn map_into_map<T>(lhs: Dict<T>, rhs: Dict<T>) -> Dict<T>
@@ -117,12 +140,14 @@ pub fn collection_from_crate(
     total_files: u64,
     info_by_version: Dict<VersionInfo>,
     wasted_by_extension: Dict<AggregateFileInfo>,
+    potential_savings: Option<AggregateFileInfo>,
 ) -> Report {
     Report::CrateCollection {
         total_size_in_bytes,
         total_files,
         info_by_crate: crate_info_from_version_info(crate_name, info_by_version),
         wasted_by_extension,
+        potential_savings,
     }
 }
 
@@ -143,9 +168,10 @@ pub fn crate_from_version(version: Report) -> Report {
                 total_files,
                 &wasted_files,
             ),
+            potential_savings: fix_to_wasted_files_aggregate(suggested_fix),
             total_size_in_bytes,
             total_files,
-            wasted_by_extension: into_map_by_extension(wasted_files, suggested_fix),
+            wasted_by_extension: into_map_by_extension(wasted_files),
         },
         _ => unreachable!("must only be called with version variant"),
     }
