@@ -1,4 +1,7 @@
-use super::{merge::NO_EXT_MARKER, Dict, Report, VersionInfo};
+use super::{
+    merge::{fix_to_wasted_files_aggregate, NO_EXT_MARKER},
+    Dict, Report, VersionInfo,
+};
 use crate::engine::report::waste::AggregateFileInfo;
 use bytesize::ByteSize;
 use horrorshow::{box_html, html, Render, RenderBox, RenderOnce, TemplateBuffer};
@@ -15,6 +18,17 @@ fn total_section(bytes: u64, files: u64) -> Box<dyn Render> {
         section {
             h3: "total files";
             p: files
+        }
+    }
+}
+
+fn savings_section(d: Option<AggregateFileInfo>) -> Box<dyn Render> {
+    box_html! {
+        @ if let Some(all) = d.as_ref() {
+            section {
+                h3: "potential savings";
+                p: format!("{} total in {} files", ByteSize(all.total_bytes), all.total_files);
+            }
         }
     }
 }
@@ -169,6 +183,7 @@ impl RenderOnce for Report {
                         article {
                             : title_section(title);
                             : total_section(total_size_in_bytes, total_files);
+                            : savings_section(fix_to_wasted_files_aggregate(suggested_fix.clone()));
                             @ if suggested_fix.is_some() {
                                 section {
                                     h3: "Fix";
@@ -201,7 +216,7 @@ impl RenderOnce for Report {
                 total_files,
                 info_by_version,
                 wasted_by_extension,
-                potential_savings: _,
+                potential_savings,
             } => {
                 tmpl << html! {
                     : page_head(crate_name.clone());
@@ -209,6 +224,7 @@ impl RenderOnce for Report {
                         article {
                             : title_section(crate_name.clone());
                             : total_section(total_size_in_bytes, total_files);
+                            : savings_section(potential_savings);
                             : by_extension_section(wasted_by_extension);
                             : child_items_section("Versions", info_by_version, format!("{}/", crate_name), ".html", SortOrder::Name);
                         }
@@ -221,7 +237,7 @@ impl RenderOnce for Report {
                 total_files,
                 info_by_crate,
                 wasted_by_extension,
-                potential_savings: _,
+                potential_savings,
             } => {
                 let title = "crates.io";
                 let no_prefix = String::new();
@@ -241,6 +257,7 @@ impl RenderOnce for Report {
                             section {
                                 h3: format!("{} wasted in {} files", ByteSize(waste_in_bytes), wasted_files_count);
                             }
+                            : savings_section(potential_savings);
                             : by_extension_section(wasted_by_extension);
                             : child_items_section("Crates", info_by_crate, no_prefix, no_suffix, SortOrder::Waste);
                         }
