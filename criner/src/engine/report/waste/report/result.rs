@@ -194,7 +194,11 @@ fn remove_implicit_includes(
     let mut current_removed_count = removed_include_patterns.len();
     loop {
         if let Some(pos_to_remove) = include_patterns.iter().position(|p| {
-            p == "Cargo.toml" || p == "Cargo.lock" || p == "./Cargo.toml" || p == "./Cargo.lock"
+            p == "Cargo.toml.orig"
+                || p == "Cargo.toml"
+                || p == "Cargo.lock"
+                || p == "./Cargo.toml"
+                || p == "./Cargo.lock"
         }) {
             removed_include_patterns.push(include_patterns[pos_to_remove].to_owned());
             include_patterns.remove(pos_to_remove);
@@ -623,8 +627,8 @@ impl Report {
         }
     }
 
-    pub(crate) fn package_into_includes_excludes(
-        cargo: CargoConfig,
+    pub(crate) fn cargo_config_into_includes_excludes(
+        config: CargoConfig,
         entries_with_buffer: &[(TarHeader, Vec<u8>)],
         entries: &[TarHeader],
     ) -> (
@@ -633,16 +637,16 @@ impl Report {
         Option<Patterns>,
         Option<String>,
     ) {
-        let maybe_build_script_name = cargo.build_script_path().map(|s| s.to_owned());
+        let maybe_build_script_name = config.build_script_path().map(|s| s.to_owned());
         let compile_time_includes = {
             let mut includes_parsed_from_files = Vec::new();
             includes_parsed_from_files.extend(included_paths_of(find_in_entries(
                 &entries_with_buffer,
                 &entries,
-                cargo.lib_path(),
+                config.lib_path(),
             )));
-            add_to_includes_if_non_default(cargo.lib_path(), &mut includes_parsed_from_files);
-            for path in cargo.bin_paths() {
+            add_to_includes_if_non_default(config.lib_path(), &mut includes_parsed_from_files);
+            for path in config.bin_paths() {
                 includes_parsed_from_files.extend(included_paths_of(find_in_entries(
                     &entries_with_buffer,
                     &entries,
@@ -663,7 +667,7 @@ impl Report {
             }
         };
 
-        let package = cargo.package.unwrap_or_default();
+        let package = config.package.unwrap_or_default();
         (
             package.include,
             package.exclude,

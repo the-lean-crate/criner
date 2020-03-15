@@ -368,7 +368,7 @@ impl Report {
                 let total_files = entries_meta_data.len() as u64;
                 let cargo_config = Self::cargo_config_from_entries(&selected_entries);
                 let (includes, excludes, compile_time_includes, build_script_name) =
-                    Self::package_into_includes_excludes(
+                    Self::cargo_config_into_includes_excludes(
                         cargo_config,
                         &selected_entries,
                         &entries_meta_data,
