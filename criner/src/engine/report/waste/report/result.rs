@@ -522,7 +522,6 @@ impl Report {
         compile_time_include: Option<Patterns>,
     ) -> (Option<Fix>, Vec<TarHeader>) {
         let compile_time_include = compile_time_include.unwrap_or_default();
-        let potential = potential_negated_includes(entries.clone());
         let include_globs = globset_from_globs_and_patterns(
             &STANDARD_INCLUDE_GLOBS,
             compile_time_include.iter().map(|s| s.as_str()),
@@ -534,6 +533,7 @@ impl Report {
             .iter()
             .map(|s| (s.as_str(), make_glob(s).compile_matcher()))
             .collect();
+        let potential = potential_negated_includes(included_entries.clone());
         let mut include_patterns = simplify_includes(
             STANDARD_INCLUDE_MATCHERS
                 .iter()
