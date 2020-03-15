@@ -221,6 +221,7 @@ fn remove_implicit_includes(
 /// These patterns must not accidentally match the 'pattern_to_not_match', as it is the pattern they are supposed to replace.
 /// Note that one could also use negated patterns, so keep the 'pattern to not match', but add a specific negation.
 /// HELP WANTED: This could be done by finding the common ancestors and resolve to patterns that match their children most specifically
+/// See https://github.com/crates-io/criner/issues/2
 fn turn_file_paths_into_patterns(
     added_include_patterns: Patterns,
     _pattern_to_not_match: &str,
