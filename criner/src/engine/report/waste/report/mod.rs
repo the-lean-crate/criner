@@ -80,7 +80,7 @@ impl CargoConfig {
 
 impl From<&[u8]> for CargoConfig {
     fn from(v: &[u8]) -> Self {
-        toml::from_slice::<CargoConfig>(v).expect("valid Cargo.toml in packages")
+        toml::from_slice::<CargoConfig>(v).unwrap_or_default() // you would think all of them parse OK, but that's wrong :D
     }
 }
 
@@ -366,7 +366,7 @@ impl Report {
             } => {
                 let total_size_in_bytes = entries_meta_data.iter().map(|e| e.size).sum();
                 let total_files = entries_meta_data.len() as u64;
-                let package = Self::package_from_entries(&selected_entries);
+                let package = Self::cargo_config_from_entries(&selected_entries);
                 let (includes, excludes, compile_time_includes, build_script_name) =
                     Self::package_into_includes_excludes(
                         package,

@@ -457,7 +457,7 @@ fn potential_negated_includes(entries: Vec<TarHeader>) -> Option<PotentialWaste>
 }
 
 impl Report {
-    pub(crate) fn package_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> PackageSection {
+    pub(crate) fn cargo_config_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> PackageSection {
         find_in_entries(entries, &[], "Cargo.toml")
             .and_then(|(_e, v)| v.and_then(|v| CargoConfig::from(v).package))
             .unwrap_or_default()
