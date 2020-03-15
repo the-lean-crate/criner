@@ -15,6 +15,40 @@ fn task_result(file_name: &str) -> TaskResult {
 }
 
 #[test]
+fn lw_webdriver_with_big_binaries() {
+    assert_eq!(
+        Report::from_result(
+            "a",
+            "1",
+            task_result("lw_webdriver-0.4.1-extract_crate-1.0.0")
+        ),
+        Report::Version {
+            crate_name: "a".into(),
+            crate_version: "1".to_string(),
+            total_size_in_bytes: 17209157,
+            total_files: 14,
+            wasted_files: [
+                (".gitignore", 30),
+                ("chromedriver", 10144248),
+                ("geckodriver", 7008696),
+                ("tests/tests.rs", 6729)
+            ]
+            .iter()
+            .map(|(p, s)| (p.to_string(), *s))
+            .collect(),
+            suggested_fix: Some(Fix::NewInclude {
+                include: vec!["src/**/*".into(), "README.md".into()],
+                potential: Some(PotentialWaste {
+                    patterns_to_fix: vec!["!**/tests/*".into()],
+                    potential_waste: vec![("tests/tests.rs".into(), 6729)]
+                }),
+                has_build_script: false
+            })
+        }
+    );
+}
+
+#[test]
 fn falcon_raptor_typescript() {
     assert_eq!(
         Report::from_result(
@@ -135,7 +169,6 @@ fn sovrin_client() {
 
 #[test]
 fn mozjs() {
-    // todo: check lw-webdriver-0.1.5/ for binaries
     assert_eq!(
         Report::from_result("a", "1", task_result("mozjs_sys-0.67.1-extract_crate-1.0.0")),
         Report::Version {
