@@ -54,11 +54,11 @@ pub struct CargoConfig {
 }
 
 impl CargoConfig {
-    pub fn build_script_path(&self) -> &str {
-        self.package
-            .as_ref()
-            .and_then(|p| p.build_script_path())
-            .unwrap_or("build.rs")
+    pub fn actual_or_expected_build_script_path(&self) -> &str {
+        self.build_script_path().unwrap_or("build.rs")
+    }
+    pub fn build_script_path(&self) -> Option<&str> {
+        self.package.as_ref().and_then(|p| p.build_script_path())
     }
     pub fn lib_path(&self) -> &str {
         self.lib
@@ -74,7 +74,7 @@ impl CargoConfig {
                     .filter_map(|s| s.path.as_ref().map(|s| s.as_str()))
                     .collect()
             })
-            .unwrap_or_default()
+            .unwrap_or_else(|| vec!["src/main.rs"])
     }
 }
 

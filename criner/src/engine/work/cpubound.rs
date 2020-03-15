@@ -138,7 +138,7 @@ fn extract_crate(
         if tar_path_to_utf8_str(e.path_bytes().as_ref()) == "Cargo.toml" {
             e.read_to_end(&mut buf)?;
             let config = CargoConfig::from(buf.as_slice());
-            interesting_paths.push(config.build_script_path().to_owned());
+            interesting_paths.push(config.actual_or_expected_build_script_path().to_owned());
             interesting_paths.push(config.lib_path().to_owned());
             interesting_paths.extend(config.bin_paths().into_iter().map(|s| s.to_owned()));
             break;
