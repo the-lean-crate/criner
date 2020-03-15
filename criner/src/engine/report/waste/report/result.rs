@@ -20,6 +20,12 @@ lazy_static! {
         .iter()
         .map(|p| make_glob(p))
         .collect();
+    static ref STANDARD_INCLUDE_MATCHERS: Vec<(&'static str, globset::GlobMatcher)> =
+        standard_include_patterns()
+            .iter()
+            .cloned()
+            .map(|p| (p, make_glob(p).compile_matcher()))
+            .collect();
 }
 
 pub fn tar_path_to_utf8_str(mut bytes: &[u8]) -> &str {
@@ -256,24 +262,30 @@ fn make_glob(pattern: &str) -> globset::Glob {
         .expect("valid include patterns")
 }
 
-fn simplify_standard_includes(
-    includes: &'static [&'static str],
-    entries: &[TarHeader],
+fn simplify_includes<'a>(
+    include_patterns_and_matchers: impl Iterator<Item = &'a (&'a str, globset::GlobMatcher)>,
+    mut entries: Vec<TarHeader>,
 ) -> Patterns {
-    let is_recursive_glob = |p: &str| p.contains("**");
-    let mut out_patterns: Vec<_> = includes
-        .iter()
-        .filter(|p| is_recursive_glob(*p))
-        .map(|p| p.to_string())
-        .collect();
-    for pattern in includes.iter().filter(|p| !is_recursive_glob(p)) {
-        let matcher = make_glob(pattern).compile_matcher();
-        out_patterns.extend(
+    let mut out_patterns = Vec::new();
+    let mut matched = Vec::<String>::new();
+    for (pattern, glob) in include_patterns_and_matchers {
+        matched.clear();
+        matched.extend(
             entries
                 .iter()
-                .filter(|e| matcher.is_match(tar_path_to_utf8_str(&e.path)))
-                .map(|e| tar_path_to_utf8_str(&e.path).to_owned()),
+                .filter(|e| glob.is_match(tar_path_to_utf8_str(&e.path)))
+                .map(|e| tar_path_to_utf8_str(&e.path).to_string()),
         );
+        match matched.len() {
+            0 => {}
+            1 => {
+                out_patterns.push(matched[0].clone());
+            }
+            _ => {
+                out_patterns.push(pattern.to_string());
+            }
+        }
+        entries.retain(|e| !matched.iter().any(|p| p == &tar_path_to_utf8_str(&e.path)));
     }
     remove_implicit_includes(&mut out_patterns, Vec::new());
     out_patterns
@@ -511,8 +523,16 @@ impl Report {
         let (included_entries, excluded_entries) =
             split_to_matched_and_unmatched(entries, &include_globs);
 
-        let mut include_patterns =
-            simplify_standard_includes(standard_include_patterns(), &included_entries);
+        let compile_time_include_matchers: Vec<_> = compile_time_include
+            .iter()
+            .map(|s| (s.as_str(), make_glob(s).compile_matcher()))
+            .collect();
+        let mut include_patterns = simplify_includes(
+            STANDARD_INCLUDE_MATCHERS
+                .iter()
+                .chain(compile_time_include_matchers.iter()),
+            included_entries,
+        );
         let has_build_script = match build_script_name {
             Some(build_script_name) => {
                 include_patterns.push(build_script_name);
@@ -520,7 +540,6 @@ impl Report {
             }
             None => false,
         };
-        include_patterns.extend(compile_time_include.into_iter());
 
         (
             Some(Fix::NewInclude {
