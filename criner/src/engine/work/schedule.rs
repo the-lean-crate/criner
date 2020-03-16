@@ -7,6 +7,8 @@ use crate::{
 };
 use std::time::SystemTime;
 
+const MAX_ATTEMPTS_BEFORE_WE_GIVE_UP: usize = 4;
+
 #[derive(Clone, Copy)]
 pub enum Scheduling {
     //   /// Considers work done if everything was done. Will block to assure that
@@ -137,7 +139,7 @@ async fn submit_single<R>(
             channel.send(f()).await;
             Submitted
         }
-        AttemptsWithFailure(ref v) if v.len() < 3 => {
+        AttemptsWithFailure(ref v) if v.len() < MAX_ATTEMPTS_BEFORE_WE_GIVE_UP => {
             configure();
             progress.info(format!("Retrying task, attempt {}", v.len() + 1));
             channel.send(f()).await;
