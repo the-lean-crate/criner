@@ -15,6 +15,12021 @@ fn task_result(file_name: &str) -> TaskResult {
 }
 
 #[test]
+fn openblas_provider() {
+    assert_eq!(
+        Report::from_result(
+            "a",
+            "1",
+            task_result("openblas_provider-0.4.0-extract_crate-1.0.0")
+        ),
+        Report::Version {
+            crate_name: "a".into(),
+            crate_version: "1".to_string(),
+            total_size_in_bytes: 92275976,
+            total_files: 8080,
+            wasted_files: vec![(".gitignore".into(), 18), (".gitmodules".into(), 84)],
+            suggested_fix: Some(Fix::NewInclude {
+                include: vec![
+                    "src/lib.rs".into(),
+                    "LICENSE.md".into(),
+                    "README.md".into(),
+                    "source/*".into(),
+                    "build.rs".into()
+                ],
+                potential: Some(PotentialWaste {
+                    patterns_to_fix: vec![
+                        "!**/*.png".into(),
+                        "!**/benchmark/*".into(),
+                        "!**/test/*".into(),
+                        "!**/testing/*".into(),
+                        "!**/*_test.*".into(),
+                        "!**/example/*".into(),
+                        "!**/examples/*".into()
+                    ],
+                    potential_waste: [
+                        ("Cargo.toml", 480),
+                        ("LICENSE.md", 2061),
+                        ("README.md", 1377),
+                        ("source/.gitignore", 977),
+                        ("source/.travis.yml", 1572),
+                        ("source/appveyor.yml", 614),
+                        ("source/BACKERS.md", 637),
+                        ("source/benchmark/asum.c", 4985),
+                        ("source/benchmark/axpy.c", 5273),
+                        ("source/benchmark/cholesky.c", 8750),
+                        ("source/benchmark/copy.c", 5271),
+                        ("source/benchmark/cula_wrapper.c", 502),
+                        ("source/benchmark/dot.c", 5137),
+                        ("source/benchmark/geev.c", 8095),
+                        ("source/benchmark/gemm.c", 5685),
+                        ("source/benchmark/gemm3m.c", 5476),
+                        ("source/benchmark/gemv.c", 7216),
+                        ("source/benchmark/ger.c", 5936),
+                        ("source/benchmark/gesv.c", 6453),
+                        ("source/benchmark/getri.c", 7022),
+                        ("source/benchmark/hemm.c", 5259),
+                        ("source/benchmark/hemv.c", 5604),
+                        ("source/benchmark/her2k.c", 5270),
+                        ("source/benchmark/herk.c", 5056),
+                        ("source/benchmark/linpack.c", 8019),
+                        ("source/benchmark/Make_exe.sh", 118),
+                        ("source/benchmark/Makefile", 81926),
+                        ("source/benchmark/plot-filter.sh", 2364),
+                        ("source/benchmark/plot-header", 2062),
+                        ("source/benchmark/potrf.c", 9202),
+                        ("source/benchmark/scal.c", 5274),
+                        ("source/benchmark/scripts/NUMPY/cgemm.py", 1024),
+                        ("source/benchmark/scripts/NUMPY/cgemv.py", 1018),
+                        ("source/benchmark/scripts/NUMPY/daxpy.py", 977),
+                        ("source/benchmark/scripts/NUMPY/ddot.py", 936),
+                        ("source/benchmark/scripts/NUMPY/deig.py", 925),
+                        ("source/benchmark/scripts/NUMPY/dgemm.py", 950),
+                        ("source/benchmark/scripts/NUMPY/dgemv.py", 946),
+                        ("source/benchmark/scripts/NUMPY/dgesv.py", 1002),
+                        ("source/benchmark/scripts/NUMPY/dsolve.py", 980),
+                        ("source/benchmark/scripts/NUMPY/sdot.py", 936),
+                        ("source/benchmark/scripts/NUMPY/sgemm.py", 950),
+                        ("source/benchmark/scripts/NUMPY/sgemv.py", 946),
+                        ("source/benchmark/scripts/NUMPY/zgemm.py", 1024),
+                        ("source/benchmark/scripts/NUMPY/zgemv.py", 1018),
+                        ("source/benchmark/scripts/OCTAVE/cgemm.m", 935),
+                        ("source/benchmark/scripts/OCTAVE/cgemv.m", 933),
+                        ("source/benchmark/scripts/OCTAVE/deig.m", 870),
+                        ("source/benchmark/scripts/OCTAVE/dgemm.m", 879),
+                        ("source/benchmark/scripts/OCTAVE/dgemv.m", 877),
+                        ("source/benchmark/scripts/OCTAVE/dsolve.m", 948),
+                        ("source/benchmark/scripts/OCTAVE/sgemm.m", 879),
+                        ("source/benchmark/scripts/OCTAVE/sgemv.m", 877),
+                        ("source/benchmark/scripts/OCTAVE/zgemm.m", 935),
+                        ("source/benchmark/scripts/OCTAVE/zgemv.m", 933),
+                        ("source/benchmark/scripts/R/deig.R", 1029),
+                        ("source/benchmark/scripts/R/dgemm.R", 1085),
+                        ("source/benchmark/scripts/R/dsolve.R", 1099),
+                        ("source/benchmark/scripts/SCIPY/dsyrk.py", 1231),
+                        ("source/benchmark/scripts/SCIPY/ssyrk.py", 1231),
+                        ("source/benchmark/smallscaling.c", 5354),
+                        ("source/benchmark/swap.c", 5271),
+                        ("source/benchmark/symm.c", 5380),
+                        ("source/benchmark/symv.c", 5724),
+                        ("source/benchmark/syr2k.c", 5396),
+                        ("source/benchmark/syrk.c", 5176),
+                        ("source/benchmark/tplot-header", 2050),
+                        ("source/benchmark/trmm.c", 5342),
+                        ("source/benchmark/trsm.c", 5554),
+                        ("source/benchmark/zdot-intel.c", 5174),
+                        ("source/benchmark/zdot.c", 5148),
+                        ("source/c_check", 7676),
+                        ("source/cblas.h", 45639),
+                        ("source/Changelog.txt", 20069),
+                        ("source/cmake/arch.cmake", 3117),
+                        ("source/cmake/c_check.cmake", 2080),
+                        ("source/cmake/cc.cmake", 2551),
+                        ("source/cmake/export.cmake", 1302),
+                        ("source/cmake/f_check.cmake", 1850),
+                        ("source/cmake/fc.cmake", 5068),
+                        ("source/cmake/kernel.cmake", 4988),
+                        ("source/cmake/lapack.cmake", 16679),
+                        ("source/cmake/lapacke.cmake", 51734),
+                        ("source/cmake/os.cmake", 2777),
+                        ("source/cmake/prebuild.cmake", 3464),
+                        ("source/cmake/system.cmake", 13024),
+                        ("source/cmake/utils.cmake", 14755),
+                        ("source/CMakeLists.txt", 6107),
+                        ("source/common.h", 19130),
+                        ("source/common_alpha.h", 5487),
+                        ("source/common_arm.h", 3669),
+                        ("source/common_arm64.h", 3880),
+                        ("source/common_c.h", 22306),
+                        ("source/common_d.h", 14648),
+                        ("source/common_ia64.h", 10213),
+                        ("source/common_interface.h", 47266),
+                        ("source/common_lapack.h", 24424),
+                        ("source/common_level1.h", 11635),
+                        ("source/common_level2.h", 108588),
+                        ("source/common_level3.h", 147412),
+                        ("source/common_linux.h", 4322),
+                        ("source/common_macro.h", 83833),
+                        ("source/common_mips64.h", 8556),
+                        ("source/common_param.h", 83469),
+                        ("source/common_power.h", 16932),
+                        ("source/common_q.h", 13753),
+                        ("source/common_reference.h", 3957),
+                        ("source/common_s.h", 14926),
+                        ("source/common_sparc.h", 7188),
+                        ("source/common_stackalloc.h", 3549),
+                        ("source/common_thread.h", 6823),
+                        ("source/common_x.h", 20396),
+                        ("source/common_x86.h", 10043),
+                        ("source/common_x86_64.h", 11302),
+                        ("source/common_z.h", 22305),
+                        ("source/CONTRIBUTORS.md", 5777),
+                        ("source/cpuid.h", 7193),
+                        ("source/cpuid.S", 3050),
+                        ("source/cpuid_alpha.c", 4064),
+                        ("source/cpuid_arm.c", 7361),
+                        ("source/cpuid_arm64.c", 5120),
+                        ("source/cpuid_ia64.c", 4805),
+                        ("source/cpuid_mips.c", 7578),
+                        ("source/cpuid_power.c", 5798),
+                        ("source/cpuid_sparc.c", 2961),
+                        ("source/cpuid_x86.c", 43932),
+                        ("source/ctest.c", 2064),
+                        ("source/ctest/auxiliary.c", 1330),
+                        ("source/ctest/c_c2chke.c", 33560),
+                        ("source/ctest/c_c3chke.c", 76414),
+                        ("source/ctest/c_c3chke_3m.c", 86822),
+                        ("source/ctest/c_cblas1.c", 1687),
+                        ("source/ctest/c_cblas2.c", 26559),
+                        ("source/ctest/c_cblas3.c", 18696),
+                        ("source/ctest/c_cblas3_3m.c", 21256),
+                        ("source/ctest/c_cblat1.f", 31416),
+                        ("source/ctest/c_cblat2.f", 104831),
+                        ("source/ctest/c_cblat3.f", 100297),
+                        ("source/ctest/c_cblat3_3m.f", 100303),
+                        ("source/ctest/c_d2chke.c", 31989),
+                        ("source/ctest/c_d3chke.c", 57366),
+                        ("source/ctest/c_dblas1.c", 1852),
+                        ("source/ctest/c_dblas2.c", 16764),
+                        ("source/ctest/c_dblas3.c", 10212),
+                        ("source/ctest/c_dblat1.f", 28683),
+                        ("source/ctest/c_dblat2.f", 105022),
+                        ("source/ctest/c_dblat3.f", 87489),
+                        ("source/ctest/c_s2chke.c", 31989),
+                        ("source/ctest/c_s3chke.c", 57368),
+                        ("source/ctest/c_sblas1.c", 1795),
+                        ("source/ctest/c_sblas2.c", 16631),
+                        ("source/ctest/c_sblas3.c", 10078),
+                        ("source/ctest/c_sblat1.f", 28679),
+                        ("source/ctest/c_sblat2.f", 104950),
+                        ("source/ctest/c_sblat3.f", 87654),
+                        ("source/ctest/c_xerbla.c", 3834),
+                        ("source/ctest/c_z2chke.c", 33561),
+                        ("source/ctest/c_z3chke.c", 76416),
+                        ("source/ctest/c_z3chke_3m.c", 86826),
+                        ("source/ctest/c_zblas1.c", 1697),
+                        ("source/ctest/c_zblas2.c", 26561),
+                        ("source/ctest/c_zblas3.c", 18696),
+                        ("source/ctest/c_zblas3_3m.c", 21255),
+                        ("source/ctest/c_zblat1.f", 31436),
+                        ("source/ctest/c_zblat2.f", 105203),
+                        ("source/ctest/c_zblat3.f", 100486),
+                        ("source/ctest/c_zblat3_3m.f", 100492),
+                        ("source/ctest/cblas_test.h", 16665),
+                        ("source/ctest/cin2", 1633),
+                        ("source/ctest/cin3", 1077),
+                        ("source/ctest/cin3_3m", 1086),
+                        ("source/ctest/CMakeLists.txt", 1541),
+                        ("source/ctest/constant.c", 40),
+                        ("source/ctest/din2", 1539),
+                        ("source/ctest/din3", 895),
+                        ("source/ctest/LICENSE", 963),
+                        ("source/ctest/Makefile", 4541),
+                        ("source/ctest/sin2", 1547),
+                        ("source/ctest/sin3", 895),
+                        ("source/ctest/zin2", 1633),
+                        ("source/ctest/zin3", 1077),
+                        ("source/ctest/zin3_3m", 1086),
+                        ("source/ctest1.c", 30),
+                        ("source/ctest2.c", 26),
+                        ("source/driver/level2/CMakeLists.txt", 10103),
+                        ("source/driver/level2/gbmv_k.c", 4001),
+                        ("source/driver/level2/gbmv_thread.c", 7590),
+                        ("source/driver/level2/gemv_thread.c", 8133),
+                        ("source/driver/level2/ger_thread.c", 5869),
+                        ("source/driver/level2/Makefile", 177954),
+                        ("source/driver/level2/sbmv_k.c", 3934),
+                        ("source/driver/level2/sbmv_thread.c", 9781),
+                        ("source/driver/level2/spmv_k.c", 3765),
+                        ("source/driver/level2/spmv_thread.c", 9283),
+                        ("source/driver/level2/spr2_k.c", 3504),
+                        ("source/driver/level2/spr2_thread.c", 10789),
+                        ("source/driver/level2/spr_k.c", 3195),
+                        ("source/driver/level2/spr_thread.c", 8462),
+                        ("source/driver/level2/symv_thread.c", 8169),
+                        ("source/driver/level2/syr2_k.c", 3518),
+                        ("source/driver/level2/syr2_thread.c", 10824),
+                        ("source/driver/level2/syr_k.c", 3209),
+                        ("source/driver/level2/syr_thread.c", 8429),
+                        ("source/driver/level2/tbmv_L.c", 3570),
+                        ("source/driver/level2/tbmv_thread.c", 10189),
+                        ("source/driver/level2/tbmv_U.c", 3542),
+                        ("source/driver/level2/tbsv_L.c", 3542),
+                        ("source/driver/level2/tbsv_U.c", 3571),
+                        ("source/driver/level2/tpmv_L.c", 3385),
+                        ("source/driver/level2/tpmv_thread.c", 9816),
+                        ("source/driver/level2/tpmv_U.c", 3365),
+                        ("source/driver/level2/tpsv_L.c", 3357),
+                        ("source/driver/level2/tpsv_U.c", 3356),
+                        ("source/driver/level2/trmv_L.c", 4013),
+                        ("source/driver/level2/trmv_thread.c", 10778),
+                        ("source/driver/level2/trmv_U.c", 3941),
+                        ("source/driver/level2/trsv_L.c", 4026),
+                        ("source/driver/level2/trsv_U.c", 4015),
+                        ("source/driver/level2/zgbmv_k.c", 4974),
+                        ("source/driver/level2/zhbmv_k.c", 6768),
+                        ("source/driver/level2/zher2_k.c", 4775),
+                        ("source/driver/level2/zher_k.c", 3596),
+                        ("source/driver/level2/zhpmv_k.c", 6272),
+                        ("source/driver/level2/zhpr2_k.c", 4771),
+                        ("source/driver/level2/zhpr_k.c", 3594),
+                        ("source/driver/level2/zsbmv_k.c", 4695),
+                        ("source/driver/level2/zspmv_k.c", 4355),
+                        ("source/driver/level2/zspr2_k.c", 3915),
+                        ("source/driver/level2/zspr_k.c", 3508),
+                        ("source/driver/level2/zsyr2_k.c", 3930),
+                        ("source/driver/level2/zsyr_k.c", 3522),
+                        ("source/driver/level2/ztbmv_L.c", 4601),
+                        ("source/driver/level2/ztbmv_U.c", 4563),
+                        ("source/driver/level2/ztbsv_L.c", 4690),
+                        ("source/driver/level2/ztbsv_U.c", 4730),
+                        ("source/driver/level2/ztpmv_L.c", 4357),
+                        ("source/driver/level2/ztpmv_U.c", 4310),
+                        ("source/driver/level2/ztpsv_L.c", 4557),
+                        ("source/driver/level2/ztpsv_U.c", 4551),
+                        ("source/driver/level2/ztrmv_L.c", 5272),
+                        ("source/driver/level2/ztrmv_U.c", 5335),
+                        ("source/driver/level2/ztrsv_L.c", 5654),
+                        ("source/driver/level2/ztrsv_U.c", 5605),
+                        ("source/driver/level3/CMakeLists.txt", 6641),
+                        ("source/driver/level3/gemm.c", 3049),
+                        ("source/driver/level3/gemm3m.c", 2981),
+                        ("source/driver/level3/gemm3m_level3.c", 15332),
+                        ("source/driver/level3/gemm_thread_m.c", 3811),
+                        ("source/driver/level3/gemm_thread_mn.c", 5216),
+                        ("source/driver/level3/gemm_thread_n.c", 4086),
+                        ("source/driver/level3/gemm_thread_variable.c", 4399),
+                        ("source/driver/level3/hemm3m_k.c", 4792),
+                        ("source/driver/level3/level3.c", 12719),
+                        ("source/driver/level3/level3_gemm3m_thread.c", 28344),
+                        ("source/driver/level3/level3_syr2k.c", 11495),
+                        ("source/driver/level3/level3_syrk.c", 12504),
+                        ("source/driver/level3/level3_syrk_threaded.c", 17407),
+                        ("source/driver/level3/level3_thread.c", 20517),
+                        ("source/driver/level3/Makefile", 220730),
+                        ("source/driver/level3/symm3m_k.c", 4793),
+                        ("source/driver/level3/symm_k.c", 3520),
+                        ("source/driver/level3/syr2k_k.c", 3816),
+                        ("source/driver/level3/syr2k_kernel.c", 6070),
+                        ("source/driver/level3/syrk_k.c", 3828),
+                        ("source/driver/level3/syrk_kernel.c", 5962),
+                        ("source/driver/level3/syrk_thread.c", 5725),
+                        ("source/driver/level3/trmm_L.c", 11839),
+                        ("source/driver/level3/trmm_R.c", 10932),
+                        ("source/driver/level3/trsm_L.c", 8245),
+                        ("source/driver/level3/trsm_R.c", 10760),
+                        ("source/driver/level3/zhemm_k.c", 3520),
+                        ("source/driver/level3/zher2k_k.c", 5269),
+                        ("source/driver/level3/zher2k_kernel.c", 6151),
+                        ("source/driver/level3/zherk_beta.c", 3687),
+                        ("source/driver/level3/zherk_k.c", 5038),
+                        ("source/driver/level3/zherk_kernel.c", 5624),
+                        ("source/driver/level3/zsyrk_beta.c", 3263),
+                        ("source/driver/mapper/device_setup", 196),
+                        ("source/driver/mapper/Makefile", 395),
+                        ("source/driver/mapper/mapper.c", 7135),
+                        ("source/driver/others/abs.c", 3061),
+                        ("source/driver/others/blas_l1_thread.c", 4317),
+                        ("source/driver/others/blas_server.c", 25368),
+                        ("source/driver/others/blas_server_omp.c", 9581),
+                        ("source/driver/others/blas_server_win32.c", 13795),
+                        ("source/driver/others/CMakeLists.txt", 1752),
+                        ("source/driver/others/divtable.c", 4967),
+                        ("source/driver/others/dynamic.c", 16365),
+                        ("source/driver/others/init.c", 21684),
+                        ("source/driver/others/lamc3.c", 2779),
+                        ("source/driver/others/lamch.c", 6062),
+                        ("source/driver/others/lsame.c", 2813),
+                        ("source/driver/others/Makefile", 5980),
+                        ("source/driver/others/memory.c", 33359),
+                        ("source/driver/others/memory_qalloc.c", 3235),
+                        ("source/driver/others/openblas_env.c", 3213),
+                        ("source/driver/others/openblas_error_handle.c", 1965),
+                        ("source/driver/others/openblas_get_config.c", 2503),
+                        ("source/driver/others/openblas_get_num_procs.c", 1849),
+                        ("source/driver/others/openblas_get_num_threads.c", 1855),
+                        ("source/driver/others/openblas_get_parallel.c", 2064),
+                        ("source/driver/others/openblas_set_num_threads.c", 2040),
+                        ("source/driver/others/parameter.c", 18215),
+                        ("source/driver/others/profile.c", 5391),
+                        ("source/driver/others/xerbla.c", 3342),
+                        ("source/exports/dllinit.c", 2957),
+                        ("source/exports/gensymbol", 83959),
+                        ("source/exports/Makefile", 7867),
+                        ("source/f_check", 7115),
+                        ("source/ftest.f", 91),
+                        ("source/ftest2.f", 30),
+                        ("source/ftest3.f", 93),
+                        ("source/getarch.c", 33170),
+                        ("source/getarch_2nd.c", 2640),
+                        ("source/GotoBLAS_00License.txt", 1608),
+                        ("source/GotoBLAS_01Readme.txt", 2043),
+                        ("source/GotoBLAS_02QuickInstall.txt", 3700),
+                        ("source/GotoBLAS_03FAQ.txt", 4662),
+                        ("source/GotoBLAS_04FAQ.txt", 296),
+                        ("source/GotoBLAS_05LargePage.txt", 1518),
+                        ("source/GotoBLAS_06WeirdPerformance.txt", 894),
+                        ("source/interface/asum.c", 3367),
+                        ("source/interface/axpby.c", 2476),
+                        ("source/interface/axpy.c", 4135),
+                        ("source/interface/CMakeLists.txt", 5865),
+                        ("source/interface/copy.c", 3329),
+                        ("source/interface/create", 331),
+                        ("source/interface/dot.c", 3614),
+                        ("source/interface/dsdot.c", 3595),
+                        ("source/interface/gbmv.c", 6835),
+                        ("source/interface/geadd.c", 4464),
+                        ("source/interface/gemm.c", 12563),
+                        ("source/interface/gemv.c", 6976),
+                        ("source/interface/ger.c", 5507),
+                        ("source/interface/imatcopy.c", 5620),
+                        ("source/interface/imax.c", 4370),
+                        ("source/interface/lapack/gesv.c", 4838),
+                        ("source/interface/lapack/getf2.c", 4055),
+                        ("source/interface/lapack/getrf.c", 4245),
+                        ("source/interface/lapack/getrs.c", 4942),
+                        ("source/interface/lapack/larf.c.obsolete", 4076),
+                        ("source/interface/lapack/laswp.c", 3991),
+                        ("source/interface/lapack/lauu2.c", 4414),
+                        ("source/interface/lapack/lauum.c", 4701),
+                        ("source/interface/lapack/potf2.c", 4414),
+                        ("source/interface/lapack/potrf.c", 4701),
+                        ("source/interface/lapack/potri.c", 5235),
+                        ("source/interface/lapack/trti2.c", 4728),
+                        ("source/interface/lapack/trtri.c", 5164),
+                        ("source/interface/lapack/zgetf2.c", 4055),
+                        ("source/interface/lapack/zgetrf.c", 4248),
+                        ("source/interface/lapack/zgetrs.c", 4991),
+                        ("source/interface/lapack/zlaswp.c", 4004),
+                        ("source/interface/lapack/zlauu2.c", 4425),
+                        ("source/interface/lapack/zlauum.c", 4700),
+                        ("source/interface/lapack/zpotf2.c", 4425),
+                        ("source/interface/lapack/zpotrf.c", 4711),
+                        ("source/interface/lapack/zpotri.c", 5242),
+                        ("source/interface/lapack/ztrti2.c", 4720),
+                        ("source/interface/lapack/ztrtri.c", 5175),
+                        ("source/interface/Makefile", 63871),
+                        ("source/interface/max.c", 4278),
+                        ("source/interface/netlib/cgemv.f", 8146),
+                        ("source/interface/netlib/dgemv.f", 7512),
+                        ("source/interface/netlib/sgemv.f", 7464),
+                        ("source/interface/netlib/zgemv.f", 8185),
+                        ("source/interface/nrm2.c", 3377),
+                        ("source/interface/omatcopy.c", 4322),
+                        ("source/interface/rot.c", 3364),
+                        ("source/interface/rotg.c", 1691),
+                        ("source/interface/rotm.c", 2729),
+                        ("source/interface/rotmg.c", 4797),
+                        ("source/interface/sbmv.c", 6305),
+                        ("source/interface/scal.c", 3733),
+                        ("source/interface/sdsdot.c", 3663),
+                        ("source/interface/spmv.c", 5861),
+                        ("source/interface/spr.c", 5402),
+                        ("source/interface/spr2.c", 5713),
+                        ("source/interface/swap.c", 4026),
+                        ("source/interface/symm.c", 10247),
+                        ("source/interface/symv.c", 6099),
+                        ("source/interface/syr.c", 5547),
+                        ("source/interface/syr2.c", 5854),
+                        ("source/interface/syr2k.c", 9481),
+                        ("source/interface/syrk.c", 9409),
+                        ("source/interface/tbmv.c", 7567),
+                        ("source/interface/tbsv.c", 6678),
+                        ("source/interface/tpmv.c", 7187),
+                        ("source/interface/tpsv.c", 6326),
+                        ("source/interface/trmv.c", 7386),
+                        ("source/interface/trsm.c", 10851),
+                        ("source/interface/trsv.c", 6507),
+                        ("source/interface/zaxpby.c", 2590),
+                        ("source/interface/zaxpy.c", 4251),
+                        ("source/interface/zdot.c", 5679),
+                        ("source/interface/zgbmv.c", 7719),
+                        ("source/interface/zgeadd.c", 4443),
+                        ("source/interface/zgemv.c", 8012),
+                        ("source/interface/zger.c", 6784),
+                        ("source/interface/zhbmv.c", 6729),
+                        ("source/interface/zhemv.c", 6526),
+                        ("source/interface/zher.c", 5690),
+                        ("source/interface/zher2.c", 6147),
+                        ("source/interface/zhpmv.c", 6250),
+                        ("source/interface/zhpr.c", 5545),
+                        ("source/interface/zhpr2.c", 6008),
+                        ("source/interface/zimatcopy.c", 7747),
+                        ("source/interface/zomatcopy.c", 5305),
+                        ("source/interface/zrot.c", 3230),
+                        ("source/interface/zrotg.c", 2443),
+                        ("source/interface/zsbmv.c", 5234),
+                        ("source/interface/zscal.c", 3935),
+                        ("source/interface/zspmv.c", 4973),
+                        ("source/interface/zspr.c", 4555),
+                        ("source/interface/zspr2.c", 4759),
+                        ("source/interface/zswap.c", 3983),
+                        ("source/interface/zsymv.c", 4866),
+                        ("source/interface/zsyr.c", 5721),
+                        ("source/interface/zsyr2.c", 4862),
+                        ("source/interface/ztbmv.c", 8291),
+                        ("source/interface/ztbsv.c", 6958),
+                        ("source/interface/ztpmv.c", 7912),
+                        ("source/interface/ztpsv.c", 6606),
+                        ("source/interface/ztrmv.c", 8631),
+                        ("source/interface/ztrsv.c", 6789),
+                        ("source/kernel/alpha/amax.S", 6259),
+                        ("source/kernel/alpha/asum.S", 4773),
+                        ("source/kernel/alpha/axpy.S", 8982),
+                        ("source/kernel/alpha/cabs.S", 3087),
+                        ("source/kernel/alpha/cnrm2.S", 7800),
+                        ("source/kernel/alpha/copy.S", 7642),
+                        ("source/kernel/alpha/cscal.S", 5464),
+                        ("source/kernel/alpha/dnrm2.S", 7835),
+                        ("source/kernel/alpha/dot.S", 9531),
+                        ("source/kernel/alpha/gemm_beta.S", 4754),
+                        ("source/kernel/alpha/gemm_kernel_4x4.S", 41613),
+                        ("source/kernel/alpha/gemv_n.S", 22325),
+                        ("source/kernel/alpha/gemv_t.S", 17351),
+                        ("source/kernel/alpha/iamax.S", 8617),
+                        ("source/kernel/alpha/imax.S", 7483),
+                        ("source/kernel/alpha/izamax.S", 8305),
+                        ("source/kernel/alpha/KERNEL", 2532),
+                        ("source/kernel/alpha/lsame.S", 3171),
+                        ("source/kernel/alpha/Makefile", 10),
+                        ("source/kernel/alpha/max.S", 5632),
+                        ("source/kernel/alpha/rot.S", 10515),
+                        ("source/kernel/alpha/scal.S", 8916),
+                        ("source/kernel/alpha/snrm2.S", 7835),
+                        ("source/kernel/alpha/staticbuffer.S", 2795),
+                        ("source/kernel/alpha/swap.S", 6195),
+                        ("source/kernel/alpha/trsm_kernel_4x4_LN.S", 58951),
+                        ("source/kernel/alpha/trsm_kernel_4x4_LT.S", 58949),
+                        ("source/kernel/alpha/trsm_kernel_4x4_RT.S", 58949),
+                        ("source/kernel/alpha/zamax.S", 6450),
+                        ("source/kernel/alpha/zasum.S", 4716),
+                        ("source/kernel/alpha/zaxpy.S", 11874),
+                        ("source/kernel/alpha/zdot.S", 8690),
+                        ("source/kernel/alpha/zgemm_beta.S", 4919),
+                        ("source/kernel/alpha/zgemm_kernel_2x2.S", 25981),
+                        ("source/kernel/alpha/zgemv_n.S", 17491),
+                        ("source/kernel/alpha/zgemv_t.S", 14935),
+                        ("source/kernel/alpha/znrm2.S", 7800),
+                        ("source/kernel/alpha/zrot.S", 10658),
+                        ("source/kernel/alpha/zscal.S", 5789),
+                        ("source/kernel/alpha/zswap.S", 6087),
+                        ("source/kernel/alpha/ztrsm_kernel_2x2_LN.S", 32936),
+                        ("source/kernel/alpha/ztrsm_kernel_2x2_LT.S", 32879),
+                        ("source/kernel/alpha/ztrsm_kernel_2x2_RT.S", 32879),
+                        ("source/kernel/arm/amax.c", 2341),
+                        ("source/kernel/arm/amin.c", 2341),
+                        ("source/kernel/arm/asum.c", 2251),
+                        ("source/kernel/arm/asum_vfp.S", 8538),
+                        ("source/kernel/arm/axpby.c", 2370),
+                        ("source/kernel/arm/axpy.c", 2310),
+                        ("source/kernel/arm/axpy_vfp.S", 8905),
+                        ("source/kernel/arm/ccopy_vfp.S", 4768),
+                        ("source/kernel/arm/cdot_vfp.S", 6110),
+                        ("source/kernel/arm/cgemm_kernel_2x2_vfp.S", 19143),
+                        ("source/kernel/arm/cgemm_kernel_2x2_vfpv3.S", 21499),
+                        ("source/kernel/arm/cgemm_ncopy_2_vfp.S", 5407),
+                        ("source/kernel/arm/cgemm_tcopy_2_vfp.S", 5286),
+                        ("source/kernel/arm/cgemv_n_vfp.S", 13316),
+                        ("source/kernel/arm/cgemv_t_vfp.S", 10653),
+                        ("source/kernel/arm/copy.c", 2184),
+                        ("source/kernel/arm/ctrmm_kernel_2x2_vfp.S", 23578),
+                        ("source/kernel/arm/ctrmm_kernel_2x2_vfpv3.S", 25103),
+                        ("source/kernel/arm/dcopy_vfp.S", 4700),
+                        ("source/kernel/arm/ddot_vfp.S", 5382),
+                        ("source/kernel/arm/dgemm_kernel_4x2_vfp.S", 12670),
+                        ("source/kernel/arm/dgemm_kernel_4x4_vfpv3.S", 22739),
+                        ("source/kernel/arm/dgemm_ncopy_2_vfp.S", 4580),
+                        ("source/kernel/arm/dgemm_ncopy_4_vfp.S", 6652),
+                        ("source/kernel/arm/dgemm_tcopy_4_vfp.S", 7469),
+                        ("source/kernel/arm/dot.c", 2324),
+                        ("source/kernel/arm/dtrmm_kernel_4x2_vfp.S", 19253),
+                        ("source/kernel/arm/dtrmm_kernel_4x4_vfpv3.S", 33356),
+                        ("source/kernel/arm/gemv_n.c", 2399),
+                        ("source/kernel/arm/gemv_n_vfp.S", 11732),
+                        ("source/kernel/arm/gemv_n_vfpv3.S", 12707),
+                        ("source/kernel/arm/gemv_t.c", 2414),
+                        ("source/kernel/arm/gemv_t_vfp.S", 12339),
+                        ("source/kernel/arm/gemv_t_vfpv3.S", 12207),
+                        ("source/kernel/arm/iamax.c", 2373),
+                        ("source/kernel/arm/iamax_vfp.S", 7546),
+                        ("source/kernel/arm/iamin.c", 2386),
+                        ("source/kernel/arm/imax.c", 2295),
+                        ("source/kernel/arm/imin.c", 2235),
+                        ("source/kernel/arm/izamax.c", 2457),
+                        ("source/kernel/arm/izamin.c", 2465),
+                        ("source/kernel/arm/KERNEL", 675),
+                        ("source/kernel/arm/KERNEL.ARMV5", 3616),
+                        ("source/kernel/arm/KERNEL.ARMV6", 3664),
+                        ("source/kernel/arm/KERNEL.ARMV7", 3415),
+                        ("source/kernel/arm/KERNEL.CORTEXA15", 33),
+                        ("source/kernel/arm/KERNEL.CORTEXA9", 33),
+                        ("source/kernel/arm/Makefile", 10),
+                        ("source/kernel/arm/max.c", 2261),
+                        ("source/kernel/arm/min.c", 2261),
+                        ("source/kernel/arm/nrm2.c", 2572),
+                        ("source/kernel/arm/nrm2_vfp.S", 12993),
+                        ("source/kernel/arm/nrm2_vfpv3.S", 12258),
+                        ("source/kernel/arm/omatcopy_cn.c", 2519),
+                        ("source/kernel/arm/omatcopy_ct.c", 2520),
+                        ("source/kernel/arm/omatcopy_rn.c", 2519),
+                        ("source/kernel/arm/omatcopy_rt.c", 2196),
+                        ("source/kernel/arm/rot.c", 2278),
+                        ("source/kernel/arm/rot_vfp.S", 11115),
+                        ("source/kernel/arm/scal.c", 2236),
+                        ("source/kernel/arm/scal_vfp.S", 6727),
+                        ("source/kernel/arm/scopy_vfp.S", 4750),
+                        ("source/kernel/arm/sdot_vfp.S", 6641),
+                        ("source/kernel/arm/sgemm_kernel_4x2_vfp.S", 12524),
+                        ("source/kernel/arm/sgemm_kernel_4x4_vfpv3.S", 22163),
+                        ("source/kernel/arm/sgemm_ncopy_2_vfp.S", 4577),
+                        ("source/kernel/arm/sgemm_ncopy_4_vfp.S", 6694),
+                        ("source/kernel/arm/sgemm_tcopy_4_vfp.S", 7709),
+                        ("source/kernel/arm/strmm_kernel_4x2_vfp.S", 19129),
+                        ("source/kernel/arm/strmm_kernel_4x4_vfpv3.S", 32044),
+                        ("source/kernel/arm/swap.c", 2294),
+                        ("source/kernel/arm/swap_vfp.S", 6328),
+                        ("source/kernel/arm/symv_L.c", 2334),
+                        ("source/kernel/arm/symv_U.c", 2361),
+                        ("source/kernel/arm/zamax.c", 2424),
+                        ("source/kernel/arm/zamin.c", 2424),
+                        ("source/kernel/arm/zasum.c", 2336),
+                        ("source/kernel/arm/zaxpby.c", 3121),
+                        ("source/kernel/arm/zaxpy.c", 2633),
+                        ("source/kernel/arm/zcopy.c", 2287),
+                        ("source/kernel/arm/zcopy_vfp.S", 4791),
+                        ("source/kernel/arm/zdot.c", 2834),
+                        ("source/kernel/arm/zdot_vfp.S", 6236),
+                        ("source/kernel/arm/zgemm_kernel_2x2_vfp.S", 19926),
+                        ("source/kernel/arm/zgemm_kernel_2x2_vfpv3.S", 22175),
+                        ("source/kernel/arm/zgemm_ncopy_2_vfp.S", 5362),
+                        ("source/kernel/arm/zgemm_tcopy_2_vfp.S", 5330),
+                        ("source/kernel/arm/zgemv_n.c", 4302),
+                        ("source/kernel/arm/zgemv_n_vfp.S", 13364),
+                        ("source/kernel/arm/zgemv_t.c", 3893),
+                        ("source/kernel/arm/zgemv_t_vfp.S", 10670),
+                        ("source/kernel/arm/znrm2.c", 2802),
+                        ("source/kernel/arm/zomatcopy_cn.c", 2359),
+                        ("source/kernel/arm/zomatcopy_cnc.c", 2375),
+                        ("source/kernel/arm/zomatcopy_ct.c", 2385),
+                        ("source/kernel/arm/zomatcopy_ctc.c", 2400),
+                        ("source/kernel/arm/zomatcopy_rn.c", 2361),
+                        ("source/kernel/arm/zomatcopy_rnc.c", 2376),
+                        ("source/kernel/arm/zomatcopy_rt.c", 2386),
+                        ("source/kernel/arm/zomatcopy_rtc.c", 2401),
+                        ("source/kernel/arm/zrot.c", 2480),
+                        ("source/kernel/arm/zscal.c", 2671),
+                        ("source/kernel/arm/zswap.c", 2514),
+                        ("source/kernel/arm/ztrmm_kernel_2x2_vfp.S", 25243),
+                        ("source/kernel/arm/ztrmm_kernel_2x2_vfpv3.S", 26330),
+                        ("source/kernel/arm64/amax.S", 4958),
+                        ("source/kernel/arm64/asum.S", 4355),
+                        ("source/kernel/arm64/axpy.S", 4636),
+                        ("source/kernel/arm64/casum.S", 3887),
+                        ("source/kernel/arm64/cgemm_kernel_4x4.S", 34901),
+                        ("source/kernel/arm64/cgemm_kernel_8x4.S", 42580),
+                        ("source/kernel/arm64/copy.S", 4757),
+                        ("source/kernel/arm64/ctrmm_kernel_4x4.S", 33014),
+                        ("source/kernel/arm64/ctrmm_kernel_8x4.S", 50092),
+                        ("source/kernel/arm64/dgemm_kernel_4x4.S", 25456),
+                        ("source/kernel/arm64/dgemm_kernel_4x8.S", 30961),
+                        ("source/kernel/arm64/dgemm_kernel_8x4.S", 28494),
+                        ("source/kernel/arm64/dnrm2.S", 3846),
+                        ("source/kernel/arm64/dot.S", 4900),
+                        ("source/kernel/arm64/dtrmm_kernel_4x4.S", 26164),
+                        ("source/kernel/arm64/dtrmm_kernel_4x8.S", 38564),
+                        ("source/kernel/arm64/dtrmm_kernel_8x4.S", 35338),
+                        ("source/kernel/arm64/gemv_n.S", 7023),
+                        ("source/kernel/arm64/gemv_t.S", 7703),
+                        ("source/kernel/arm64/iamax.S", 3441),
+                        ("source/kernel/arm64/izamax.S", 3728),
+                        ("source/kernel/arm64/KERNEL", 675),
+                        ("source/kernel/arm64/KERNEL.ARMV8", 3607),
+                        ("source/kernel/arm64/KERNEL.CORTEXA57", 3391),
+                        ("source/kernel/arm64/KERNEL.XGENE1", 33),
+                        ("source/kernel/arm64/Makefile", 10),
+                        ("source/kernel/arm64/nrm2.S", 4625),
+                        ("source/kernel/arm64/rot.S", 5964),
+                        ("source/kernel/arm64/scal.S", 5097),
+                        ("source/kernel/arm64/sgemm_kernel_16x4.S", 37170),
+                        ("source/kernel/arm64/sgemm_kernel_4x4.S", 29587),
+                        ("source/kernel/arm64/sgemm_kernel_8x8.S", 43112),
+                        ("source/kernel/arm64/snrm2.S", 3958),
+                        ("source/kernel/arm64/strmm_kernel_16x4.S", 46981),
+                        ("source/kernel/arm64/strmm_kernel_4x4.S", 26529),
+                        ("source/kernel/arm64/strmm_kernel_8x8.S", 53268),
+                        ("source/kernel/arm64/swap.S", 5577),
+                        ("source/kernel/arm64/zamax.S", 5721),
+                        ("source/kernel/arm64/zasum.S", 3743),
+                        ("source/kernel/arm64/zaxpy.S", 7494),
+                        ("source/kernel/arm64/zdot.S", 8311),
+                        ("source/kernel/arm64/zgemm_kernel_4x4.S", 34243),
+                        ("source/kernel/arm64/zgemv_n.S", 14592),
+                        ("source/kernel/arm64/zgemv_t.S", 10641),
+                        ("source/kernel/arm64/znrm2.S", 5967),
+                        ("source/kernel/arm64/zrot.S", 6741),
+                        ("source/kernel/arm64/zscal.S", 8718),
+                        ("source/kernel/arm64/ztrmm_kernel_4x4.S", 39998),
+                        ("source/kernel/CMakeLists.txt", 30263),
+                        ("source/kernel/generic/cabs.c", 2762),
+                        ("source/kernel/generic/dot.c", 2727),
+                        ("source/kernel/generic/geadd.c", 2188),
+                        ("source/kernel/generic/gemm_beta.c", 4591),
+                        ("source/kernel/generic/gemm_ncopy_1.c", 3595),
+                        ("source/kernel/generic/gemm_ncopy_16.c", 11643),
+                        ("source/kernel/generic/gemm_ncopy_2.c", 4295),
+                        ("source/kernel/generic/gemm_ncopy_4.c", 6472),
+                        ("source/kernel/generic/gemm_ncopy_6.c", 6472),
+                        ("source/kernel/generic/gemm_ncopy_8.c", 11530),
+                        ("source/kernel/generic/gemm_tcopy_1.c", 3223),
+                        ("source/kernel/generic/gemm_tcopy_16.c", 10402),
+                        ("source/kernel/generic/gemm_tcopy_2.c", 3877),
+                        ("source/kernel/generic/gemm_tcopy_4.c", 7558),
+                        ("source/kernel/generic/gemm_tcopy_6.c", 7558),
+                        ("source/kernel/generic/gemm_tcopy_8.c", 20411),
+                        ("source/kernel/generic/gemmkernel_2x2.c", 4781),
+                        ("source/kernel/generic/ger.c", 3088),
+                        ("source/kernel/generic/imatcopy_cn.c", 2306),
+                        ("source/kernel/generic/imatcopy_ct.c", 2672),
+                        ("source/kernel/generic/imatcopy_rn.c", 2311),
+                        ("source/kernel/generic/imatcopy_rt.c", 2292),
+                        ("source/kernel/generic/laswp_ncopy_1.c", 4264),
+                        ("source/kernel/generic/laswp_ncopy_2.c", 6499),
+                        ("source/kernel/generic/laswp_ncopy_4.c", 9950),
+                        ("source/kernel/generic/laswp_ncopy_8.c", 7327),
+                        ("source/kernel/generic/lsame.c", 2813),
+                        ("source/kernel/generic/neg_tcopy_1.c", 3224),
+                        ("source/kernel/generic/neg_tcopy_16.c", 10495),
+                        ("source/kernel/generic/neg_tcopy_2.c", 3887),
+                        ("source/kernel/generic/neg_tcopy_4.c", 7607),
+                        ("source/kernel/generic/neg_tcopy_8.c", 20636),
+                        ("source/kernel/generic/symm_lcopy_1.c", 3247),
+                        ("source/kernel/generic/symm_lcopy_16.c", 9969),
+                        ("source/kernel/generic/symm_lcopy_2.c", 3788),
+                        ("source/kernel/generic/symm_lcopy_4.c", 4738),
+                        ("source/kernel/generic/symm_lcopy_6.c", 4738),
+                        ("source/kernel/generic/symm_lcopy_8.c", 6482),
+                        ("source/kernel/generic/symm_ucopy_1.c", 3243),
+                        ("source/kernel/generic/symm_ucopy_16.c", 9979),
+                        ("source/kernel/generic/symm_ucopy_2.c", 3787),
+                        ("source/kernel/generic/symm_ucopy_4.c", 4736),
+                        ("source/kernel/generic/symm_ucopy_6.c", 4736),
+                        ("source/kernel/generic/symm_ucopy_8.c", 6482),
+                        ("source/kernel/generic/symv_k.c", 4635),
+                        ("source/kernel/generic/trmm_lncopy_1.c", 3452),
+                        ("source/kernel/generic/trmm_lncopy_16.c", 32606),
+                        ("source/kernel/generic/trmm_lncopy_2.c", 5110),
+                        ("source/kernel/generic/trmm_lncopy_4.c", 10221),
+                        ("source/kernel/generic/trmm_lncopy_6.c", 10221),
+                        ("source/kernel/generic/trmm_lncopy_8.c", 23848),
+                        ("source/kernel/generic/trmm_ltcopy_1.c", 3456),
+                        ("source/kernel/generic/trmm_ltcopy_16.c", 31993),
+                        ("source/kernel/generic/trmm_ltcopy_2.c", 5123),
+                        ("source/kernel/generic/trmm_ltcopy_4.c", 10375),
+                        ("source/kernel/generic/trmm_ltcopy_6.c", 10375),
+                        ("source/kernel/generic/trmm_ltcopy_8.c", 24480),
+                        ("source/kernel/generic/trmm_uncopy_1.c", 3419),
+                        ("source/kernel/generic/trmm_uncopy_16.c", 31511),
+                        ("source/kernel/generic/trmm_uncopy_2.c", 5067),
+                        ("source/kernel/generic/trmm_uncopy_4.c", 10278),
+                        ("source/kernel/generic/trmm_uncopy_6.c", 16345),
+                        ("source/kernel/generic/trmm_uncopy_8.c", 23957),
+                        ("source/kernel/generic/trmm_utcopy_1.c", 3424),
+                        ("source/kernel/generic/trmm_utcopy_16.c", 31026),
+                        ("source/kernel/generic/trmm_utcopy_2.c", 5039),
+                        ("source/kernel/generic/trmm_utcopy_4.c", 10166),
+                        ("source/kernel/generic/trmm_utcopy_6.c", 10166),
+                        ("source/kernel/generic/trmm_utcopy_8.c", 26243),
+                        ("source/kernel/generic/trmmkernel_16x2.c", 17914),
+                        ("source/kernel/generic/trmmkernel_2x2.c", 7236),
+                        ("source/kernel/generic/trmmkernel_4x4.c", 13901),
+                        ("source/kernel/generic/trmmkernel_4x8.c", 22145),
+                        ("source/kernel/generic/trmmkernel_8x2.c", 11741),
+                        ("source/kernel/generic/trsm_kernel_LN.c", 8558),
+                        ("source/kernel/generic/trsm_kernel_LT.c", 7698),
+                        ("source/kernel/generic/trsm_kernel_RN.c", 7646),
+                        ("source/kernel/generic/trsm_kernel_RT.c", 8277),
+                        ("source/kernel/generic/trsm_lncopy_1.c", 3308),
+                        ("source/kernel/generic/trsm_lncopy_16.c", 6684),
+                        ("source/kernel/generic/trsm_lncopy_2.c", 4225),
+                        ("source/kernel/generic/trsm_lncopy_4.c", 6945),
+                        ("source/kernel/generic/trsm_lncopy_6.c", 6945),
+                        ("source/kernel/generic/trsm_lncopy_8.c", 16032),
+                        ("source/kernel/generic/trsm_ltcopy_1.c", 3308),
+                        ("source/kernel/generic/trsm_ltcopy_16.c", 5464),
+                        ("source/kernel/generic/trsm_ltcopy_2.c", 4284),
+                        ("source/kernel/generic/trsm_ltcopy_4.c", 7260),
+                        ("source/kernel/generic/trsm_ltcopy_6.c", 7260),
+                        ("source/kernel/generic/trsm_ltcopy_8.c", 17794),
+                        ("source/kernel/generic/trsm_uncopy_1.c", 3308),
+                        ("source/kernel/generic/trsm_uncopy_16.c", 6699),
+                        ("source/kernel/generic/trsm_uncopy_2.c", 4271),
+                        ("source/kernel/generic/trsm_uncopy_4.c", 7261),
+                        ("source/kernel/generic/trsm_uncopy_6.c", 7261),
+                        ("source/kernel/generic/trsm_uncopy_8.c", 17879),
+                        ("source/kernel/generic/trsm_utcopy_1.c", 3307),
+                        ("source/kernel/generic/trsm_utcopy_16.c", 5511),
+                        ("source/kernel/generic/trsm_utcopy_2.c", 4239),
+                        ("source/kernel/generic/trsm_utcopy_4.c", 6956),
+                        ("source/kernel/generic/trsm_utcopy_6.c", 6956),
+                        ("source/kernel/generic/trsm_utcopy_8.c", 15870),
+                        ("source/kernel/generic/zgeadd.c", 2285),
+                        ("source/kernel/generic/zgemm3m_ncopy_1.c", 3537),
+                        ("source/kernel/generic/zgemm3m_ncopy_2.c", 4087),
+                        ("source/kernel/generic/zgemm3m_ncopy_4.c", 4769),
+                        ("source/kernel/generic/zgemm3m_ncopy_8.c", 6493),
+                        ("source/kernel/generic/zgemm3m_tcopy_1.c", 3537),
+                        ("source/kernel/generic/zgemm3m_tcopy_2.c", 4905),
+                        ("source/kernel/generic/zgemm3m_tcopy_4.c", 9245),
+                        ("source/kernel/generic/zgemm3m_tcopy_8.c", 27577),
+                        ("source/kernel/generic/zgemm3mkernel_dump.c", 1812),
+                        ("source/kernel/generic/zgemm_beta.c", 4963),
+                        ("source/kernel/generic/zgemm_ncopy_1.c", 3897),
+                        ("source/kernel/generic/zgemm_ncopy_2.c", 5532),
+                        ("source/kernel/generic/zgemm_ncopy_4.c", 10586),
+                        ("source/kernel/generic/zgemm_ncopy_4_sandy.c", 7310),
+                        ("source/kernel/generic/zgemm_ncopy_8.c", 6327),
+                        ("source/kernel/generic/zgemm_ncopy_8_sandy.c", 12454),
+                        ("source/kernel/generic/zgemm_tcopy_1.c", 4059),
+                        ("source/kernel/generic/zgemm_tcopy_2.c", 6465),
+                        ("source/kernel/generic/zgemm_tcopy_4.c", 10910),
+                        ("source/kernel/generic/zgemm_tcopy_4_sandy.c", 7286),
+                        ("source/kernel/generic/zgemm_tcopy_8.c", 9969),
+                        ("source/kernel/generic/zgemm_tcopy_8_sandy.c", 11592),
+                        ("source/kernel/generic/zgemmkernel_2x2.c", 32678),
+                        ("source/kernel/generic/zger.c", 3429),
+                        ("source/kernel/generic/zhemm3m_lcopy_1.c", 3895),
+                        ("source/kernel/generic/zhemm3m_lcopy_2.c", 4889),
+                        ("source/kernel/generic/zhemm3m_lcopy_4.c", 7008),
+                        ("source/kernel/generic/zhemm3m_lcopy_8.c", 12485),
+                        ("source/kernel/generic/zhemm3m_ucopy_1.c", 3896),
+                        ("source/kernel/generic/zhemm3m_ucopy_2.c", 4895),
+                        ("source/kernel/generic/zhemm3m_ucopy_4.c", 7023),
+                        ("source/kernel/generic/zhemm3m_ucopy_8.c", 12485),
+                        ("source/kernel/generic/zhemm_ltcopy_1.c", 3466),
+                        ("source/kernel/generic/zhemm_ltcopy_2.c", 4511),
+                        ("source/kernel/generic/zhemm_ltcopy_4.c", 6704),
+                        ("source/kernel/generic/zhemm_ltcopy_8.c", 12213),
+                        ("source/kernel/generic/zhemm_utcopy_1.c", 3464),
+                        ("source/kernel/generic/zhemm_utcopy_2.c", 4509),
+                        ("source/kernel/generic/zhemm_utcopy_4.c", 6702),
+                        ("source/kernel/generic/zhemm_utcopy_8.c", 12210),
+                        ("source/kernel/generic/zhemv_k.c", 5677),
+                        ("source/kernel/generic/zimatcopy_cn.c", 2373),
+                        ("source/kernel/generic/zimatcopy_cnc.c", 2388),
+                        ("source/kernel/generic/zimatcopy_ct.c", 2728),
+                        ("source/kernel/generic/zimatcopy_ctc.c", 2803),
+                        ("source/kernel/generic/zimatcopy_rn.c", 2324),
+                        ("source/kernel/generic/zimatcopy_rnc.c", 2326),
+                        ("source/kernel/generic/zimatcopy_rt.c", 2728),
+                        ("source/kernel/generic/zimatcopy_rtc.c", 2779),
+                        ("source/kernel/generic/zlaswp_ncopy_1.c", 5048),
+                        ("source/kernel/generic/zlaswp_ncopy_2.c", 8674),
+                        ("source/kernel/generic/zlaswp_ncopy_4.c", 15187),
+                        ("source/kernel/generic/zneg_tcopy_1.c", 4069),
+                        ("source/kernel/generic/zneg_tcopy_2.c", 6507),
+                        ("source/kernel/generic/zneg_tcopy_4.c", 11008),
+                        ("source/kernel/generic/zneg_tcopy_8.c", 10059),
+                        ("source/kernel/generic/zsymm3m_lcopy_1.c", 3751),
+                        ("source/kernel/generic/zsymm3m_lcopy_2.c", 4357),
+                        ("source/kernel/generic/zsymm3m_lcopy_4.c", 5428),
+                        ("source/kernel/generic/zsymm3m_lcopy_8.c", 7422),
+                        ("source/kernel/generic/zsymm3m_ucopy_1.c", 3750),
+                        ("source/kernel/generic/zsymm3m_ucopy_2.c", 4356),
+                        ("source/kernel/generic/zsymm3m_ucopy_4.c", 5429),
+                        ("source/kernel/generic/zsymm3m_ucopy_8.c", 7423),
+                        ("source/kernel/generic/zsymm_lcopy_1.c", 3328),
+                        ("source/kernel/generic/zsymm_lcopy_2.c", 4004),
+                        ("source/kernel/generic/zsymm_lcopy_4.c", 5215),
+                        ("source/kernel/generic/zsymm_lcopy_8.c", 7494),
+                        ("source/kernel/generic/zsymm_ucopy_1.c", 3327),
+                        ("source/kernel/generic/zsymm_ucopy_2.c", 4003),
+                        ("source/kernel/generic/zsymm_ucopy_4.c", 5213),
+                        ("source/kernel/generic/zsymm_ucopy_8.c", 7494),
+                        ("source/kernel/generic/zsymv_k.c", 4919),
+                        ("source/kernel/generic/ztrmm_lncopy_1.c", 3681),
+                        ("source/kernel/generic/ztrmm_lncopy_2.c", 5887),
+                        ("source/kernel/generic/ztrmm_lncopy_4.c", 14272),
+                        ("source/kernel/generic/ztrmm_lncopy_8.c", 18526),
+                        ("source/kernel/generic/ztrmm_ltcopy_1.c", 3686),
+                        ("source/kernel/generic/ztrmm_ltcopy_2.c", 5986),
+                        ("source/kernel/generic/ztrmm_ltcopy_4.c", 14801),
+                        ("source/kernel/generic/ztrmm_ltcopy_8.c", 18935),
+                        ("source/kernel/generic/ztrmm_uncopy_1.c", 3687),
+                        ("source/kernel/generic/ztrmm_uncopy_2.c", 6022),
+                        ("source/kernel/generic/ztrmm_uncopy_4.c", 14564),
+                        ("source/kernel/generic/ztrmm_uncopy_8.c", 19109),
+                        ("source/kernel/generic/ztrmm_utcopy_1.c", 3689),
+                        ("source/kernel/generic/ztrmm_utcopy_2.c", 5993),
+                        ("source/kernel/generic/ztrmm_utcopy_4.c", 14328),
+                        ("source/kernel/generic/ztrmm_utcopy_8.c", 18750),
+                        ("source/kernel/generic/ztrmmkernel_2x2.c", 24137),
+                        ("source/kernel/generic/ztrmmkernel_4x4.c", 17736),
+                        ("source/kernel/generic/ztrsm_lncopy_1.c", 3338),
+                        ("source/kernel/generic/ztrsm_lncopy_2.c", 4644),
+                        ("source/kernel/generic/ztrsm_lncopy_4.c", 9334),
+                        ("source/kernel/generic/ztrsm_lncopy_8.c", 6178),
+                        ("source/kernel/generic/ztrsm_ltcopy_1.c", 3338),
+                        ("source/kernel/generic/ztrsm_ltcopy_2.c", 4743),
+                        ("source/kernel/generic/ztrsm_ltcopy_4.c", 9955),
+                        ("source/kernel/generic/ztrsm_ltcopy_8.c", 5512),
+                        ("source/kernel/generic/ztrsm_uncopy_1.c", 3337),
+                        ("source/kernel/generic/ztrsm_uncopy_2.c", 4729),
+                        ("source/kernel/generic/ztrsm_uncopy_4.c", 10015),
+                        ("source/kernel/generic/ztrsm_uncopy_8.c", 6193),
+                        ("source/kernel/generic/ztrsm_utcopy_1.c", 3339),
+                        ("source/kernel/generic/ztrsm_utcopy_2.c", 4656),
+                        ("source/kernel/generic/ztrsm_utcopy_4.c", 9292),
+                        ("source/kernel/generic/ztrsm_utcopy_8.c", 5615),
+                        ("source/kernel/ia64/amax.S", 7889),
+                        ("source/kernel/ia64/asum.S", 7834),
+                        ("source/kernel/ia64/cabs.S", 2876),
+                        ("source/kernel/ia64/caxpy.S", 11286),
+                        ("source/kernel/ia64/copy.S", 15343),
+                        ("source/kernel/ia64/daxpy.S", 29387),
+                        ("source/kernel/ia64/ddot.S", 23704),
+                        ("source/kernel/ia64/gemm_beta.S", 9936),
+                        ("source/kernel/ia64/gemm_kernel.S", 146945),
+                        ("source/kernel/ia64/gemm_ncopy.S", 9142),
+                        ("source/kernel/ia64/gemm_tcopy.S", 28323),
+                        ("source/kernel/ia64/gemv_n.S", 62806),
+                        ("source/kernel/ia64/gemv_t.S", 59134),
+                        ("source/kernel/ia64/iamax.S", 12124),
+                        ("source/kernel/ia64/izamax.S", 10032),
+                        ("source/kernel/ia64/KERNEL", 3335),
+                        ("source/kernel/ia64/lsame.S", 3082),
+                        ("source/kernel/ia64/Makefile", 9),
+                        ("source/kernel/ia64/nrm2.S", 7287),
+                        ("source/kernel/ia64/qaxpy.S", 10348),
+                        ("source/kernel/ia64/qcopy.S", 11068),
+                        ("source/kernel/ia64/qdot.S", 9001),
+                        ("source/kernel/ia64/qgemm_kernel.S", 147425),
+                        ("source/kernel/ia64/qgemv_n.S", 35208),
+                        ("source/kernel/ia64/qgemv_t.S", 27801),
+                        ("source/kernel/ia64/qscal.S", 11611),
+                        ("source/kernel/ia64/rot.S", 15929),
+                        ("source/kernel/ia64/saxpy.S", 31415),
+                        ("source/kernel/ia64/scal.S", 16060),
+                        ("source/kernel/ia64/sdot.S", 23531),
+                        ("source/kernel/ia64/sgemv_n.S", 61710),
+                        ("source/kernel/ia64/staticbuffer.S", 2797),
+                        ("source/kernel/ia64/swap.S", 11073),
+                        ("source/kernel/ia64/symv_U.S", 10053),
+                        ("source/kernel/ia64/trsm_kernel_LN.S", 235341),
+                        ("source/kernel/ia64/trsm_kernel_LT.S", 180022),
+                        ("source/kernel/ia64/trsm_kernel_RT.S", 279342),
+                        ("source/kernel/ia64/xcopy.S", 10705),
+                        ("source/kernel/ia64/xdot.S", 10292),
+                        ("source/kernel/ia64/zaxpy.S", 16580),
+                        ("source/kernel/ia64/zcopy.S", 23901),
+                        ("source/kernel/ia64/zdot.S", 10299),
+                        ("source/kernel/ia64/zgemm3m_kernel.S", 109823),
+                        ("source/kernel/ia64/zgemm_beta.S", 10891),
+                        ("source/kernel/ia64/zgemm_kernel.S", 109304),
+                        ("source/kernel/ia64/zgemm_ncopy.S", 14173),
+                        ("source/kernel/ia64/zgemm_tcopy.S", 14776),
+                        ("source/kernel/ia64/zgemv_n.S", 46103),
+                        ("source/kernel/ia64/zgemv_t.S", 35663),
+                        ("source/kernel/ia64/zrot.S", 15686),
+                        ("source/kernel/ia64/zscal.S", 10838),
+                        ("source/kernel/ia64/zswap.S", 9745),
+                        ("source/kernel/ia64/ztrsm_kernel_LN.S", 171262),
+                        ("source/kernel/ia64/ztrsm_kernel_LT.S", 171250),
+                        ("source/kernel/ia64/ztrsm_kernel_RT.S", 171253),
+                        ("source/kernel/Makefile", 3409),
+                        ("source/kernel/Makefile.L1", 24351),
+                        ("source/kernel/Makefile.L2", 17513),
+                        ("source/kernel/Makefile.L3", 192522),
+                        ("source/kernel/Makefile.LA", 2305),
+                        ("source/kernel/mips64/amax.S", 5341),
+                        ("source/kernel/mips64/amin.S", 5341),
+                        ("source/kernel/mips64/asum.S", 5875),
+                        ("source/kernel/mips64/axpy.S", 8184),
+                        ("source/kernel/mips64/axpy_loongson3a.S", 10093),
+                        ("source/kernel/mips64/cgemm_kernel_loongson3a_2x2.S", 26784),
+                        (
+                            "source/kernel/mips64/cgemm_kernel_loongson3a_4x2_ps.S",
+                            75496
+                        ),
+                        ("source/kernel/mips64/cgemm_kernel_loongson3b_2x2.S", 26784),
+                        ("source/kernel/mips64/cnrm2.S", 4788),
+                        ("source/kernel/mips64/copy.S", 5900),
+                        ("source/kernel/mips64/daxpy_loongson3a_simd.S", 15663),
+                        ("source/kernel/mips64/dgemm_kernel_loongson3a_4x4.S", 39294),
+                        ("source/kernel/mips64/dgemm_kernel_loongson3b_4x4.S", 40870),
+                        ("source/kernel/mips64/dnrm2.S", 7396),
+                        ("source/kernel/mips64/dot.S", 6097),
+                        ("source/kernel/mips64/gemm_beta.S", 4679),
+                        ("source/kernel/mips64/gemm_kernel.S", 39690),
+                        ("source/kernel/mips64/gemv_n.S", 11890),
+                        ("source/kernel/mips64/gemv_n_loongson3a.c", 2691),
+                        ("source/kernel/mips64/gemv_t.S", 9966),
+                        ("source/kernel/mips64/gemv_t_loongson3a.c", 2471),
+                        ("source/kernel/mips64/iamax.S", 6063),
+                        ("source/kernel/mips64/iamin.S", 6063),
+                        ("source/kernel/mips64/imax.S", 5818),
+                        ("source/kernel/mips64/imin.S", 5818),
+                        ("source/kernel/mips64/izamax.S", 5669),
+                        ("source/kernel/mips64/izamin.S", 5669),
+                        ("source/kernel/mips64/KERNEL", 3240),
+                        ("source/kernel/mips64/KERNEL.LOONGSON3A", 2195),
+                        ("source/kernel/mips64/KERNEL.LOONGSON3B", 2054),
+                        ("source/kernel/mips64/Makefile", 10),
+                        ("source/kernel/mips64/max.S", 5038),
+                        ("source/kernel/mips64/min.S", 5038),
+                        ("source/kernel/mips64/rot.S", 7324),
+                        ("source/kernel/mips64/scal.S", 7555),
+                        ("source/kernel/mips64/sgemm_kernel_8x4_ps.S", 136808),
+                        ("source/kernel/mips64/sgemm_kernel_loongson3a_4x4.S", 40870),
+                        ("source/kernel/mips64/sgemm_kernel_loongson3b_4x4.S", 40870),
+                        ("source/kernel/mips64/snrm2.S", 6267),
+                        ("source/kernel/mips64/swap.S", 8099),
+                        ("source/kernel/mips64/symv_L.S", 13090),
+                        ("source/kernel/mips64/symv_U.S", 15060),
+                        ("source/kernel/mips64/trsm_kernel_LN.S", 58747),
+                        ("source/kernel/mips64/trsm_kernel_LN_loongson3a.S", 34616),
+                        ("source/kernel/mips64/trsm_kernel_LT.S", 58613),
+                        ("source/kernel/mips64/trsm_kernel_LT_loongson3a.S", 31383),
+                        ("source/kernel/mips64/trsm_kernel_RN_loongson3a.S", 34891),
+                        ("source/kernel/mips64/trsm_kernel_RT.S", 58619),
+                        ("source/kernel/mips64/trsm_kernel_RT_loongson3a.S", 33709),
+                        ("source/kernel/mips64/zamax.S", 5201),
+                        ("source/kernel/mips64/zamin.S", 5201),
+                        ("source/kernel/mips64/zasum.S", 4529),
+                        ("source/kernel/mips64/zaxpy.S", 9121),
+                        ("source/kernel/mips64/zcopy.S", 5704),
+                        ("source/kernel/mips64/zdot.S", 7878),
+                        ("source/kernel/mips64/zgemm3m_kernel.S", 30324),
+                        ("source/kernel/mips64/zgemm_kernel.S", 23484),
+                        ("source/kernel/mips64/zgemm_kernel_loongson3a_2x2.S", 25753),
+                        ("source/kernel/mips64/zgemm_kernel_loongson3b_2x2.S", 26784),
+                        ("source/kernel/mips64/zgemv_n.S", 14622),
+                        ("source/kernel/mips64/zgemv_n_loongson3a.c", 6328),
+                        ("source/kernel/mips64/zgemv_t.S", 12690),
+                        ("source/kernel/mips64/zgemv_t_loongson3a.c", 6308),
+                        ("source/kernel/mips64/znrm2.S", 7144),
+                        ("source/kernel/mips64/zrot.S", 7187),
+                        ("source/kernel/mips64/zscal.S", 8446),
+                        ("source/kernel/mips64/zswap.S", 7681),
+                        ("source/kernel/mips64/zsymv_L.S", 13997),
+                        ("source/kernel/mips64/zsymv_U.S", 14291),
+                        ("source/kernel/mips64/ztrsm_kernel_LT.S", 28493),
+                        ("source/kernel/mips64/ztrsm_kernel_RT.S", 28492),
+                        ("source/kernel/power/amax.S", 10483),
+                        ("source/kernel/power/amax_cell.S", 13013),
+                        ("source/kernel/power/amax_hummer.S", 9925),
+                        ("source/kernel/power/amax_ppc440.S", 7321),
+                        ("source/kernel/power/amin.S", 10435),
+                        ("source/kernel/power/amin_cell.S", 12924),
+                        ("source/kernel/power/amin_hummer.S", 9920),
+                        ("source/kernel/power/amin_ppc440.S", 7388),
+                        ("source/kernel/power/asum.S", 8515),
+                        ("source/kernel/power/asum_cell.S", 9558),
+                        ("source/kernel/power/asum_hummer.S", 8320),
+                        ("source/kernel/power/asum_ppc440.S", 6467),
+                        ("source/kernel/power/axpy.S", 11636),
+                        ("source/kernel/power/axpy_hummer.S", 12606),
+                        ("source/kernel/power/axpy_ppc440.S", 7932),
+                        ("source/kernel/power/cabs.S", 2830),
+                        ("source/kernel/power/cnrm2.S", 8826),
+                        ("source/kernel/power/cnrm2_hummer.S", 15583),
+                        ("source/kernel/power/cnrm2_ppc440.S", 6720),
+                        ("source/kernel/power/copy.S", 5542),
+                        ("source/kernel/power/copy_hummer.S", 16542),
+                        ("source/kernel/power/def_vsx.h", 1004),
+                        ("source/kernel/power/dgemm_kernel_16x4_power8.S", 8800),
+                        ("source/kernel/power/dgemm_logic_16x4_power8.S", 21668),
+                        ("source/kernel/power/dgemm_macros_16x4_power8.S", 56285),
+                        ("source/kernel/power/dnrm2_hummer.S", 18506),
+                        ("source/kernel/power/dnrm2_ppc440.S", 10987),
+                        ("source/kernel/power/dot.S", 9776),
+                        ("source/kernel/power/dot_cell.S", 9559),
+                        ("source/kernel/power/dot_hummer.S", 15766),
+                        ("source/kernel/power/dot_ppc440.S", 6966),
+                        ("source/kernel/power/dtrmm_kernel_16x4_power8.S", 9068),
+                        ("source/kernel/power/dtrmm_logic_16x4_power8.S", 40170),
+                        ("source/kernel/power/exfunc.S", 3031),
+                        ("source/kernel/power/gemm_beta.S", 6275),
+                        ("source/kernel/power/gemm_kernel.S", 47890),
+                        ("source/kernel/power/gemm_kernel_altivec.S", 49008),
+                        ("source/kernel/power/gemm_kernel_altivec_cell.S", 49047),
+                        ("source/kernel/power/gemm_kernel_altivec_g4.S", 47951),
+                        ("source/kernel/power/gemm_kernel_cell.S", 46733),
+                        ("source/kernel/power/gemm_kernel_g4.S", 42723),
+                        ("source/kernel/power/gemm_kernel_hummer.S", 122222),
+                        ("source/kernel/power/gemm_kernel_power3.S", 30068),
+                        ("source/kernel/power/gemm_kernel_power6.S", 47391),
+                        ("source/kernel/power/gemm_kernel_ppc440.S", 43995),
+                        ("source/kernel/power/gemm_ncopy_4.S", 7726),
+                        ("source/kernel/power/gemm_ncopy_hummer_4.S", 14390),
+                        ("source/kernel/power/gemm_ncopy_hummer_8.S", 22359),
+                        ("source/kernel/power/gemm_tcopy_4.S", 9181),
+                        ("source/kernel/power/gemm_tcopy_hummer_4.S", 9378),
+                        ("source/kernel/power/gemm_tcopy_hummer_8.S", 23385),
+                        ("source/kernel/power/gemv_hummer_n.S", 32177),
+                        ("source/kernel/power/gemv_n.S", 63166),
+                        ("source/kernel/power/gemv_n_ppc440.S", 23669),
+                        ("source/kernel/power/gemv_t.S", 57193),
+                        ("source/kernel/power/gemv_t_ppc440.S", 20269),
+                        ("source/kernel/power/ger.S", 24211),
+                        ("source/kernel/power/iamax.S", 14507),
+                        ("source/kernel/power/iamax_hummer.S", 16485),
+                        ("source/kernel/power/iamax_ppc440.S", 9492),
+                        ("source/kernel/power/iamin.S", 14476),
+                        ("source/kernel/power/iamin_hummer.S", 16478),
+                        ("source/kernel/power/iamin_ppc440.S", 9461),
+                        ("source/kernel/power/imax.S", 12992),
+                        ("source/kernel/power/imax_hummer.S", 14613),
+                        ("source/kernel/power/imax_ppc440.S", 8770),
+                        ("source/kernel/power/imin.S", 12936),
+                        ("source/kernel/power/imin_hummer.S", 14605),
+                        ("source/kernel/power/imin_ppc440.S", 8600),
+                        ("source/kernel/power/izamax.S", 15703),
+                        ("source/kernel/power/izamax_hummer.S", 10152),
+                        ("source/kernel/power/izamax_ppc440.S", 10018),
+                        ("source/kernel/power/izamin.S", 15688),
+                        ("source/kernel/power/izamin_hummer.S", 10148),
+                        ("source/kernel/power/izamin_ppc440.S", 9999),
+                        ("source/kernel/power/KERNEL", 851),
+                        ("source/kernel/power/KERNEL.CELL", 2476),
+                        ("source/kernel/power/KERNEL.POWER3", 36),
+                        ("source/kernel/power/KERNEL.POWER4", 35),
+                        ("source/kernel/power/KERNEL.POWER5", 1738),
+                        ("source/kernel/power/KERNEL.POWER6", 2082),
+                        ("source/kernel/power/KERNEL.POWER8", 5084),
+                        ("source/kernel/power/KERNEL.PPC440", 3276),
+                        ("source/kernel/power/KERNEL.PPC440FP2", 3938),
+                        ("source/kernel/power/KERNEL.PPC970", 1988),
+                        ("source/kernel/power/KERNEL.PPCG4", 3488),
+                        ("source/kernel/power/lock.c", 3087),
+                        ("source/kernel/power/lsame.S", 3106),
+                        ("source/kernel/power/Makefile", 9),
+                        ("source/kernel/power/max.S", 9498),
+                        ("source/kernel/power/max_hummer.S", 9186),
+                        ("source/kernel/power/max_ppc440.S", 6726),
+                        ("source/kernel/power/min.S", 9442),
+                        ("source/kernel/power/min_hummer.S", 9182),
+                        ("source/kernel/power/min_ppc440.S", 6698),
+                        ("source/kernel/power/nrm2.S", 16926),
+                        ("source/kernel/power/rot.S", 11584),
+                        ("source/kernel/power/rot_ppc440.S", 6750),
+                        ("source/kernel/power/scal.S", 8557),
+                        ("source/kernel/power/scal_hummer.S", 9155),
+                        ("source/kernel/power/scal_ppc440.S", 5574),
+                        ("source/kernel/power/snrm2.S", 8666),
+                        ("source/kernel/power/snrm2_hummer.S", 12026),
+                        ("source/kernel/power/snrm2_ppc440.S", 6641),
+                        ("source/kernel/power/staticbuffer.S", 2795),
+                        ("source/kernel/power/swap.S", 8430),
+                        ("source/kernel/power/swap_hummer.S", 12974),
+                        ("source/kernel/power/symv_L.S", 29655),
+                        ("source/kernel/power/symv_U.S", 28952),
+                        ("source/kernel/power/trsm_kernel_cell_LN.S", 62271),
+                        ("source/kernel/power/trsm_kernel_cell_LT.S", 62567),
+                        ("source/kernel/power/trsm_kernel_cell_RT.S", 62388),
+                        ("source/kernel/power/trsm_kernel_hummer_LN.S", 97447),
+                        ("source/kernel/power/trsm_kernel_hummer_LT.S", 97466),
+                        ("source/kernel/power/trsm_kernel_hummer_RT.S", 97472),
+                        ("source/kernel/power/trsm_kernel_LN.S", 62054),
+                        ("source/kernel/power/trsm_kernel_LT.S", 62385),
+                        ("source/kernel/power/trsm_kernel_power6_LN.S", 62906),
+                        ("source/kernel/power/trsm_kernel_power6_LT.S", 62826),
+                        ("source/kernel/power/trsm_kernel_power6_RT.S", 63031),
+                        ("source/kernel/power/trsm_kernel_ppc440_LN.S", 59297),
+                        ("source/kernel/power/trsm_kernel_ppc440_LT.S", 59234),
+                        ("source/kernel/power/trsm_kernel_ppc440_RT.S", 59424),
+                        ("source/kernel/power/trsm_kernel_RT.S", 62487),
+                        ("source/kernel/power/zamax.S", 9692),
+                        ("source/kernel/power/zamax_cell.S", 9623),
+                        ("source/kernel/power/zamax_hummer.S", 7040),
+                        ("source/kernel/power/zamax_ppc440.S", 6822),
+                        ("source/kernel/power/zamin.S", 9676),
+                        ("source/kernel/power/zamin_cell.S", 9588),
+                        ("source/kernel/power/zamin_hummer.S", 7036),
+                        ("source/kernel/power/zamin_ppc440.S", 6813),
+                        ("source/kernel/power/zasum.S", 8686),
+                        ("source/kernel/power/zasum_cell.S", 9410),
+                        ("source/kernel/power/zasum_hummer.S", 10059),
+                        ("source/kernel/power/zasum_ppc440.S", 6570),
+                        ("source/kernel/power/zaxpy.S", 14668),
+                        ("source/kernel/power/zaxpy_hummer.S", 10787),
+                        ("source/kernel/power/zaxpy_ppc440.S", 9735),
+                        ("source/kernel/power/zcopy.S", 5751),
+                        ("source/kernel/power/zcopy_hummer.S", 12167),
+                        ("source/kernel/power/zdot.S", 13294),
+                        ("source/kernel/power/zdot_cell.S", 13055),
+                        ("source/kernel/power/zdot_hummer.S", 10546),
+                        ("source/kernel/power/zdot_ppc440.S", 9470),
+                        ("source/kernel/power/zgemm_beta.S", 6067),
+                        ("source/kernel/power/zgemm_kernel.S", 34759),
+                        ("source/kernel/power/zgemm_kernel_8x2_power8.S", 9218),
+                        ("source/kernel/power/zgemm_kernel_altivec.S", 32053),
+                        ("source/kernel/power/zgemm_kernel_altivec_cell.S", 35005),
+                        ("source/kernel/power/zgemm_kernel_altivec_g4.S", 33209),
+                        ("source/kernel/power/zgemm_kernel_cell.S", 33652),
+                        ("source/kernel/power/zgemm_kernel_g4.S", 30739),
+                        ("source/kernel/power/zgemm_kernel_hummer.S", 79111),
+                        ("source/kernel/power/zgemm_kernel_power3.S", 25482),
+                        ("source/kernel/power/zgemm_kernel_power6.S", 54316),
+                        ("source/kernel/power/zgemm_kernel_ppc440.S", 32202),
+                        ("source/kernel/power/zgemm_logic_8x2_power8.S", 10712),
+                        ("source/kernel/power/zgemm_macros_8x2_power8.S", 92820),
+                        ("source/kernel/power/zgemm_ncopy_hummer_2.S", 8780),
+                        ("source/kernel/power/zgemm_ncopy_hummer_4.S", 12260),
+                        ("source/kernel/power/zgemm_tcopy_hummer_2.S", 6127),
+                        ("source/kernel/power/zgemm_tcopy_hummer_4.S", 13077),
+                        ("source/kernel/power/zgemv_n.S", 86556),
+                        ("source/kernel/power/zgemv_n_ppc440.S", 29338),
+                        ("source/kernel/power/zgemv_t.S", 30630),
+                        ("source/kernel/power/zgemv_t_ppc440.S", 25410),
+                        ("source/kernel/power/zger.S", 28674),
+                        ("source/kernel/power/znrm2.S", 17266),
+                        ("source/kernel/power/znrm2_hummer.S", 18018),
+                        ("source/kernel/power/znrm2_ppc440.S", 11097),
+                        ("source/kernel/power/zrot.S", 12059),
+                        ("source/kernel/power/zrot_ppc440.S", 7060),
+                        ("source/kernel/power/zscal.S", 8728),
+                        ("source/kernel/power/zscal_hummer.S", 16062),
+                        ("source/kernel/power/zscal_ppc440.S", 6512),
+                        ("source/kernel/power/zswap.S", 9009),
+                        ("source/kernel/power/zswap_hummer.S", 12500),
+                        ("source/kernel/power/zsymv_L.S", 33168),
+                        ("source/kernel/power/zsymv_U.S", 32807),
+                        ("source/kernel/power/ztrmm_kernel_8x2_power8.S", 9397),
+                        ("source/kernel/power/ztrmm_logic_8x2_power8.S", 22583),
+                        ("source/kernel/power/ztrsm_kernel_cell_LN.S", 38698),
+                        ("source/kernel/power/ztrsm_kernel_cell_LT.S", 39297),
+                        ("source/kernel/power/ztrsm_kernel_cell_RT.S", 38703),
+                        ("source/kernel/power/ztrsm_kernel_hummer_LN.S", 50894),
+                        ("source/kernel/power/ztrsm_kernel_hummer_LT.S", 50893),
+                        ("source/kernel/power/ztrsm_kernel_hummer_RT.S", 50893),
+                        ("source/kernel/power/ztrsm_kernel_LN.S", 39517),
+                        ("source/kernel/power/ztrsm_kernel_LT.S", 39633),
+                        ("source/kernel/power/ztrsm_kernel_power6_LN.S", 84676),
+                        ("source/kernel/power/ztrsm_kernel_power6_LT.S", 84457),
+                        ("source/kernel/power/ztrsm_kernel_power6_RT.S", 84447),
+                        ("source/kernel/power/ztrsm_kernel_ppc440_LN.S", 38683),
+                        ("source/kernel/power/ztrsm_kernel_ppc440_LT.S", 37942),
+                        ("source/kernel/power/ztrsm_kernel_ppc440_RT.S", 37943),
+                        ("source/kernel/power/ztrsm_kernel_RT.S", 39634),
+                        ("source/kernel/setparam-ref.c", 33470),
+                        ("source/kernel/sparc/amax.S", 7591),
+                        ("source/kernel/sparc/asum.S", 6494),
+                        ("source/kernel/sparc/axpy.S", 10129),
+                        ("source/kernel/sparc/cabs.S", 2942),
+                        ("source/kernel/sparc/cnrm2.S", 6803),
+                        ("source/kernel/sparc/copy.S", 5365),
+                        ("source/kernel/sparc/dnrm2.S", 11992),
+                        ("source/kernel/sparc/dot.S", 8098),
+                        ("source/kernel/sparc/gemm_kernel.S", 49621),
+                        ("source/kernel/sparc/gemm_kernel_2x8.S", 50618),
+                        ("source/kernel/sparc/gemm_ncopy.S", 7179),
+                        ("source/kernel/sparc/gemm_ncopy_2.S", 5843),
+                        ("source/kernel/sparc/gemm_ncopy_8.S", 20207),
+                        ("source/kernel/sparc/gemm_tcopy.S", 8281),
+                        ("source/kernel/sparc/gemm_tcopy_2.S", 6841),
+                        ("source/kernel/sparc/gemv_n.S", 24772),
+                        ("source/kernel/sparc/gemv_t.S", 13021),
+                        ("source/kernel/sparc/ger.S", 9273),
+                        ("source/kernel/sparc/iamax.S", 8960),
+                        ("source/kernel/sparc/imax.S", 8465),
+                        ("source/kernel/sparc/izamax.S", 8292),
+                        ("source/kernel/sparc/KERNEL", 915),
+                        ("source/kernel/sparc/KERNEL.sparc", 1552),
+                        ("source/kernel/sparc/KERNEL.sparcv7", 2079),
+                        ("source/kernel/sparc/lsame.S", 2964),
+                        ("source/kernel/sparc/Makefile", 10),
+                        ("source/kernel/sparc/max.S", 7100),
+                        ("source/kernel/sparc/rot.S", 11214),
+                        ("source/kernel/sparc/scal.S", 8054),
+                        ("source/kernel/sparc/snrm2.S", 6807),
+                        ("source/kernel/sparc/staticbuffer.S", 2796),
+                        ("source/kernel/sparc/swap.S", 7966),
+                        ("source/kernel/sparc/trsm_kernel_LN.S", 65498),
+                        ("source/kernel/sparc/trsm_kernel_LN_2x8.S", 72702),
+                        ("source/kernel/sparc/trsm_kernel_LT.S", 65041),
+                        ("source/kernel/sparc/trsm_kernel_LT_2x8.S", 72701),
+                        ("source/kernel/sparc/trsm_kernel_RT.S", 65103),
+                        ("source/kernel/sparc/trsm_kernel_RT_2x8.S", 72701),
+                        ("source/kernel/sparc/zamax.S", 7388),
+                        ("source/kernel/sparc/zasum.S", 6492),
+                        ("source/kernel/sparc/zaxpy.S", 11909),
+                        ("source/kernel/sparc/zcopy.S", 5070),
+                        ("source/kernel/sparc/zdot.S", 10342),
+                        ("source/kernel/sparc/zgemm_kernel.S", 31533),
+                        ("source/kernel/sparc/zgemm_kernel_1x4.S", 33268),
+                        ("source/kernel/sparc/zgemm_ncopy.S", 6208),
+                        ("source/kernel/sparc/zgemm_tcopy.S", 7127),
+                        ("source/kernel/sparc/zgemv_n.S", 21075),
+                        ("source/kernel/sparc/zgemv_t.S", 28210),
+                        ("source/kernel/sparc/znrm2.S", 11978),
+                        ("source/kernel/sparc/zrot.S", 11185),
+                        ("source/kernel/sparc/zscal.S", 10197),
+                        ("source/kernel/sparc/zswap.S", 8011),
+                        ("source/kernel/sparc/ztrsm_kernel_LN.S", 36981),
+                        ("source/kernel/sparc/ztrsm_kernel_LT.S", 36955),
+                        ("source/kernel/sparc/ztrsm_kernel_LT_1x4.S", 41459),
+                        ("source/kernel/sparc/ztrsm_kernel_RT.S", 36955),
+                        ("source/kernel/sparc/ztrsm_kernel_RT_1x4.S", 41460),
+                        ("source/kernel/x86/amax.S", 5870),
+                        ("source/kernel/x86/amax_sse.S", 8901),
+                        ("source/kernel/x86/amax_sse2.S", 9238),
+                        ("source/kernel/x86/asum.S", 4700),
+                        ("source/kernel/x86/asum_sse.S", 7165),
+                        ("source/kernel/x86/asum_sse2.S", 6678),
+                        ("source/kernel/x86/axpy.S", 5384),
+                        ("source/kernel/x86/axpy_sse.S", 28278),
+                        ("source/kernel/x86/axpy_sse2.S", 15400),
+                        ("source/kernel/x86/axpy_sse2_opteron.S", 10382),
+                        ("source/kernel/x86/cabs.S", 2905),
+                        ("source/kernel/x86/copy.S", 4928),
+                        ("source/kernel/x86/copy_sse.S", 17726),
+                        ("source/kernel/x86/copy_sse2.S", 12833),
+                        ("source/kernel/x86/cpuid.S", 2978),
+                        ("source/kernel/x86/cpuid_win.c", 1912),
+                        ("source/kernel/x86/dot.S", 4853),
+                        ("source/kernel/x86/dot_amd.S", 5121),
+                        ("source/kernel/x86/dot_sse.S", 23964),
+                        ("source/kernel/x86/dot_sse2.S", 14134),
+                        ("source/kernel/x86/dot_sse2_opteron.S", 7980),
+                        ("source/kernel/x86/dot_sse_opteron.S", 8545),
+                        ("source/kernel/x86/gemm_beta.S", 5244),
+                        ("source/kernel/x86/gemm_kernel_1x4.S", 18658),
+                        ("source/kernel/x86/gemm_kernel_2x2.S", 14144),
+                        ("source/kernel/x86/gemm_kernel_2x2_atom.S", 14363),
+                        ("source/kernel/x86/gemm_kernel_2x4_3dnow.S", 43568),
+                        ("source/kernel/x86/gemm_kernel_2x4_barcelona.S", 25507),
+                        ("source/kernel/x86/gemm_kernel_2x4_core2.S", 24614),
+                        ("source/kernel/x86/gemm_kernel_2x4_penryn.S", 25305),
+                        ("source/kernel/x86/gemm_kernel_2x4_sse2.S", 37539),
+                        ("source/kernel/x86/gemm_kernel_2x4_sse3.S", 34919),
+                        ("source/kernel/x86/gemm_kernel_4x2_core2.S", 26010),
+                        ("source/kernel/x86/gemm_kernel_4x2_sse2.S", 32087),
+                        ("source/kernel/x86/gemm_kernel_4x4_barcelona.S", 44591),
+                        ("source/kernel/x86/gemm_kernel_4x4_penryn.S", 34087),
+                        ("source/kernel/x86/gemm_kernel_4x4_sse.S", 55234),
+                        ("source/kernel/x86/gemm_kernel_4x4_sse3.S", 43444),
+                        ("source/kernel/x86/gemm_kernel_8x1_sse2.S", 19853),
+                        ("source/kernel/x86/gemm_kernel_8x2_core2.S", 32358),
+                        ("source/kernel/x86/gemm_kernel_8x2_sse.S", 57117),
+                        ("source/kernel/x86/gemm_ncopy_2.S", 6647),
+                        ("source/kernel/x86/gemm_ncopy_2_sse.S", 5249),
+                        ("source/kernel/x86/gemm_ncopy_4_sse.S", 7142),
+                        ("source/kernel/x86/gemm_tcopy_2.S", 6859),
+                        ("source/kernel/x86/gemm_tcopy_2_sse.S", 5730),
+                        ("source/kernel/x86/gemm_tcopy_4_sse.S", 7033),
+                        ("source/kernel/x86/gemv_n.S", 10126),
+                        ("source/kernel/x86/gemv_n_atom.S", 15453),
+                        ("source/kernel/x86/gemv_n_sse.S", 13597),
+                        ("source/kernel/x86/gemv_n_sse2.S", 13899),
+                        ("source/kernel/x86/gemv_t.S", 11941),
+                        ("source/kernel/x86/gemv_t_atom.S", 12169),
+                        ("source/kernel/x86/gemv_t_sse.S", 13191),
+                        ("source/kernel/x86/gemv_t_sse2.S", 12081),
+                        ("source/kernel/x86/iamax.S", 6497),
+                        ("source/kernel/x86/iamax_sse.S", 15665),
+                        ("source/kernel/x86/iamax_sse2.S", 18827),
+                        ("source/kernel/x86/izamax.S", 5677),
+                        ("source/kernel/x86/izamax_sse.S", 10963),
+                        ("source/kernel/x86/izamax_sse2.S", 11585),
+                        ("source/kernel/x86/KERNEL", 3147),
+                        ("source/kernel/x86/KERNEL.ATHLON", 2550),
+                        ("source/kernel/x86/KERNEL.ATOM", 2011),
+                        ("source/kernel/x86/KERNEL.BANIAS", 2202),
+                        ("source/kernel/x86/KERNEL.BARCELONA", 2279),
+                        ("source/kernel/x86/KERNEL.BOBCAT", 2279),
+                        ("source/kernel/x86/KERNEL.BULLDOZER", 2279),
+                        ("source/kernel/x86/KERNEL.COPPERMINE", 2202),
+                        ("source/kernel/x86/KERNEL.CORE2", 2459),
+                        ("source/kernel/x86/KERNEL.DUNNINGTON", 2279),
+                        ("source/kernel/x86/KERNEL.generic", 4570),
+                        ("source/kernel/x86/KERNEL.HASWELL", 35),
+                        ("source/kernel/x86/KERNEL.KATMAI", 39),
+                        ("source/kernel/x86/KERNEL.NANO", 35),
+                        ("source/kernel/x86/KERNEL.NEHALEM", 35),
+                        ("source/kernel/x86/KERNEL.NORTHWOOD", 2440),
+                        ("source/kernel/x86/KERNEL.OPTERON", 2253),
+                        ("source/kernel/x86/KERNEL.OPTERON_SSE3", 36),
+                        ("source/kernel/x86/KERNEL.P5", 32),
+                        ("source/kernel/x86/KERNEL.P6", 1924),
+                        ("source/kernel/x86/KERNEL.PENRYN", 2279),
+                        ("source/kernel/x86/KERNEL.PILEDRIVER", 2279),
+                        ("source/kernel/x86/KERNEL.PRESCOTT", 2235),
+                        ("source/kernel/x86/KERNEL.SANDYBRIDGE", 35),
+                        ("source/kernel/x86/KERNEL.VIAC3", 35),
+                        ("source/kernel/x86/KERNEL.YONAH", 2257),
+                        ("source/kernel/x86/lsame.S", 3335),
+                        ("source/kernel/x86/Makefile", 10),
+                        ("source/kernel/x86/nrm2.S", 4923),
+                        ("source/kernel/x86/nrm2_sse.S", 8044),
+                        ("source/kernel/x86/qaxpy.S", 5434),
+                        ("source/kernel/x86/qconjg.S", 2961),
+                        ("source/kernel/x86/qdot.S", 5027),
+                        ("source/kernel/x86/qgemm_kernel_2x2.S", 14055),
+                        ("source/kernel/x86/qgemv_n.S", 10022),
+                        ("source/kernel/x86/qgemv_t.S", 11920),
+                        ("source/kernel/x86/qtrsm_kernel_LN_2x2.S", 19041),
+                        ("source/kernel/x86/qtrsm_kernel_LT_2x2.S", 19010),
+                        ("source/kernel/x86/qtrsm_kernel_RT_2x2.S", 19040),
+                        ("source/kernel/x86/rot.S", 6931),
+                        ("source/kernel/x86/rot_sse.S", 18112),
+                        ("source/kernel/x86/rot_sse2.S", 15788),
+                        ("source/kernel/x86/scal.S", 6851),
+                        ("source/kernel/x86/scal_sse.S", 11347),
+                        ("source/kernel/x86/scal_sse2.S", 10485),
+                        ("source/kernel/x86/staticbuffer.S", 2872),
+                        ("source/kernel/x86/swap.S", 5076),
+                        ("source/kernel/x86/swap_sse.S", 20942),
+                        ("source/kernel/x86/swap_sse2.S", 11005),
+                        ("source/kernel/x86/trsm_kernel_LN_2x2.S", 19123),
+                        ("source/kernel/x86/trsm_kernel_LN_2x2_atom.S", 19572),
+                        ("source/kernel/x86/trsm_kernel_LN_2x4_penryn.S", 35472),
+                        ("source/kernel/x86/trsm_kernel_LN_2x4_sse2.S", 47849),
+                        ("source/kernel/x86/trsm_kernel_LN_2x4_sse3.S", 36748),
+                        ("source/kernel/x86/trsm_kernel_LN_4x2_core2.S", 38325),
+                        ("source/kernel/x86/trsm_kernel_LN_4x2_sse2.S", 43133),
+                        ("source/kernel/x86/trsm_kernel_LN_4x4_penryn.S", 55345),
+                        ("source/kernel/x86/trsm_kernel_LN_4x4_sse.S", 68829),
+                        ("source/kernel/x86/trsm_kernel_LN_8x2_sse.S", 64824),
+                        ("source/kernel/x86/trsm_kernel_LT_1x4.S", 20365),
+                        ("source/kernel/x86/trsm_kernel_LT_2x2.S", 18716),
+                        ("source/kernel/x86/trsm_kernel_LT_2x2_atom.S", 19572),
+                        ("source/kernel/x86/trsm_kernel_LT_2x4_penryn.S", 35417),
+                        ("source/kernel/x86/trsm_kernel_LT_2x4_sse2.S", 47848),
+                        ("source/kernel/x86/trsm_kernel_LT_2x4_sse3.S", 36748),
+                        ("source/kernel/x86/trsm_kernel_LT_4x2_core2.S", 38325),
+                        ("source/kernel/x86/trsm_kernel_LT_4x2_sse2.S", 42954),
+                        ("source/kernel/x86/trsm_kernel_LT_4x4_penryn.S", 55345),
+                        ("source/kernel/x86/trsm_kernel_LT_4x4_sse.S", 68848),
+                        ("source/kernel/x86/trsm_kernel_LT_8x2_sse.S", 64824),
+                        ("source/kernel/x86/trsm_kernel_RT_1x4.S", 20365),
+                        ("source/kernel/x86/trsm_kernel_RT_2x2.S", 18662),
+                        ("source/kernel/x86/trsm_kernel_RT_2x2_atom.S", 19572),
+                        ("source/kernel/x86/trsm_kernel_RT_2x4_penryn.S", 35533),
+                        ("source/kernel/x86/trsm_kernel_RT_2x4_sse2.S", 47851),
+                        ("source/kernel/x86/trsm_kernel_RT_2x4_sse3.S", 36747),
+                        ("source/kernel/x86/trsm_kernel_RT_4x2_core2.S", 38325),
+                        ("source/kernel/x86/trsm_kernel_RT_4x2_sse2.S", 42970),
+                        ("source/kernel/x86/trsm_kernel_RT_4x4_penryn.S", 55344),
+                        ("source/kernel/x86/trsm_kernel_RT_4x4_sse.S", 68694),
+                        ("source/kernel/x86/trsm_kernel_RT_8x2_sse.S", 64863),
+                        ("source/kernel/x86/xaxpy.S", 7252),
+                        ("source/kernel/x86/xdot.S", 6810),
+                        ("source/kernel/x86/xgemm3m_kernel_2x2.S", 13317),
+                        ("source/kernel/x86/xgemm_kernel_1x1.S", 7831),
+                        ("source/kernel/x86/xgemv_n.S", 7932),
+                        ("source/kernel/x86/xgemv_t.S", 7981),
+                        ("source/kernel/x86/xtrsm_kernel_LT_1x1.S", 8998),
+                        ("source/kernel/x86/zamax.S", 5256),
+                        ("source/kernel/x86/zamax_sse.S", 7856),
+                        ("source/kernel/x86/zamax_sse2.S", 7919),
+                        ("source/kernel/x86/zasum.S", 4813),
+                        ("source/kernel/x86/zasum_sse.S", 6827),
+                        ("source/kernel/x86/zasum_sse2.S", 6682),
+                        ("source/kernel/x86/zaxpy.S", 7218),
+                        ("source/kernel/x86/zaxpy_sse.S", 63954),
+                        ("source/kernel/x86/zaxpy_sse2.S", 31949),
+                        ("source/kernel/x86/zcopy.S", 5699),
+                        ("source/kernel/x86/zcopy_sse.S", 18214),
+                        ("source/kernel/x86/zcopy_sse2.S", 13096),
+                        ("source/kernel/x86/zdot.S", 6584),
+                        ("source/kernel/x86/zdot_amd.S", 7241),
+                        ("source/kernel/x86/zdot_sse.S", 65274),
+                        ("source/kernel/x86/zdot_sse2.S", 31165),
+                        ("source/kernel/x86/zgemm3m_kernel_1x4_athlon.S", 16634),
+                        ("source/kernel/x86/zgemm3m_kernel_2x2_atom.S", 14346),
+                        ("source/kernel/x86/zgemm3m_kernel_2x2_coppermine.S", 14054),
+                        ("source/kernel/x86/zgemm3m_kernel_2x4_barcelona.S", 26056),
+                        ("source/kernel/x86/zgemm3m_kernel_2x4_opteron.S", 37972),
+                        ("source/kernel/x86/zgemm3m_kernel_2x4_penryn.S", 25139),
+                        ("source/kernel/x86/zgemm3m_kernel_2x4_prescott.S", 34525),
+                        ("source/kernel/x86/zgemm3m_kernel_4x2_core2.S", 26875),
+                        ("source/kernel/x86/zgemm3m_kernel_4x2_northwood.S", 32037),
+                        ("source/kernel/x86/zgemm3m_kernel_4x4_barcelona.S", 44535),
+                        ("source/kernel/x86/zgemm3m_kernel_4x4_opteron.S", 53895),
+                        ("source/kernel/x86/zgemm3m_kernel_4x4_penryn.S", 32920),
+                        ("source/kernel/x86/zgemm3m_kernel_4x4_prescott.S", 42620),
+                        ("source/kernel/x86/zgemm3m_kernel_8x2_core2.S", 32556),
+                        ("source/kernel/x86/zgemm3m_kernel_8x2_sse.S", 57876),
+                        ("source/kernel/x86/zgemm_beta.S", 5556),
+                        ("source/kernel/x86/zgemm_kernel_1x1.S", 9387),
+                        ("source/kernel/x86/zgemm_kernel_1x1_atom.S", 8036),
+                        ("source/kernel/x86/zgemm_kernel_1x2.S", 17327),
+                        ("source/kernel/x86/zgemm_kernel_1x2_3dnow.S", 22299),
+                        ("source/kernel/x86/zgemm_kernel_1x2_barcelona.S", 15948),
+                        ("source/kernel/x86/zgemm_kernel_1x2_penryn.S", 14725),
+                        ("source/kernel/x86/zgemm_kernel_1x2_sse2.S", 20186),
+                        ("source/kernel/x86/zgemm_kernel_1x2_sse3.S", 19275),
+                        ("source/kernel/x86/zgemm_kernel_2x1_core2.S", 14977),
+                        ("source/kernel/x86/zgemm_kernel_2x1_sse2.S", 18724),
+                        ("source/kernel/x86/zgemm_kernel_2x2_barcelona.S", 29515),
+                        ("source/kernel/x86/zgemm_kernel_2x2_penryn.S", 24179),
+                        ("source/kernel/x86/zgemm_kernel_2x2_sse.S", 34580),
+                        ("source/kernel/x86/zgemm_kernel_2x2_sse3.S", 28947),
+                        ("source/kernel/x86/zgemm_kernel_4x1_core2.S", 18979),
+                        ("source/kernel/x86/zgemm_kernel_4x1_sse.S", 32372),
+                        ("source/kernel/x86/zgemm_ncopy_2.S", 6257),
+                        ("source/kernel/x86/zgemm_tcopy_2.S", 4652),
+                        ("source/kernel/x86/zgemv_n.S", 8423),
+                        ("source/kernel/x86/zgemv_n_atom.S", 11309),
+                        ("source/kernel/x86/zgemv_n_sse.S", 12533),
+                        ("source/kernel/x86/zgemv_n_sse2.S", 10572),
+                        ("source/kernel/x86/zgemv_t.S", 8404),
+                        ("source/kernel/x86/zgemv_t_atom.S", 9307),
+                        ("source/kernel/x86/zgemv_t_sse.S", 11006),
+                        ("source/kernel/x86/zgemv_t_sse2.S", 9295),
+                        ("source/kernel/x86/znrm2.S", 5060),
+                        ("source/kernel/x86/znrm2_sse.S", 8869),
+                        ("source/kernel/x86/zrot.S", 7230),
+                        ("source/kernel/x86/zrot_sse.S", 22724),
+                        ("source/kernel/x86/zrot_sse2.S", 26250),
+                        ("source/kernel/x86/zscal.S", 6326),
+                        ("source/kernel/x86/zscal_sse.S", 25335),
+                        ("source/kernel/x86/zscal_sse2.S", 32592),
+                        ("source/kernel/x86/zswap.S", 6048),
+                        ("source/kernel/x86/zswap_sse.S", 20588),
+                        ("source/kernel/x86/zswap_sse2.S", 18077),
+                        ("source/kernel/x86/ztrsm_kernel_LN_2x1_core2.S", 19502),
+                        ("source/kernel/x86/ztrsm_kernel_LN_2x1_sse2.S", 22838),
+                        ("source/kernel/x86/ztrsm_kernel_LN_2x2_penryn.S", 33447),
+                        ("source/kernel/x86/ztrsm_kernel_LN_2x2_sse.S", 39306),
+                        ("source/kernel/x86/ztrsm_kernel_LN_4x1_sse.S", 33088),
+                        ("source/kernel/x86/ztrsm_kernel_LT_1x1.S", 9546),
+                        ("source/kernel/x86/ztrsm_kernel_LT_1x1_atom.S", 9124),
+                        ("source/kernel/x86/ztrsm_kernel_LT_1x2_penryn.S", 17083),
+                        ("source/kernel/x86/ztrsm_kernel_LT_1x2_sse2.S", 25547),
+                        ("source/kernel/x86/ztrsm_kernel_LT_1x2_sse3.S", 18849),
+                        ("source/kernel/x86/ztrsm_kernel_LT_2x1_core2.S", 19501),
+                        ("source/kernel/x86/ztrsm_kernel_LT_2x1_sse2.S", 22839),
+                        ("source/kernel/x86/ztrsm_kernel_LT_2x2_penryn.S", 33447),
+                        ("source/kernel/x86/ztrsm_kernel_LT_2x2_sse.S", 39306),
+                        ("source/kernel/x86/ztrsm_kernel_LT_4x1_sse.S", 33136),
+                        ("source/kernel/x86/ztrsm_kernel_RT_1x2_penryn.S", 17081),
+                        ("source/kernel/x86/ztrsm_kernel_RT_1x2_sse2.S", 25531),
+                        ("source/kernel/x86/ztrsm_kernel_RT_1x2_sse3.S", 18847),
+                        ("source/kernel/x86/ztrsm_kernel_RT_2x2_penryn.S", 33447),
+                        ("source/kernel/x86/ztrsm_kernel_RT_2x2_sse.S", 39307),
+                        ("source/kernel/x86_64/amax.S", 5464),
+                        ("source/kernel/x86_64/amax_atom.S", 8339),
+                        ("source/kernel/x86_64/amax_sse.S", 8487),
+                        ("source/kernel/x86_64/amax_sse2.S", 8984),
+                        ("source/kernel/x86_64/asum.S", 4273),
+                        ("source/kernel/x86_64/asum_atom.S", 8796),
+                        ("source/kernel/x86_64/asum_sse.S", 7030),
+                        ("source/kernel/x86_64/asum_sse2.S", 6567),
+                        ("source/kernel/x86_64/axpy.S", 4948),
+                        ("source/kernel/x86_64/axpy_atom.S", 10373),
+                        ("source/kernel/x86_64/axpy_sse.S", 28164),
+                        ("source/kernel/x86_64/axpy_sse2.S", 17190),
+                        ("source/kernel/x86_64/builtin_stinit.S", 2900),
+                        ("source/kernel/x86_64/cabs.S", 3161),
+                        ("source/kernel/x86_64/caxpy.c", 3960),
+                        ("source/kernel/x86_64/caxpy_microk_bulldozer-2.c", 7773),
+                        ("source/kernel/x86_64/caxpy_microk_haswell-2.c", 5491),
+                        ("source/kernel/x86_64/caxpy_microk_sandy-2.c", 4688),
+                        ("source/kernel/x86_64/caxpy_microk_steamroller-2.c", 7679),
+                        ("source/kernel/x86_64/cdot.c", 4308),
+                        ("source/kernel/x86_64/cdot_microk_bulldozer-2.c", 7917),
+                        ("source/kernel/x86_64/cdot_microk_haswell-2.c", 4932),
+                        ("source/kernel/x86_64/cdot_microk_sandy-2.c", 5002),
+                        ("source/kernel/x86_64/cdot_microk_steamroller-2.c", 7837),
+                        ("source/kernel/x86_64/cgemm_kernel_4x2_bulldozer.S", 53053),
+                        ("source/kernel/x86_64/cgemm_kernel_4x2_piledriver.S", 53575),
+                        ("source/kernel/x86_64/cgemm_kernel_4x8_sandy.S", 110512),
+                        ("source/kernel/x86_64/cgemm_kernel_8x2_haswell.S", 105547),
+                        ("source/kernel/x86_64/cgemm_kernel_8x2_sandy.S", 58793),
+                        ("source/kernel/x86_64/cgemv_n.S", 81260),
+                        ("source/kernel/x86_64/cgemv_n_4.c", 15806),
+                        ("source/kernel/x86_64/cgemv_n_microk_bulldozer-4.c", 22231),
+                        ("source/kernel/x86_64/cgemv_n_microk_haswell-4.c", 22112),
+                        ("source/kernel/x86_64/cgemv_t.S", 79767),
+                        ("source/kernel/x86_64/cgemv_t_4.c", 15985),
+                        ("source/kernel/x86_64/cgemv_t_microk_bulldozer-4.c", 24771),
+                        ("source/kernel/x86_64/cgemv_t_microk_haswell-4.c", 24512),
+                        ("source/kernel/x86_64/copy.S", 6905),
+                        ("source/kernel/x86_64/copy_sse.S", 17515),
+                        ("source/kernel/x86_64/copy_sse2.S", 12618),
+                        ("source/kernel/x86_64/cscal.c", 8330),
+                        ("source/kernel/x86_64/cscal_microk_bulldozer-2.c", 10778),
+                        ("source/kernel/x86_64/cscal_microk_haswell-2.c", 10758),
+                        ("source/kernel/x86_64/cscal_microk_steamroller-2.c", 10794),
+                        ("source/kernel/x86_64/ctrsm_kernel_LN_bulldozer.c", 12859),
+                        ("source/kernel/x86_64/ctrsm_kernel_LT_bulldozer.c", 11854),
+                        ("source/kernel/x86_64/ctrsm_kernel_RN_bulldozer.c", 11860),
+                        ("source/kernel/x86_64/ctrsm_kernel_RT_bulldozer.c", 12593),
+                        ("source/kernel/x86_64/daxpy.c", 3406),
+                        ("source/kernel/x86_64/daxpy_bulldozer.S", 8814),
+                        ("source/kernel/x86_64/daxpy_microk_bulldozer-2.c", 3475),
+                        ("source/kernel/x86_64/daxpy_microk_haswell-2.c", 3242),
+                        ("source/kernel/x86_64/daxpy_microk_nehalem-2.c", 3774),
+                        ("source/kernel/x86_64/daxpy_microk_piledriver-2.c", 6508),
+                        ("source/kernel/x86_64/daxpy_microk_sandy-2.c", 4400),
+                        ("source/kernel/x86_64/daxpy_microk_steamroller-2.c", 6509),
+                        ("source/kernel/x86_64/dcopy_bulldozer.S", 6409),
+                        ("source/kernel/x86_64/ddot.c", 3408),
+                        ("source/kernel/x86_64/ddot_bulldozer.S", 7445),
+                        ("source/kernel/x86_64/ddot_microk_bulldozer-2.c", 3354),
+                        ("source/kernel/x86_64/ddot_microk_haswell-2.c", 3705),
+                        ("source/kernel/x86_64/ddot_microk_nehalem-2.c", 3668),
+                        ("source/kernel/x86_64/ddot_microk_piledriver-2.c", 6308),
+                        ("source/kernel/x86_64/ddot_microk_sandy-2.c", 3910),
+                        ("source/kernel/x86_64/ddot_microk_steamroller-2.c", 3995),
+                        ("source/kernel/x86_64/dgemm_kernel_16x2_haswell.S", 109703),
+                        ("source/kernel/x86_64/dgemm_kernel_4x4_haswell.S", 66669),
+                        ("source/kernel/x86_64/dgemm_kernel_4x8_haswell.S", 88803),
+                        ("source/kernel/x86_64/dgemm_kernel_4x8_sandy.S", 72359),
+                        ("source/kernel/x86_64/dgemm_kernel_6x4_piledriver.S", 51459),
+                        ("source/kernel/x86_64/dgemm_kernel_8x2_bulldozer.S", 98686),
+                        ("source/kernel/x86_64/dgemm_kernel_8x2_piledriver.S", 98128),
+                        ("source/kernel/x86_64/dgemm_ncopy_2.S", 11121),
+                        ("source/kernel/x86_64/dgemm_ncopy_4.S", 22516),
+                        ("source/kernel/x86_64/dgemm_ncopy_8.S", 38760),
+                        ("source/kernel/x86_64/dgemm_ncopy_8_bulldozer.S", 37836),
+                        ("source/kernel/x86_64/dgemm_tcopy_2.S", 7591),
+                        ("source/kernel/x86_64/dgemm_tcopy_4.S", 11052),
+                        ("source/kernel/x86_64/dgemm_tcopy_8.S", 16437),
+                        ("source/kernel/x86_64/dgemm_tcopy_8_bulldozer.S", 14813),
+                        ("source/kernel/x86_64/dgemv_n.S", 54212),
+                        ("source/kernel/x86_64/dgemv_n_4.c", 10901),
+                        ("source/kernel/x86_64/dgemv_n_atom.S", 15764),
+                        ("source/kernel/x86_64/dgemv_n_bulldozer.S", 49321),
+                        ("source/kernel/x86_64/dgemv_n_microk_haswell-4.c", 5818),
+                        ("source/kernel/x86_64/dgemv_n_microk_nehalem-4.c", 6118),
+                        ("source/kernel/x86_64/dgemv_n_microk_piledriver-4.c", 8595),
+                        ("source/kernel/x86_64/dgemv_t.S", 47601),
+                        ("source/kernel/x86_64/dgemv_t_4.c", 13929),
+                        ("source/kernel/x86_64/dgemv_t_atom.S", 13702),
+                        ("source/kernel/x86_64/dgemv_t_bulldozer.S", 27004),
+                        ("source/kernel/x86_64/dgemv_t_microk_haswell-4.c", 4881),
+                        ("source/kernel/x86_64/dger.c", 3401),
+                        ("source/kernel/x86_64/dger_microk_sandy-2.c", 4545),
+                        ("source/kernel/x86_64/dot.S", 4429),
+                        ("source/kernel/x86_64/dot_atom.S", 6805),
+                        ("source/kernel/x86_64/dot_sse.S", 23751),
+                        ("source/kernel/x86_64/dot_sse2.S", 13987),
+                        ("source/kernel/x86_64/dscal.c", 5367),
+                        ("source/kernel/x86_64/dscal_microk_bulldozer-2.c", 6091),
+                        ("source/kernel/x86_64/dscal_microk_haswell-2.c", 6097),
+                        ("source/kernel/x86_64/dscal_microk_sandy-2.c", 6091),
+                        ("source/kernel/x86_64/dsymv_L.c", 6889),
+                        ("source/kernel/x86_64/dsymv_L_microk_bulldozer-2.c", 5722),
+                        ("source/kernel/x86_64/dsymv_L_microk_haswell-2.c", 5170),
+                        ("source/kernel/x86_64/dsymv_L_microk_nehalem-2.c", 5716),
+                        ("source/kernel/x86_64/dsymv_L_microk_sandy-2.c", 5395),
+                        ("source/kernel/x86_64/dsymv_U.c", 6078),
+                        ("source/kernel/x86_64/dsymv_U_microk_bulldozer-2.c", 5507),
+                        ("source/kernel/x86_64/dsymv_U_microk_haswell-2.c", 5272),
+                        ("source/kernel/x86_64/dsymv_U_microk_nehalem-2.c", 5396),
+                        ("source/kernel/x86_64/dsymv_U_microk_sandy-2.c", 5777),
+                        ("source/kernel/x86_64/dtrmm_kernel_4x8_haswell.c", 26633),
+                        ("source/kernel/x86_64/dtrsm_kernel_LN_bulldozer.c", 22100),
+                        (
+                            "source/kernel/x86_64/dtrsm_kernel_LT_8x2_bulldozer.S",
+                            27271
+                        ),
+                        (
+                            "source/kernel/x86_64/dtrsm_kernel_RN_8x2_bulldozer.S",
+                            20348
+                        ),
+                        ("source/kernel/x86_64/dtrsm_kernel_RN_haswell.c", 20723),
+                        ("source/kernel/x86_64/dtrsm_kernel_RT_bulldozer.c", 15364),
+                        ("source/kernel/x86_64/gemm_beta.S", 5605),
+                        ("source/kernel/x86_64/gemm_kernel_2x8_nehalem.S", 33853),
+                        ("source/kernel/x86_64/gemm_kernel_4x2_atom.S", 25743),
+                        ("source/kernel/x86_64/gemm_kernel_4x4_barcelona.S", 43297),
+                        ("source/kernel/x86_64/gemm_kernel_4x4_core2.S", 42980),
+                        ("source/kernel/x86_64/gemm_kernel_4x4_penryn.S", 38122),
+                        ("source/kernel/x86_64/gemm_kernel_4x4_sse2.S", 56127),
+                        ("source/kernel/x86_64/gemm_kernel_4x4_sse3.S", 56611),
+                        ("source/kernel/x86_64/gemm_kernel_4x8_nano.S", 45910),
+                        ("source/kernel/x86_64/gemm_kernel_4x8_nehalem.S", 43373),
+                        ("source/kernel/x86_64/gemm_kernel_8x4_barcelona.S", 68327),
+                        ("source/kernel/x86_64/gemm_kernel_8x4_core2.S", 48562),
+                        ("source/kernel/x86_64/gemm_kernel_8x4_penryn.S", 46299),
+                        ("source/kernel/x86_64/gemm_kernel_8x4_sse.S", 71669),
+                        ("source/kernel/x86_64/gemm_kernel_8x4_sse3.S", 65070),
+                        ("source/kernel/x86_64/gemm_ncopy_2.S", 6787),
+                        ("source/kernel/x86_64/gemm_ncopy_2_bulldozer.S", 8188),
+                        ("source/kernel/x86_64/gemm_ncopy_4.S", 10522),
+                        ("source/kernel/x86_64/gemm_ncopy_4_opteron.S", 8255),
+                        ("source/kernel/x86_64/gemm_tcopy_2.S", 6328),
+                        ("source/kernel/x86_64/gemm_tcopy_2_bulldozer.S", 7904),
+                        ("source/kernel/x86_64/gemm_tcopy_4.S", 11627),
+                        ("source/kernel/x86_64/gemm_tcopy_4_opteron.S", 9789),
+                        ("source/kernel/x86_64/iamax.S", 6044),
+                        ("source/kernel/x86_64/iamax_sse.S", 16467),
+                        ("source/kernel/x86_64/iamax_sse2.S", 18604),
+                        ("source/kernel/x86_64/izamax.S", 5225),
+                        ("source/kernel/x86_64/izamax_sse.S", 10434),
+                        ("source/kernel/x86_64/izamax_sse2.S", 11448),
+                        ("source/kernel/x86_64/KERNEL", 6678),
+                        ("source/kernel/x86_64/KERNEL.ATOM", 2908),
+                        ("source/kernel/x86_64/KERNEL.BARCELONA", 2243),
+                        ("source/kernel/x86_64/KERNEL.BOBCAT", 2298),
+                        ("source/kernel/x86_64/KERNEL.BULLDOZER", 3012),
+                        ("source/kernel/x86_64/KERNEL.CORE2", 2176),
+                        ("source/kernel/x86_64/KERNEL.DUNNINGTON", 2189),
+                        ("source/kernel/x86_64/KERNEL.EXCAVATOR", 2953),
+                        ("source/kernel/x86_64/KERNEL.generic", 4717),
+                        ("source/kernel/x86_64/KERNEL.HASWELL", 3287),
+                        ("source/kernel/x86_64/KERNEL.NANO", 2218),
+                        ("source/kernel/x86_64/KERNEL.NEHALEM", 2792),
+                        ("source/kernel/x86_64/KERNEL.OPTERON", 2190),
+                        ("source/kernel/x86_64/KERNEL.OPTERON_SSE3", 2245),
+                        ("source/kernel/x86_64/KERNEL.PENRYN", 2189),
+                        ("source/kernel/x86_64/KERNEL.PILEDRIVER", 2913),
+                        ("source/kernel/x86_64/KERNEL.PRESCOTT", 2216),
+                        ("source/kernel/x86_64/KERNEL.SANDYBRIDGE", 3744),
+                        ("source/kernel/x86_64/KERNEL.STEAMROLLER", 3015),
+                        ("source/kernel/x86_64/lsame.S", 3034),
+                        ("source/kernel/x86_64/Makefile", 10),
+                        ("source/kernel/x86_64/mcount.S", 2739),
+                        ("source/kernel/x86_64/nrm2.S", 4625),
+                        ("source/kernel/x86_64/nrm2_sse.S", 6702),
+                        ("source/kernel/x86_64/qconjg.S", 2848),
+                        ("source/kernel/x86_64/qdot.S", 4814),
+                        ("source/kernel/x86_64/qgemm_kernel_2x2.S", 13934),
+                        ("source/kernel/x86_64/qgemv_n.S", 8173),
+                        ("source/kernel/x86_64/qgemv_t.S", 8980),
+                        ("source/kernel/x86_64/qtrsm_kernel_LN_2x2.S", 19003),
+                        ("source/kernel/x86_64/qtrsm_kernel_LT_2x2.S", 19003),
+                        ("source/kernel/x86_64/qtrsm_kernel_RT_2x2.S", 19003),
+                        ("source/kernel/x86_64/rot.S", 6110),
+                        ("source/kernel/x86_64/rot_sse.S", 18951),
+                        ("source/kernel/x86_64/rot_sse2.S", 17652),
+                        ("source/kernel/x86_64/saxpy.c", 3459),
+                        ("source/kernel/x86_64/saxpy_microk_haswell-2.c", 3245),
+                        ("source/kernel/x86_64/saxpy_microk_nehalem-2.c", 3777),
+                        ("source/kernel/x86_64/saxpy_microk_piledriver-2.c", 6503),
+                        ("source/kernel/x86_64/saxpy_microk_sandy-2.c", 4403),
+                        ("source/kernel/x86_64/scal.S", 5589),
+                        ("source/kernel/x86_64/scal_atom.S", 8729),
+                        ("source/kernel/x86_64/scal_sse.S", 11187),
+                        ("source/kernel/x86_64/scal_sse2.S", 11077),
+                        ("source/kernel/x86_64/sdot.c", 3142),
+                        ("source/kernel/x86_64/sdot_microk_bulldozer-2.c", 3403),
+                        ("source/kernel/x86_64/sdot_microk_haswell-2.c", 3754),
+                        ("source/kernel/x86_64/sdot_microk_nehalem-2.c", 3707),
+                        ("source/kernel/x86_64/sdot_microk_sandy-2.c", 3951),
+                        ("source/kernel/x86_64/sdot_microk_steamroller-2.c", 6259),
+                        ("source/kernel/x86_64/sgemm_kernel_16x2_bulldozer.S", 119980),
+                        (
+                            "source/kernel/x86_64/sgemm_kernel_16x2_piledriver.S",
+                            120573
+                        ),
+                        ("source/kernel/x86_64/sgemm_kernel_16x4_haswell.S", 140668),
+                        ("source/kernel/x86_64/sgemm_kernel_16x4_sandy.S", 69653),
+                        ("source/kernel/x86_64/sgemm_kernel_8x4_bulldozer.S", 63688),
+                        ("source/kernel/x86_64/sgemm_kernel_8x8_sandy.S", 85607),
+                        ("source/kernel/x86_64/sgemv_n.c", 4514),
+                        ("source/kernel/x86_64/sgemv_n.S", 116854),
+                        ("source/kernel/x86_64/sgemv_n_4.c", 13610),
+                        ("source/kernel/x86_64/sgemv_n_microk_bulldozer-4.c", 10037),
+                        ("source/kernel/x86_64/sgemv_n_microk_haswell-4.c", 10448),
+                        ("source/kernel/x86_64/sgemv_n_microk_nehalem-4.c", 6814),
+                        ("source/kernel/x86_64/sgemv_n_microk_sandy-4.c", 12574),
+                        ("source/kernel/x86_64/sgemv_t.c", 4503),
+                        ("source/kernel/x86_64/sgemv_t.S", 120709),
+                        ("source/kernel/x86_64/sgemv_t_4.c", 14339),
+                        ("source/kernel/x86_64/sgemv_t_microk_bulldozer-4.c", 5727),
+                        ("source/kernel/x86_64/sgemv_t_microk_haswell-4.c", 5612),
+                        ("source/kernel/x86_64/sgemv_t_microk_nehalem-4.c", 3783),
+                        ("source/kernel/x86_64/sgemv_t_microk_sandy-4.c", 6911),
+                        ("source/kernel/x86_64/sger.c", 3401),
+                        ("source/kernel/x86_64/sger_microk_sandy-2.c", 4554),
+                        ("source/kernel/x86_64/ssymv_L.c", 6889),
+                        ("source/kernel/x86_64/ssymv_L_microk_bulldozer-2.c", 4935),
+                        ("source/kernel/x86_64/ssymv_L_microk_haswell-2.c", 4938),
+                        ("source/kernel/x86_64/ssymv_L_microk_nehalem-2.c", 5870),
+                        ("source/kernel/x86_64/ssymv_L_microk_sandy-2.c", 9472),
+                        ("source/kernel/x86_64/ssymv_U.c", 6078),
+                        ("source/kernel/x86_64/ssymv_U_microk_bulldozer-2.c", 4715),
+                        ("source/kernel/x86_64/ssymv_U_microk_haswell-2.c", 5460),
+                        ("source/kernel/x86_64/ssymv_U_microk_nehalem-2.c", 5549),
+                        ("source/kernel/x86_64/ssymv_U_microk_sandy-2.c", 5636),
+                        ("source/kernel/x86_64/staticbuffer.S", 2795),
+                        ("source/kernel/x86_64/strsm_kernel_LN_bulldozer.c", 35006),
+                        ("source/kernel/x86_64/strsm_kernel_LT_bulldozer.c", 34179),
+                        ("source/kernel/x86_64/strsm_kernel_RN_bulldozer.c", 12124),
+                        ("source/kernel/x86_64/strsm_kernel_RT_bulldozer.c", 12835),
+                        ("source/kernel/x86_64/swap.S", 8670),
+                        ("source/kernel/x86_64/swap_sse.S", 20974),
+                        ("source/kernel/x86_64/swap_sse2.S", 10967),
+                        ("source/kernel/x86_64/symv_L_sse.S", 20421),
+                        ("source/kernel/x86_64/symv_L_sse2.S", 19536),
+                        ("source/kernel/x86_64/symv_U_sse.S", 20331),
+                        ("source/kernel/x86_64/symv_U_sse2.S", 19215),
+                        ("source/kernel/x86_64/trsm_kernel_LN_2x8_nehalem.S", 55950),
+                        ("source/kernel/x86_64/trsm_kernel_LN_4x2_atom.S", 37092),
+                        ("source/kernel/x86_64/trsm_kernel_LN_4x4_barcelona.S", 65451),
+                        ("source/kernel/x86_64/trsm_kernel_LN_4x4_core2.S", 66756),
+                        ("source/kernel/x86_64/trsm_kernel_LN_4x4_penryn.S", 60620),
+                        ("source/kernel/x86_64/trsm_kernel_LN_4x4_sse2.S", 79540),
+                        ("source/kernel/x86_64/trsm_kernel_LN_4x4_sse3.S", 76195),
+                        ("source/kernel/x86_64/trsm_kernel_LN_4x8_nehalem.S", 88052),
+                        ("source/kernel/x86_64/trsm_kernel_LN_8x4_sse.S", 115494),
+                        ("source/kernel/x86_64/trsm_kernel_LT_2x8_nehalem.S", 55932),
+                        ("source/kernel/x86_64/trsm_kernel_LT_4x2_atom.S", 37099),
+                        ("source/kernel/x86_64/trsm_kernel_LT_4x4_barcelona.S", 65451),
+                        ("source/kernel/x86_64/trsm_kernel_LT_4x4_core2.S", 66531),
+                        ("source/kernel/x86_64/trsm_kernel_LT_4x4_penryn.S", 60621),
+                        ("source/kernel/x86_64/trsm_kernel_LT_4x4_sse2.S", 79655),
+                        ("source/kernel/x86_64/trsm_kernel_LT_4x4_sse3.S", 75947),
+                        ("source/kernel/x86_64/trsm_kernel_LT_4x8_nehalem.S", 88037),
+                        ("source/kernel/x86_64/trsm_kernel_LT_8x4_sse.S", 115493),
+                        ("source/kernel/x86_64/trsm_kernel_RT_2x8_nehalem.S", 55952),
+                        ("source/kernel/x86_64/trsm_kernel_RT_4x2_atom.S", 37092),
+                        ("source/kernel/x86_64/trsm_kernel_RT_4x4_barcelona.S", 65480),
+                        ("source/kernel/x86_64/trsm_kernel_RT_4x4_core2.S", 66753),
+                        ("source/kernel/x86_64/trsm_kernel_RT_4x4_penryn.S", 60635),
+                        ("source/kernel/x86_64/trsm_kernel_RT_4x4_sse2.S", 79212),
+                        ("source/kernel/x86_64/trsm_kernel_RT_4x4_sse3.S", 75675),
+                        ("source/kernel/x86_64/trsm_kernel_RT_4x8_nehalem.S", 88037),
+                        ("source/kernel/x86_64/trsm_kernel_RT_8x4_sse.S", 115891),
+                        ("source/kernel/x86_64/xdot.S", 5871),
+                        ("source/kernel/x86_64/xgemm3m_kernel_2x2.S", 14869),
+                        ("source/kernel/x86_64/xgemm_kernel_1x1.S", 7706),
+                        ("source/kernel/x86_64/xgemv_n.S", 7499),
+                        ("source/kernel/x86_64/xgemv_t.S", 7472),
+                        ("source/kernel/x86_64/xtrsm_kernel_LT_1x1.S", 8773),
+                        ("source/kernel/x86_64/zamax.S", 4846),
+                        ("source/kernel/x86_64/zamax_atom.S", 7125),
+                        ("source/kernel/x86_64/zamax_sse.S", 6769),
+                        ("source/kernel/x86_64/zamax_sse2.S", 7514),
+                        ("source/kernel/x86_64/zasum.S", 4385),
+                        ("source/kernel/x86_64/zasum_atom.S", 8701),
+                        ("source/kernel/x86_64/zasum_sse.S", 6705),
+                        ("source/kernel/x86_64/zasum_sse2.S", 6704),
+                        ("source/kernel/x86_64/zaxpy.c", 3959),
+                        ("source/kernel/x86_64/zaxpy.S", 6851),
+                        ("source/kernel/x86_64/zaxpy_atom.S", 13565),
+                        ("source/kernel/x86_64/zaxpy_microk_bulldozer-2.c", 7723),
+                        ("source/kernel/x86_64/zaxpy_microk_haswell-2.c", 5439),
+                        ("source/kernel/x86_64/zaxpy_microk_sandy-2.c", 7384),
+                        ("source/kernel/x86_64/zaxpy_microk_steamroller-2.c", 7628),
+                        ("source/kernel/x86_64/zaxpy_sse.S", 62809),
+                        ("source/kernel/x86_64/zaxpy_sse2.S", 36471),
+                        ("source/kernel/x86_64/zcopy.S", 7981),
+                        ("source/kernel/x86_64/zcopy_sse.S", 18004),
+                        ("source/kernel/x86_64/zcopy_sse2.S", 12729),
+                        ("source/kernel/x86_64/zdot.c", 4108),
+                        ("source/kernel/x86_64/zdot.S", 5419),
+                        ("source/kernel/x86_64/zdot_atom.S", 10170),
+                        ("source/kernel/x86_64/zdot_microk_bulldozer-2.c", 7844),
+                        ("source/kernel/x86_64/zdot_microk_haswell-2.c", 8155),
+                        ("source/kernel/x86_64/zdot_microk_sandy-2.c", 8307),
+                        ("source/kernel/x86_64/zdot_microk_steamroller-2.c", 7852),
+                        ("source/kernel/x86_64/zdot_sse.S", 67296),
+                        ("source/kernel/x86_64/zdot_sse2.S", 31746),
+                        ("source/kernel/x86_64/zgemm3m_kernel_2x8_nehalem.S", 36447),
+                        ("source/kernel/x86_64/zgemm3m_kernel_4x2_atom.S", 22680),
+                        ("source/kernel/x86_64/zgemm3m_kernel_4x4_barcelona.S", 50760),
+                        ("source/kernel/x86_64/zgemm3m_kernel_4x4_core2.S", 44359),
+                        ("source/kernel/x86_64/zgemm3m_kernel_4x4_penryn.S", 39671),
+                        ("source/kernel/x86_64/zgemm3m_kernel_4x4_sse2.S", 58751),
+                        ("source/kernel/x86_64/zgemm3m_kernel_4x4_sse3.S", 57542),
+                        ("source/kernel/x86_64/zgemm3m_kernel_4x8_nehalem.S", 45689),
+                        ("source/kernel/x86_64/zgemm3m_kernel_8x4_barcelona.S", 67345),
+                        ("source/kernel/x86_64/zgemm3m_kernel_8x4_core2.S", 50440),
+                        ("source/kernel/x86_64/zgemm3m_kernel_8x4_penryn.S", 48584),
+                        ("source/kernel/x86_64/zgemm3m_kernel_8x4_sse.S", 73425),
+                        ("source/kernel/x86_64/zgemm3m_kernel_8x4_sse3.S", 66187),
+                        ("source/kernel/x86_64/zgemm_beta.S", 5979),
+                        ("source/kernel/x86_64/zgemm_kernel_1x4_nehalem.S", 21300),
+                        ("source/kernel/x86_64/zgemm_kernel_2x1_atom.S", 15491),
+                        ("source/kernel/x86_64/zgemm_kernel_2x2_barcelona.S", 32213),
+                        ("source/kernel/x86_64/zgemm_kernel_2x2_bulldozer.S", 39624),
+                        ("source/kernel/x86_64/zgemm_kernel_2x2_core2.S", 26806),
+                        ("source/kernel/x86_64/zgemm_kernel_2x2_penryn.S", 25390),
+                        ("source/kernel/x86_64/zgemm_kernel_2x2_piledriver.S", 40186),
+                        ("source/kernel/x86_64/zgemm_kernel_2x2_sse2.S", 40122),
+                        ("source/kernel/x86_64/zgemm_kernel_2x2_sse3.S", 35555),
+                        ("source/kernel/x86_64/zgemm_kernel_2x4_nehalem.S", 31158),
+                        ("source/kernel/x86_64/zgemm_kernel_4x2_barcelona.S", 47680),
+                        ("source/kernel/x86_64/zgemm_kernel_4x2_core2.S", 34234),
+                        ("source/kernel/x86_64/zgemm_kernel_4x2_haswell.S", 89621),
+                        ("source/kernel/x86_64/zgemm_kernel_4x2_penryn.S", 34697),
+                        ("source/kernel/x86_64/zgemm_kernel_4x2_sse.S", 48949),
+                        ("source/kernel/x86_64/zgemm_kernel_4x2_sse3.S", 47157),
+                        ("source/kernel/x86_64/zgemm_kernel_4x4_sandy.S", 80976),
+                        ("source/kernel/x86_64/zgemm_ncopy_1.S", 5203),
+                        ("source/kernel/x86_64/zgemm_ncopy_2.S", 8339),
+                        ("source/kernel/x86_64/zgemm_tcopy_1.S", 4951),
+                        ("source/kernel/x86_64/zgemm_tcopy_2.S", 9526),
+                        ("source/kernel/x86_64/zgemv_n.S", 53972),
+                        ("source/kernel/x86_64/zgemv_n_4.c", 15870),
+                        ("source/kernel/x86_64/zgemv_n_atom.S", 23008),
+                        ("source/kernel/x86_64/zgemv_n_dup.S", 30093),
+                        ("source/kernel/x86_64/zgemv_n_microk_bulldozer-4.c", 20983),
+                        ("source/kernel/x86_64/zgemv_n_microk_haswell-4.c", 16384),
+                        ("source/kernel/x86_64/zgemv_n_microk_sandy-4.c", 15336),
+                        ("source/kernel/x86_64/zgemv_t.S", 47733),
+                        ("source/kernel/x86_64/zgemv_t_4.c", 15987),
+                        ("source/kernel/x86_64/zgemv_t_atom.S", 19275),
+                        ("source/kernel/x86_64/zgemv_t_dup.S", 25159),
+                        ("source/kernel/x86_64/zgemv_t_microk_bulldozer-4.c", 21368),
+                        ("source/kernel/x86_64/zgemv_t_microk_haswell-4.c", 20520),
+                        ("source/kernel/x86_64/znrm2.S", 4768),
+                        ("source/kernel/x86_64/znrm2_sse.S", 8002),
+                        ("source/kernel/x86_64/zrot.S", 6421),
+                        ("source/kernel/x86_64/zrot_sse.S", 30216),
+                        ("source/kernel/x86_64/zrot_sse2.S", 30523),
+                        ("source/kernel/x86_64/zscal.c", 7916),
+                        ("source/kernel/x86_64/zscal.S", 4765),
+                        ("source/kernel/x86_64/zscal_atom.S", 8223),
+                        ("source/kernel/x86_64/zscal_microk_bulldozer-2.c", 10753),
+                        ("source/kernel/x86_64/zscal_microk_haswell-2.c", 10755),
+                        ("source/kernel/x86_64/zscal_microk_steamroller-2.c", 10791),
+                        ("source/kernel/x86_64/zscal_sse.S", 25160),
+                        ("source/kernel/x86_64/zscal_sse2.S", 32473),
+                        ("source/kernel/x86_64/zswap.S", 9438),
+                        ("source/kernel/x86_64/zswap_sse.S", 20635),
+                        ("source/kernel/x86_64/zswap_sse2.S", 18123),
+                        ("source/kernel/x86_64/zsymv_L_sse.S", 16454),
+                        ("source/kernel/x86_64/zsymv_L_sse2.S", 17731),
+                        ("source/kernel/x86_64/zsymv_U_sse.S", 11726),
+                        ("source/kernel/x86_64/zsymv_U_sse2.S", 18204),
+                        ("source/kernel/x86_64/ztrsm_kernel_LN_2x1_atom.S", 18354),
+                        ("source/kernel/x86_64/ztrsm_kernel_LN_2x2_core2.S", 38330),
+                        ("source/kernel/x86_64/ztrsm_kernel_LN_2x2_penryn.S", 35311),
+                        ("source/kernel/x86_64/ztrsm_kernel_LN_2x2_sse2.S", 42818),
+                        ("source/kernel/x86_64/ztrsm_kernel_LN_2x2_sse3.S", 45168),
+                        ("source/kernel/x86_64/ztrsm_kernel_LN_2x4_nehalem.S", 50924),
+                        ("source/kernel/x86_64/ztrsm_kernel_LN_4x2_sse.S", 71685),
+                        ("source/kernel/x86_64/ztrsm_kernel_LN_bulldozer.c", 14132),
+                        ("source/kernel/x86_64/ztrsm_kernel_LT_1x4_nehalem.S", 28294),
+                        ("source/kernel/x86_64/ztrsm_kernel_LT_2x1_atom.S", 18354),
+                        ("source/kernel/x86_64/ztrsm_kernel_LT_2x2_core2.S", 38330),
+                        ("source/kernel/x86_64/ztrsm_kernel_LT_2x2_penryn.S", 35315),
+                        ("source/kernel/x86_64/ztrsm_kernel_LT_2x2_sse2.S", 42616),
+                        ("source/kernel/x86_64/ztrsm_kernel_LT_2x2_sse3.S", 45029),
+                        ("source/kernel/x86_64/ztrsm_kernel_LT_2x4_nehalem.S", 50924),
+                        ("source/kernel/x86_64/ztrsm_kernel_LT_4x2_sse.S", 71685),
+                        ("source/kernel/x86_64/ztrsm_kernel_LT_bulldozer.c", 13127),
+                        ("source/kernel/x86_64/ztrsm_kernel_RN_bulldozer.c", 13130),
+                        ("source/kernel/x86_64/ztrsm_kernel_RT_1x4_nehalem.S", 28294),
+                        ("source/kernel/x86_64/ztrsm_kernel_RT_2x2_core2.S", 38338),
+                        ("source/kernel/x86_64/ztrsm_kernel_RT_2x2_penryn.S", 35206),
+                        ("source/kernel/x86_64/ztrsm_kernel_RT_2x2_sse2.S", 42651),
+                        ("source/kernel/x86_64/ztrsm_kernel_RT_2x2_sse3.S", 45031),
+                        ("source/kernel/x86_64/ztrsm_kernel_RT_2x4_nehalem.S", 50924),
+                        ("source/kernel/x86_64/ztrsm_kernel_RT_4x2_sse.S", 71685),
+                        ("source/kernel/x86_64/ztrsm_kernel_RT_bulldozer.c", 13865),
+                        ("source/l1param.h", 2096),
+                        ("source/l2param.h", 4056),
+                        ("source/lapack-devel.log", 712),
+                        ("source/lapack-netlib/BLAS/blas.pc.in", 222),
+                        ("source/lapack-netlib/BLAS/cblat2.in", 1546),
+                        ("source/lapack-netlib/BLAS/cblat3.in", 1046),
+                        ("source/lapack-netlib/BLAS/CMakeLists.txt", 266),
+                        ("source/lapack-netlib/BLAS/dblat2.in", 1466),
+                        ("source/lapack-netlib/BLAS/dblat3.in", 882),
+                        ("source/lapack-netlib/BLAS/sblat2.in", 1466),
+                        ("source/lapack-netlib/BLAS/sblat3.in", 882),
+                        ("source/lapack-netlib/BLAS/SRC/caxpy.f", 2274),
+                        ("source/lapack-netlib/BLAS/SRC/ccopy.f", 2082),
+                        ("source/lapack-netlib/BLAS/SRC/cdotc.f", 2324),
+                        ("source/lapack-netlib/BLAS/SRC/cdotu.f", 2246),
+                        ("source/lapack-netlib/BLAS/SRC/cgbmv.f", 11164),
+                        ("source/lapack-netlib/BLAS/SRC/cgemm.f", 14304),
+                        ("source/lapack-netlib/BLAS/SRC/cgemv.f", 9350),
+                        ("source/lapack-netlib/BLAS/SRC/cgerc.f", 5652),
+                        ("source/lapack-netlib/BLAS/SRC/cgeru.f", 5632),
+                        ("source/lapack-netlib/BLAS/SRC/chbmv.f", 11310),
+                        ("source/lapack-netlib/BLAS/SRC/chemm.f", 11345),
+                        ("source/lapack-netlib/BLAS/SRC/chemv.f", 9553),
+                        ("source/lapack-netlib/BLAS/SRC/cher.f", 7956),
+                        ("source/lapack-netlib/BLAS/SRC/cher2.f", 9488),
+                        ("source/lapack-netlib/BLAS/SRC/cher2k.f", 14563),
+                        ("source/lapack-netlib/BLAS/SRC/cherk.f", 12138),
+                        ("source/lapack-netlib/BLAS/SRC/chpmv.f", 9678),
+                        ("source/lapack-netlib/BLAS/SRC/chpr.f", 8073),
+                        ("source/lapack-netlib/BLAS/SRC/chpr2.f", 9604),
+                        ("source/lapack-netlib/BLAS/SRC/CMakeLists.txt", 5363),
+                        ("source/lapack-netlib/BLAS/SRC/crotg.f", 1655),
+                        ("source/lapack-netlib/BLAS/SRC/cscal.f", 1946),
+                        ("source/lapack-netlib/BLAS/SRC/csrot.f", 3906),
+                        ("source/lapack-netlib/BLAS/SRC/csscal.f", 2088),
+                        ("source/lapack-netlib/BLAS/SRC/cswap.f", 2195),
+                        ("source/lapack-netlib/BLAS/SRC/csymm.f", 11148),
+                        ("source/lapack-netlib/BLAS/SRC/csyr2k.f", 12277),
+                        ("source/lapack-netlib/BLAS/SRC/csyrk.f", 10644),
+                        ("source/lapack-netlib/BLAS/SRC/ctbmv.f", 14051),
+                        ("source/lapack-netlib/BLAS/SRC/ctbsv.f", 14143),
+                        ("source/lapack-netlib/BLAS/SRC/ctpmv.f", 12249),
+                        ("source/lapack-netlib/BLAS/SRC/ctpsv.f", 12351),
+                        ("source/lapack-netlib/BLAS/SRC/ctrmm.f", 14426),
+                        ("source/lapack-netlib/BLAS/SRC/ctrmv.f", 11558),
+                        ("source/lapack-netlib/BLAS/SRC/ctrsm.f", 15310),
+                        ("source/lapack-netlib/BLAS/SRC/ctrsv.f", 11646),
+                        ("source/lapack-netlib/BLAS/SRC/dasum.f", 2558),
+                        ("source/lapack-netlib/BLAS/SRC/daxpy.f", 2689),
+                        ("source/lapack-netlib/BLAS/SRC/dcabs1.f", 1302),
+                        ("source/lapack-netlib/BLAS/SRC/dcopy.f", 2631),
+                        ("source/lapack-netlib/BLAS/SRC/ddot.f", 2749),
+                        ("source/lapack-netlib/BLAS/SRC/dgbmv.f", 10548),
+                        ("source/lapack-netlib/BLAS/SRC/dgemm.f", 11135),
+                        ("source/lapack-netlib/BLAS/SRC/dgemv.f", 8779),
+                        ("source/lapack-netlib/BLAS/SRC/dger.f", 5709),
+                        ("source/lapack-netlib/BLAS/SRC/dnrm2.f", 2673),
+                        ("source/lapack-netlib/BLAS/SRC/drot.f", 2334),
+                        ("source/lapack-netlib/BLAS/SRC/drotg.f", 1934),
+                        ("source/lapack-netlib/BLAS/SRC/drotm.f", 5325),
+                        ("source/lapack-netlib/BLAS/SRC/drotmg.f", 6406),
+                        ("source/lapack-netlib/BLAS/SRC/dsbmv.f", 11167),
+                        ("source/lapack-netlib/BLAS/SRC/dscal.f", 2454),
+                        ("source/lapack-netlib/BLAS/SRC/dsdot.f", 4222),
+                        ("source/lapack-netlib/BLAS/SRC/dspmv.f", 9481),
+                        ("source/lapack-netlib/BLAS/SRC/dspr.f", 7311),
+                        ("source/lapack-netlib/BLAS/SRC/dspr2.f", 8629),
+                        ("source/lapack-netlib/BLAS/SRC/dswap.f", 2784),
+                        ("source/lapack-netlib/BLAS/SRC/dsymm.f", 11198),
+                        ("source/lapack-netlib/BLAS/SRC/dsymv.f", 9413),
+                        ("source/lapack-netlib/BLAS/SRC/dsyr.f", 7283),
+                        ("source/lapack-netlib/BLAS/SRC/dsyr2.f", 8610),
+                        ("source/lapack-netlib/BLAS/SRC/dsyr2k.f", 12510),
+                        ("source/lapack-netlib/BLAS/SRC/dsyrk.f", 10812),
+                        ("source/lapack-netlib/BLAS/SRC/dtbmv.f", 12580),
+                        ("source/lapack-netlib/BLAS/SRC/dtbsv.f", 12665),
+                        ("source/lapack-netlib/BLAS/SRC/dtpmv.f", 10671),
+                        ("source/lapack-netlib/BLAS/SRC/dtpsv.f", 10754),
+                        ("source/lapack-netlib/BLAS/SRC/dtrmm.f", 12821),
+                        ("source/lapack-netlib/BLAS/SRC/dtrmv.f", 10141),
+                        ("source/lapack-netlib/BLAS/SRC/dtrsm.f", 13804),
+                        ("source/lapack-netlib/BLAS/SRC/dtrsv.f", 10138),
+                        ("source/lapack-netlib/BLAS/SRC/dzasum.f", 2219),
+                        ("source/lapack-netlib/BLAS/SRC/dznrm2.f", 2971),
+                        ("source/lapack-netlib/BLAS/SRC/icamax.f", 2387),
+                        ("source/lapack-netlib/BLAS/SRC/idamax.f", 2385),
+                        ("source/lapack-netlib/BLAS/SRC/isamax.f", 2342),
+                        ("source/lapack-netlib/BLAS/SRC/izamax.f", 2408),
+                        ("source/lapack-netlib/BLAS/SRC/lsame.f", 3146),
+                        ("source/lapack-netlib/BLAS/SRC/Makefile", 5792),
+                        ("source/lapack-netlib/BLAS/SRC/sasum.f", 2543),
+                        ("source/lapack-netlib/BLAS/SRC/saxpy.f", 2639),
+                        ("source/lapack-netlib/BLAS/SRC/scabs1.f", 1253),
+                        ("source/lapack-netlib/BLAS/SRC/scasum.f", 2212),
+                        ("source/lapack-netlib/BLAS/SRC/scnrm2.f", 2917),
+                        ("source/lapack-netlib/BLAS/SRC/scopy.f", 2605),
+                        ("source/lapack-netlib/BLAS/SRC/sdot.f", 2689),
+                        ("source/lapack-netlib/BLAS/SRC/sdsdot.f", 6831),
+                        ("source/lapack-netlib/BLAS/SRC/sgbmv.f", 10414),
+                        ("source/lapack-netlib/BLAS/SRC/sgemm.f", 11001),
+                        ("source/lapack-netlib/BLAS/SRC/sgemv.f", 8645),
+                        ("source/lapack-netlib/BLAS/SRC/sger.f", 5588),
+                        ("source/lapack-netlib/BLAS/SRC/snrm2.f", 2602),
+                        ("source/lapack-netlib/BLAS/SRC/srot.f", 2269),
+                        ("source/lapack-netlib/BLAS/SRC/srotg.f", 1867),
+                        ("source/lapack-netlib/BLAS/SRC/srotm.f", 5263),
+                        ("source/lapack-netlib/BLAS/SRC/srotmg.f", 6260),
+                        ("source/lapack-netlib/BLAS/SRC/ssbmv.f", 11033),
+                        ("source/lapack-netlib/BLAS/SRC/sscal.f", 2398),
+                        ("source/lapack-netlib/BLAS/SRC/sspmv.f", 9347),
+                        ("source/lapack-netlib/BLAS/SRC/sspr.f", 7202),
+                        ("source/lapack-netlib/BLAS/SRC/sspr2.f", 8508),
+                        ("source/lapack-netlib/BLAS/SRC/sswap.f", 2749),
+                        ("source/lapack-netlib/BLAS/SRC/ssymm.f", 11064),
+                        ("source/lapack-netlib/BLAS/SRC/ssymv.f", 9279),
+                        ("source/lapack-netlib/BLAS/SRC/ssyr.f", 7174),
+                        ("source/lapack-netlib/BLAS/SRC/ssyr2.f", 8489),
+                        ("source/lapack-netlib/BLAS/SRC/ssyr2k.f", 12376),
+                        ("source/lapack-netlib/BLAS/SRC/ssyrk.f", 10690),
+                        ("source/lapack-netlib/BLAS/SRC/stbmv.f", 12508),
+                        ("source/lapack-netlib/BLAS/SRC/stbsv.f", 12593),
+                        ("source/lapack-netlib/BLAS/SRC/stpmv.f", 10599),
+                        ("source/lapack-netlib/BLAS/SRC/stpsv.f", 10682),
+                        ("source/lapack-netlib/BLAS/SRC/strmm.f", 12711),
+                        ("source/lapack-netlib/BLAS/SRC/strmv.f", 10069),
+                        ("source/lapack-netlib/BLAS/SRC/strsm.f", 13695),
+                        ("source/lapack-netlib/BLAS/SRC/strsv.f", 10151),
+                        ("source/lapack-netlib/BLAS/SRC/xerbla.f", 2161),
+                        ("source/lapack-netlib/BLAS/SRC/xerbla_array.f", 3215),
+                        ("source/lapack-netlib/BLAS/SRC/zaxpy.f", 2290),
+                        ("source/lapack-netlib/BLAS/SRC/zcopy.f", 2091),
+                        ("source/lapack-netlib/BLAS/SRC/zdotc.f", 2342),
+                        ("source/lapack-netlib/BLAS/SRC/zdotu.f", 2262),
+                        ("source/lapack-netlib/BLAS/SRC/zdrot.f", 3939),
+                        ("source/lapack-netlib/BLAS/SRC/zdscal.f", 2058),
+                        ("source/lapack-netlib/BLAS/SRC/zgbmv.f", 11205),
+                        ("source/lapack-netlib/BLAS/SRC/zgemm.f", 14349),
+                        ("source/lapack-netlib/BLAS/SRC/zgemv.f", 9392),
+                        ("source/lapack-netlib/BLAS/SRC/zgerc.f", 5687),
+                        ("source/lapack-netlib/BLAS/SRC/zgeru.f", 5664),
+                        ("source/lapack-netlib/BLAS/SRC/zhbmv.f", 11353),
+                        ("source/lapack-netlib/BLAS/SRC/zhemm.f", 11388),
+                        ("source/lapack-netlib/BLAS/SRC/zhemv.f", 9596),
+                        ("source/lapack-netlib/BLAS/SRC/zher.f", 8018),
+                        ("source/lapack-netlib/BLAS/SRC/zher2.f", 9529),
+                        ("source/lapack-netlib/BLAS/SRC/zher2k.f", 14696),
+                        ("source/lapack-netlib/BLAS/SRC/zherk.f", 12240),
+                        ("source/lapack-netlib/BLAS/SRC/zhpmv.f", 9721),
+                        ("source/lapack-netlib/BLAS/SRC/zhpr.f", 8135),
+                        ("source/lapack-netlib/BLAS/SRC/zhpr2.f", 9645),
+                        ("source/lapack-netlib/BLAS/SRC/zrotg.f", 1784),
+                        ("source/lapack-netlib/BLAS/SRC/zscal.f", 1950),
+                        ("source/lapack-netlib/BLAS/SRC/zswap.f", 2198),
+                        ("source/lapack-netlib/BLAS/SRC/zsymm.f", 11186),
+                        ("source/lapack-netlib/BLAS/SRC/zsyr2k.f", 12315),
+                        ("source/lapack-netlib/BLAS/SRC/zsyrk.f", 10679),
+                        ("source/lapack-netlib/BLAS/SRC/ztbmv.f", 14091),
+                        ("source/lapack-netlib/BLAS/SRC/ztbsv.f", 14172),
+                        ("source/lapack-netlib/BLAS/SRC/ztpmv.f", 12289),
+                        ("source/lapack-netlib/BLAS/SRC/ztpsv.f", 12380),
+                        ("source/lapack-netlib/BLAS/SRC/ztrmm.f", 14478),
+                        ("source/lapack-netlib/BLAS/SRC/ztrmv.f", 11598),
+                        ("source/lapack-netlib/BLAS/SRC/ztrsm.f", 15351),
+                        ("source/lapack-netlib/BLAS/SRC/ztrsv.f", 11675),
+                        ("source/lapack-netlib/BLAS/TESTING/cblat1.f", 32109),
+                        ("source/lapack-netlib/BLAS/TESTING/cblat2.f", 116657),
+                        ("source/lapack-netlib/BLAS/TESTING/cblat3.f", 131550),
+                        ("source/lapack-netlib/BLAS/TESTING/CMakeLists.txt", 2394),
+                        ("source/lapack-netlib/BLAS/TESTING/dblat1.f", 44819),
+                        ("source/lapack-netlib/BLAS/TESTING/dblat2.f", 112335),
+                        ("source/lapack-netlib/BLAS/TESTING/dblat3.f", 104262),
+                        ("source/lapack-netlib/BLAS/TESTING/Makeblat1", 1936),
+                        ("source/lapack-netlib/BLAS/TESTING/Makeblat2", 1936),
+                        ("source/lapack-netlib/BLAS/TESTING/Makeblat3", 1931),
+                        ("source/lapack-netlib/BLAS/TESTING/sblat1.f", 43388),
+                        ("source/lapack-netlib/BLAS/TESTING/sblat2.f", 112251),
+                        ("source/lapack-netlib/BLAS/TESTING/sblat3.f", 104172),
+                        ("source/lapack-netlib/BLAS/TESTING/zblat1.f", 32114),
+                        ("source/lapack-netlib/BLAS/TESTING/zblat2.f", 117003),
+                        ("source/lapack-netlib/BLAS/TESTING/zblat3.f", 131995),
+                        ("source/lapack-netlib/BLAS/zblat2.in", 1546),
+                        ("source/lapack-netlib/BLAS/zblat3.in", 1046),
+                        ("source/lapack-netlib/CBLAS/cblas.pc.in", 214),
+                        (
+                            "source/lapack-netlib/CBLAS/cmake/cblas-config-build.cmake.in",
+                            436
+                        ),
+                        (
+                            "source/lapack-netlib/CBLAS/cmake/cblas-config-install.cmake.in",
+                            803
+                        ),
+                        (
+                            "source/lapack-netlib/CBLAS/cmake/cblas-config-version.cmake.in",
+                            258
+                        ),
+                        ("source/lapack-netlib/CBLAS/CMakeLists.txt", 2882),
+                        ("source/lapack-netlib/CBLAS/examples/cblas_example1.c", 1418),
+                        ("source/lapack-netlib/CBLAS/examples/cblas_example2.c", 2370),
+                        ("source/lapack-netlib/CBLAS/examples/CMakeLists.txt", 378),
+                        ("source/lapack-netlib/CBLAS/examples/Makefile", 344),
+                        ("source/lapack-netlib/CBLAS/include/cblas.h", 29942),
+                        ("source/lapack-netlib/CBLAS/include/cblas_f77.h", 21255),
+                        (
+                            "source/lapack-netlib/CBLAS/include/cblas_mangling_with_flags.h",
+                            444
+                        ),
+                        ("source/lapack-netlib/CBLAS/include/cblas_test.h", 8051),
+                        ("source/lapack-netlib/CBLAS/include/CMakeLists.txt", 140),
+                        ("source/lapack-netlib/CBLAS/Makefile", 419),
+                        ("source/lapack-netlib/CBLAS/Makefile.in", 1348),
+                        ("source/lapack-netlib/CBLAS/README", 1911),
+                        ("source/lapack-netlib/CBLAS/src/cblas_caxpy.c", 499),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ccopy.c", 471),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cdotc_sub.c", 572),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cdotu_sub.c", 569),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cgbmv.c", 4187),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cgemm.c", 2977),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cgemv.c", 4070),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cgerc.c", 1929),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cgeru.c", 1131),
+                        ("source/lapack-netlib/CBLAS/src/cblas_chbmv.c", 3537),
+                        ("source/lapack-netlib/CBLAS/src/cblas_chemm.c", 2657),
+                        ("source/lapack-netlib/CBLAS/src/cblas_chemv.c", 3487),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cher.c", 2572),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cher2.c", 3436),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cher2k.c", 2868),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cherk.c", 2674),
+                        ("source/lapack-netlib/CBLAS/src/cblas_chpmv.c", 3417),
+                        ("source/lapack-netlib/CBLAS/src/cblas_chpr.c", 2497),
+                        ("source/lapack-netlib/CBLAS/src/cblas_chpr2.c", 3273),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cscal.c", 414),
+                        ("source/lapack-netlib/CBLAS/src/cblas_csscal.c", 418),
+                        ("source/lapack-netlib/CBLAS/src/cblas_cswap.c", 466),
+                        ("source/lapack-netlib/CBLAS/src/cblas_csymm.c", 2663),
+                        ("source/lapack-netlib/CBLAS/src/cblas_csyr2k.c", 2783),
+                        ("source/lapack-netlib/CBLAS/src/cblas_csyrk.c", 2674),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ctbmv.c", 3956),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ctbsv.c", 3965),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ctpmv.c", 3768),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ctpsv.c", 3778),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ctrmm.c", 3883),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ctrmv.c", 3887),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ctrsm.c", 3980),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ctrsv.c", 3903),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dasum.c", 472),
+                        ("source/lapack-netlib/CBLAS/src/cblas_daxpy.c", 505),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dcopy.c", 475),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ddot.c", 575),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dgbmv.c", 2280),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dgemm.c", 2972),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dgemv.c", 2125),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dger.c", 1152),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dnrm2.c", 471),
+                        ("source/lapack-netlib/CBLAS/src/cblas_drot.c", 497),
+                        ("source/lapack-netlib/CBLAS/src/cblas_drotg.c", 253),
+                        ("source/lapack-netlib/CBLAS/src/cblas_drotm.c", 376),
+                        ("source/lapack-netlib/CBLAS/src/cblas_drotmg.c", 304),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dsbmv.c", 2008),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dscal.c", 418),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dsdot.c", 580),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dspmv.c", 1885),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dspr.c", 1656),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dspr2.c", 1752),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dswap.c", 470),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dsymm.c", 2667),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dsymv.c", 1951),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dsyr.c", 1729),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dsyr2.c", 1898),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dsyr2k.c", 2806),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dsyrk.c", 2679),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dtbmv.c", 3276),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dtbsv.c", 3286),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dtpmv.c", 3099),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dtpsv.c", 3100),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dtrmm.c", 3950),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dtrmv.c", 3243),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dtrsm.c", 4036),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dtrsv.c", 3229),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dzasum.c", 475),
+                        ("source/lapack-netlib/CBLAS/src/cblas_dznrm2.c", 475),
+                        ("source/lapack-netlib/CBLAS/src/cblas_globals.c", 43),
+                        ("source/lapack-netlib/CBLAS/src/cblas_icamax.c", 501),
+                        ("source/lapack-netlib/CBLAS/src/cblas_idamax.c", 503),
+                        ("source/lapack-netlib/CBLAS/src/cblas_isamax.c", 502),
+                        ("source/lapack-netlib/CBLAS/src/cblas_izamax.c", 503),
+                        ("source/lapack-netlib/CBLAS/src/cblas_sasum.c", 469),
+                        ("source/lapack-netlib/CBLAS/src/cblas_saxpy.c", 556),
+                        ("source/lapack-netlib/CBLAS/src/cblas_scasum.c", 473),
+                        ("source/lapack-netlib/CBLAS/src/cblas_scnrm2.c", 473),
+                        ("source/lapack-netlib/CBLAS/src/cblas_scopy.c", 473),
+                        ("source/lapack-netlib/CBLAS/src/cblas_sdot.c", 571),
+                        ("source/lapack-netlib/CBLAS/src/cblas_sdsdot.c", 608),
+                        ("source/lapack-netlib/CBLAS/src/cblas_sgbmv.c", 2287),
+                        ("source/lapack-netlib/CBLAS/src/cblas_sgemm.c", 3056),
+                        ("source/lapack-netlib/CBLAS/src/cblas_sgemv.c", 2106),
+                        ("source/lapack-netlib/CBLAS/src/cblas_sger.c", 1118),
+                        ("source/lapack-netlib/CBLAS/src/cblas_snrm2.c", 469),
+                        ("source/lapack-netlib/CBLAS/src/cblas_srot.c", 504),
+                        ("source/lapack-netlib/CBLAS/src/cblas_srotg.c", 249),
+                        ("source/lapack-netlib/CBLAS/src/cblas_srotm.c", 490),
+                        ("source/lapack-netlib/CBLAS/src/cblas_srotmg.c", 299),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ssbmv.c", 1933),
+                        ("source/lapack-netlib/CBLAS/src/cblas_sscal.c", 416),
+                        ("source/lapack-netlib/CBLAS/src/cblas_sspmv.c", 1866),
+                        ("source/lapack-netlib/CBLAS/src/cblas_sspr.c", 1656),
+                        ("source/lapack-netlib/CBLAS/src/cblas_sspr2.c", 1753),
+                        ("source/lapack-netlib/CBLAS/src/cblas_sswap.c", 468),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ssymm.c", 2741),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ssymv.c", 1946),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ssyr.c", 1725),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ssyr2.c", 1894),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ssyr2k.c", 2881),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ssyrk.c", 2757),
+                        ("source/lapack-netlib/CBLAS/src/cblas_stbmv.c", 3301),
+                        ("source/lapack-netlib/CBLAS/src/cblas_stbsv.c", 3285),
+                        ("source/lapack-netlib/CBLAS/src/cblas_stpmv.c", 3112),
+                        ("source/lapack-netlib/CBLAS/src/cblas_stpsv.c", 3098),
+                        ("source/lapack-netlib/CBLAS/src/cblas_strmm.c", 3922),
+                        ("source/lapack-netlib/CBLAS/src/cblas_strmv.c", 3242),
+                        ("source/lapack-netlib/CBLAS/src/cblas_strsm.c", 3950),
+                        ("source/lapack-netlib/CBLAS/src/cblas_strsv.c", 3227),
+                        ("source/lapack-netlib/CBLAS/src/cblas_xerbla.c", 1912),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zaxpy.c", 499),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zcopy.c", 471),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zdotc_sub.c", 572),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zdotu_sub.c", 572),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zdscal.c", 420),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zgbmv.c", 4204),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zgemm.c", 2974),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zgemv.c", 4034),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zgerc.c", 1934),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zgeru.c", 1131),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zhbmv.c", 3547),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zhemm.c", 2658),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zhemv.c", 3495),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zher.c", 2497),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zher2.c", 3452),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zher2k.c", 2868),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zherk.c", 2676),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zhpmv.c", 3427),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zhpr.c", 2503),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zhpr2.c", 3297),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zscal.c", 414),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zswap.c", 468),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zsymm.c", 2664),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zsyr2k.c", 2783),
+                        ("source/lapack-netlib/CBLAS/src/cblas_zsyrk.c", 2674),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ztbmv.c", 3958),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ztbsv.c", 3967),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ztpmv.c", 3770),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ztpsv.c", 3780),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ztrmm.c", 3959),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ztrmv.c", 3903),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ztrsm.c", 3981),
+                        ("source/lapack-netlib/CBLAS/src/cblas_ztrsv.c", 3905),
+                        ("source/lapack-netlib/CBLAS/src/cdotcsub.f", 320),
+                        ("source/lapack-netlib/CBLAS/src/cdotusub.f", 320),
+                        ("source/lapack-netlib/CBLAS/src/CMakeLists.txt", 4675),
+                        ("source/lapack-netlib/CBLAS/src/dasumsub.f", 315),
+                        ("source/lapack-netlib/CBLAS/src/ddotsub.f", 329),
+                        ("source/lapack-netlib/CBLAS/src/dnrm2sub.f", 314),
+                        ("source/lapack-netlib/CBLAS/src/dsdotsub.f", 329),
+                        ("source/lapack-netlib/CBLAS/src/dzasumsub.f", 318),
+                        ("source/lapack-netlib/CBLAS/src/dznrm2sub.f", 318),
+                        ("source/lapack-netlib/CBLAS/src/icamaxsub.f", 306),
+                        ("source/lapack-netlib/CBLAS/src/idamaxsub.f", 315),
+                        ("source/lapack-netlib/CBLAS/src/isamaxsub.f", 303),
+                        ("source/lapack-netlib/CBLAS/src/izamaxsub.f", 313),
+                        ("source/lapack-netlib/CBLAS/src/Makefile", 6202),
+                        ("source/lapack-netlib/CBLAS/src/sasumsub.f", 290),
+                        ("source/lapack-netlib/CBLAS/src/scasumsub.f", 299),
+                        ("source/lapack-netlib/CBLAS/src/scnrm2sub.f", 299),
+                        ("source/lapack-netlib/CBLAS/src/sdotsub.f", 311),
+                        ("source/lapack-netlib/CBLAS/src/sdsdotsub.f", 326),
+                        ("source/lapack-netlib/CBLAS/src/snrm2sub.f", 290),
+                        ("source/lapack-netlib/CBLAS/src/xerbla.c", 804),
+                        ("source/lapack-netlib/CBLAS/src/zdotcsub.f", 334),
+                        ("source/lapack-netlib/CBLAS/src/zdotusub.f", 334),
+                        ("source/lapack-netlib/CBLAS/testing/auxiliary.c", 1309),
+                        ("source/lapack-netlib/CBLAS/testing/c_c2chke.c", 33705),
+                        ("source/lapack-netlib/CBLAS/testing/c_c3chke.c", 76424),
+                        ("source/lapack-netlib/CBLAS/testing/c_cblas1.c", 1688),
+                        ("source/lapack-netlib/CBLAS/testing/c_cblas2.c", 26494),
+                        ("source/lapack-netlib/CBLAS/testing/c_cblas3.c", 18642),
+                        ("source/lapack-netlib/CBLAS/testing/c_cblat1.f", 31416),
+                        ("source/lapack-netlib/CBLAS/testing/c_cblat2.f", 104838),
+                        ("source/lapack-netlib/CBLAS/testing/c_cblat3.f", 100347),
+                        ("source/lapack-netlib/CBLAS/testing/c_d2chke.c", 32133),
+                        ("source/lapack-netlib/CBLAS/testing/c_d3chke.c", 57372),
+                        ("source/lapack-netlib/CBLAS/testing/c_dblas1.c", 1851),
+                        ("source/lapack-netlib/CBLAS/testing/c_dblas2.c", 16691),
+                        ("source/lapack-netlib/CBLAS/testing/c_dblas3.c", 10171),
+                        ("source/lapack-netlib/CBLAS/testing/c_dblat1.f", 28685),
+                        ("source/lapack-netlib/CBLAS/testing/c_dblat2.f", 105029),
+                        ("source/lapack-netlib/CBLAS/testing/c_dblat3.f", 87526),
+                        ("source/lapack-netlib/CBLAS/testing/c_s2chke.c", 32133),
+                        ("source/lapack-netlib/CBLAS/testing/c_s3chke.c", 57374),
+                        ("source/lapack-netlib/CBLAS/testing/c_sblas1.c", 1847),
+                        ("source/lapack-netlib/CBLAS/testing/c_sblas2.c", 16558),
+                        ("source/lapack-netlib/CBLAS/testing/c_sblas3.c", 10038),
+                        ("source/lapack-netlib/CBLAS/testing/c_sblat1.f", 28679),
+                        ("source/lapack-netlib/CBLAS/testing/c_sblat2.f", 104957),
+                        ("source/lapack-netlib/CBLAS/testing/c_sblat3.f", 87688),
+                        ("source/lapack-netlib/CBLAS/testing/c_xerbla.c", 3714),
+                        ("source/lapack-netlib/CBLAS/testing/c_z2chke.c", 33706),
+                        ("source/lapack-netlib/CBLAS/testing/c_z3chke.c", 76424),
+                        ("source/lapack-netlib/CBLAS/testing/c_zblas1.c", 1698),
+                        ("source/lapack-netlib/CBLAS/testing/c_zblas2.c", 26496),
+                        ("source/lapack-netlib/CBLAS/testing/c_zblas3.c", 18645),
+                        ("source/lapack-netlib/CBLAS/testing/c_zblat1.f", 31436),
+                        ("source/lapack-netlib/CBLAS/testing/c_zblat2.f", 105206),
+                        ("source/lapack-netlib/CBLAS/testing/c_zblat3.f", 100537),
+                        ("source/lapack-netlib/CBLAS/testing/cin2", 1633),
+                        ("source/lapack-netlib/CBLAS/testing/cin3", 1077),
+                        ("source/lapack-netlib/CBLAS/testing/CMakeLists.txt", 4325),
+                        ("source/lapack-netlib/CBLAS/testing/din2", 1539),
+                        ("source/lapack-netlib/CBLAS/testing/din3", 895),
+                        ("source/lapack-netlib/CBLAS/testing/Makefile", 3725),
+                        ("source/lapack-netlib/CBLAS/testing/sin2", 1547),
+                        ("source/lapack-netlib/CBLAS/testing/sin3", 895),
+                        ("source/lapack-netlib/CBLAS/testing/zin2", 1633),
+                        ("source/lapack-netlib/CBLAS/testing/zin3", 1077),
+                        (
+                            "source/lapack-netlib/CMAKE/CheckFortranTypeSizes.cmake",
+                            2012
+                        ),
+                        (
+                            "source/lapack-netlib/CMAKE/CheckLAPACKCompilerFlags.cmake",
+                            3802
+                        ),
+                        ("source/lapack-netlib/CMAKE/CheckTimeFunction.cmake", 994),
+                        ("source/lapack-netlib/CMAKE/FortranMangling.cmake", 3828),
+                        (
+                            "source/lapack-netlib/CMAKE/lapack-config-build.cmake.in",
+                            405
+                        ),
+                        (
+                            "source/lapack-netlib/CMAKE/lapack-config-install.cmake.in",
+                            578
+                        ),
+                        ("source/lapack-netlib/CMakeLists.txt", 12665),
+                        ("source/lapack-netlib/CTestConfig.cmake", 529),
+                        ("source/lapack-netlib/CTestCustom.cmake.in", 1604),
+                        ("source/lapack-netlib/DOCS/Doxyfile", 106613),
+                        ("source/lapack-netlib/DOCS/Doxyfile_man", 106610),
+                        ("source/lapack-netlib/DOCS/groups-usr.dox", 18906),
+                        ("source/lapack-netlib/DOCS/lapack.png", 15912),
+                        ("source/lapack-netlib/DOCS/lapacke.pdf", 186936),
+                        ("source/lapack-netlib/DOCS/lawn81.tex", 71758),
+                        ("source/lapack-netlib/DOCS/org2.ps", 17072),
+                        ("source/lapack-netlib/INSTALL/CMakeLists.txt", 484),
+                        ("source/lapack-netlib/INSTALL/dlamch.f", 5259),
+                        ("source/lapack-netlib/INSTALL/dlamchf77.f", 26175),
+                        ("source/lapack-netlib/INSTALL/dlamchtst.f", 2201),
+                        ("source/lapack-netlib/INSTALL/dsecnd_EXT_ETIME.f", 1465),
+                        ("source/lapack-netlib/INSTALL/dsecnd_EXT_ETIME_.f", 1376),
+                        ("source/lapack-netlib/INSTALL/dsecnd_INT_CPU_TIME.f", 1335),
+                        ("source/lapack-netlib/INSTALL/dsecnd_INT_ETIME.f", 1479),
+                        ("source/lapack-netlib/INSTALL/dsecnd_NONE.f", 1282),
+                        ("source/lapack-netlib/INSTALL/dsecndtst.f", 3443),
+                        ("source/lapack-netlib/INSTALL/ilaver.f", 1686),
+                        ("source/lapack-netlib/INSTALL/LAPACK_version.f", 920),
+                        ("source/lapack-netlib/INSTALL/lsame.f", 3170),
+                        ("source/lapack-netlib/INSTALL/lsametst.f", 2421),
+                        ("source/lapack-netlib/INSTALL/make.inc.ALPHA", 2738),
+                        ("source/lapack-netlib/INSTALL/make.inc.gfortran", 2958),
+                        ("source/lapack-netlib/INSTALL/make.inc.gfortran_debug", 2995),
+                        ("source/lapack-netlib/INSTALL/make.inc.HPPA", 2748),
+                        ("source/lapack-netlib/INSTALL/make.inc.ifort", 2764),
+                        ("source/lapack-netlib/INSTALL/make.inc.IRIX64", 3076),
+                        ("source/lapack-netlib/INSTALL/make.inc.O2K", 2938),
+                        ("source/lapack-netlib/INSTALL/make.inc.pgf95", 2720),
+                        ("source/lapack-netlib/INSTALL/make.inc.pghpf", 2770),
+                        ("source/lapack-netlib/INSTALL/make.inc.SGI5", 2739),
+                        ("source/lapack-netlib/INSTALL/make.inc.SUN4", 2764),
+                        ("source/lapack-netlib/INSTALL/make.inc.SUN4SOL2", 2978),
+                        ("source/lapack-netlib/INSTALL/make.inc.XLF", 2817),
+                        ("source/lapack-netlib/INSTALL/Makefile", 1116),
+                        ("source/lapack-netlib/INSTALL/second_EXT_ETIME.f", 1439),
+                        ("source/lapack-netlib/INSTALL/second_EXT_ETIME_.f", 1353),
+                        ("source/lapack-netlib/INSTALL/second_INT_CPU_TIME.f", 1311),
+                        ("source/lapack-netlib/INSTALL/second_INT_ETIME.f", 1455),
+                        ("source/lapack-netlib/INSTALL/second_NONE.f", 1258),
+                        ("source/lapack-netlib/INSTALL/secondtst.f", 3374),
+                        ("source/lapack-netlib/INSTALL/slamch.f", 5261),
+                        ("source/lapack-netlib/INSTALL/slamchf77.f", 26232),
+                        ("source/lapack-netlib/INSTALL/slamchtst.f", 2146),
+                        ("source/lapack-netlib/INSTALL/tstiee.f", 21800),
+                        ("source/lapack-netlib/lapack.pc.in", 228),
+                        ("source/lapack-netlib/lapack_build.cmake", 7600),
+                        ("source/lapack-netlib/lapack_testing.py", 12140),
+                        (
+                            "source/lapack-netlib/LAPACKE/cmake/lapacke-config-build.cmake.in",
+                            444
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/cmake/lapacke-config-install.cmake.in",
+                            837
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/cmake/lapacke-config-version.cmake.in",
+                            258
+                        ),
+                        ("source/lapack-netlib/LAPACKE/CMakeLists.txt", 2967),
+                        ("source/lapack-netlib/LAPACKE/example/CMakeLists.txt", 1174),
+                        (
+                            "source/lapack-netlib/LAPACKE/example/example_DGELS_colmajor.c",
+                            2916
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/example/example_DGELS_rowmajor.c",
+                            2910
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/example/example_DGESV_colmajor.c",
+                            3642
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/example/example_DGESV_rowmajor.c",
+                            3594
+                        ),
+                        ("source/lapack-netlib/LAPACKE/example/example_user.c", 3408),
+                        (
+                            "source/lapack-netlib/LAPACKE/example/lapacke_example_aux.c",
+                            1038
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/example/lapacke_example_aux.h",
+                            359
+                        ),
+                        ("source/lapack-netlib/LAPACKE/example/Makefile", 1063),
+                        ("source/lapack-netlib/LAPACKE/include/CMakeLists.txt", 156),
+                        ("source/lapack-netlib/LAPACKE/include/lapacke.h", 1144601),
+                        (
+                            "source/lapack-netlib/LAPACKE/include/lapacke_config.h",
+                            4388
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/include/lapacke_mangling_with_flags.h",
+                            474
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/include/lapacke_utils.h",
+                            33161
+                        ),
+                        ("source/lapack-netlib/LAPACKE/lapacke.pc.in", 225),
+                        ("source/lapack-netlib/LAPACKE/LICENSE", 1571),
+                        ("source/lapack-netlib/LAPACKE/Makefile", 2497),
+                        ("source/lapack-netlib/LAPACKE/mangling/Cintface.c", 263),
+                        ("source/lapack-netlib/LAPACKE/mangling/CMakeLists.txt", 114),
+                        ("source/lapack-netlib/LAPACKE/mangling/Fintface.f", 116),
+                        ("source/lapack-netlib/LAPACKE/README", 9451),
+                        ("source/lapack-netlib/LAPACKE/src/CMakeLists.txt", 43753),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cbbcsd.c", 5227),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cbbcsd_work.c",
+                            9061
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cbdsqr.c", 3750),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cbdsqr_work.c",
+                            6073
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgbbrd.c", 3842),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgbbrd_work.c",
+                            6981
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgbcon.c", 3557),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgbcon_work.c",
+                            3977
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgbequ.c", 2740),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgbequ_work.c",
+                            3868
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgbequb.c", 2749),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgbequb_work.c",
+                            3881
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgbrfs.c", 4099),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgbrfs_work.c",
+                            6272
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgbrfsx.c", 4886),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgbrfsx_work.c",
+                            7802
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgbsv.c", 2808),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgbsv_work.c",
+                            4679
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgbsvx.c", 4660),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgbsvx_work.c",
+                            7143
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgbsvxx.c", 4988),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgbsvxx_work.c",
+                            8519
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgbtrf.c", 2611),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgbtrf_work.c",
+                            3882
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgbtrs.c", 2849),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgbtrs_work.c",
+                            4640
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgebak.c", 2736),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgebak_work.c",
+                            3858
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgebal.c", 2690),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgebal_work.c",
+                            4303
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgebrd.c", 3543),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgebrd_work.c",
+                            4204
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgecon.c", 3445),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgecon_work.c",
+                            3741
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeequ.c", 2661),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeequ_work.c",
+                            3709
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeequb.c", 2669),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeequb_work.c",
+                            3743
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgees.c", 4360),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgees_work.c",
+                            5275
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeesx.c", 4520),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeesx_work.c",
+                            5544
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeev.c", 3928),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeev_work.c",
+                            6040
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeevx.c", 4344),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeevx_work.c",
+                            6517
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgehrd.c", 3473),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgehrd_work.c",
+                            4103
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgejsv.c", 9517),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgejsv_work.c",
+                            6800
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgelq2.c", 3085),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgelq2_work.c",
+                            3774
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgelqf.c", 3409),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgelqf_work.c",
+                            4034
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgels.c", 3631),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgels_work.c",
+                            4959
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgelsd.c", 4565),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgelsd_work.c",
+                            5170
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgelss.c", 4089),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgelss_work.c",
+                            5098
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgelsy.c", 4096),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgelsy_work.c",
+                            5115
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgemqrt.c", 3557),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgemqrt_work.c",
+                            5253
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeqlf.c", 3409),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeqlf_work.c",
+                            4034
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeqp3.c", 3764),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeqp3_work.c",
+                            4187
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeqpf.c", 3380),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeqpf_work.c",
+                            3832
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeqr2.c", 3085),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeqr2_work.c",
+                            3774
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeqrf.c", 3409),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeqrf_work.c",
+                            4034
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeqrfp.c", 3418),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeqrfp_work.c",
+                            4045
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeqrt.c", 3161),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeqrt2.c", 2561),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeqrt2_work.c",
+                            4311
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgeqrt3.c", 2561),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeqrt3_work.c",
+                            4311
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgeqrt_work.c",
+                            4478
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgerfs.c", 3971),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgerfs_work.c",
+                            6072
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgerfsx.c", 4816),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgerfsx_work.c",
+                            7591
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgerqf.c", 3409),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgerqf_work.c",
+                            4034
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgesdd.c", 4492),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgesdd_work.c",
+                            7285
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgesv.c", 2696),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgesv_work.c",
+                            4470
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgesvd.c", 4104),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgesvd_work.c",
+                            6740
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgesvdx.c", 4605),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgesvdx_work.c",
+                            6976
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgesvj.c", 4118),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgesvj_work.c",
+                            5326
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgesvx.c", 4580),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgesvx_work.c",
+                            6905
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgesvxx.c", 4873),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgesvxx_work.c",
+                            8224
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgetf2.c", 2529),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgetf2_work.c",
+                            3695
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgetrf.c", 2529),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgetrf2.c", 2534),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgetrf2_work.c",
+                            3703
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgetrf_work.c",
+                            3695
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgetri.c", 3388),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgetri_work.c",
+                            4008
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgetrs.c", 2766),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgetrs_work.c",
+                            4471
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggbak.c", 2841),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggbak_work.c",
+                            3953
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggbal.c", 3826),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggbal_work.c",
+                            5733
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgges.c", 4776),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgges3.c", 4791),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgges3_work.c",
+                            7275
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgges_work.c",
+                            7257
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggesx.c", 5406),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggesx_work.c",
+                            7668
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggev.c", 4240),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggev3.c", 4284),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggev3_work.c",
+                            7385
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggev_work.c",
+                            7328
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggevx.c", 6067),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggevx_work.c",
+                            7659
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggglm.c", 3784),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggglm_work.c",
+                            5005
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgghd3.c", 4258),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgghd3_work.c",
+                            6544
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgghrd.c", 3275),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgghrd_work.c",
+                            6769
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgglse.c", 3852),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgglse_work.c",
+                            5005
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggqrf.c", 3704),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggqrf_work.c",
+                            4963
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggrqf.c", 3704),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggrqf_work.c",
+                            4963
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggsvd.c", 3989),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggsvd3.c", 4416),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggsvd3_work.c",
+                            8076
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggsvd_work.c",
+                            7590
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggsvp.c", 4606),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cggsvp3.c", 5080),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggsvp3_work.c",
+                            8104
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cggsvp_work.c",
+                            7657
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgtcon.c", 3406),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgtcon_work.c",
+                            2586
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgtrfs.c", 4590),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgtrfs_work.c",
+                            5248
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgtsv.c", 2829),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgtsv_work.c",
+                            3866
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgtsvx.c", 4707),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgtsvx_work.c",
+                            5221
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgttrf.c", 2512),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgttrf_work.c",
+                            2347
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cgttrs.c", 3126),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cgttrs_work.c",
+                            4113
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chbev.c", 3455),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chbev_work.c",
+                            4853
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chbevd.c", 4360),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chbevd_work.c",
+                            5443
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chbevx.c", 4359),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chbevx_work.c",
+                            6391
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chbgst.c", 3650),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chbgst_work.c",
+                            5543
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chbgv.c", 3649),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chbgv_work.c",
+                            5679
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chbgvd.c", 4571),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chbgvd_work.c",
+                            6335
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chbgvx.c", 4557),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chbgvx_work.c",
+                            6966
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chbtrd.c", 3413),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chbtrd_work.c",
+                            5071
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_checon.c", 3239),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_checon_work.c",
+                            3752
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cheequb.c", 3157),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cheequb_work.c",
+                            3715
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cheev.c", 3708),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cheev_work.c",
+                            4174
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cheevd.c", 4179),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cheevd_work.c",
+                            4385
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cheevr.c", 4934),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cheevr_work.c",
+                            5970
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cheevx.c", 4725),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cheevx_work.c",
+                            5810
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chegst.c", 2704),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chegst_work.c",
+                            4378
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chegv.c", 3935),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chegv_work.c",
+                            4962
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chegvd.c", 4443),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chegvd_work.c",
+                            5234
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chegvx.c", 4932),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chegvx_work.c",
+                            6601
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cherfs.c", 3975),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cherfs_work.c",
+                            6075
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cherfsx.c", 4585),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cherfsx_work.c",
+                            7539
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chesv.c", 3634),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chesv_work.c",
+                            4923
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chesvx.c", 4466),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chesvx_work.c",
+                            6739
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chesvxx.c", 4587),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chesvxx_work.c",
+                            8088
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cheswapr.c", 2535),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cheswapr_work.c",
+                            3441
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chetrd.c", 3479),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chetrd_work.c",
+                            4111
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chetrf.c", 3440),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chetrf_rook.c",
+                            3471
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chetrf_rook_work.c",
+                            4081
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chetrf_work.c",
+                            4040
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chetri.c", 3086),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chetri2.c", 3456),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chetri2_work.c",
+                            4057
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chetri2x.c", 3162),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chetri2x_work.c",
+                            3827
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chetri_work.c",
+                            3782
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chetrs.c", 2767),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chetrs2.c", 3324),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chetrs2_work.c",
+                            4556
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chetrs_rook.c",
+                            2788
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chetrs_rook_work.c",
+                            4512
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chetrs_work.c",
+                            4471
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chfrk.c", 3013),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chfrk_work.c",
+                            4427
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chgeqz.c", 4700),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chgeqz_work.c",
+                            7508
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chpcon.c", 3195),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chpcon_work.c",
+                            3518
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chpev.c", 3360),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chpev_work.c",
+                            4505
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chpevd.c", 4218),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chpevd_work.c",
+                            5105
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chpevx.c", 4183),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chpevx_work.c",
+                            5204
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chpgst.c", 2592),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chpgst_work.c",
+                            3958
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chpgv.c", 3508),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chpgv_work.c",
+                            5155
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chpgvd.c", 4410),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chpgvd_work.c",
+                            5715
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chpgvx.c", 4360),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chpgvx_work.c",
+                            5801
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chprfs.c", 3883),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chprfs_work.c",
+                            5726
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chpsv.c", 2672),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chpsv_work.c",
+                            4322
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chpsvx.c", 3878),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chpsvx_work.c",
+                            5877
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chptrd.c", 2522),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chptrd_work.c",
+                            3522
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chptrf.c", 2461),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chptrf_work.c",
+                            3451
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chptri.c", 3015),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chptri_work.c",
+                            3561
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chptrs.c", 2691),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chptrs_work.c",
+                            4278
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chsein.c", 4205),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chsein_work.c",
+                            6583
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_chseqr.c", 3803),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_chseqr_work.c",
+                            5363
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clacgv.c", 2271),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clacgv_work.c",
+                            2184
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clacn2.c", 2420),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clacn2_work.c",
+                            2319
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clacp2.c", 2563),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clacp2_work.c",
+                            4173
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clacpy.c", 2604),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clacpy_work.c",
+                            4256
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clag2z.c", 2567),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clag2z_work.c",
+                            4254
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clagge.c", 3182),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clagge_work.c",
+                            3733
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_claghe.c", 3078),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_claghe_work.c",
+                            3683
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clagsy.c", 3078),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clagsy_work.c",
+                            3683
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clange.c", 3149),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clange_work.c",
+                            3600
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clanhe.c", 3256),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clanhe_work.c",
+                            3606
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clansy.c", 3256),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clansy_work.c",
+                            3606
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clantr.c", 3238),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clantr_work.c",
+                            3705
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clapmr.c", 2554),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clapmr_work.c",
+                            3725
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clapmt.c", 2555),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clapmt_work.c",
+                            3726
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clarfb.c", 5596),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clarfb_work.c",
+                            7497
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clarfg.c", 2437),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clarfg_work.c",
+                            2284
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clarft.c", 3070),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clarft_work.c",
+                            4701
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clarfx.c", 2815),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clarfx_work.c",
+                            3833
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clarnv.c", 2122),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clarnv_work.c",
+                            2212
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clascl.c", 4192),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clascl_work.c",
+                            3795
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_claset.c", 2961),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_claset_work.c",
+                            3773
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_claswp.c", 3181),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_claswp_work.c",
+                            3764
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clatms.c", 3551),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clatms_work.c",
+                            4100
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_clauum.c", 2481),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_clauum_work.c",
+                            3642
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpbcon.c", 3475),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpbcon_work.c",
+                            3816
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpbequ.c", 2655),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpbequ_work.c",
+                            3714
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpbrfs.c", 4016),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpbrfs_work.c",
+                            6162
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpbstf.c", 2537),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpbstf_work.c",
+                            3758
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpbsv.c", 2752),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpbsv_work.c",
+                            4577
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpbsvx.c", 4217),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpbsvx_work.c",
+                            6770
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpbtrf.c", 2537),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpbtrf_work.c",
+                            3758
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpbtrs.c", 2766),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpbtrs_work.c",
+                            4484
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpftrf.c", 2455),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpftrf_work.c",
+                            3457
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpftri.c", 2455),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpftri_work.c",
+                            3457
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpftrs.c", 2711),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpftrs_work.c",
+                            4272
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpocon.c", 3446),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpocon_work.c",
+                            3744
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpoequ.c", 2547),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpoequ_work.c",
+                            3605
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpoequb.c", 2553),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpoequb_work.c",
+                            3614
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cporfs.c", 3917),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cporfs_work.c",
+                            6007
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cporfsx.c", 4555),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cporfsx_work.c",
+                            7479
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cposv.c", 2692),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cposv_work.c",
+                            4471
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cposvx.c", 4151),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cposvx_work.c",
+                            6595
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cposvxx.c", 4567),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cposvxx_work.c",
+                            7936
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpotrf.c", 2481),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpotrf2.c", 2486),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpotrf2_work.c",
+                            3650
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpotrf_work.c",
+                            3642
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpotri.c", 2481),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpotri_work.c",
+                            3642
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpotrs.c", 2705),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpotrs_work.c",
+                            4412
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cppcon.c", 3402),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cppcon_work.c",
+                            3510
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cppequ.c", 2523),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cppequ_work.c",
+                            3422
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpprfs.c", 3825),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpprfs_work.c",
+                            5658
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cppsv.c", 2622),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cppsv_work.c",
+                            4261
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cppsvx.c", 4032),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cppsvx_work.c",
+                            6194
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpptrf.c", 2437),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpptrf_work.c",
+                            3421
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpptri.c", 2437),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpptri_work.c",
+                            3421
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpptrs.c", 2634),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpptrs_work.c",
+                            4210
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpstrf.c", 3168),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpstrf_work.c",
+                            3811
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cptcon.c", 2957),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cptcon_work.c",
+                            2285
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpteqr.c", 3440),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpteqr_work.c",
+                            3786
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cptrfs.c", 4026),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cptrfs_work.c",
+                            4864
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cptsv.c", 2685),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cptsv_work.c",
+                            3752
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cptsvx.c", 4056),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cptsvx_work.c",
+                            4807
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpttrf.c", 2284),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpttrf_work.c",
+                            2180
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cpttrs.c", 2747),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cpttrs_work.c",
+                            3830
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cspcon.c", 3195),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cspcon_work.c",
+                            3518
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csprfs.c", 3883),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csprfs_work.c",
+                            5726
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cspsv.c", 2672),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cspsv_work.c",
+                            4322
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cspsvx.c", 3878),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cspsvx_work.c",
+                            5877
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csptrf.c", 2461),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csptrf_work.c",
+                            3451
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csptri.c", 3015),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csptri_work.c",
+                            3561
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csptrs.c", 2691),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csptrs_work.c",
+                            4278
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cstedc.c", 4400),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cstedc_work.c",
+                            4753
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cstegr.c", 4442),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cstegr_work.c",
+                            4896
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cstein.c", 3604),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cstein_work.c",
+                            3975
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cstemr.c", 4317),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cstemr_work.c",
+                            4859
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csteqr.c", 3471),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csteqr_work.c",
+                            4105
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csycon.c", 3239),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csycon_work.c",
+                            3752
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csyconv.c", 2849),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csyconv_work.c",
+                            3814
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csyequb.c", 3157),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csyequb_work.c",
+                            3715
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csyr.c", 2797),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csyr_work.c", 3809),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csyrfs.c", 3975),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csyrfs_work.c",
+                            6075
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csyrfsx.c", 4585),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csyrfsx_work.c",
+                            7539
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csysv.c", 3634),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csysv_rook.c",
+                            3690
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csysv_rook_work.c",
+                            5040
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csysv_work.c",
+                            4923
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csysvx.c", 4466),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csysvx_work.c",
+                            6739
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csysvxx.c", 4587),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csysvxx_work.c",
+                            8088
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csyswapr.c", 2535),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csyswapr_work.c",
+                            3441
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csytrf.c", 3440),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csytrf_rook.c",
+                            3471
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csytrf_rook_work.c",
+                            4081
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csytrf_work.c",
+                            4040
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csytri.c", 3088),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csytri2.c", 3456),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csytri2_work.c",
+                            4057
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csytri2x.c", 3163),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csytri2x_work.c",
+                            3827
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csytri_work.c",
+                            3782
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csytrs.c", 2767),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_csytrs2.c", 3326),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csytrs2_work.c",
+                            4556
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csytrs_rook.c",
+                            2788
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csytrs_rook_work.c",
+                            4512
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_csytrs_work.c",
+                            4471
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctbcon.c", 3450),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctbcon_work.c",
+                            3902
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctbrfs.c", 3874),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctbrfs_work.c",
+                            5374
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctbtrs.c", 2809),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctbtrs_work.c",
+                            4626
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctfsm.c", 3017),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctfsm_work.c",
+                            4607
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctftri.c", 2507),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctftri_work.c",
+                            3526
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctfttp.c", 2524),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctfttp_work.c",
+                            3909
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctfttr.c", 2543),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctfttr_work.c",
+                            4117
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctgevc.c", 4178),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctgevc_work.c",
+                            7079
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctgexc.c", 3219),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctgexc_work.c",
+                            6464
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctgsen.c", 4946),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctgsen_work.c",
+                            7390
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctgsja.c", 4449),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctgsja_work.c",
+                            8270
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctgsna.c", 5037),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctgsna_work.c",
+                            7011
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctgsyl.c", 4803),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctgsyl_work.c",
+                            7854
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctpcon.c", 3371),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctpcon_work.c",
+                            3560
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctpmqrt.c", 3741),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctpmqrt_work.c",
+                            6049
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctpqrt.c", 3377),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctpqrt2.c", 2772),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctpqrt2_work.c",
+                            5105
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctpqrt_work.c",
+                            5239
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctprfb.c", 4026),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctprfb_work.c",
+                            6090
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctprfs.c", 3789),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctprfs_work.c",
+                            5127
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctptri.c", 2481),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctptri_work.c",
+                            3458
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctptrs.c", 2756),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctptrs_work.c",
+                            4324
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctpttf.c", 2523),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctpttf_work.c",
+                            3909
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctpttr.c", 2519),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctpttr_work.c",
+                            4069
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctrcon.c", 3394),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctrcon_work.c",
+                            3826
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctrevc.c", 3966),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctrevc_work.c",
+                            6452
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctrexc.c", 2808),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctrexc_work.c",
+                            4777
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctrrfs.c", 3812),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctrrfs_work.c",
+                            5298
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctrsen.c", 3851),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctrsen_work.c",
+                            5357
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctrsna.c", 4497),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctrsna_work.c",
+                            5984
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctrsyl.c", 2989),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctrsyl_work.c",
+                            5200
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctrtri.c", 2504),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctrtri_work.c",
+                            3738
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctrtrs.c", 2779),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctrtrs_work.c",
+                            4518
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctrttf.c", 2564),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctrttf_work.c",
+                            4117
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctrttp.c", 2541),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctrttp_work.c",
+                            4069
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ctzrzf.c", 3409),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ctzrzf_work.c",
+                            4034
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cunbdb.c", 4841),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cunbdb_work.c",
+                            7765
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cuncsd.c", 5833),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cuncsd2by1.c",
+                            4928
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cuncsd2by1_work.c",
+                            8712
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cuncsd_work.c",
+                            12143
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cungbr.c", 3566),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cungbr_work.c",
+                            4180
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cunghr.c", 3550),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cunghr_work.c",
+                            4109
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cunglq.c", 3536),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cunglq_work.c",
+                            4066
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cungql.c", 3536),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cungql_work.c",
+                            4066
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cungqr.c", 3536),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cungqr_work.c",
+                            4066
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cungrq.c", 3536),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cungrq_work.c",
+                            4066
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cungtr.c", 3521),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cungtr_work.c",
+                            4046
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cunmbr.c", 3952),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cunmbr_work.c",
+                            5133
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cunmhr.c", 3889),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cunmhr_work.c",
+                            5022
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cunmlq.c", 3792),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cunmlq_work.c",
+                            4987
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cunmql.c", 3854),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cunmql_work.c",
+                            4980
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cunmqr.c", 3854),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cunmqr_work.c",
+                            4980
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cunmrq.c", 3792),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cunmrq_work.c",
+                            4921
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cunmrz.c", 3813),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cunmrz_work.c",
+                            4947
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cunmtr.c", 3859),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cunmtr_work.c",
+                            4986
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cupgtr.c", 3205),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cupgtr_work.c",
+                            4216
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_cupmtr.c", 3795),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_cupmtr_work.c",
+                            4499
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dbbcsd.c", 5172),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dbbcsd_work.c",
+                            8647
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dbdsdc.c", 3900),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dbdsdc_work.c",
+                            4743
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dbdsqr.c", 3686),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dbdsqr_work.c",
+                            5763
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dbdsvdx.c", 3772),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dbdsvdx_work.c",
+                            4234
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ddisna.c", 2278),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ddisna_work.c",
+                            2211
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgbbrd.c", 3468),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgbbrd_work.c",
+                            6527
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgbcon.c", 3507),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgbcon_work.c",
+                            3869
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgbequ.c", 2704),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgbequ_work.c",
+                            3772
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgbequb.c", 2712),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgbequb_work.c",
+                            3784
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgbrfs.c", 3955),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgbrfs_work.c",
+                            5901
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgbrfsx.c", 4771),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgbrfsx_work.c",
+                            7375
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgbsv.c", 2754),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgbsv_work.c",
+                            4482
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgbsvx.c", 4546),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgbsvx_work.c",
+                            6743
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgbsvxx.c", 4874),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgbsvxx_work.c",
+                            8159
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgbtrf.c", 2570),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgbtrf_work.c",
+                            3781
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgbtrs.c", 2794),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgbtrs_work.c",
+                            4474
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgebak.c", 2696),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgebak_work.c",
+                            3790
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgebal.c", 2677),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgebal_work.c",
+                            4199
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgebrd.c", 3407),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgebrd_work.c",
+                            4063
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgecon.c", 3395),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgecon_work.c",
+                            3633
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeequ.c", 2652),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeequ_work.c",
+                            3645
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeequb.c", 2660),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeequb_work.c",
+                            3679
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgees.c", 4002),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgees_work.c",
+                            5052
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeesx.c", 4747),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeesx_work.c",
+                            5424
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeev.c", 3507),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeev_work.c",
+                            5699
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeevx.c", 4432),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeevx_work.c",
+                            6217
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgehrd.c", 3376),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgehrd_work.c",
+                            3974
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgejsv.c", 6135),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgejsv_work.c",
+                            6474
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgelq2.c", 2979),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgelq2_work.c",
+                            3645
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgelqf.c", 3285),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgelqf_work.c",
+                            3905
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgels.c", 3508),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgels_work.c",
+                            4748
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgelsd.c", 4078),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgelsd_work.c",
+                            4893
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgelss.c", 3667),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgelss_work.c",
+                            4853
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgelsy.c", 3680),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgelsy_work.c",
+                            4869
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgemqrt.c", 3436),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgemqrt_work.c",
+                            4999
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeqlf.c", 3285),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeqlf_work.c",
+                            3905
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeqp3.c", 3374),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeqp3_work.c",
+                            3941
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeqpf.c", 3032),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeqpf_work.c",
+                            3675
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeqr2.c", 2979),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeqr2_work.c",
+                            3645
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeqrf.c", 3285),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeqrf_work.c",
+                            3905
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeqrfp.c", 3293),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeqrfp_work.c",
+                            3915
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeqrt.c", 3055),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeqrt2.c", 2533),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeqrt2_work.c",
+                            4173
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgeqrt3.c", 2533),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeqrt3_work.c",
+                            4173
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgeqrt_work.c",
+                            4279
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgerfs.c", 3854),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgerfs_work.c",
+                            5701
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgerfsx.c", 4673),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgerfsx_work.c",
+                            7197
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgerqf.c", 3285),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgerqf_work.c",
+                            3905
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgesdd.c", 3804),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgesdd_work.c",
+                            6928
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgesv.c", 2642),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgesv_work.c",
+                            4273
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgesvd.c", 3669),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgesvd_work.c",
+                            6383
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgesvdx.c", 4196),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgesvdx_work.c",
+                            6718
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgesvj.c", 3732),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgesvj_work.c",
+                            5040
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgesvx.c", 4437),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgesvx_work.c",
+                            6473
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgesvxx.c", 4731),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgesvxx_work.c",
+                            7864
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgetf2.c", 2488),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgetf2_work.c",
+                            3594
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgetrf.c", 2488),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgetrf2.c", 2493),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgetrf2_work.c",
+                            3602
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgetrf_work.c",
+                            3594
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgetri.c", 3278),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgetri_work.c",
+                            3893
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgetrs.c", 2711),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgetrs_work.c",
+                            4305
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggbak.c", 2829),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggbak_work.c",
+                            3854
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggbal.c", 3776),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggbal_work.c",
+                            5526
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgges.c", 4360),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgges3.c", 4408),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgges3_work.c",
+                            6905
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgges_work.c",
+                            6848
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggesx.c", 4963),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggesx_work.c",
+                            7227
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggev.c", 3777),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggev3.c", 3846),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggev3_work.c",
+                            6910
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggev_work.c",
+                            6888
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggevx.c", 5367),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggevx_work.c",
+                            7190
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggglm.c", 3591),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggglm_work.c",
+                            4715
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgghd3.c", 4096),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgghd3_work.c",
+                            6274
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgghrd.c", 3192),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgghrd_work.c",
+                            6389
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgglse.c", 3659),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgglse_work.c",
+                            4715
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggqrf.c", 3552),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggqrf_work.c",
+                            4719
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggrqf.c", 3552),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggrqf_work.c",
+                            4719
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggsvd.c", 3577),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggsvd3.c", 3927),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggsvd3_work.c",
+                            7464
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggsvd_work.c",
+                            7001
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggsvp.c", 4143),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dggsvp3.c", 4578),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggsvp3_work.c",
+                            7454
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dggsvp_work.c",
+                            7022
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgtcon.c", 3472),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgtcon_work.c",
+                            2480
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgtrfs.c", 4295),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgtrfs_work.c",
+                            4821
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgtsv.c", 2747),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgtsv_work.c",
+                            3665
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgtsvx.c", 4440),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgtsvx_work.c",
+                            4763
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgttrf.c", 2429),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgttrf_work.c",
+                            2227
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dgttrs.c", 2975),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dgttrs_work.c",
+                            3896
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dhgeqz.c", 4237),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dhgeqz_work.c",
+                            7031
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dhsein.c", 3951),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dhsein_work.c",
+                            6241
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dhseqr.c", 3688),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dhseqr_work.c",
+                            5157
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlacn2.c", 2390),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlacn2_work.c",
+                            2284
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlacpy.c", 2549),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlacpy_work.c",
+                            4086
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlag2s.c", 2535),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlag2s_work.c",
+                            4108
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlagge.c", 3091),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlagge_work.c",
+                            3651
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlagsy.c", 3014),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlagsy_work.c",
+                            3569
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlamch.c", 2014),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlamch_work.c",
+                            2093
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlange.c", 3110),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlange_work.c",
+                            3531
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlansy.c", 3249),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlansy_work.c",
+                            3537
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlantr.c", 3226),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlantr_work.c",
+                            3607
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlapmr.c", 2540),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlapmr_work.c",
+                            3624
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlapmt.c", 2541),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlapmt_work.c",
+                            3625
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlapy2.c", 2248),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlapy2_work.c",
+                            2107
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlapy3.c", 2329),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlapy3_work.c",
+                            2121
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlarfb.c", 5476),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlarfb_work.c",
+                            7257
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlarfg.c", 2368),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlarfg_work.c",
+                            2210
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlarft.c", 3001),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlarft_work.c",
+                            4518
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlarfx.c", 2732),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlarfx_work.c",
+                            3658
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlarnv.c", 2108),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlarnv_work.c",
+                            2198
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlartgp.c", 2329),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlartgp_work.c",
+                            2192
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlartgs.c", 2408),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlartgs_work.c",
+                            2200
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlascl.c", 4181),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlascl_work.c",
+                            3729
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlaset.c", 2841),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlaset_work.c",
+                            3644
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlasrt.c", 2196),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlasrt_work.c",
+                            2130
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlaswp.c", 3140),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlaswp_work.c",
+                            3663
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlatms.c", 3489),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlatms_work.c",
+                            4020
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dlauum.c", 2467),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dlauum_work.c",
+                            3573
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dopgtr.c", 3085),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dopgtr_work.c",
+                            3963
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dopmtr.c", 3648),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dopmtr_work.c",
+                            4253
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dorbdb.c", 4554),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dorbdb_work.c",
+                            7263
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dorcsd.c", 5218),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dorcsd2by1.c",
+                            4377
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dorcsd2by1_work.c",
+                            8241
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dorcsd_work.c",
+                            11247
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dorgbr.c", 3469),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dorgbr_work.c",
+                            4051
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dorghr.c", 3453),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dorghr_work.c",
+                            4012
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dorglq.c", 3439),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dorglq_work.c",
+                            3969
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dorgql.c", 3439),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dorgql_work.c",
+                            3969
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dorgqr.c", 3439),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dorgqr_work.c",
+                            3969
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dorgrq.c", 3439),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dorgrq_work.c",
+                            3969
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dorgtr.c", 3397),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dorgtr_work.c",
+                            3917
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dormbr.c", 3814),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dormbr_work.c",
+                            5038
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dormhr.c", 3751),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dormhr_work.c",
+                            4819
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dormlq.c", 3654),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dormlq_work.c",
+                            4931
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dormql.c", 3716),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dormql_work.c",
+                            4777
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dormqr.c", 3716),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dormqr_work.c",
+                            4777
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dormrq.c", 3654),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dormrq_work.c",
+                            4711
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dormrz.c", 3675),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dormrz_work.c",
+                            4737
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dormtr.c", 3721),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dormtr_work.c",
+                            4768
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpbcon.c", 3427),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpbcon_work.c",
+                            3740
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpbequ.c", 2617),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpbequ_work.c",
+                            3648
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpbrfs.c", 3872),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpbrfs_work.c",
+                            5791
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpbstf.c", 2496),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpbstf_work.c",
+                            3657
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpbsv.c", 2698),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpbsv_work.c",
+                            4380
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpbsvx.c", 4075),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpbsvx_work.c",
+                            6369
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpbtrf.c", 2496),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpbtrf_work.c",
+                            3657
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpbtrs.c", 2711),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpbtrs_work.c",
+                            4318
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpftrf.c", 2441),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpftrf_work.c",
+                            3373
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpftri.c", 2441),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpftri_work.c",
+                            3373
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpftrs.c", 2656),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpftrs_work.c",
+                            4059
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpocon.c", 3398),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpocon_work.c",
+                            3636
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpoequ.c", 2536),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpoequ_work.c",
+                            3539
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpoequb.c", 2542),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpoequb_work.c",
+                            3548
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dporfs.c", 3800),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dporfs_work.c",
+                            5668
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dporfsx.c", 4411),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dporfsx_work.c",
+                            7084
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dposv.c", 2638),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dposv_work.c",
+                            4274
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dposvx.c", 4009),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dposvx_work.c",
+                            6194
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dposvxx.c", 4424),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dposvxx_work.c",
+                            7575
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpotrf.c", 2467),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpotrf2.c", 2472),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpotrf2_work.c",
+                            3581
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpotrf_work.c",
+                            3573
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpotri.c", 2467),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpotri_work.c",
+                            3573
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpotrs.c", 2650),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpotrs_work.c",
+                            4214
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dppcon.c", 3327),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dppcon_work.c",
+                            3387
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dppequ.c", 2512),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dppequ_work.c",
+                            3341
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpprfs.c", 3681),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpprfs_work.c",
+                            5257
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dppsv.c", 2594),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dppsv_work.c",
+                            4080
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dppsvx.c", 3917),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dppsvx_work.c",
+                            5731
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpptrf.c", 2423),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpptrf_work.c",
+                            3337
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpptri.c", 2423),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpptri_work.c",
+                            3337
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpptrs.c", 2606),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpptrs_work.c",
+                            4029
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpstrf.c", 3158),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpstrf_work.c",
+                            3712
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dptcon.c", 2922),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dptcon_work.c",
+                            2243
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpteqr.c", 3431),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpteqr_work.c",
+                            3720
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dptrfs.c", 3617),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dptrfs_work.c",
+                            4514
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dptsv.c", 2632),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dptsv_work.c",
+                            3611
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dptsvx.c", 3665),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dptsvx_work.c",
+                            4484
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpttrf.c", 2271),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpttrf_work.c",
+                            2135
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dpttrs.c", 2676),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dpttrs_work.c",
+                            3663
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsbev.c", 3114),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsbev_work.c",
+                            4576
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsbevd.c", 3819),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsbevd_work.c",
+                            5036
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsbevx.c", 4006),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsbevx_work.c",
+                            6027
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsbgst.c", 3295),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsbgst_work.c",
+                            5226
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsbgv.c", 3294),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsbgv_work.c",
+                            5333
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsbgvd.c", 4080),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsbgvd_work.c",
+                            5813
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsbgvx.c", 4190),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsbgvx_work.c",
+                            6516
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsbtrd.c", 3309),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsbtrd_work.c",
+                            4853
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsfrk.c", 2987),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsfrk_work.c",
+                            4281
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsgesv.c", 3530),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsgesv_work.c",
+                            5053
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dspcon.c", 3384),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dspcon_work.c",
+                            3478
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dspev.c", 3013),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dspev_work.c",
+                            4222
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dspevd.c", 3709),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dspevd_work.c",
+                            4710
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dspevx.c", 3869),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dspevx_work.c",
+                            4884
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dspgst.c", 2537),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dspgst_work.c",
+                            3758
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dspgv.c", 3147),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dspgv_work.c",
+                            4779
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dspgvd.c", 3887),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dspgvd_work.c",
+                            5236
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dspgvx.c", 4005),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dspgvx_work.c",
+                            5420
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsposv.c", 3526),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsposv_work.c",
+                            5054
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsprfs.c", 3739),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsprfs_work.c",
+                            5293
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dspsv.c", 2618),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dspsv_work.c",
+                            4110
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dspsvx.c", 3762),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dspsvx_work.c",
+                            5445
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsptrd.c", 2469),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsptrd_work.c",
+                            3394
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsptrf.c", 2447),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsptrf_work.c",
+                            3367
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsptri.c", 2950),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsptri_work.c",
+                            3431
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsptrs.c", 2636),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsptrs_work.c",
+                            4097
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dstebz.c", 3749),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dstebz_work.c",
+                            2624
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dstedc.c", 3933),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dstedc_work.c",
+                            4475
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dstegr.c", 4438),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dstegr_work.c",
+                            4766
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dstein.c", 3569),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dstein_work.c",
+                            3878
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dstemr.c", 4312),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dstemr_work.c",
+                            4728
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsteqr.c", 3462),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsteqr_work.c",
+                            4003
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsterf.c", 2271),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsterf_work.c",
+                            2135
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dstev.c", 3146),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dstev_work.c",
+                            3728
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dstevd.c", 3750),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dstevd_work.c",
+                            4208
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dstevr.c", 4440),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dstevr_work.c",
+                            4926
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dstevx.c", 3899),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dstevx_work.c",
+                            4407
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsycon.c", 3428),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsycon_work.c",
+                            3727
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsyconv.c", 2768),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsyconv_work.c",
+                            3698
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsyequb.c", 3095),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsyequb_work.c",
+                            3602
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsyev.c", 3331),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsyev_work.c",
+                            3925
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsyevd.c", 3711),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsyevd_work.c",
+                            4142
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsyevr.c", 4428),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsyevr_work.c",
+                            5642
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsyevx.c", 4359),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsyevx_work.c",
+                            5544
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsygst.c", 2649),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsygst_work.c",
+                            4208
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsygv.c", 3518),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsygv_work.c",
+                            4714
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsygvd.c", 3934),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsygvd_work.c",
+                            4863
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsygvx.c", 4552),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsygvx_work.c",
+                            6266
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsyrfs.c", 3858),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsyrfs_work.c",
+                            5704
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsyrfsx.c", 4469),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsyrfsx_work.c",
+                            7177
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsysv.c", 3511),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsysv_rook.c",
+                            3562
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsysv_rook_work.c",
+                            4788
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsysv_work.c",
+                            4712
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsysvx.c", 4332),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsysvx_work.c",
+                            6369
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsysvxx.c", 4444),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsysvxx_work.c",
+                            7694
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsyswapr.c", 2492),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsyswapr_work.c",
+                            3338
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsytrd.c", 3357),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsytrd_work.c",
+                            3984
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsytrf.c", 3330),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsytrf_rook.c",
+                            3361
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsytrf_rook_work.c",
+                            3966
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsytrf_work.c",
+                            3925
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsytri.c", 2996),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsytri2.c", 3418),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsytri2_work.c",
+                            3989
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsytri2x.c", 3098),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsytri2x_work.c",
+                            3744
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsytri_work.c",
+                            3667
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsytrs.c", 2712),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dsytrs2.c", 3217),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsytrs2_work.c",
+                            4343
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsytrs_rook.c",
+                            2733
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsytrs_rook_work.c",
+                            4346
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dsytrs_work.c",
+                            4305
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtbcon.c", 3374),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtbcon_work.c",
+                            3793
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtbrfs.c", 3771),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtbrfs_work.c",
+                            5104
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtbtrs.c", 2781),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtbtrs_work.c",
+                            4428
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtfsm.c", 2949),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtfsm_work.c",
+                            4437
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtftri.c", 2493),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtftri_work.c",
+                            3410
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtfttp.c", 2469),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtfttp_work.c",
+                            3709
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtfttr.c", 2515),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtfttr_work.c",
+                            3964
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtgevc.c", 3773),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtgevc_work.c",
+                            6636
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtgexc.c", 3988),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtgexc_work.c",
+                            6479
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtgsen.c", 4782),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtgsen_work.c",
+                            7010
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtgsja.c", 4305),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtgsja_work.c",
+                            7743
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtgsna.c", 4883),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtgsna_work.c",
+                            6685
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtgsyl.c", 4598),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtgsyl_work.c",
+                            7332
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtpcon.c", 3295),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtpcon_work.c",
+                            3436
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtpmqrt.c", 3606),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtpmqrt_work.c",
+                            5693
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtpqrt.c", 3255),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtpqrt2.c", 2702),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtpqrt2_work.c",
+                            4865
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtpqrt_work.c",
+                            4953
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtprfb.c", 3871),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtprfb_work.c",
+                            5774
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtprfs.c", 3659),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtprfs_work.c",
+                            4810
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtptri.c", 2467),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtptri_work.c",
+                            3374
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtptrs.c", 2701),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtptrs_work.c",
+                            4111
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtpttf.c", 2468),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtpttf_work.c",
+                            3709
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtpttr.c", 2464),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtpttr_work.c",
+                            3884
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtrcon.c", 3345),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtrcon_work.c",
+                            3717
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtrevc.c", 3609),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtrevc_work.c",
+                            6028
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtrexc.c", 3252),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtrexc_work.c",
+                            4627
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtrrfs.c", 3709),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtrrfs_work.c",
+                            4996
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtrsen.c", 4346),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtrsen_work.c",
+                            5413
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtrsna.c", 4408),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtrsna_work.c",
+                            5732
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtrsyl.c", 2921),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtrsyl_work.c",
+                            4962
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtrtri.c", 2490),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtrtri_work.c",
+                            3637
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtrtrs.c", 2724),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtrtrs_work.c",
+                            4352
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtrttf.c", 2536),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtrttf_work.c",
+                            3964
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtrttp.c", 2486),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtrttp_work.c",
+                            3884
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_dtzrzf.c", 3285),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_dtzrzf_work.c",
+                            3905
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ilaver.c", 2191),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sbbcsd.c", 5127),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sbbcsd_work.c",
+                            8603
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sbdsdc.c", 3892),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sbdsdc_work.c",
+                            4714
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sbdsqr.c", 3651),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sbdsqr_work.c",
+                            5731
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sbdsvdx.c", 3765),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sbdsvdx_work.c",
+                            4226
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sdisna.c", 2276),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sdisna_work.c",
+                            2209
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgbbrd.c", 3432),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgbbrd_work.c",
+                            6474
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgbcon.c", 3501),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgbcon_work.c",
+                            3862
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgbequ.c", 2698),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgbequ_work.c",
+                            3763
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgbequb.c", 2706),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgbequb_work.c",
+                            3775
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgbrfs.c", 3946),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgbrfs_work.c",
+                            5882
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgbrfsx.c", 4757),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgbrfsx_work.c",
+                            7312
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgbsv.c", 2752),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgbsv_work.c",
+                            4474
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgbsvx.c", 4533),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgbsvx_work.c",
+                            6721
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgbsvxx.c", 4859),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgbsvxx_work.c",
+                            8062
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgbtrf.c", 2569),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgbtrf_work.c",
+                            3777
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgbtrs.c", 2792),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgbtrs_work.c",
+                            4466
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgebak.c", 2694),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgebak_work.c",
+                            3785
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgebal.c", 2675),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgebal_work.c",
+                            4194
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgebrd.c", 3398),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgebrd_work.c",
+                            4054
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgecon.c", 3389),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgecon_work.c",
+                            3626
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeequ.c", 2619),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeequ_work.c",
+                            3636
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeequb.c", 2626),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeequb_work.c",
+                            3670
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgees.c", 3994),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgees_work.c",
+                            5024
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeesx.c", 4737),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeesx_work.c",
+                            5394
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeev.c", 3498),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeev_work.c",
+                            5650
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeevx.c", 4419),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeevx_work.c",
+                            6164
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgehrd.c", 3370),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgehrd_work.c",
+                            3968
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgejsv.c", 6127),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgejsv_work.c",
+                            6460
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgelq2.c", 2974),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgelq2_work.c",
+                            3639
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgelqf.c", 3279),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgelqf_work.c",
+                            3899
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgels.c", 3502),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgels_work.c",
+                            4739
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgelsd.c", 4070),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgelsd_work.c",
+                            4882
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgelss.c", 3659),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgelss_work.c",
+                            4842
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgelsy.c", 3673),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgelsy_work.c",
+                            4859
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgemqrt.c", 3430),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgemqrt_work.c",
+                            4986
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeqlf.c", 3279),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeqlf_work.c",
+                            3899
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeqp3.c", 3368),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeqp3_work.c",
+                            3935
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeqpf.c", 3027),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeqpf_work.c",
+                            3669
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeqr2.c", 2974),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeqr2_work.c",
+                            3639
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeqrf.c", 3279),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeqrf_work.c",
+                            3899
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeqrfp.c", 3287),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeqrfp_work.c",
+                            3909
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeqrt.c", 3050),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeqrt2.c", 2503),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeqrt2_work.c",
+                            4165
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgeqrt3.c", 2503),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeqrt3_work.c",
+                            4165
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgeqrt_work.c",
+                            4257
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgerfs.c", 3845),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgerfs_work.c",
+                            5682
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgerfsx.c", 4659),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgerfsx_work.c",
+                            7134
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgerqf.c", 3279),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgerqf_work.c",
+                            3899
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgesdd.c", 3796),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgesdd_work.c",
+                            6897
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgesv.c", 2640),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgesv_work.c",
+                            4265
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgesvd.c", 3660),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgesvd_work.c",
+                            6352
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgesvdx.c", 4188),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgesvdx_work.c",
+                            6704
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgesvj.c", 3725),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgesvj_work.c",
+                            5030
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgesvx.c", 4424),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgesvx_work.c",
+                            6451
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgesvxx.c", 4716),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgesvxx_work.c",
+                            7800
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgetf2.c", 2487),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgetf2_work.c",
+                            3590
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgetrf.c", 2487),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgetrf2.c", 2492),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgetrf2_work.c",
+                            3598
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgetrf_work.c",
+                            3590
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgetri.c", 3273),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgetri_work.c",
+                            3888
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgetrs.c", 2709),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgetrs_work.c",
+                            4297
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggbak.c", 2826),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggbak_work.c",
+                            3848
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggbal.c", 3769),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggbal_work.c",
+                            5515
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgges.c", 4349),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgges3.c", 4365),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgges3_work.c",
+                            6885
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgges_work.c",
+                            6828
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggesx.c", 4950),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggesx_work.c",
+                            7205
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggev.c", 3766),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggev3.c", 3781),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggev3_work.c",
+                            6954
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggev_work.c",
+                            6868
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggevx.c", 5350),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggevx_work.c",
+                            7130
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggglm.c", 3582),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggglm_work.c",
+                            4703
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgghd3.c", 4032),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgghd3_work.c",
+                            6257
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgghrd.c", 3161),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgghrd_work.c",
+                            6373
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgglse.c", 3650),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgglse_work.c",
+                            4703
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggqrf.c", 3517),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggqrf_work.c",
+                            4708
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggrqf.c", 3517),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggrqf_work.c",
+                            4708
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggsvd.c", 3567),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggsvd3.c", 3975),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggsvd3_work.c",
+                            7442
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggsvd_work.c",
+                            6978
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggsvp.c", 4130),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sggsvp3.c", 4564),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggsvp3_work.c",
+                            7493
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sggsvp_work.c",
+                            6998
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgtcon.c", 3463),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgtcon_work.c",
+                            2473
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgtrfs.c", 4281),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgtrfs_work.c",
+                            4803
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgtsv.c", 2743),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgtsv_work.c",
+                            3658
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgtsvx.c", 4425),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgtsvx_work.c",
+                            4744
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgttrf.c", 2425),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgttrf_work.c",
+                            2223
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sgttrs.c", 2970),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sgttrs_work.c",
+                            3888
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_shgeqz.c", 4199),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_shgeqz_work.c",
+                            7011
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_shsein.c", 3916),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_shsein_work.c",
+                            6192
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_shseqr.c", 3680),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_shseqr_work.c",
+                            5146
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slacn2.c", 2387),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slacn2_work.c",
+                            2281
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slacpy.c", 2547),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slacpy_work.c",
+                            4078
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slag2d.c", 2537),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slag2d_work.c",
+                            4108
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slagge.c", 3086),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slagge_work.c",
+                            3645
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slagsy.c", 3009),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slagsy_work.c",
+                            3563
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slamch.c", 2013),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slamch_work.c",
+                            2091
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slange.c", 3104),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slange_work.c",
+                            3524
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slansy.c", 3243),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slansy_work.c",
+                            3530
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slantr.c", 3223),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slantr_work.c",
+                            3600
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slapmr.c", 2539),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slapmr_work.c",
+                            3620
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slapmt.c", 2540),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slapmt_work.c",
+                            3621
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slapy2.c", 2245),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slapy2_work.c",
+                            2103
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slapy3.c", 2325),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slapy3_work.c",
+                            2116
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slarfb.c", 5470),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slarfb_work.c",
+                            7233
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slarfg.c", 2365),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slarfg_work.c",
+                            2207
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slarft.c", 2998),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slarft_work.c",
+                            4497
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slarfx.c", 2728),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slarfx_work.c",
+                            3651
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slarnv.c", 2107),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slarnv_work.c",
+                            2197
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slartgp.c", 2296),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slartgp_work.c",
+                            2187
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slartgs.c", 2403),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slartgs_work.c",
+                            2195
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slascl.c", 4178),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slascl_work.c",
+                            3723
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slaset.c", 2889),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slaset_work.c",
+                            3638
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slasrt.c", 2195),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slasrt_work.c",
+                            2129
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slaswp.c", 3139),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slaswp_work.c",
+                            3659
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slatms.c", 3482),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slatms_work.c",
+                            4012
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_slauum.c", 2466),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_slauum_work.c",
+                            3569
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sopgtr.c", 3079),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sopgtr_work.c",
+                            3954
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sopmtr.c", 3642),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sopmtr_work.c",
+                            4244
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sorbdb.c", 4540),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sorbdb_work.c",
+                            7214
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sorcsd.c", 5205),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sorcsd2by1.c",
+                            4367
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sorcsd2by1_work.c",
+                            8219
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sorcsd_work.c",
+                            11170
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sorgbr.c", 3463),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sorgbr_work.c",
+                            4045
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sorghr.c", 3447),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sorghr_work.c",
+                            4006
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sorglq.c", 3433),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sorglq_work.c",
+                            3963
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sorgql.c", 3433),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sorgql_work.c",
+                            3963
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sorgqr.c", 3433),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sorgqr_work.c",
+                            3963
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sorgrq.c", 3433),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sorgrq_work.c",
+                            3963
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sorgtr.c", 3391),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sorgtr_work.c",
+                            3911
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sormbr.c", 3807),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sormbr_work.c",
+                            5027
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sormhr.c", 3744),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sormhr_work.c",
+                            4810
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sormlq.c", 3647),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sormlq_work.c",
+                            4920
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sormql.c", 3709),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sormql_work.c",
+                            4768
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sormqr.c", 3709),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sormqr_work.c",
+                            4768
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sormrq.c", 3647),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sormrq_work.c",
+                            4702
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sormrz.c", 3668),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sormrz_work.c",
+                            4728
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sormtr.c", 3714),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sormtr_work.c",
+                            4759
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spbcon.c", 3421),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spbcon_work.c",
+                            3733
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spbequ.c", 2613),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spbequ_work.c",
+                            3609
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spbrfs.c", 3863),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spbrfs_work.c",
+                            5772
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spbstf.c", 2495),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spbstf_work.c",
+                            3653
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spbsv.c", 2696),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spbsv_work.c",
+                            4372
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spbsvx.c", 4064),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spbsvx_work.c",
+                            6348
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spbtrf.c", 2495),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spbtrf_work.c",
+                            3653
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spbtrs.c", 2709),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spbtrs_work.c",
+                            4278
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spftrf.c", 2440),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spftrf_work.c",
+                            3369
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spftri.c", 2440),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spftri_work.c",
+                            3369
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spftrs.c", 2654),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spftrs_work.c",
+                            4051
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spocon.c", 3392),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spocon_work.c",
+                            3629
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spoequ.c", 2505),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spoequ_work.c",
+                            3532
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spoequb.c", 2538),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spoequb_work.c",
+                            3541
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sporfs.c", 3791),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sporfs_work.c",
+                            5617
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sporfsx.c", 4398),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sporfsx_work.c",
+                            7022
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sposv.c", 2636),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sposv_work.c",
+                            4266
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sposvx.c", 3998),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sposvx_work.c",
+                            6173
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sposvxx.c", 4410),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sposvxx_work.c",
+                            7512
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spotrf.c", 2466),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spotrf2.c", 2471),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spotrf2_work.c",
+                            3577
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spotrf_work.c",
+                            3569
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spotri.c", 2466),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spotri_work.c",
+                            3569
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spotrs.c", 2648),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spotrs_work.c",
+                            4206
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sppcon.c", 3321),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sppcon_work.c",
+                            3380
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sppequ.c", 2508),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sppequ_work.c",
+                            3334
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spprfs.c", 3672),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spprfs_work.c",
+                            5238
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sppsv.c", 2566),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sppsv_work.c",
+                            4072
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sppsvx.c", 3906),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sppsvx_work.c",
+                            5710
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spptrf.c", 2422),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spptrf_work.c",
+                            3333
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spptri.c", 2422),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spptri_work.c",
+                            3333
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spptrs.c", 2604),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spptrs_work.c",
+                            4021
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spstrf.c", 3153),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spstrf_work.c",
+                            3706
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sptcon.c", 2915),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sptcon_work.c",
+                            2238
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spteqr.c", 3425),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spteqr_work.c",
+                            3713
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sptrfs.c", 3579),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sptrfs_work.c",
+                            4467
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sptsv.c", 2629),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sptsv_work.c",
+                            3605
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sptsvx.c", 3653),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sptsvx_work.c",
+                            4468
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spttrf.c", 2269),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spttrf_work.c",
+                            2133
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_spttrs.c", 2673),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_spttrs_work.c",
+                            3657
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssbev.c", 3108),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssbev_work.c",
+                            4566
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssbevd.c", 3812),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssbevd_work.c",
+                            5026
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssbevx.c", 3996),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssbevx_work.c",
+                            6010
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssbgst.c", 3289),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssbgst_work.c",
+                            5213
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssbgv.c", 3287),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssbgv_work.c",
+                            5319
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssbgvd.c", 4072),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssbgvd_work.c",
+                            5799
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssbgvx.c", 4179),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssbgvx_work.c",
+                            6495
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssbtrd.c", 3302),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssbtrd_work.c",
+                            4842
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssfrk.c", 2957),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssfrk_work.c",
+                            4271
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sspcon.c", 3378),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sspcon_work.c",
+                            3471
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sspev.c", 3007),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sspev_work.c",
+                            4212
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sspevd.c", 3702),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sspevd_work.c",
+                            4700
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sspevx.c", 3860),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sspevx_work.c",
+                            4871
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sspgst.c", 2535),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sspgst_work.c",
+                            3750
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sspgv.c", 3140),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sspgv_work.c",
+                            4734
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sspgvd.c", 3879),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sspgvd_work.c",
+                            5222
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sspgvx.c", 3968),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sspgvx_work.c",
+                            5371
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssprfs.c", 3730),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssprfs_work.c",
+                            5274
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sspsv.c", 2616),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sspsv_work.c",
+                            4102
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sspsvx.c", 3752),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sspsvx_work.c",
+                            5425
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssptrd.c", 2465),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssptrd_work.c",
+                            3387
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssptrf.c", 2446),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssptrf_work.c",
+                            3363
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssptri.c", 2946),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssptri_work.c",
+                            3394
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssptrs.c", 2634),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssptrs_work.c",
+                            4089
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sstebz.c", 3740),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sstebz_work.c",
+                            2617
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sstedc.c", 3926),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sstedc_work.c",
+                            4468
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sstegr.c", 4427),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sstegr_work.c",
+                            4755
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sstein.c", 3562),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sstein_work.c",
+                            3870
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sstemr.c", 4275),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sstemr_work.c",
+                            4718
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssteqr.c", 3456),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssteqr_work.c",
+                            3996
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssterf.c", 2269),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssterf_work.c",
+                            2133
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sstev.c", 3140),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sstev_work.c",
+                            3721
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sstevd.c", 3743),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sstevd_work.c",
+                            4201
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sstevr.c", 4429),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sstevr_work.c",
+                            4915
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_sstevx.c", 3889),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_sstevx_work.c",
+                            4396
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssycon.c", 3422),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssycon_work.c",
+                            3720
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssyconv.c", 2767),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssyconv_work.c",
+                            3693
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssyequb.c", 3088),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssyequb_work.c",
+                            3594
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssyev.c", 3325),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssyev_work.c",
+                            3919
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssyevd.c", 3705),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssyevd_work.c",
+                            4136
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssyevr.c", 4418),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssyevr_work.c",
+                            5629
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssyevx.c", 4349),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssyevx_work.c",
+                            5531
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssygst.c", 2647),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssygst_work.c",
+                            4200
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssygv.c", 3511),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssygv_work.c",
+                            4704
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssygvd.c", 3927),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssygvd_work.c",
+                            4853
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssygvx.c", 4541),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssygvx_work.c",
+                            6249
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssyrfs.c", 3849),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssyrfs_work.c",
+                            5685
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssyrfsx.c", 4456),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssyrfsx_work.c",
+                            7115
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssysv.c", 3505),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssysv_rook.c",
+                            3556
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssysv_rook_work.c",
+                            4779
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssysv_work.c",
+                            4703
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssysvx.c", 4321),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssysvx_work.c",
+                            6349
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssysvxx.c", 4430),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssysvxx_work.c",
+                            7664
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssyswapr.c", 2491),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssyswapr_work.c",
+                            3334
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssytrd.c", 3349),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssytrd_work.c",
+                            3976
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssytrf.c", 3325),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssytrf_rook.c",
+                            3356
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssytrf_rook_work.c",
+                            3961
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssytrf_work.c",
+                            3920
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssytri.c", 2992),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssytri2.c", 3413),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssytri2_work.c",
+                            3984
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssytri2x.c", 3094),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssytri2x_work.c",
+                            3739
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssytri_work.c",
+                            3662
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssytrs.c", 2710),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ssytrs2.c", 3212),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssytrs2_work.c",
+                            4334
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssytrs_rook.c",
+                            2731
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssytrs_rook_work.c",
+                            4338
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ssytrs_work.c",
+                            4297
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stbcon.c", 3369),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stbcon_work.c",
+                            3787
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stbrfs.c", 3763),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stbrfs_work.c",
+                            5057
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stbtrs.c", 2779),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stbtrs_work.c",
+                            4420
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stfsm.c", 2946),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stfsm_work.c",
+                            4396
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stftri.c", 2492),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stftri_work.c",
+                            3406
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stfttp.c", 2467),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stfttp_work.c",
+                            3701
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stfttr.c", 2513),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stfttr_work.c",
+                            3956
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stgevc.c", 3766),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stgevc_work.c",
+                            6585
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stgexc.c", 3980),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stgexc_work.c",
+                            6462
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stgsen.c", 4768),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stgsen_work.c",
+                            6987
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stgsja.c", 4266),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stgsja_work.c",
+                            7718
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stgsna.c", 4873),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stgsna_work.c",
+                            6600
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stgsyl.c", 4559),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stgsyl_work.c",
+                            7305
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stpcon.c", 3290),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stpcon_work.c",
+                            3430
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stpmqrt.c", 3571),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stpmqrt_work.c",
+                            5676
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stpqrt.c", 3252),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stpqrt2.c", 2699),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stpqrt2_work.c",
+                            4853
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stpqrt_work.c",
+                            4941
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stprfb.c", 3870),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stprfb_work.c",
+                            5757
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stprfs.c", 3651),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stprfs_work.c",
+                            4763
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stptri.c", 2466),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stptri_work.c",
+                            3370
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stptrs.c", 2699),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stptrs_work.c",
+                            4103
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stpttf.c", 2466),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stpttf_work.c",
+                            3701
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stpttr.c", 2462),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stpttr_work.c",
+                            3876
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_strcon.c", 3340),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_strcon_work.c",
+                            3711
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_strevc.c", 3603),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_strevc_work.c",
+                            5981
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_strexc.c", 3247),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_strexc_work.c",
+                            4618
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_strrfs.c", 3701),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_strrfs_work.c",
+                            4981
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_strsen.c", 4309),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_strsen_work.c",
+                            5400
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_strsna.c", 4373),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_strsna_work.c",
+                            5651
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_strsyl.c", 2917),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_strsyl_work.c",
+                            4949
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_strtri.c", 2489),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_strtri_work.c",
+                            3633
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_strtrs.c", 2722),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_strtrs_work.c",
+                            4344
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_strttf.c", 2534),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_strttf_work.c",
+                            3956
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_strttp.c", 2484),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_strttp_work.c",
+                            3876
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_stzrzf.c", 3279),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_stzrzf_work.c",
+                            3899
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zbbcsd.c", 5272),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zbbcsd_work.c",
+                            9088
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zbdsqr.c", 3758),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zbdsqr_work.c",
+                            6088
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zcgesv.c", 3998),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zcgesv_work.c",
+                            5451
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zcposv.c", 3994),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zcposv_work.c",
+                            5452
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgbbrd.c", 3854),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgbbrd_work.c",
+                            7001
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgbcon.c", 3566),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgbcon_work.c",
+                            3985
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgbequ.c", 2746),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgbequ_work.c",
+                            3877
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgbequb.c", 2755),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgbequb_work.c",
+                            3890
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgbrfs.c", 4111),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgbrfs_work.c",
+                            6352
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgbrfsx.c", 4903),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgbrfsx_work.c",
+                            7861
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgbsv.c", 2810),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgbsv_work.c",
+                            4687
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgbsvx.c", 4676),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgbsvx_work.c",
+                            7194
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgbsvxx.c", 5006),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgbsvxx_work.c",
+                            8579
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgbtrf.c", 2612),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgbtrf_work.c",
+                            3886
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgbtrs.c", 2851),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgbtrs_work.c",
+                            4648
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgebak.c", 2738),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgebak_work.c",
+                            3863
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgebal.c", 2692),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgebal_work.c",
+                            4340
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgebrd.c", 3552),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgebrd_work.c",
+                            4245
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgecon.c", 3454),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgecon_work.c",
+                            3749
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeequ.c", 2667),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeequ_work.c",
+                            3718
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeequb.c", 2675),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeequb_work.c",
+                            3752
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgees.c", 4370),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgees_work.c",
+                            5286
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeesx.c", 4532),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeesx_work.c",
+                            5557
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeev.c", 3939),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeev_work.c",
+                            6055
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeevx.c", 4359),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeevx_work.c",
+                            6536
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgehrd.c", 3479),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgehrd_work.c",
+                            4109
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgejsv.c", 9537),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgejsv_work.c",
+                            6815
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgelq2.c", 3090),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgelq2_work.c",
+                            3780
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgelqf.c", 3415),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgelqf_work.c",
+                            4040
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgels.c", 3637),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgels_work.c",
+                            4968
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgelsd.c", 4577),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgelsd_work.c",
+                            5182
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgelss.c", 4100),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgelss_work.c",
+                            5110
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgelsy.c", 4106),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgelsy_work.c",
+                            5126
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgemqrt.c", 3563),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgemqrt_work.c",
+                            5266
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeqlf.c", 3415),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeqlf_work.c",
+                            4040
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeqp3.c", 3773),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeqp3_work.c",
+                            4194
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeqpf.c", 3388),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeqpf_work.c",
+                            3839
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeqr2.c", 3090),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeqr2_work.c",
+                            3780
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeqrf.c", 3415),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeqrf_work.c",
+                            4040
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeqrfp.c", 3424),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeqrfp_work.c",
+                            4051
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeqrt.c", 3166),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeqrt2.c", 2563),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeqrt2_work.c",
+                            4319
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgeqrt3.c", 2563),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeqrt3_work.c",
+                            4319
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgeqrt_work.c",
+                            4487
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgerfs.c", 3983),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgerfs_work.c",
+                            6092
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgerfsx.c", 4833),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgerfsx_work.c",
+                            7622
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgerqf.c", 3415),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgerqf_work.c",
+                            4040
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgesdd.c", 4503),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgesdd_work.c",
+                            7300
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgesv.c", 2698),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgesv_work.c",
+                            4478
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgesvd.c", 4116),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgesvd_work.c",
+                            6755
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgesvdx.c", 4616),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgesvdx_work.c",
+                            6993
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgesvj.c", 4129),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgesvj_work.c",
+                            5337
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgesvx.c", 4596),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgesvx_work.c",
+                            6928
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgesvxx.c", 4891),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgesvxx_work.c",
+                            8256
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgetf2.c", 2530),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgetf2_work.c",
+                            3699
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgetrf.c", 2530),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgetrf2.c", 2535),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgetrf2_work.c",
+                            3707
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgetrf_work.c",
+                            3699
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgetri.c", 3393),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgetri_work.c",
+                            4013
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgetrs.c", 2768),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgetrs_work.c",
+                            4479
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggbak.c", 2844),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggbak_work.c",
+                            3959
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggbal.c", 3833),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggbal_work.c",
+                            5744
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgges.c", 4789),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgges3.c", 4807),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgges3_work.c",
+                            7336
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgges_work.c",
+                            7277
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggesx.c", 5421),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggesx_work.c",
+                            7690
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggev.c", 4253),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggev3.c", 4297),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggev3_work.c",
+                            7405
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggev_work.c",
+                            7348
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggevx.c", 6113),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggevx_work.c",
+                            7685
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggglm.c", 3793),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggglm_work.c",
+                            5017
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgghd3.c", 4268),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgghd3_work.c",
+                            6593
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgghrd.c", 3279),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgghrd_work.c",
+                            6785
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgglse.c", 3861),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgglse_work.c",
+                            5017
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggqrf.c", 3712),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggqrf_work.c",
+                            4974
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggrqf.c", 3712),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggrqf_work.c",
+                            4974
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggsvd.c", 4053),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggsvd3.c", 4465),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggsvd3_work.c",
+                            8054
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggsvd_work.c",
+                            7614
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggsvp.c", 4649),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zggsvp3.c", 5092),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggsvp3_work.c",
+                            8155
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zggsvp_work.c",
+                            7682
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgtcon.c", 3415),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgtcon_work.c",
+                            2593
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgtrfs.c", 4607),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgtrfs_work.c",
+                            5299
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgtsv.c", 2833),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgtsv_work.c",
+                            3873
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgtsvx.c", 4752),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgtsvx_work.c",
+                            5241
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgttrf.c", 2516),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgttrf_work.c",
+                            2351
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zgttrs.c", 3131),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zgttrs_work.c",
+                            4153
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhbev.c", 3464),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhbev_work.c",
+                            4864
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhbevd.c", 4371),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhbevd_work.c",
+                            5454
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhbevx.c", 4399),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhbevx_work.c",
+                            6409
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhbgst.c", 3659),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhbgst_work.c",
+                            5589
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhbgv.c", 3659),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhbgv_work.c",
+                            5694
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhbgvd.c", 4583),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhbgvd_work.c",
+                            6350
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhbgvx.c", 4598),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhbgvx_work.c",
+                            6988
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhbtrd.c", 3420),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhbtrd_work.c",
+                            5082
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhecon.c", 3245),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhecon_work.c",
+                            3759
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zheequb.c", 3164),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zheequb_work.c",
+                            3723
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zheev.c", 3717),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zheev_work.c",
+                            4181
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zheevd.c", 4189),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zheevd_work.c",
+                            4392
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zheevr.c", 4948),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zheevr_work.c",
+                            5984
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zheevx.c", 4738),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zheevx_work.c",
+                            5824
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhegst.c", 2706),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhegst_work.c",
+                            4386
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhegv.c", 3945),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhegv_work.c",
+                            4973
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhegvd.c", 4454),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhegvd_work.c",
+                            5245
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhegvx.c", 4973),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhegvx_work.c",
+                            6619
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zherfs.c", 3987),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zherfs_work.c",
+                            6095
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zherfsx.c", 4601),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zherfsx_work.c",
+                            7602
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhesv.c", 3640),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhesv_work.c",
+                            4932
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhesvx.c", 4480),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhesvx_work.c",
+                            6792
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhesvxx.c", 4604),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhesvxx_work.c",
+                            8119
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zheswapr.c", 2536),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zheswapr_work.c",
+                            3445
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhetrd.c", 3487),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhetrd_work.c",
+                            4151
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhetrf.c", 3445),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhetrf_rook.c",
+                            3476
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhetrf_rook_work.c",
+                            4086
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhetrf_work.c",
+                            4045
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhetri.c", 3090),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhetri2.c", 3461),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhetri2_work.c",
+                            4062
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhetri2x.c", 3166),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhetri2x_work.c",
+                            3832
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhetri_work.c",
+                            3787
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhetrs.c", 2769),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhetrs2.c", 3329),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhetrs2_work.c",
+                            4598
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhetrs_rook.c",
+                            2790
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhetrs_rook_work.c",
+                            4520
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhetrs_work.c",
+                            4479
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhfrk.c", 3017),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhfrk_work.c",
+                            4436
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhgeqz.c", 4713),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhgeqz_work.c",
+                            7528
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhpcon.c", 3201),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhpcon_work.c",
+                            3525
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhpev.c", 3369),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhpev_work.c",
+                            4547
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhpevd.c", 4229),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhpevd_work.c",
+                            5116
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhpevx.c", 4222),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhpevx_work.c",
+                            5218
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhpgst.c", 2594),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhpgst_work.c",
+                            3966
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhpgv.c", 3518),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhpgv_work.c",
+                            5170
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhpgvd.c", 4422),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhpgvd_work.c",
+                            5730
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhpgvx.c", 4373),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhpgvx_work.c",
+                            5819
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhprfs.c", 3895),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhprfs_work.c",
+                            5778
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhpsv.c", 2674),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhpsv_work.c",
+                            4330
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhpsvx.c", 3891),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhpsvx_work.c",
+                            5898
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhptrd.c", 2526),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhptrd_work.c",
+                            3529
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhptrf.c", 2462),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhptrf_work.c",
+                            3455
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhptri.c", 3019),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhptri_work.c",
+                            3566
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhptrs.c", 2693),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhptrs_work.c",
+                            4318
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhsein.c", 4215),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhsein_work.c",
+                            6598
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zhseqr.c", 3810),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zhseqr_work.c",
+                            5373
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlacgv.c", 2272),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlacgv_work.c",
+                            2185
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlacn2.c", 2423),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlacn2_work.c",
+                            2322
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlacp2.c", 2565),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlacp2_work.c",
+                            4181
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlacpy.c", 2606),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlacpy_work.c",
+                            4264
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlag2c.c", 2565),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlag2c_work.c",
+                            4254
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlagge.c", 3187),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlagge_work.c",
+                            3739
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlaghe.c", 3083),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlaghe_work.c",
+                            3689
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlagsy.c", 3083),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlagsy_work.c",
+                            3689
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlange.c", 3152),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlange_work.c",
+                            3604
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlanhe.c", 3264),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlanhe_work.c",
+                            3610
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlansy.c", 3264),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlansy_work.c",
+                            3610
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlantr.c", 3241),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlantr_work.c",
+                            3712
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlapmr.c", 2555),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlapmr_work.c",
+                            3729
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlapmt.c", 2556),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlapmt_work.c",
+                            3730
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlarfb.c", 5602),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlarfb_work.c",
+                            7508
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlarfg.c", 2440),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlarfg_work.c",
+                            2287
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlarft.c", 3073),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlarft_work.c",
+                            4711
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlarfx.c", 2819),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlarfx_work.c",
+                            3840
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlarnv.c", 2123),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlarnv_work.c",
+                            2213
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlascl.c", 4195),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlascl_work.c",
+                            3802
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlaset.c", 2965),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlaset_work.c",
+                            3779
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlaswp.c", 3182),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlaswp_work.c",
+                            3768
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlatms.c", 3558),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlatms_work.c",
+                            4108
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zlauum.c", 2482),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zlauum_work.c",
+                            3646
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpbcon.c", 3484),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpbcon_work.c",
+                            3824
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpbequ.c", 2659),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpbequ_work.c",
+                            3721
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpbrfs.c", 4028),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpbrfs_work.c",
+                            6274
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpbstf.c", 2538),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpbstf_work.c",
+                            3762
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpbsv.c", 2754),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpbsv_work.c",
+                            4585
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpbsvx.c", 4231),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpbsvx_work.c",
+                            6820
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpbtrf.c", 2538),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpbtrf_work.c",
+                            3762
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpbtrs.c", 2768),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpbtrs_work.c",
+                            4524
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpftrf.c", 2456),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpftrf_work.c",
+                            3461
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpftri.c", 2456),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpftri_work.c",
+                            3461
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpftrs.c", 2713),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpftrs_work.c",
+                            4280
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpocon.c", 3455),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpocon_work.c",
+                            3752
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpoequ.c", 2551),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpoequ_work.c",
+                            3612
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpoequb.c", 2557),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpoequb_work.c",
+                            3621
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zporfs.c", 3929),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zporfs_work.c",
+                            6027
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zporfsx.c", 4571),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zporfsx_work.c",
+                            7509
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zposv.c", 2694),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zposv_work.c",
+                            4479
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zposvx.c", 4165),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zposvx_work.c",
+                            6617
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zposvxx.c", 4584),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zposvxx_work.c",
+                            8000
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpotrf.c", 2482),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpotrf2.c", 2487),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpotrf2_work.c",
+                            3654
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpotrf_work.c",
+                            3646
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpotri.c", 2482),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpotri_work.c",
+                            3646
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpotrs.c", 2707),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpotrs_work.c",
+                            4420
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zppcon.c", 3411),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zppcon_work.c",
+                            3518
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zppequ.c", 2527),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zppequ_work.c",
+                            3429
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpprfs.c", 3837),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpprfs_work.c",
+                            5710
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zppsv.c", 2624),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zppsv_work.c",
+                            4269
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zppsvx.c", 4046),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zppsvx_work.c",
+                            6216
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpptrf.c", 2438),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpptrf_work.c",
+                            3425
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpptri.c", 2438),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpptri_work.c",
+                            3425
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpptrs.c", 2636),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpptrs_work.c",
+                            4250
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpstrf.c", 3173),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpstrf_work.c",
+                            3817
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zptcon.c", 2964),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zptcon_work.c",
+                            2290
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpteqr.c", 3473),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpteqr_work.c",
+                            3793
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zptrfs.c", 4040),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zptrfs_work.c",
+                            4912
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zptsv.c", 2688),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zptsv_work.c",
+                            3758
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zptsvx.c", 4071),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zptsvx_work.c",
+                            4824
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpttrf.c", 2286),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpttrf_work.c",
+                            2182
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zpttrs.c", 2750),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zpttrs_work.c",
+                            3836
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zspcon.c", 3201),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zspcon_work.c",
+                            3525
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsprfs.c", 3895),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsprfs_work.c",
+                            5778
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zspsv.c", 2674),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zspsv_work.c",
+                            4330
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zspsvx.c", 3891),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zspsvx_work.c",
+                            5898
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsptrf.c", 2462),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsptrf_work.c",
+                            3455
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsptri.c", 3019),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsptri_work.c",
+                            3566
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsptrs.c", 2693),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsptrs_work.c",
+                            4318
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zstedc.c", 4438),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zstedc_work.c",
+                            4761
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zstegr.c", 4480),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zstegr_work.c",
+                            4907
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zstein.c", 3611),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zstein_work.c",
+                            3983
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zstemr.c", 4327),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zstemr_work.c",
+                            4869
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsteqr.c", 3504),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsteqr_work.c",
+                            4112
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsycon.c", 3245),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsycon_work.c",
+                            3759
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsyconv.c", 2852),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsyconv_work.c",
+                            3819
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsyequb.c", 3164),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsyequb_work.c",
+                            3723
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsyr.c", 2800),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsyr_work.c", 3815),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsyrfs.c", 3987),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsyrfs_work.c",
+                            6095
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsyrfsx.c", 4601),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsyrfsx_work.c",
+                            7602
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsysv.c", 3640),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsysv_rook.c",
+                            3696
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsysv_rook_work.c",
+                            5049
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsysv_work.c",
+                            4932
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsysvx.c", 4480),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsysvx_work.c",
+                            6792
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsysvxx.c", 4604),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsysvxx_work.c",
+                            8119
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsyswapr.c", 2536),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsyswapr_work.c",
+                            3445
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsytrf.c", 3445),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsytrf_rook.c",
+                            3476
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsytrf_rook_work.c",
+                            4086
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsytrf_work.c",
+                            4045
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsytri.c", 3092),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsytri2.c", 3461),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsytri2_work.c",
+                            4062
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsytri2x.c", 3167),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsytri2x_work.c",
+                            3832
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsytri_work.c",
+                            3787
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsytrs.c", 2769),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zsytrs2.c", 3331),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsytrs2_work.c",
+                            4598
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsytrs_rook.c",
+                            2790
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsytrs_rook_work.c",
+                            4520
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zsytrs_work.c",
+                            4479
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztbcon.c", 3458),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztbcon_work.c",
+                            3909
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztbrfs.c", 3885),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztbrfs_work.c",
+                            5422
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztbtrs.c", 2811),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztbtrs_work.c",
+                            4666
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztfsm.c", 3020),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztfsm_work.c",
+                            4616
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztftri.c", 2508),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztftri_work.c",
+                            3530
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztfttp.c", 2526),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztfttp_work.c",
+                            3917
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztfttr.c", 2545),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztfttr_work.c",
+                            4125
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztgevc.c", 4188),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztgevc_work.c",
+                            7097
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztgexc.c", 3223),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztgexc_work.c",
+                            6480
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztgsen.c", 4959),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztgsen_work.c",
+                            7444
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztgsja.c", 4488),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztgsja_work.c",
+                            8295
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztgsna.c", 5074),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztgsna_work.c",
+                            7094
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztgsyl.c", 4815),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztgsyl_work.c",
+                            7881
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztpcon.c", 3379),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztpcon_work.c",
+                            3567
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztpmqrt.c", 3748),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztpmqrt_work.c",
+                            6066
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztpqrt.c", 3381),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztpqrt2.c", 2775),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztpqrt2_work.c",
+                            5117
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztpqrt_work.c",
+                            5251
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztprfb.c", 4034),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztprfb_work.c",
+                            6107
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztprfs.c", 3800),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztprfs_work.c",
+                            5143
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztptri.c", 2482),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztptri_work.c",
+                            3462
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztptrs.c", 2758),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztptrs_work.c",
+                            4332
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztpttf.c", 2525),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztpttf_work.c",
+                            3917
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztpttr.c", 2521),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztpttr_work.c",
+                            4077
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztrcon.c", 3402),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztrcon_work.c",
+                            3833
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztrevc.c", 3975),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztrevc_work.c",
+                            6466
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztrexc.c", 2810),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztrexc_work.c",
+                            4785
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztrrfs.c", 3823),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztrrfs_work.c",
+                            5314
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztrsen.c", 3860),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztrsen_work.c",
+                            5369
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztrsna.c", 4535),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztrsna_work.c",
+                            6064
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztrsyl.c", 2993),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztrsyl_work.c",
+                            5213
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztrtri.c", 2505),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztrtri_work.c",
+                            3742
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztrtrs.c", 2781),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztrtrs_work.c",
+                            4526
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztrttf.c", 2566),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztrttf_work.c",
+                            4125
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztrttp.c", 2543),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztrttp_work.c",
+                            4077
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_ztzrzf.c", 3415),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_ztzrzf_work.c",
+                            4040
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zunbdb.c", 4855),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zunbdb_work.c",
+                            7844
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zuncsd.c", 5850),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zuncsd2by1.c",
+                            4942
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zuncsd2by1_work.c",
+                            8734
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zuncsd_work.c",
+                            12234
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zungbr.c", 3572),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zungbr_work.c",
+                            4186
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zunghr.c", 3556),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zunghr_work.c",
+                            4147
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zunglq.c", 3542),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zunglq_work.c",
+                            4104
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zungql.c", 3542),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zungql_work.c",
+                            4104
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zungqr.c", 3542),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zungqr_work.c",
+                            4104
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zungrq.c", 3542),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zungrq_work.c",
+                            4104
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zungtr.c", 3527),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zungtr_work.c",
+                            4052
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zunmbr.c", 3959),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zunmbr_work.c",
+                            5175
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zunmhr.c", 3896),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zunmhr_work.c",
+                            5064
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zunmlq.c", 3799),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zunmlq_work.c",
+                            4997
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zunmql.c", 3861),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zunmql_work.c",
+                            4990
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zunmqr.c", 3861),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zunmqr_work.c",
+                            4990
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zunmrq.c", 3799),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zunmrq_work.c",
+                            4931
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zunmrz.c", 3820),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zunmrz_work.c",
+                            4989
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zunmtr.c", 3866),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zunmtr_work.c",
+                            4996
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zupgtr.c", 3211),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zupgtr_work.c",
+                            4226
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/lapacke_zupmtr.c", 3802),
+                        (
+                            "source/lapack-netlib/LAPACKE/src/lapacke_zupmtr_work.c",
+                            4509
+                        ),
+                        ("source/lapack-netlib/LAPACKE/src/Makefile", 50358),
+                        ("source/lapack-netlib/LAPACKE/utils/CMakeLists.txt", 4369),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_c_nancheck.c",
+                            2419
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cgb_nancheck.c",
+                            3008
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cgb_trans.c",
+                            3060
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cge_nancheck.c",
+                            2850
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cge_trans.c",
+                            2806
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cgg_nancheck.c",
+                            2277
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cgg_trans.c",
+                            2317
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cgt_nancheck.c",
+                            2361
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_chb_nancheck.c",
+                            2503
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_chb_trans.c",
+                            2541
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_che_nancheck.c",
+                            2282
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_che_trans.c",
+                            2324
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_chp_nancheck.c",
+                            2314
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_chp_trans.c",
+                            2283
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_chs_nancheck.c",
+                            2758
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_chs_trans.c",
+                            2804
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cpb_nancheck.c",
+                            2503
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cpb_trans.c",
+                            2543
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cpf_nancheck.c",
+                            2323
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cpf_trans.c",
+                            2291
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cpo_nancheck.c",
+                            2282
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cpo_trans.c",
+                            2324
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cpp_nancheck.c",
+                            2314
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cpp_trans.c",
+                            2283
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cpt_nancheck.c",
+                            2229
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_csp_nancheck.c",
+                            2314
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_csp_trans.c",
+                            2283
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_cst_nancheck.c",
+                            2244
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_csy_nancheck.c",
+                            2282
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_csy_trans.c",
+                            2324
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ctb_nancheck.c",
+                            3829
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ctb_trans.c",
+                            3917
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ctf_nancheck.c",
+                            7821
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ctf_trans.c",
+                            3584
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ctp_nancheck.c",
+                            3783
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ctp_trans.c",
+                            3599
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ctr_nancheck.c",
+                            3691
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ctr_trans.c",
+                            3643
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_d_nancheck.c",
+                            2405
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dgb_nancheck.c",
+                            2994
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dgb_trans.c",
+                            3032
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dge_nancheck.c",
+                            2836
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dge_trans.c",
+                            2778
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dgg_nancheck.c",
+                            2263
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dgg_trans.c",
+                            2289
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dgt_nancheck.c",
+                            2319
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dhs_nancheck.c",
+                            2744
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dhs_trans.c",
+                            2776
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dpb_nancheck.c",
+                            2489
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dpb_trans.c",
+                            2515
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dpf_nancheck.c",
+                            2309
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dpf_trans.c",
+                            2263
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dpo_nancheck.c",
+                            2268
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dpo_trans.c",
+                            2296
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dpp_nancheck.c",
+                            2300
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dpp_trans.c",
+                            2255
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dpt_nancheck.c",
+                            2216
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dsb_nancheck.c",
+                            2489
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dsb_trans.c",
+                            2515
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dsp_nancheck.c",
+                            2300
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dsp_trans.c",
+                            2255
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dst_nancheck.c",
+                            2216
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dsy_nancheck.c",
+                            2268
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dsy_trans.c",
+                            2296
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dtb_nancheck.c",
+                            3815
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dtb_trans.c",
+                            3889
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dtf_nancheck.c",
+                            7807
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dtf_trans.c",
+                            3556
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dtp_nancheck.c",
+                            3769
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dtp_trans.c",
+                            3571
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dtr_nancheck.c",
+                            3677
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_dtr_trans.c",
+                            3615
+                        ),
+                        ("source/lapack-netlib/LAPACKE/utils/lapacke_lsame.c", 2029),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_make_complex_double.c",
+                            2347
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_make_complex_float.c",
+                            2340
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_s_nancheck.c",
+                            2404
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_sgb_nancheck.c",
+                            2993
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_sgb_trans.c",
+                            3030
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_sge_nancheck.c",
+                            2835
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_sge_trans.c",
+                            2776
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_sgg_nancheck.c",
+                            2262
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_sgg_trans.c",
+                            2287
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_sgt_nancheck.c",
+                            2316
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_shs_nancheck.c",
+                            2743
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_shs_trans.c",
+                            2774
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_spb_nancheck.c",
+                            2488
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_spb_trans.c",
+                            2513
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_spf_nancheck.c",
+                            2308
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_spf_trans.c",
+                            2261
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_spo_nancheck.c",
+                            2267
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_spo_trans.c",
+                            2294
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_spp_nancheck.c",
+                            2299
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_spp_trans.c",
+                            2253
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_spt_nancheck.c",
+                            2214
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ssb_nancheck.c",
+                            2488
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ssb_trans.c",
+                            2513
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ssp_nancheck.c",
+                            2299
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ssp_trans.c",
+                            2254
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_sst_nancheck.c",
+                            2214
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ssy_nancheck.c",
+                            2267
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ssy_trans.c",
+                            2294
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_stb_nancheck.c",
+                            3814
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_stb_trans.c",
+                            3887
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_stf_nancheck.c",
+                            7823
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_stf_trans.c",
+                            3554
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_stp_nancheck.c",
+                            3768
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_stp_trans.c",
+                            3569
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_str_nancheck.c",
+                            3676
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_str_trans.c",
+                            3613
+                        ),
+                        ("source/lapack-netlib/LAPACKE/utils/lapacke_xerbla.c", 2345),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_z_nancheck.c",
+                            2420
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zgb_nancheck.c",
+                            3009
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zgb_trans.c",
+                            3061
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zge_nancheck.c",
+                            2851
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zge_trans.c",
+                            2808
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zgg_nancheck.c",
+                            2278
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zgg_trans.c",
+                            2319
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zgt_nancheck.c",
+                            2364
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zhb_nancheck.c",
+                            2504
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zhb_trans.c",
+                            2543
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zhe_nancheck.c",
+                            2283
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zhe_trans.c",
+                            2326
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zhp_nancheck.c",
+                            2315
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zhp_trans.c",
+                            2285
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zhs_nancheck.c",
+                            2759
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zhs_trans.c",
+                            2806
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zpb_nancheck.c",
+                            2504
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zpb_trans.c",
+                            2545
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zpf_nancheck.c",
+                            2324
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zpf_trans.c",
+                            2293
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zpo_nancheck.c",
+                            2283
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zpo_trans.c",
+                            2326
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zpp_nancheck.c",
+                            2315
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zpp_trans.c",
+                            2285
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zpt_nancheck.c",
+                            2231
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zsp_nancheck.c",
+                            2315
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zsp_trans.c",
+                            2285
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zst_nancheck.c",
+                            2246
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zsy_nancheck.c",
+                            2283
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_zsy_trans.c",
+                            2326
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ztb_nancheck.c",
+                            3830
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ztb_trans.c",
+                            3919
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ztf_nancheck.c",
+                            7839
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ztf_trans.c",
+                            3586
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ztp_nancheck.c",
+                            3784
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ztp_trans.c",
+                            3601
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ztr_nancheck.c",
+                            3692
+                        ),
+                        (
+                            "source/lapack-netlib/LAPACKE/utils/lapacke_ztr_trans.c",
+                            3645
+                        ),
+                        ("source/lapack-netlib/LAPACKE/utils/Makefile", 6510),
+                        ("source/lapack-netlib/LICENSE", 2266),
+                        ("source/lapack-netlib/make.inc.example", 2911),
+                        ("source/lapack-netlib/Makefile", 4079),
+                        ("source/lapack-netlib/README", 6416),
+                        ("source/lapack-netlib/SRC/cbbcsd.f", 38957),
+                        ("source/lapack-netlib/SRC/cbdsqr.f", 25905),
+                        ("source/lapack-netlib/SRC/cgbbrd.f", 17629),
+                        ("source/lapack-netlib/SRC/cgbcon.f", 9033),
+                        ("source/lapack-netlib/SRC/cgbequ.f", 8904),
+                        ("source/lapack-netlib/SRC/cgbequb.f", 9679),
+                        ("source/lapack-netlib/SRC/cgbrfs.f", 14528),
+                        ("source/lapack-netlib/SRC/cgbrfsx.f", 29238),
+                        ("source/lapack-netlib/SRC/cgbsv.f", 7038),
+                        ("source/lapack-netlib/SRC/cgbsvx.f", 23038),
+                        ("source/lapack-netlib/SRC/cgbsvxx.f", 31026),
+                        ("source/lapack-netlib/SRC/cgbtf2.f", 8137),
+                        ("source/lapack-netlib/SRC/cgbtrf.f", 16339),
+                        ("source/lapack-netlib/SRC/cgbtrs.f", 8431),
+                        ("source/lapack-netlib/SRC/cgebak.f", 7278),
+                        ("source/lapack-netlib/SRC/cgebal.f", 10738),
+                        ("source/lapack-netlib/SRC/cgebd2.f", 10452),
+                        ("source/lapack-netlib/SRC/cgebrd.f", 11285),
+                        ("source/lapack-netlib/SRC/cgecon.f", 7334),
+                        ("source/lapack-netlib/SRC/cgeequ.f", 8218),
+                        ("source/lapack-netlib/SRC/cgeequb.f", 8969),
+                        ("source/lapack-netlib/SRC/cgees.f", 13352),
+                        ("source/lapack-netlib/SRC/cgeesx.f", 16440),
+                        ("source/lapack-netlib/SRC/cgeev.f", 15365),
+                        ("source/lapack-netlib/SRC/cgeevx.f", 22000),
+                        ("source/lapack-netlib/SRC/cgehd2.f", 6592),
+                        ("source/lapack-netlib/SRC/cgehrd.f", 10935),
+                        ("source/lapack-netlib/SRC/cgejsv.f", 76510),
+                        ("source/lapack-netlib/SRC/cgelq2.f", 5259),
+                        ("source/lapack-netlib/SRC/cgelqf.f", 7568),
+                        ("source/lapack-netlib/SRC/cgels.f", 15124),
+                        ("source/lapack-netlib/SRC/cgelsd.f", 22701),
+                        ("source/lapack-netlib/SRC/cgelss.f", 26424),
+                        ("source/lapack-netlib/SRC/cgelsy.f", 14945),
+                        ("source/lapack-netlib/SRC/cgemqrt.f", 8080),
+                        ("source/lapack-netlib/SRC/cgeql2.f", 5235),
+                        ("source/lapack-netlib/SRC/cgeqlf.f", 8099),
+                        ("source/lapack-netlib/SRC/cgeqp3.f", 10499),
+                        ("source/lapack-netlib/SRC/cgeqr2.f", 5165),
+                        ("source/lapack-netlib/SRC/cgeqr2p.f", 5373),
+                        ("source/lapack-netlib/SRC/cgeqrf.f", 7586),
+                        ("source/lapack-netlib/SRC/cgeqrfp.f", 7761),
+                        ("source/lapack-netlib/SRC/cgeqrt.f", 6144),
+                        ("source/lapack-netlib/SRC/cgeqrt2.f", 6266),
+                        ("source/lapack-netlib/SRC/cgeqrt3.f", 7368),
+                        ("source/lapack-netlib/SRC/cgerfs.f", 13346),
+                        ("source/lapack-netlib/SRC/cgerfsx.f", 27860),
+                        ("source/lapack-netlib/SRC/cgerq2.f", 5369),
+                        ("source/lapack-netlib/SRC/cgerqf.f", 8106),
+                        ("source/lapack-netlib/SRC/cgesc2.f", 5535),
+                        ("source/lapack-netlib/SRC/cgesdd.f", 78817),
+                        ("source/lapack-netlib/SRC/cgesv.f", 5161),
+                        ("source/lapack-netlib/SRC/cgesvd.f", 142157),
+                        ("source/lapack-netlib/SRC/cgesvdx.f", 27874),
+                        ("source/lapack-netlib/SRC/cgesvj.f", 55521),
+                        ("source/lapack-netlib/SRC/cgesvx.f", 21299),
+                        ("source/lapack-netlib/SRC/cgesvxx.f", 29972),
+                        ("source/lapack-netlib/SRC/cgetc2.f", 6378),
+                        ("source/lapack-netlib/SRC/cgetf2.f", 5937),
+                        ("source/lapack-netlib/SRC/cgetrf.f", 6314),
+                        ("source/lapack-netlib/SRC/cgetrf2.f", 7151),
+                        ("source/lapack-netlib/SRC/cgetri.f", 7421),
+                        ("source/lapack-netlib/SRC/cgetrs.f", 6059),
+                        ("source/lapack-netlib/SRC/cggbak.f", 8368),
+                        ("source/lapack-netlib/SRC/cggbal.f", 16129),
+                        ("source/lapack-netlib/SRC/cgges.f", 19239),
+                        ("source/lapack-netlib/SRC/cgges3.f", 19307),
+                        ("source/lapack-netlib/SRC/cggesx.f", 23617),
+                        ("source/lapack-netlib/SRC/cggev.f", 17422),
+                        ("source/lapack-netlib/SRC/cggev3.f", 17635),
+                        ("source/lapack-netlib/SRC/cggevx.f", 26928),
+                        ("source/lapack-netlib/SRC/cggglm.f", 10386),
+                        ("source/lapack-netlib/SRC/cgghd3.f", 32123),
+                        ("source/lapack-netlib/SRC/cgghrd.f", 10880),
+                        ("source/lapack-netlib/SRC/cgglse.f", 10652),
+                        ("source/lapack-netlib/SRC/cggqrf.f", 9374),
+                        ("source/lapack-netlib/SRC/cggrqf.f", 9388),
+                        ("source/lapack-netlib/SRC/cggsvd3.f", 15345),
+                        ("source/lapack-netlib/SRC/cggsvp3.f", 16266),
+                        ("source/lapack-netlib/SRC/cgsvj0.f", 35848),
+                        ("source/lapack-netlib/SRC/cgsvj1.f", 25637),
+                        ("source/lapack-netlib/SRC/cgtcon.f", 6909),
+                        ("source/lapack-netlib/SRC/cgtrfs.f", 15349),
+                        ("source/lapack-netlib/SRC/cgtsv.f", 6870),
+                        ("source/lapack-netlib/SRC/cgtsvx.f", 13896),
+                        ("source/lapack-netlib/SRC/cgttrf.f", 6795),
+                        ("source/lapack-netlib/SRC/cgttrs.f", 6231),
+                        ("source/lapack-netlib/SRC/cgtts2.f", 10435),
+                        ("source/lapack-netlib/SRC/chbev.f", 8588),
+                        ("source/lapack-netlib/SRC/chbevd.f", 13019),
+                        ("source/lapack-netlib/SRC/chbevx.f", 17220),
+                        ("source/lapack-netlib/SRC/chbgst.f", 49228),
+                        ("source/lapack-netlib/SRC/chbgv.f", 8685),
+                        ("source/lapack-netlib/SRC/chbgvd.f", 13280),
+                        ("source/lapack-netlib/SRC/chbgvx.f", 16655),
+                        ("source/lapack-netlib/SRC/chbtrd.f", 22118),
+                        ("source/lapack-netlib/SRC/checon.f", 6375),
+                        ("source/lapack-netlib/SRC/checon_rook.f", 6991),
+                        ("source/lapack-netlib/SRC/cheequb.f", 9569),
+                        ("source/lapack-netlib/SRC/cheev.f", 8790),
+                        ("source/lapack-netlib/SRC/cheevd.f", 13008),
+                        ("source/lapack-netlib/SRC/cheevr.f", 25045),
+                        ("source/lapack-netlib/SRC/cheevx.f", 17777),
+                        ("source/lapack-netlib/SRC/chegs2.f", 9494),
+                        ("source/lapack-netlib/SRC/chegst.f", 11422),
+                        ("source/lapack-netlib/SRC/chegv.f", 9761),
+                        ("source/lapack-netlib/SRC/chegvd.f", 13493),
+                        ("source/lapack-netlib/SRC/chegvx.f", 15030),
+                        ("source/lapack-netlib/SRC/cherfs.f", 13778),
+                        ("source/lapack-netlib/SRC/cherfsx.f", 26605),
+                        ("source/lapack-netlib/SRC/chesv.f", 8440),
+                        ("source/lapack-netlib/SRC/chesv_rook.f", 9401),
+                        ("source/lapack-netlib/SRC/chesvx.f", 14253),
+                        ("source/lapack-netlib/SRC/chesvxx.f", 27120),
+                        ("source/lapack-netlib/SRC/cheswapr.f", 5447),
+                        ("source/lapack-netlib/SRC/chetd2.f", 10172),
+                        ("source/lapack-netlib/SRC/chetf2.f", 20086),
+                        ("source/lapack-netlib/SRC/chetf2_rook.f", 29064),
+                        ("source/lapack-netlib/SRC/chetrd.f", 11550),
+                        ("source/lapack-netlib/SRC/chetrf.f", 10791),
+                        ("source/lapack-netlib/SRC/chetrf_rook.f", 12353),
+                        ("source/lapack-netlib/SRC/chetri.f", 11707),
+                        ("source/lapack-netlib/SRC/chetri2.f", 5984),
+                        ("source/lapack-netlib/SRC/chetri2x.f", 16193),
+                        ("source/lapack-netlib/SRC/chetri_rook.f", 15107),
+                        ("source/lapack-netlib/SRC/chetrs.f", 13471),
+                        ("source/lapack-netlib/SRC/chetrs2.f", 10264),
+                        ("source/lapack-netlib/SRC/chetrs_rook.f", 14718),
+                        ("source/lapack-netlib/SRC/chfrk.f", 17690),
+                        ("source/lapack-netlib/SRC/chgeqz.f", 28434),
+                        ("source/lapack-netlib/SRC/chla_transtype.f", 2543),
+                        ("source/lapack-netlib/SRC/chpcon.f", 6186),
+                        ("source/lapack-netlib/SRC/chpev.f", 8084),
+                        ("source/lapack-netlib/SRC/chpevd.f", 12261),
+                        ("source/lapack-netlib/SRC/chpevx.f", 15908),
+                        ("source/lapack-netlib/SRC/chpgst.f", 8554),
+                        ("source/lapack-netlib/SRC/chpgv.f", 8441),
+                        ("source/lapack-netlib/SRC/chpgvd.f", 12685),
+                        ("source/lapack-netlib/SRC/chpgvx.f", 13071),
+                        ("source/lapack-netlib/SRC/chprfs.f", 13453),
+                        ("source/lapack-netlib/SRC/chpsv.f", 6944),
+                        ("source/lapack-netlib/SRC/chpsvx.f", 13146),
+                        ("source/lapack-netlib/SRC/chptrd.f", 9096),
+                        ("source/lapack-netlib/SRC/chptrf.f", 20757),
+                        ("source/lapack-netlib/SRC/chptri.f", 12236),
+                        ("source/lapack-netlib/SRC/chptrs.f", 13656),
+                        ("source/lapack-netlib/SRC/chsein.f", 14814),
+                        ("source/lapack-netlib/SRC/chseqr.f", 17942),
+                        ("source/lapack-netlib/SRC/cla_gbamv.f", 12879),
+                        ("source/lapack-netlib/SRC/cla_gbrcond_c.f", 9658),
+                        ("source/lapack-netlib/SRC/cla_gbrcond_x.f", 8865),
+                        ("source/lapack-netlib/SRC/cla_gbrfsx_extended.f", 26371),
+                        ("source/lapack-netlib/SRC/cla_gbrpvgrw.f", 4971),
+                        ("source/lapack-netlib/SRC/cla_geamv.f", 12323),
+                        ("source/lapack-netlib/SRC/cla_gercond_c.f", 8493),
+                        ("source/lapack-netlib/SRC/cla_gercond_x.f", 7813),
+                        ("source/lapack-netlib/SRC/cla_gerfsx_extended.f", 25387),
+                        ("source/lapack-netlib/SRC/cla_gerpvgrw.f", 4050),
+                        ("source/lapack-netlib/SRC/cla_heamv.f", 13124),
+                        ("source/lapack-netlib/SRC/cla_hercond_c.f", 8711),
+                        ("source/lapack-netlib/SRC/cla_hercond_x.f", 7772),
+                        ("source/lapack-netlib/SRC/cla_herfsx_extended.f", 26073),
+                        ("source/lapack-netlib/SRC/cla_herpvgrw.f", 9825),
+                        ("source/lapack-netlib/SRC/cla_lin_berr.f", 4706),
+                        ("source/lapack-netlib/SRC/cla_porcond_c.f", 8452),
+                        ("source/lapack-netlib/SRC/cla_porcond_x.f", 7494),
+                        ("source/lapack-netlib/SRC/cla_porfsx_extended.f", 25143),
+                        ("source/lapack-netlib/SRC/cla_porpvgrw.f", 6288),
+                        ("source/lapack-netlib/SRC/cla_syamv.f", 13178),
+                        ("source/lapack-netlib/SRC/cla_syrcond_c.f", 8719),
+                        ("source/lapack-netlib/SRC/cla_syrcond_x.f", 7810),
+                        ("source/lapack-netlib/SRC/cla_syrfsx_extended.f", 26075),
+                        ("source/lapack-netlib/SRC/cla_syrpvgrw.f", 9948),
+                        ("source/lapack-netlib/SRC/cla_wwaddw.f", 2886),
+                        ("source/lapack-netlib/SRC/clabrd.f", 15335),
+                        ("source/lapack-netlib/SRC/clacgv.f", 2862),
+                        ("source/lapack-netlib/SRC/clacn2.f", 7976),
+                        ("source/lapack-netlib/SRC/clacon.f", 7354),
+                        ("source/lapack-netlib/SRC/clacp2.f", 4151),
+                        ("source/lapack-netlib/SRC/clacpy.f", 4086),
+                        ("source/lapack-netlib/SRC/clacrm.f", 4795),
+                        ("source/lapack-netlib/SRC/clacrt.f", 4006),
+                        ("source/lapack-netlib/SRC/cladiv.f", 2419),
+                        ("source/lapack-netlib/SRC/claed0.f", 11301),
+                        ("source/lapack-netlib/SRC/claed7.f", 12488),
+                        ("source/lapack-netlib/SRC/claed8.f", 14937),
+                        ("source/lapack-netlib/SRC/claein.f", 9685),
+                        ("source/lapack-netlib/SRC/claesy.f", 6357),
+                        ("source/lapack-netlib/SRC/claev2.f", 4463),
+                        ("source/lapack-netlib/SRC/clag2z.f", 3519),
+                        ("source/lapack-netlib/SRC/clags2.f", 11736),
+                        ("source/lapack-netlib/SRC/clagtm.f", 10156),
+                        ("source/lapack-netlib/SRC/clahef.f", 32370),
+                        ("source/lapack-netlib/SRC/clahef_rook.f", 39771),
+                        ("source/lapack-netlib/SRC/clahqr.f", 18443),
+                        ("source/lapack-netlib/SRC/clahr2.f", 10374),
+                        ("source/lapack-netlib/SRC/claic1.f", 10404),
+                        ("source/lapack-netlib/SRC/clals0.f", 18377),
+                        ("source/lapack-netlib/SRC/clalsa.f", 20624),
+                        ("source/lapack-netlib/SRC/clalsd.f", 23190),
+                        ("source/lapack-netlib/SRC/clangb.f", 6541),
+                        ("source/lapack-netlib/SRC/clange.f", 5904),
+                        ("source/lapack-netlib/SRC/clangt.f", 6134),
+                        ("source/lapack-netlib/SRC/clanhb.f", 8639),
+                        ("source/lapack-netlib/SRC/clanhe.f", 8123),
+                        ("source/lapack-netlib/SRC/clanhf.f", 57950),
+                        ("source/lapack-netlib/SRC/clanhp.f", 8313),
+                        ("source/lapack-netlib/SRC/clanhs.f", 5827),
+                        ("source/lapack-netlib/SRC/clanht.f", 5400),
+                        ("source/lapack-netlib/SRC/clansb.f", 7963),
+                        ("source/lapack-netlib/SRC/clansp.f", 8272),
+                        ("source/lapack-netlib/SRC/clansy.f", 7427),
+                        ("source/lapack-netlib/SRC/clantb.f", 11451),
+                        ("source/lapack-netlib/SRC/clantp.f", 10905),
+                        ("source/lapack-netlib/SRC/clantr.f", 11133),
+                        ("source/lapack-netlib/SRC/clapll.f", 4481),
+                        ("source/lapack-netlib/SRC/clapmr.f", 4744),
+                        ("source/lapack-netlib/SRC/clapmt.f", 4753),
+                        ("source/lapack-netlib/SRC/claqgb.f", 7147),
+                        ("source/lapack-netlib/SRC/claqge.f", 6331),
+                        ("source/lapack-netlib/SRC/claqhb.f", 6502),
+                        ("source/lapack-netlib/SRC/claqhe.f", 6093),
+                        ("source/lapack-netlib/SRC/claqhp.f", 5956),
+                        ("source/lapack-netlib/SRC/claqp2.f", 7794),
+                        ("source/lapack-netlib/SRC/claqps.f", 11031),
+                        ("source/lapack-netlib/SRC/claqr0.f", 25076),
+                        ("source/lapack-netlib/SRC/claqr1.f", 4857),
+                        ("source/lapack-netlib/SRC/claqr2.f", 17597),
+                        ("source/lapack-netlib/SRC/claqr3.f", 18019),
+                        ("source/lapack-netlib/SRC/claqr4.f", 25130),
+                        ("source/lapack-netlib/SRC/claqr5.f", 33638),
+                        ("source/lapack-netlib/SRC/claqsb.f", 6384),
+                        ("source/lapack-netlib/SRC/claqsp.f", 5819),
+                        ("source/lapack-netlib/SRC/claqsy.f", 5964),
+                        ("source/lapack-netlib/SRC/clar1v.f", 14785),
+                        ("source/lapack-netlib/SRC/clar2v.f", 4774),
+                        ("source/lapack-netlib/SRC/clarcm.f", 4810),
+                        ("source/lapack-netlib/SRC/clarf.f", 6362),
+                        ("source/lapack-netlib/SRC/clarfb.f", 22193),
+                        ("source/lapack-netlib/SRC/clarfg.f", 5402),
+                        ("source/lapack-netlib/SRC/clarfgp.f", 7859),
+                        ("source/lapack-netlib/SRC/clarft.f", 10522),
+                        ("source/lapack-netlib/SRC/clarfx.f", 20808),
+                        ("source/lapack-netlib/SRC/clargv.f", 9008),
+                        ("source/lapack-netlib/SRC/clarnv.f", 5622),
+                        ("source/lapack-netlib/SRC/clarrv.f", 43481),
+                        ("source/lapack-netlib/SRC/clarscl2.f", 3046),
+                        ("source/lapack-netlib/SRC/clartg.f", 7359),
+                        ("source/lapack-netlib/SRC/clartv.f", 3901),
+                        ("source/lapack-netlib/SRC/clarz.f", 6435),
+                        ("source/lapack-netlib/SRC/clarzb.f", 9536),
+                        ("source/lapack-netlib/SRC/clarzt.f", 8041),
+                        ("source/lapack-netlib/SRC/clascl.f", 9844),
+                        ("source/lapack-netlib/SRC/clascl2.f", 3010),
+                        ("source/lapack-netlib/SRC/claset.f", 4853),
+                        ("source/lapack-netlib/SRC/clasr.f", 15135),
+                        ("source/lapack-netlib/SRC/classq.f", 4759),
+                        ("source/lapack-netlib/SRC/claswp.f", 5047),
+                        ("source/lapack-netlib/SRC/clasyf.f", 26926),
+                        ("source/lapack-netlib/SRC/clasyf_rook.f", 27661),
+                        ("source/lapack-netlib/SRC/clatbs.f", 31419),
+                        ("source/lapack-netlib/SRC/clatdf.f", 10788),
+                        ("source/lapack-netlib/SRC/clatps.f", 30593),
+                        ("source/lapack-netlib/SRC/clatrd.f", 12543),
+                        ("source/lapack-netlib/SRC/clatrs.f", 30308),
+                        ("source/lapack-netlib/SRC/clatrz.f", 5894),
+                        ("source/lapack-netlib/SRC/clauu2.f", 5940),
+                        ("source/lapack-netlib/SRC/clauum.f", 6705),
+                        ("source/lapack-netlib/SRC/CMakeLists.txt", 22663),
+                        ("source/lapack-netlib/SRC/cpbcon.f", 7867),
+                        ("source/lapack-netlib/SRC/cpbequ.f", 6687),
+                        ("source/lapack-netlib/SRC/cpbrfs.f", 13841),
+                        ("source/lapack-netlib/SRC/cpbstf.f", 9784),
+                        ("source/lapack-netlib/SRC/cpbsv.f", 6956),
+                        ("source/lapack-netlib/SRC/cpbsvx.f", 18127),
+                        ("source/lapack-netlib/SRC/cpbtf2.f", 7859),
+                        ("source/lapack-netlib/SRC/cpbtrf.f", 13984),
+                        ("source/lapack-netlib/SRC/cpbtrs.f", 6030),
+                        ("source/lapack-netlib/SRC/cpftrf.f", 15361),
+                        ("source/lapack-netlib/SRC/cpftri.f", 14260),
+                        ("source/lapack-netlib/SRC/cpftrs.f", 9209),
+                        ("source/lapack-netlib/SRC/cpocon.f", 7178),
+                        ("source/lapack-netlib/SRC/cpoequ.f", 5563),
+                        ("source/lapack-netlib/SRC/cpoequb.f", 5819),
+                        ("source/lapack-netlib/SRC/cporfs.f", 13360),
+                        ("source/lapack-netlib/SRC/cporfsx.f", 26228),
+                        ("source/lapack-netlib/SRC/cposv.f", 5701),
+                        ("source/lapack-netlib/SRC/cposvx.f", 16696),
+                        ("source/lapack-netlib/SRC/cposvxx.f", 26447),
+                        ("source/lapack-netlib/SRC/cpotf2.f", 6907),
+                        ("source/lapack-netlib/SRC/cpotrf.f", 7391),
+                        ("source/lapack-netlib/SRC/cpotrf2.f", 6500),
+                        ("source/lapack-netlib/SRC/cpotri.f", 4175),
+                        ("source/lapack-netlib/SRC/cpotrs.f", 5413),
+                        ("source/lapack-netlib/SRC/cppcon.f", 7141),
+                        ("source/lapack-netlib/SRC/cppequ.f", 6534),
+                        ("source/lapack-netlib/SRC/cpprfs.f", 13086),
+                        ("source/lapack-netlib/SRC/cppsv.f", 5929),
+                        ("source/lapack-netlib/SRC/cppsvx.f", 16615),
+                        ("source/lapack-netlib/SRC/cpptrf.f", 6473),
+                        ("source/lapack-netlib/SRC/cpptri.f", 5174),
+                        ("source/lapack-netlib/SRC/cpptrs.f", 5427),
+                        ("source/lapack-netlib/SRC/cpstf2.f", 11861),
+                        ("source/lapack-netlib/SRC/cpstrf.f", 14132),
+                        ("source/lapack-netlib/SRC/cptcon.f", 5779),
+                        ("source/lapack-netlib/SRC/cpteqr.f", 7806),
+                        ("source/lapack-netlib/SRC/cptrfs.f", 14665),
+                        ("source/lapack-netlib/SRC/cptsv.f", 4914),
+                        ("source/lapack-netlib/SRC/cptsvx.f", 11085),
+                        ("source/lapack-netlib/SRC/cpttrf.f", 5988),
+                        ("source/lapack-netlib/SRC/cpttrs.f", 5754),
+                        ("source/lapack-netlib/SRC/cptts2.f", 6906),
+                        ("source/lapack-netlib/SRC/crot.f", 4180),
+                        ("source/lapack-netlib/SRC/cspcon.f", 6202),
+                        ("source/lapack-netlib/SRC/cspmv.f", 9991),
+                        ("source/lapack-netlib/SRC/cspr.f", 8384),
+                        ("source/lapack-netlib/SRC/csprfs.f", 13412),
+                        ("source/lapack-netlib/SRC/cspsv.f", 6937),
+                        ("source/lapack-netlib/SRC/cspsvx.f", 13143),
+                        ("source/lapack-netlib/SRC/csptrf.f", 19241),
+                        ("source/lapack-netlib/SRC/csptri.f", 11838),
+                        ("source/lapack-netlib/SRC/csptrs.f", 12621),
+                        ("source/lapack-netlib/SRC/csrscl.f", 4374),
+                        ("source/lapack-netlib/SRC/cstedc.f", 16064),
+                        ("source/lapack-netlib/SRC/cstegr.f", 9729),
+                        ("source/lapack-netlib/SRC/cstein.f", 14071),
+                        ("source/lapack-netlib/SRC/cstemr.f", 27787),
+                        ("source/lapack-netlib/SRC/csteqr.f", 15727),
+                        ("source/lapack-netlib/SRC/csycon.f", 6391),
+                        ("source/lapack-netlib/SRC/csycon_rook.f", 6937),
+                        ("source/lapack-netlib/SRC/csyconv.f", 9109),
+                        ("source/lapack-netlib/SRC/csyequb.f", 10038),
+                        ("source/lapack-netlib/SRC/csymv.f", 9973),
+                        ("source/lapack-netlib/SRC/csyr.f", 7765),
+                        ("source/lapack-netlib/SRC/csyrfs.f", 13766),
+                        ("source/lapack-netlib/SRC/csyrfsx.f", 26625),
+                        ("source/lapack-netlib/SRC/csysv.f", 8404),
+                        ("source/lapack-netlib/SRC/csysv_rook.f", 9184),
+                        ("source/lapack-netlib/SRC/csysvx.f", 14253),
+                        ("source/lapack-netlib/SRC/csysvxx.f", 27118),
+                        ("source/lapack-netlib/SRC/csyswapr.f", 5173),
+                        ("source/lapack-netlib/SRC/csytf2.f", 18753),
+                        ("source/lapack-netlib/SRC/csytf2_rook.f", 25227),
+                        ("source/lapack-netlib/SRC/csytrf.f", 11076),
+                        ("source/lapack-netlib/SRC/csytrf_rook.f", 12094),
+                        ("source/lapack-netlib/SRC/csytri.f", 11138),
+                        ("source/lapack-netlib/SRC/csytri2.f", 5995),
+                        ("source/lapack-netlib/SRC/csytri2x.f", 16026),
+                        ("source/lapack-netlib/SRC/csytri_rook.f", 13429),
+                        ("source/lapack-netlib/SRC/csytrs.f", 12438),
+                        ("source/lapack-netlib/SRC/csytrs2.f", 10444),
+                        ("source/lapack-netlib/SRC/csytrs_rook.f", 13685),
+                        ("source/lapack-netlib/SRC/ctbcon.f", 8220),
+                        ("source/lapack-netlib/SRC/ctbrfs.f", 15570),
+                        ("source/lapack-netlib/SRC/ctbtrs.f", 6818),
+                        ("source/lapack-netlib/SRC/ctfsm.f", 35658),
+                        ("source/lapack-netlib/SRC/ctftri.f", 15840),
+                        ("source/lapack-netlib/SRC/ctfttp.f", 15758),
+                        ("source/lapack-netlib/SRC/ctfttr.f", 15906),
+                        ("source/lapack-netlib/SRC/ctgevc.f", 23360),
+                        ("source/lapack-netlib/SRC/ctgex2.f", 11414),
+                        ("source/lapack-netlib/SRC/ctgexc.f", 8930),
+                        ("source/lapack-netlib/SRC/ctgsen.f", 26612),
+                        ("source/lapack-netlib/SRC/ctgsja.f", 19990),
+                        ("source/lapack-netlib/SRC/ctgsna.f", 16771),
+                        ("source/lapack-netlib/SRC/ctgsy2.f", 15123),
+                        ("source/lapack-netlib/SRC/ctgsyl.f", 23705),
+                        ("source/lapack-netlib/SRC/ctpcon.f", 7657),
+                        ("source/lapack-netlib/SRC/ctpmqrt.f", 10551),
+                        ("source/lapack-netlib/SRC/ctpqrt.f", 7902),
+                        ("source/lapack-netlib/SRC/ctpqrt2.f", 8737),
+                        ("source/lapack-netlib/SRC/ctprfb.f", 26285),
+                        ("source/lapack-netlib/SRC/ctprfs.f", 15047),
+                        ("source/lapack-netlib/SRC/ctptri.f", 6701),
+                        ("source/lapack-netlib/SRC/ctptrs.f", 6256),
+                        ("source/lapack-netlib/SRC/ctpttf.f", 15717),
+                        ("source/lapack-netlib/SRC/ctpttr.f", 4811),
+                        ("source/lapack-netlib/SRC/ctrcon.f", 8027),
+                        ("source/lapack-netlib/SRC/ctrevc.f", 14951),
+                        ("source/lapack-netlib/SRC/ctrexc.f", 6360),
+                        ("source/lapack-netlib/SRC/ctrrfs.f", 14905),
+                        ("source/lapack-netlib/SRC/ctrsen.f", 13869),
+                        ("source/lapack-netlib/SRC/ctrsna.f", 14272),
+                        ("source/lapack-netlib/SRC/ctrsyl.f", 13669),
+                        ("source/lapack-netlib/SRC/ctrti2.f", 5932),
+                        ("source/lapack-netlib/SRC/ctrtri.f", 6963),
+                        ("source/lapack-netlib/SRC/ctrtrs.f", 6450),
+                        ("source/lapack-netlib/SRC/ctrttf.f", 15895),
+                        ("source/lapack-netlib/SRC/ctrttp.f", 4809),
+                        ("source/lapack-netlib/SRC/ctzrzf.f", 8548),
+                        ("source/lapack-netlib/SRC/cunbdb.f", 23881),
+                        ("source/lapack-netlib/SRC/cunbdb1.f", 10071),
+                        ("source/lapack-netlib/SRC/cunbdb2.f", 10441),
+                        ("source/lapack-netlib/SRC/cunbdb3.f", 10336),
+                        ("source/lapack-netlib/SRC/cunbdb4.f", 12620),
+                        ("source/lapack-netlib/SRC/cunbdb5.f", 7323),
+                        ("source/lapack-netlib/SRC/cunbdb6.f", 8356),
+                        ("source/lapack-netlib/SRC/cuncsd.f", 22483),
+                        ("source/lapack-netlib/SRC/cuncsd2by1.f", 26344),
+                        ("source/lapack-netlib/SRC/cung2l.f", 5295),
+                        ("source/lapack-netlib/SRC/cung2r.f", 5189),
+                        ("source/lapack-netlib/SRC/cungbr.f", 9955),
+                        ("source/lapack-netlib/SRC/cunghr.f", 6604),
+                        ("source/lapack-netlib/SRC/cungl2.f", 5547),
+                        ("source/lapack-netlib/SRC/cunglq.f", 8058),
+                        ("source/lapack-netlib/SRC/cungql.f", 8203),
+                        ("source/lapack-netlib/SRC/cungqr.f", 8077),
+                        ("source/lapack-netlib/SRC/cungr2.f", 5517),
+                        ("source/lapack-netlib/SRC/cungrq.f", 8197),
+                        ("source/lapack-netlib/SRC/cungtr.f", 7077),
+                        ("source/lapack-netlib/SRC/cunm22.f", 13663),
+                        ("source/lapack-netlib/SRC/cunm2l.f", 7445),
+                        ("source/lapack-netlib/SRC/cunm2r.f", 7532),
+                        ("source/lapack-netlib/SRC/cunmbr.f", 11201),
+                        ("source/lapack-netlib/SRC/cunmhr.f", 8413),
+                        ("source/lapack-netlib/SRC/cunml2.f", 7722),
+                        ("source/lapack-netlib/SRC/cunmlq.f", 9746),
+                        ("source/lapack-netlib/SRC/cunmql.f", 9476),
+                        ("source/lapack-netlib/SRC/cunmqr.f", 9423),
+                        ("source/lapack-netlib/SRC/cunmr2.f", 7587),
+                        ("source/lapack-netlib/SRC/cunmr3.f", 8037),
+                        ("source/lapack-netlib/SRC/cunmrq.f", 9611),
+                        ("source/lapack-netlib/SRC/cunmrz.f", 10531),
+                        ("source/lapack-netlib/SRC/cunmtr.f", 8873),
+                        ("source/lapack-netlib/SRC/cupgtr.f", 6108),
+                        ("source/lapack-netlib/SRC/cupmtr.f", 9067),
+                        ("source/lapack-netlib/SRC/dbbcsd.f", 38688),
+                        ("source/lapack-netlib/SRC/dbdsdc.f", 17013),
+                        ("source/lapack-netlib/SRC/dbdsqr.f", 26362),
+                        ("source/lapack-netlib/SRC/dbdsvdx.f", 27187),
+                        ("source/lapack-netlib/SRC/ddisna.f", 7063),
+                        ("source/lapack-netlib/SRC/DEPRECATED/cgegs.f", 16521),
+                        ("source/lapack-netlib/SRC/DEPRECATED/cgegv.f", 22658),
+                        ("source/lapack-netlib/SRC/DEPRECATED/cgelsx.f", 13514),
+                        ("source/lapack-netlib/SRC/DEPRECATED/cgeqpf.f", 9060),
+                        ("source/lapack-netlib/SRC/DEPRECATED/cggsvd.f", 14093),
+                        ("source/lapack-netlib/SRC/DEPRECATED/cggsvp.f", 14970),
+                        ("source/lapack-netlib/SRC/DEPRECATED/clahrd.f", 8974),
+                        ("source/lapack-netlib/SRC/DEPRECATED/clatzm.f", 6200),
+                        ("source/lapack-netlib/SRC/DEPRECATED/ctzrqf.f", 7057),
+                        ("source/lapack-netlib/SRC/DEPRECATED/dgegs.f", 17280),
+                        ("source/lapack-netlib/SRC/DEPRECATED/dgegv.f", 25304),
+                        ("source/lapack-netlib/SRC/DEPRECATED/dgelsx.f", 13091),
+                        ("source/lapack-netlib/SRC/DEPRECATED/dgeqpf.f", 8863),
+                        ("source/lapack-netlib/SRC/DEPRECATED/dggsvd.f", 14069),
+                        ("source/lapack-netlib/SRC/DEPRECATED/dggsvp.f", 14550),
+                        ("source/lapack-netlib/SRC/DEPRECATED/dlahrd.f", 8737),
+                        ("source/lapack-netlib/SRC/DEPRECATED/dlatzm.f", 6080),
+                        ("source/lapack-netlib/SRC/DEPRECATED/dtzrqf.f", 6691),
+                        ("source/lapack-netlib/SRC/DEPRECATED/sgegs.f", 17179),
+                        ("source/lapack-netlib/SRC/DEPRECATED/sgegv.f", 25204),
+                        ("source/lapack-netlib/SRC/DEPRECATED/sgelsx.f", 13050),
+                        ("source/lapack-netlib/SRC/DEPRECATED/sgeqpf.f", 8825),
+                        ("source/lapack-netlib/SRC/DEPRECATED/sggsvd.f", 13951),
+                        ("source/lapack-netlib/SRC/DEPRECATED/sggsvp.f", 14440),
+                        ("source/lapack-netlib/SRC/DEPRECATED/slahrd.f", 8687),
+                        ("source/lapack-netlib/SRC/DEPRECATED/slatzm.f", 6018),
+                        ("source/lapack-netlib/SRC/DEPRECATED/stzrqf.f", 6665),
+                        ("source/lapack-netlib/SRC/DEPRECATED/zgegs.f", 16558),
+                        ("source/lapack-netlib/SRC/DEPRECATED/zgegv.f", 22696),
+                        ("source/lapack-netlib/SRC/DEPRECATED/zgelsx.f", 13543),
+                        ("source/lapack-netlib/SRC/DEPRECATED/zgeqpf.f", 9087),
+                        ("source/lapack-netlib/SRC/DEPRECATED/zggsvd.f", 14170),
+                        ("source/lapack-netlib/SRC/DEPRECATED/zggsvp.f", 15061),
+                        ("source/lapack-netlib/SRC/DEPRECATED/zlahrd.f", 8988),
+                        ("source/lapack-netlib/SRC/DEPRECATED/zlatzm.f", 6217),
+                        ("source/lapack-netlib/SRC/DEPRECATED/ztzrqf.f", 7070),
+                        ("source/lapack-netlib/SRC/dgbbrd.f", 16883),
+                        ("source/lapack-netlib/SRC/dgbcon.f", 8799),
+                        ("source/lapack-netlib/SRC/dgbequ.f", 8686),
+                        ("source/lapack-netlib/SRC/dgbequb.f", 9427),
+                        ("source/lapack-netlib/SRC/dgbrfs.f", 14292),
+                        ("source/lapack-netlib/SRC/dgbrfsx.f", 29439),
+                        ("source/lapack-netlib/SRC/dgbsv.f", 7052),
+                        ("source/lapack-netlib/SRC/dgbsvx.f", 22900),
+                        ("source/lapack-netlib/SRC/dgbsvxx.f", 31027),
+                        ("source/lapack-netlib/SRC/dgbtf2.f", 8091),
+                        ("source/lapack-netlib/SRC/dgbtrf.f", 16291),
+                        ("source/lapack-netlib/SRC/dgbtrs.f", 7508),
+                        ("source/lapack-netlib/SRC/dgebak.f", 7242),
+                        ("source/lapack-netlib/SRC/dgebal.f", 10563),
+                        ("source/lapack-netlib/SRC/dgebd2.f", 10049),
+                        ("source/lapack-netlib/SRC/dgebrd.f", 11278),
+                        ("source/lapack-netlib/SRC/dgecon.f", 7117),
+                        ("source/lapack-netlib/SRC/dgeequ.f", 8000),
+                        ("source/lapack-netlib/SRC/dgeequb.f", 8751),
+                        ("source/lapack-netlib/SRC/dgees.f", 17458),
+                        ("source/lapack-netlib/SRC/dgeesx.f", 22175),
+                        ("source/lapack-netlib/SRC/dgeev.f", 16957),
+                        ("source/lapack-netlib/SRC/dgeevx.f", 23581),
+                        ("source/lapack-netlib/SRC/dgehd2.f", 6608),
+                        ("source/lapack-netlib/SRC/dgehrd.f", 10908),
+                        ("source/lapack-netlib/SRC/dgejsv.f", 72483),
+                        ("source/lapack-netlib/SRC/dgelq2.f", 5155),
+                        ("source/lapack-netlib/SRC/dgelqf.f", 7572),
+                        ("source/lapack-netlib/SRC/dgels.f", 14998),
+                        ("source/lapack-netlib/SRC/dgelsd.f", 21134),
+                        ("source/lapack-netlib/SRC/dgelss.f", 25651),
+                        ("source/lapack-netlib/SRC/dgelsy.f", 14794),
+                        ("source/lapack-netlib/SRC/dgemqrt.f", 8121),
+                        ("source/lapack-netlib/SRC/dgeql2.f", 5252),
+                        ("source/lapack-netlib/SRC/dgeqlf.f", 8109),
+                        ("source/lapack-netlib/SRC/dgeqp3.f", 10221),
+                        ("source/lapack-netlib/SRC/dgeqr2.f", 5148),
+                        ("source/lapack-netlib/SRC/dgeqr2p.f", 5337),
+                        ("source/lapack-netlib/SRC/dgeqrf.f", 7596),
+                        ("source/lapack-netlib/SRC/dgeqrfp.f", 7753),
+                        ("source/lapack-netlib/SRC/dgeqrt.f", 6175),
+                        ("source/lapack-netlib/SRC/dgeqrt2.f", 6290),
+                        ("source/lapack-netlib/SRC/dgeqrt3.f", 7385),
+                        ("source/lapack-netlib/SRC/dgerfs.f", 13140),
+                        ("source/lapack-netlib/SRC/dgerfsx.f", 27955),
+                        ("source/lapack-netlib/SRC/dgerq2.f", 5257),
+                        ("source/lapack-netlib/SRC/dgerqf.f", 8110),
+                        ("source/lapack-netlib/SRC/dgesc2.f", 5451),
+                        ("source/lapack-netlib/SRC/dgesdd.f", 53660),
+                        ("source/lapack-netlib/SRC/dgesv.f", 5158),
+                        ("source/lapack-netlib/SRC/dgesvd.f", 134919),
+                        ("source/lapack-netlib/SRC/dgesvdx.f", 26661),
+                        ("source/lapack-netlib/SRC/dgesvj.f", 68265),
+                        ("source/lapack-netlib/SRC/dgesvx.f", 21307),
+                        ("source/lapack-netlib/SRC/dgesvxx.f", 29982),
+                        ("source/lapack-netlib/SRC/dgetc2.f", 6301),
+                        ("source/lapack-netlib/SRC/dgetf2.f", 5909),
+                        ("source/lapack-netlib/SRC/dgetrf.f", 6310),
+                        ("source/lapack-netlib/SRC/dgetrf2.f", 7083),
+                        ("source/lapack-netlib/SRC/dgetri.f", 7389),
+                        ("source/lapack-netlib/SRC/dgetrs.f", 6020),
+                        ("source/lapack-netlib/SRC/dggbak.f", 8371),
+                        ("source/lapack-netlib/SRC/dggbal.f", 15776),
+                        ("source/lapack-netlib/SRC/dgges.f", 22789),
+                        ("source/lapack-netlib/SRC/dgges3.f", 22692),
+                        ("source/lapack-netlib/SRC/dggesx.f", 27780),
+                        ("source/lapack-netlib/SRC/dggev.f", 19041),
+                        ("source/lapack-netlib/SRC/dggev3.f", 19269),
+                        ("source/lapack-netlib/SRC/dggevx.f", 29636),
+                        ("source/lapack-netlib/SRC/dggglm.f", 10365),
+                        ("source/lapack-netlib/SRC/dgghd3.f", 32001),
+                        ("source/lapack-netlib/SRC/dgghrd.f", 10828),
+                        ("source/lapack-netlib/SRC/dgglse.f", 10655),
+                        ("source/lapack-netlib/SRC/dggqrf.f", 9406),
+                        ("source/lapack-netlib/SRC/dggrqf.f", 9419),
+                        ("source/lapack-netlib/SRC/dggsvd3.f", 15303),
+                        ("source/lapack-netlib/SRC/dggsvp3.f", 15995),
+                        ("source/lapack-netlib/SRC/dgsvj0.f", 46133),
+                        ("source/lapack-netlib/SRC/dgsvj1.f", 31154),
+                        ("source/lapack-netlib/SRC/dgtcon.f", 7031),
+                        ("source/lapack-netlib/SRC/dgtrfs.f", 14903),
+                        ("source/lapack-netlib/SRC/dgtsv.f", 9746),
+                        ("source/lapack-netlib/SRC/dgtsvx.f", 13975),
+                        ("source/lapack-netlib/SRC/dgttrf.f", 6584),
+                        ("source/lapack-netlib/SRC/dgttrs.f", 6189),
+                        ("source/lapack-netlib/SRC/dgtts2.f", 8046),
+                        ("source/lapack-netlib/SRC/dhgeqz.f", 45367),
+                        ("source/lapack-netlib/SRC/dhsein.f", 17476),
+                        ("source/lapack-netlib/SRC/dhseqr.f", 18709),
+                        ("source/lapack-netlib/SRC/disnan.f", 2010),
+                        ("source/lapack-netlib/SRC/dla_gbamv.f", 12671),
+                        ("source/lapack-netlib/SRC/dla_gbrcond.f", 10411),
+                        ("source/lapack-netlib/SRC/dla_gbrfsx_extended.f", 26319),
+                        ("source/lapack-netlib/SRC/dla_gbrpvgrw.f", 4810),
+                        ("source/lapack-netlib/SRC/dla_geamv.f", 12076),
+                        ("source/lapack-netlib/SRC/dla_gercond.f", 9204),
+                        ("source/lapack-netlib/SRC/dla_gerfsx_extended.f", 25496),
+                        ("source/lapack-netlib/SRC/dla_gerpvgrw.f", 3844),
+                        ("source/lapack-netlib/SRC/dla_lin_berr.f", 4513),
+                        ("source/lapack-netlib/SRC/dla_porcond.f", 9168),
+                        ("source/lapack-netlib/SRC/dla_porfsx_extended.f", 25180),
+                        ("source/lapack-netlib/SRC/dla_porpvgrw.f", 6158),
+                        ("source/lapack-netlib/SRC/dla_syamv.f", 12878),
+                        ("source/lapack-netlib/SRC/dla_syrcond.f", 9609),
+                        ("source/lapack-netlib/SRC/dla_syrfsx_extended.f", 26095),
+                        ("source/lapack-netlib/SRC/dla_syrpvgrw.f", 9682),
+                        ("source/lapack-netlib/SRC/dla_wwaddw.f", 2912),
+                        ("source/lapack-netlib/SRC/dlabad.f", 3104),
+                        ("source/lapack-netlib/SRC/dlabrd.f", 13884),
+                        ("source/lapack-netlib/SRC/dlacn2.f", 7734),
+                        ("source/lapack-netlib/SRC/dlacon.f", 7123),
+                        ("source/lapack-netlib/SRC/dlacpy.f", 4118),
+                        ("source/lapack-netlib/SRC/dladiv.f", 6050),
+                        ("source/lapack-netlib/SRC/dlae2.f", 4830),
+                        ("source/lapack-netlib/SRC/dlaebz.f", 22565),
+                        ("source/lapack-netlib/SRC/dlaed0.f", 13912),
+                        ("source/lapack-netlib/SRC/dlaed1.f", 8502),
+                        ("source/lapack-netlib/SRC/dlaed2.f", 16053),
+                        ("source/lapack-netlib/SRC/dlaed3.f", 10971),
+                        ("source/lapack-netlib/SRC/dlaed4.f", 27054),
+                        ("source/lapack-netlib/SRC/dlaed5.f", 5389),
+                        ("source/lapack-netlib/SRC/dlaed6.f", 11646),
+                        ("source/lapack-netlib/SRC/dlaed7.f", 13290),
+                        ("source/lapack-netlib/SRC/dlaed8.f", 16070),
+                        ("source/lapack-netlib/SRC/dlaed9.f", 8676),
+                        ("source/lapack-netlib/SRC/dlaeda.f", 9906),
+                        ("source/lapack-netlib/SRC/dlaein.f", 19210),
+                        ("source/lapack-netlib/SRC/dlaev2.f", 6223),
+                        ("source/lapack-netlib/SRC/dlaexc.f", 12816),
+                        ("source/lapack-netlib/SRC/dlag2.f", 12463),
+                        ("source/lapack-netlib/SRC/dlag2s.f", 4125),
+                        ("source/lapack-netlib/SRC/dlags2.f", 10262),
+                        ("source/lapack-netlib/SRC/dlagtf.f", 8260),
+                        ("source/lapack-netlib/SRC/dlagtm.f", 8379),
+                        ("source/lapack-netlib/SRC/dlagts.f", 12534),
+                        ("source/lapack-netlib/SRC/dlagv2.f", 10790),
+                        ("source/lapack-netlib/SRC/dlahqr.f", 20109),
+                        ("source/lapack-netlib/SRC/dlahr2.f", 10223),
+                        ("source/lapack-netlib/SRC/dlaic1.f", 10142),
+                        ("source/lapack-netlib/SRC/dlaisnan.f", 2611),
+                        ("source/lapack-netlib/SRC/dlaln2.f", 19079),
+                        ("source/lapack-netlib/SRC/dlals0.f", 16163),
+                        ("source/lapack-netlib/SRC/dlalsa.f", 15745),
+                        ("source/lapack-netlib/SRC/dlalsd.f", 16965),
+                        ("source/lapack-netlib/SRC/dlamrg.f", 4582),
+                        ("source/lapack-netlib/SRC/dlaneg.f", 6947),
+                        ("source/lapack-netlib/SRC/dlangb.f", 6513),
+                        ("source/lapack-netlib/SRC/dlange.f", 5871),
+                        ("source/lapack-netlib/SRC/dlangt.f", 6157),
+                        ("source/lapack-netlib/SRC/dlanhs.f", 5797),
+                        ("source/lapack-netlib/SRC/dlansb.f", 7933),
+                        ("source/lapack-netlib/SRC/dlansf.f", 33373),
+                        ("source/lapack-netlib/SRC/dlansp.f", 7880),
+                        ("source/lapack-netlib/SRC/dlanst.f", 5353),
+                        ("source/lapack-netlib/SRC/dlansy.f", 7391),
+                        ("source/lapack-netlib/SRC/dlantb.f", 11406),
+                        ("source/lapack-netlib/SRC/dlantp.f", 10875),
+                        ("source/lapack-netlib/SRC/dlantr.f", 11103),
+                        ("source/lapack-netlib/SRC/dlanv2.f", 7707),
+                        ("source/lapack-netlib/SRC/dlapll.f", 4363),
+                        ("source/lapack-netlib/SRC/dlapmr.f", 4752),
+                        ("source/lapack-netlib/SRC/dlapmt.f", 4759),
+                        ("source/lapack-netlib/SRC/dlapy2.f", 2537),
+                        ("source/lapack-netlib/SRC/dlapy3.f", 2763),
+                        ("source/lapack-netlib/SRC/dlaqgb.f", 7165),
+                        ("source/lapack-netlib/SRC/dlaqge.f", 6349),
+                        ("source/lapack-netlib/SRC/dlaqp2.f", 7694),
+                        ("source/lapack-netlib/SRC/dlaqps.f", 10593),
+                        ("source/lapack-netlib/SRC/dlaqr0.f", 26864),
+                        ("source/lapack-netlib/SRC/dlaqr1.f", 5026),
+                        ("source/lapack-netlib/SRC/dlaqr2.f", 21032),
+                        ("source/lapack-netlib/SRC/dlaqr3.f", 21472),
+                        ("source/lapack-netlib/SRC/dlaqr4.f", 26842),
+                        ("source/lapack-netlib/SRC/dlaqr5.f", 33873),
+                        ("source/lapack-netlib/SRC/dlaqsb.f", 6377),
+                        ("source/lapack-netlib/SRC/dlaqsp.f", 5813),
+                        ("source/lapack-netlib/SRC/dlaqsy.f", 5958),
+                        ("source/lapack-netlib/SRC/dlaqtr.f", 24119),
+                        ("source/lapack-netlib/SRC/dlar1v.f", 14827),
+                        ("source/lapack-netlib/SRC/dlar2v.f", 4239),
+                        ("source/lapack-netlib/SRC/dlarf.f", 6234),
+                        ("source/lapack-netlib/SRC/dlarfb.f", 21205),
+                        ("source/lapack-netlib/SRC/dlarfg.f", 5004),
+                        ("source/lapack-netlib/SRC/dlarfgp.f", 6536),
+                        ("source/lapack-netlib/SRC/dlarft.f", 10294),
+                        ("source/lapack-netlib/SRC/dlarfx.f", 19245),
+                        ("source/lapack-netlib/SRC/dlargv.f", 4406),
+                        ("source/lapack-netlib/SRC/dlarnv.f", 4807),
+                        ("source/lapack-netlib/SRC/dlarra.f", 5943),
+                        ("source/lapack-netlib/SRC/dlarrb.f", 12528),
+                        ("source/lapack-netlib/SRC/dlarrc.f", 6479),
+                        ("source/lapack-netlib/SRC/dlarrd.f", 29727),
+                        ("source/lapack-netlib/SRC/dlarre.f", 31887),
+                        ("source/lapack-netlib/SRC/dlarrf.f", 15480),
+                        ("source/lapack-netlib/SRC/dlarrj.f", 11146),
+                        ("source/lapack-netlib/SRC/dlarrk.f", 6695),
+                        ("source/lapack-netlib/SRC/dlarrr.f", 5982),
+                        ("source/lapack-netlib/SRC/dlarrv.f", 42696),
+                        ("source/lapack-netlib/SRC/dlarscl2.f", 3015),
+                        ("source/lapack-netlib/SRC/dlartg.f", 5536),
+                        ("source/lapack-netlib/SRC/dlartgp.f", 5445),
+                        ("source/lapack-netlib/SRC/dlartgs.f", 4220),
+                        ("source/lapack-netlib/SRC/dlartv.f", 3821),
+                        ("source/lapack-netlib/SRC/dlaruv.f", 18516),
+                        ("source/lapack-netlib/SRC/dlarz.f", 6202),
+                        ("source/lapack-netlib/SRC/dlarzb.f", 9100),
+                        ("source/lapack-netlib/SRC/dlarzt.f", 7948),
+                        ("source/lapack-netlib/SRC/dlas2.f", 5120),
+                        ("source/lapack-netlib/SRC/dlascl.f", 9870),
+                        ("source/lapack-netlib/SRC/dlascl2.f", 2974),
+                        ("source/lapack-netlib/SRC/dlasd0.f", 9190),
+                        ("source/lapack-netlib/SRC/dlasd1.f", 10096),
+                        ("source/lapack-netlib/SRC/dlasd2.f", 19722),
+                        ("source/lapack-netlib/SRC/dlasd3.f", 15007),
+                        ("source/lapack-netlib/SRC/dlasd4.f", 33387),
+                        ("source/lapack-netlib/SRC/dlasd5.f", 6964),
+                        ("source/lapack-netlib/SRC/dlasd6.f", 14707),
+                        ("source/lapack-netlib/SRC/dlasd7.f", 17591),
+                        ("source/lapack-netlib/SRC/dlasd8.f", 10963),
+                        ("source/lapack-netlib/SRC/dlasda.f", 17859),
+                        ("source/lapack-netlib/SRC/dlasdq.f", 12989),
+                        ("source/lapack-netlib/SRC/dlasdt.f", 4617),
+                        ("source/lapack-netlib/SRC/dlaset.f", 4943),
+                        ("source/lapack-netlib/SRC/dlasq1.f", 6701),
+                        ("source/lapack-netlib/SRC/dlasq2.f", 17125),
+                        ("source/lapack-netlib/SRC/dlasq3.f", 10764),
+                        ("source/lapack-netlib/SRC/dlasq4.f", 11737),
+                        ("source/lapack-netlib/SRC/dlasq5.f", 11545),
+                        ("source/lapack-netlib/SRC/dlasq6.f", 6820),
+                        ("source/lapack-netlib/SRC/dlasr.f", 15087),
+                        ("source/lapack-netlib/SRC/dlasrt.f", 7909),
+                        ("source/lapack-netlib/SRC/dlassq.f", 4358),
+                        ("source/lapack-netlib/SRC/dlasv2.f", 8510),
+                        ("source/lapack-netlib/SRC/dlaswp.f", 5055),
+                        ("source/lapack-netlib/SRC/dlasy2.f", 14556),
+                        ("source/lapack-netlib/SRC/dlasyf.f", 26542),
+                        ("source/lapack-netlib/SRC/dlasyf_rook.f", 27300),
+                        ("source/lapack-netlib/SRC/dlat2s.f", 4857),
+                        ("source/lapack-netlib/SRC/dlatbs.f", 24920),
+                        ("source/lapack-netlib/SRC/dlatdf.f", 10630),
+                        ("source/lapack-netlib/SRC/dlatps.f", 24237),
+                        ("source/lapack-netlib/SRC/dlatrd.f", 11650),
+                        ("source/lapack-netlib/SRC/dlatrs.f", 24089),
+                        ("source/lapack-netlib/SRC/dlatrz.f", 5673),
+                        ("source/lapack-netlib/SRC/dlauu2.f", 5528),
+                        ("source/lapack-netlib/SRC/dlauum.f", 6485),
+                        ("source/lapack-netlib/SRC/dopgtr.f", 6087),
+                        ("source/lapack-netlib/SRC/dopmtr.f", 8732),
+                        ("source/lapack-netlib/SRC/dorbdb.f", 23583),
+                        ("source/lapack-netlib/SRC/dorbdb1.f", 9948),
+                        ("source/lapack-netlib/SRC/dorbdb2.f", 10309),
+                        ("source/lapack-netlib/SRC/dorbdb3.f", 10238),
+                        ("source/lapack-netlib/SRC/dorbdb4.f", 12292),
+                        ("source/lapack-netlib/SRC/dorbdb5.f", 7343),
+                        ("source/lapack-netlib/SRC/dorbdb6.f", 8349),
+                        ("source/lapack-netlib/SRC/dorcsd.f", 21166),
+                        ("source/lapack-netlib/SRC/dorcsd2by1.f", 25393),
+                        ("source/lapack-netlib/SRC/dorg2l.f", 5272),
+                        ("source/lapack-netlib/SRC/dorg2r.f", 5282),
+                        ("source/lapack-netlib/SRC/dorgbr.f", 9936),
+                        ("source/lapack-netlib/SRC/dorghr.f", 6584),
+                        ("source/lapack-netlib/SRC/dorgl2.f", 5259),
+                        ("source/lapack-netlib/SRC/dorglq.f", 8049),
+                        ("source/lapack-netlib/SRC/dorgql.f", 8214),
+                        ("source/lapack-netlib/SRC/dorgqr.f", 8088),
+                        ("source/lapack-netlib/SRC/dorgr2.f", 5349),
+                        ("source/lapack-netlib/SRC/dorgrq.f", 8161),
+                        ("source/lapack-netlib/SRC/dorgtr.f", 7072),
+                        ("source/lapack-netlib/SRC/dorm22.f", 13699),
+                        ("source/lapack-netlib/SRC/dorm2l.f", 7331),
+                        ("source/lapack-netlib/SRC/dorm2r.f", 7396),
+                        ("source/lapack-netlib/SRC/dormbr.f", 10875),
+                        ("source/lapack-netlib/SRC/dormhr.f", 8384),
+                        ("source/lapack-netlib/SRC/dorml2.f", 7423),
+                        ("source/lapack-netlib/SRC/dormlq.f", 9554),
+                        ("source/lapack-netlib/SRC/dormql.f", 9421),
+                        ("source/lapack-netlib/SRC/dormqr.f", 9393),
+                        ("source/lapack-netlib/SRC/dormr2.f", 7355),
+                        ("source/lapack-netlib/SRC/dormr3.f", 7907),
+                        ("source/lapack-netlib/SRC/dormrq.f", 9582),
+                        ("source/lapack-netlib/SRC/dormrz.f", 10429),
+                        ("source/lapack-netlib/SRC/dormtr.f", 8812),
+                        ("source/lapack-netlib/SRC/dpbcon.f", 7737),
+                        ("source/lapack-netlib/SRC/dpbequ.f", 6659),
+                        ("source/lapack-netlib/SRC/dpbrfs.f", 13723),
+                        ("source/lapack-netlib/SRC/dpbstf.f", 9192),
+                        ("source/lapack-netlib/SRC/dpbsv.f", 6970),
+                        ("source/lapack-netlib/SRC/dpbsvx.f", 18273),
+                        ("source/lapack-netlib/SRC/dpbtf2.f", 7597),
+                        ("source/lapack-netlib/SRC/dpbtrf.f", 13645),
+                        ("source/lapack-netlib/SRC/dpbtrs.f", 6027),
+                        ("source/lapack-netlib/SRC/dpftrf.f", 14566),
+                        ("source/lapack-netlib/SRC/dpftri.f", 13446),
+                        ("source/lapack-netlib/SRC/dpftrs.f", 8451),
+                        ("source/lapack-netlib/SRC/dpocon.f", 7002),
+                        ("source/lapack-netlib/SRC/dpoequ.f", 5535),
+                        ("source/lapack-netlib/SRC/dpoequb.f", 5815),
+                        ("source/lapack-netlib/SRC/dporfs.f", 13212),
+                        ("source/lapack-netlib/SRC/dporfsx.f", 26448),
+                        ("source/lapack-netlib/SRC/dposv.f", 5714),
+                        ("source/lapack-netlib/SRC/dposvx.f", 16840),
+                        ("source/lapack-netlib/SRC/dposvxx.f", 26484),
+                        ("source/lapack-netlib/SRC/dpotf2.f", 6572),
+                        ("source/lapack-netlib/SRC/dpotrf.f", 7222),
+                        ("source/lapack-netlib/SRC/dpotrf2.f", 6367),
+                        ("source/lapack-netlib/SRC/dpotri.f", 4180),
+                        ("source/lapack-netlib/SRC/dpotrs.f", 5397),
+                        ("source/lapack-netlib/SRC/dppcon.f", 6964),
+                        ("source/lapack-netlib/SRC/dppequ.f", 6498),
+                        ("source/lapack-netlib/SRC/dpprfs.f", 12904),
+                        ("source/lapack-netlib/SRC/dppsv.f", 5941),
+                        ("source/lapack-netlib/SRC/dppsvx.f", 16702),
+                        ("source/lapack-netlib/SRC/dpptrf.f", 6412),
+                        ("source/lapack-netlib/SRC/dpptri.f", 5087),
+                        ("source/lapack-netlib/SRC/dpptrs.f", 5424),
+                        ("source/lapack-netlib/SRC/dpstf2.f", 10979),
+                        ("source/lapack-netlib/SRC/dpstrf.f", 13184),
+                        ("source/lapack-netlib/SRC/dptcon.f", 5763),
+                        ("source/lapack-netlib/SRC/dpteqr.f", 7761),
+                        ("source/lapack-netlib/SRC/dptrfs.f", 11830),
+                        ("source/lapack-netlib/SRC/dptsv.f", 4883),
+                        ("source/lapack-netlib/SRC/dptsvx.f", 10962),
+                        ("source/lapack-netlib/SRC/dpttrf.f", 5431),
+                        ("source/lapack-netlib/SRC/dpttrs.f", 4877),
+                        ("source/lapack-netlib/SRC/dptts2.f", 4385),
+                        ("source/lapack-netlib/SRC/drscl.f", 4371),
+                        ("source/lapack-netlib/SRC/dsbev.f", 8435),
+                        ("source/lapack-netlib/SRC/dsbevd.f", 11472),
+                        ("source/lapack-netlib/SRC/dsbevx.f", 17106),
+                        ("source/lapack-netlib/SRC/dsbgst.f", 47661),
+                        ("source/lapack-netlib/SRC/dsbgv.f", 8540),
+                        ("source/lapack-netlib/SRC/dsbgvd.f", 11892),
+                        ("source/lapack-netlib/SRC/dsbgvx.f", 16317),
+                        ("source/lapack-netlib/SRC/dsbtrd.f", 20796),
+                        ("source/lapack-netlib/SRC/dsfrk.f", 17294),
+                        ("source/lapack-netlib/SRC/dsgesv.f", 13245),
+                        ("source/lapack-netlib/SRC/dspcon.f", 6440),
+                        ("source/lapack-netlib/SRC/dspev.f", 7726),
+                        ("source/lapack-netlib/SRC/dspevd.f", 10838),
+                        ("source/lapack-netlib/SRC/dspevx.f", 15607),
+                        ("source/lapack-netlib/SRC/dspgst.f", 8307),
+                        ("source/lapack-netlib/SRC/dspgv.f", 8351),
+                        ("source/lapack-netlib/SRC/dspgvd.f", 11497),
+                        ("source/lapack-netlib/SRC/dspgvx.f", 13024),
+                        ("source/lapack-netlib/SRC/dsposv.f", 13402),
+                        ("source/lapack-netlib/SRC/dsprfs.f", 13281),
+                        ("source/lapack-netlib/SRC/dspsv.f", 6951),
+                        ("source/lapack-netlib/SRC/dspsvx.f", 13209),
+                        ("source/lapack-netlib/SRC/dsptrd.f", 8832),
+                        ("source/lapack-netlib/SRC/dsptrf.f", 18931),
+                        ("source/lapack-netlib/SRC/dsptri.f", 11755),
+                        ("source/lapack-netlib/SRC/dsptrs.f", 12610),
+                        ("source/lapack-netlib/SRC/dstebz.f", 23778),
+                        ("source/lapack-netlib/SRC/dstedc.f", 15634),
+                        ("source/lapack-netlib/SRC/dstegr.f", 9821),
+                        ("source/lapack-netlib/SRC/dstein.f", 13439),
+                        ("source/lapack-netlib/SRC/dstemr.f", 27014),
+                        ("source/lapack-netlib/SRC/dsteqr.f", 15566),
+                        ("source/lapack-netlib/SRC/dsterf.f", 10671),
+                        ("source/lapack-netlib/SRC/dstev.f", 6473),
+                        ("source/lapack-netlib/SRC/dstevd.f", 9120),
+                        ("source/lapack-netlib/SRC/dstevr.f", 19011),
+                        ("source/lapack-netlib/SRC/dstevx.f", 14131),
+                        ("source/lapack-netlib/SRC/dsycon.f", 6577),
+                        ("source/lapack-netlib/SRC/dsycon_rook.f", 7029),
+                        ("source/lapack-netlib/SRC/dsyconv.f", 9117),
+                        ("source/lapack-netlib/SRC/dsyequb.f", 9786),
+                        ("source/lapack-netlib/SRC/dsyev.f", 8452),
+                        ("source/lapack-netlib/SRC/dsyevd.f", 11438),
+                        ("source/lapack-netlib/SRC/dsyevr.f", 23527),
+                        ("source/lapack-netlib/SRC/dsyevx.f", 17506),
+                        ("source/lapack-netlib/SRC/dsygs2.f", 8881),
+                        ("source/lapack-netlib/SRC/dsygst.f", 11008),
+                        ("source/lapack-netlib/SRC/dsygv.f", 9614),
+                        ("source/lapack-netlib/SRC/dsygvd.f", 12188),
+                        ("source/lapack-netlib/SRC/dsygvx.f", 14917),
+                        ("source/lapack-netlib/SRC/dsyrfs.f", 13660),
+                        ("source/lapack-netlib/SRC/dsyrfsx.f", 26749),
+                        ("source/lapack-netlib/SRC/dsysv.f", 8427),
+                        ("source/lapack-netlib/SRC/dsysv_rook.f", 9202),
+                        ("source/lapack-netlib/SRC/dsysvx.f", 14305),
+                        ("source/lapack-netlib/SRC/dsysvxx.f", 27011),
+                        ("source/lapack-netlib/SRC/dsyswapr.f", 5261),
+                        ("source/lapack-netlib/SRC/dsytd2.f", 9868),
+                        ("source/lapack-netlib/SRC/dsytf2.f", 18568),
+                        ("source/lapack-netlib/SRC/dsytf2_rook.f", 24919),
+                        ("source/lapack-netlib/SRC/dsytrd.f", 11510),
+                        ("source/lapack-netlib/SRC/dsytrf.f", 11120),
+                        ("source/lapack-netlib/SRC/dsytrf_rook.f", 12099),
+                        ("source/lapack-netlib/SRC/dsytri.f", 11105),
+                        ("source/lapack-netlib/SRC/dsytri2.f", 6021),
+                        ("source/lapack-netlib/SRC/dsytri2x.f", 16041),
+                        ("source/lapack-netlib/SRC/dsytri_rook.f", 13375),
+                        ("source/lapack-netlib/SRC/dsytrs.f", 12427),
+                        ("source/lapack-netlib/SRC/dsytrs2.f", 10446),
+                        ("source/lapack-netlib/SRC/dsytrs_rook.f", 13651),
+                        ("source/lapack-netlib/SRC/dtbcon.f", 8022),
+                        ("source/lapack-netlib/SRC/dtbrfs.f", 15206),
+                        ("source/lapack-netlib/SRC/dtbtrs.f", 6797),
+                        ("source/lapack-netlib/SRC/dtfsm.f", 34761),
+                        ("source/lapack-netlib/SRC/dtftri.f", 15112),
+                        ("source/lapack-netlib/SRC/dtfttp.f", 14824),
+                        ("source/lapack-netlib/SRC/dtfttr.f", 13875),
+                        ("source/lapack-netlib/SRC/dtgevc.f", 41312),
+                        ("source/lapack-netlib/SRC/dtgex2.f", 24167),
+                        ("source/lapack-netlib/SRC/dtgexc.f", 16189),
+                        ("source/lapack-netlib/SRC/dtgsen.f", 29547),
+                        ("source/lapack-netlib/SRC/dtgsja.f", 19581),
+                        ("source/lapack-netlib/SRC/dtgsna.f", 24260),
+                        ("source/lapack-netlib/SRC/dtgsy2.f", 36911),
+                        ("source/lapack-netlib/SRC/dtgsyl.f", 22733),
+                        ("source/lapack-netlib/SRC/dtpcon.f", 7471),
+                        ("source/lapack-netlib/SRC/dtpmqrt.f", 10619),
+                        ("source/lapack-netlib/SRC/dtpqrt.f", 7952),
+                        ("source/lapack-netlib/SRC/dtpqrt2.f", 8763),
+                        ("source/lapack-netlib/SRC/dtprfb.f", 26255),
+                        ("source/lapack-netlib/SRC/dtprfs.f", 14700),
+                        ("source/lapack-netlib/SRC/dtptri.f", 6657),
+                        ("source/lapack-netlib/SRC/dtptrs.f", 6237),
+                        ("source/lapack-netlib/SRC/dtpttf.f", 13862),
+                        ("source/lapack-netlib/SRC/dtpttr.f", 4828),
+                        ("source/lapack-netlib/SRC/dtrcon.f", 7841),
+                        ("source/lapack-netlib/SRC/dtrevc.f", 36813),
+                        ("source/lapack-netlib/SRC/dtrexc.f", 12238),
+                        ("source/lapack-netlib/SRC/dtrrfs.f", 14708),
+                        ("source/lapack-netlib/SRC/dtrsen.f", 18321),
+                        ("source/lapack-netlib/SRC/dtrsna.f", 19864),
+                        ("source/lapack-netlib/SRC/dtrsyl.f", 35645),
+                        ("source/lapack-netlib/SRC/dtrti2.f", 5925),
+                        ("source/lapack-netlib/SRC/dtrtri.f", 6919),
+                        ("source/lapack-netlib/SRC/dtrtrs.f", 6395),
+                        ("source/lapack-netlib/SRC/dtrttf.f", 13776),
+                        ("source/lapack-netlib/SRC/dtrttp.f", 4821),
+                        ("source/lapack-netlib/SRC/dtzrzf.f", 8568),
+                        ("source/lapack-netlib/SRC/dzsum1.f", 3316),
+                        ("source/lapack-netlib/SRC/icmax1.f", 3488),
+                        ("source/lapack-netlib/SRC/ieeeck.f", 4583),
+                        ("source/lapack-netlib/SRC/ilaclc.f", 3004),
+                        ("source/lapack-netlib/SRC/ilaclr.f", 3047),
+                        ("source/lapack-netlib/SRC/iladiag.f", 2466),
+                        ("source/lapack-netlib/SRC/iladlc.f", 2999),
+                        ("source/lapack-netlib/SRC/iladlr.f", 3050),
+                        ("source/lapack-netlib/SRC/ilaenv.f", 18742),
+                        ("source/lapack-netlib/SRC/ilaprec.f", 2761),
+                        ("source/lapack-netlib/SRC/ilaslc.f", 2988),
+                        ("source/lapack-netlib/SRC/ilaslr.f", 3038),
+                        ("source/lapack-netlib/SRC/ilatrans.f", 2575),
+                        ("source/lapack-netlib/SRC/ilauplo.f", 2437),
+                        ("source/lapack-netlib/SRC/ilaver.f", 1686),
+                        ("source/lapack-netlib/SRC/ilazlc.f", 3009),
+                        ("source/lapack-netlib/SRC/ilazlr.f", 3060),
+                        ("source/lapack-netlib/SRC/iparmq.f", 14152),
+                        ("source/lapack-netlib/SRC/izmax1.f", 3491),
+                        ("source/lapack-netlib/SRC/lsamen.f", 3045),
+                        ("source/lapack-netlib/SRC/Makefile", 23569),
+                        ("source/lapack-netlib/SRC/sbbcsd.f", 38490),
+                        ("source/lapack-netlib/SRC/sbdsdc.f", 16920),
+                        ("source/lapack-netlib/SRC/sbdsqr.f", 26280),
+                        ("source/lapack-netlib/SRC/sbdsvdx.f", 27101),
+                        ("source/lapack-netlib/SRC/scsum1.f", 3311),
+                        ("source/lapack-netlib/SRC/sdisna.f", 7039),
+                        ("source/lapack-netlib/SRC/sgbbrd.f", 16797),
+                        ("source/lapack-netlib/SRC/sgbcon.f", 8749),
+                        ("source/lapack-netlib/SRC/sgbequ.f", 8612),
+                        ("source/lapack-netlib/SRC/sgbequb.f", 9365),
+                        ("source/lapack-netlib/SRC/sgbrfs.f", 14206),
+                        ("source/lapack-netlib/SRC/sgbrfsx.f", 29190),
+                        ("source/lapack-netlib/SRC/sgbsv.f", 7026),
+                        ("source/lapack-netlib/SRC/sgbsvx.f", 22896),
+                        ("source/lapack-netlib/SRC/sgbsvxx.f", 31003),
+                        ("source/lapack-netlib/SRC/sgbtf2.f", 8077),
+                        ("source/lapack-netlib/SRC/sgbtrf.f", 16277),
+                        ("source/lapack-netlib/SRC/sgbtrs.f", 7482),
+                        ("source/lapack-netlib/SRC/sgebak.f", 7216),
+                        ("source/lapack-netlib/SRC/sgebal.f", 10548),
+                        ("source/lapack-netlib/SRC/sgebd2.f", 9975),
+                        ("source/lapack-netlib/SRC/sgebrd.f", 11205),
+                        ("source/lapack-netlib/SRC/sgecon.f", 7067),
+                        ("source/lapack-netlib/SRC/sgeequ.f", 7926),
+                        ("source/lapack-netlib/SRC/sgeequb.f", 8677),
+                        ("source/lapack-netlib/SRC/sgees.f", 17382),
+                        ("source/lapack-netlib/SRC/sgeesx.f", 22065),
+                        ("source/lapack-netlib/SRC/sgeev.f", 16883),
+                        ("source/lapack-netlib/SRC/sgeevx.f", 23449),
+                        ("source/lapack-netlib/SRC/sgehd2.f", 6570),
+                        ("source/lapack-netlib/SRC/sgehrd.f", 10878),
+                        ("source/lapack-netlib/SRC/sgejsv.f", 72353),
+                        ("source/lapack-netlib/SRC/sgelq2.f", 5117),
+                        ("source/lapack-netlib/SRC/sgelqf.f", 7534),
+                        ("source/lapack-netlib/SRC/sgels.f", 14963),
+                        ("source/lapack-netlib/SRC/sgelsd.f", 21608),
+                        ("source/lapack-netlib/SRC/sgelss.f", 25435),
+                        ("source/lapack-netlib/SRC/sgelsy.f", 14744),
+                        ("source/lapack-netlib/SRC/sgemqrt.f", 8052),
+                        ("source/lapack-netlib/SRC/sgeql2.f", 5214),
+                        ("source/lapack-netlib/SRC/sgeqlf.f", 8071),
+                        ("source/lapack-netlib/SRC/sgeqp3.f", 10138),
+                        ("source/lapack-netlib/SRC/sgeqr2.f", 5110),
+                        ("source/lapack-netlib/SRC/sgeqr2p.f", 5301),
+                        ("source/lapack-netlib/SRC/sgeqrf.f", 7559),
+                        ("source/lapack-netlib/SRC/sgeqrfp.f", 7717),
+                        ("source/lapack-netlib/SRC/sgeqrt.f", 6113),
+                        ("source/lapack-netlib/SRC/sgeqrt2.f", 6208),
+                        ("source/lapack-netlib/SRC/sgeqrt3.f", 7319),
+                        ("source/lapack-netlib/SRC/sgerfs.f", 13054),
+                        ("source/lapack-netlib/SRC/sgerfsx.f", 27682),
+                        ("source/lapack-netlib/SRC/sgerq2.f", 5219),
+                        ("source/lapack-netlib/SRC/sgerqf.f", 8183),
+                        ("source/lapack-netlib/SRC/sgesc2.f", 5423),
+                        ("source/lapack-netlib/SRC/sgesdd.f", 53599),
+                        ("source/lapack-netlib/SRC/sgesv.f", 5149),
+                        ("source/lapack-netlib/SRC/sgesvd.f", 134906),
+                        ("source/lapack-netlib/SRC/sgesvdx.f", 26575),
+                        ("source/lapack-netlib/SRC/sgesvj.f", 68038),
+                        ("source/lapack-netlib/SRC/sgesvx.f", 21185),
+                        ("source/lapack-netlib/SRC/sgesvxx.f", 29963),
+                        ("source/lapack-netlib/SRC/sgetc2.f", 6295),
+                        ("source/lapack-netlib/SRC/sgetf2.f", 5886),
+                        ("source/lapack-netlib/SRC/sgetrf.f", 6296),
+                        ("source/lapack-netlib/SRC/sgetrf2.f", 7069),
+                        ("source/lapack-netlib/SRC/sgetri.f", 7363),
+                        ("source/lapack-netlib/SRC/sgetrs.f", 5994),
+                        ("source/lapack-netlib/SRC/sggbak.f", 8308),
+                        ("source/lapack-netlib/SRC/sggbal.f", 15704),
+                        ("source/lapack-netlib/SRC/sgges.f", 22616),
+                        ("source/lapack-netlib/SRC/sgges3.f", 22476),
+                        ("source/lapack-netlib/SRC/sggesx.f", 27638),
+                        ("source/lapack-netlib/SRC/sggev.f", 18944),
+                        ("source/lapack-netlib/SRC/sggev3.f", 18961),
+                        ("source/lapack-netlib/SRC/sggevx.f", 29366),
+                        ("source/lapack-netlib/SRC/sggglm.f", 10292),
+                        ("source/lapack-netlib/SRC/sgghd3.f", 31940),
+                        ("source/lapack-netlib/SRC/sgghrd.f", 10778),
+                        ("source/lapack-netlib/SRC/sgglse.f", 10582),
+                        ("source/lapack-netlib/SRC/sggqrf.f", 9345),
+                        ("source/lapack-netlib/SRC/sggrqf.f", 9358),
+                        ("source/lapack-netlib/SRC/sggsvd3.f", 15181),
+                        ("source/lapack-netlib/SRC/sggsvp3.f", 15897),
+                        ("source/lapack-netlib/SRC/sgsvj0.f", 45995),
+                        ("source/lapack-netlib/SRC/sgsvj1.f", 31038),
+                        ("source/lapack-netlib/SRC/sgtcon.f", 6945),
+                        ("source/lapack-netlib/SRC/sgtrfs.f", 14757),
+                        ("source/lapack-netlib/SRC/sgtsv.f", 9696),
+                        ("source/lapack-netlib/SRC/sgtsvx.f", 13817),
+                        ("source/lapack-netlib/SRC/sgttrf.f", 6534),
+                        ("source/lapack-netlib/SRC/sgttrs.f", 6127),
+                        ("source/lapack-netlib/SRC/sgtts2.f", 7984),
+                        ("source/lapack-netlib/SRC/shgeqz.f", 45269),
+                        ("source/lapack-netlib/SRC/shsein.f", 17402),
+                        ("source/lapack-netlib/SRC/shseqr.f", 18647),
+                        ("source/lapack-netlib/SRC/sisnan.f", 1998),
+                        ("source/lapack-netlib/SRC/sla_gbamv.f", 12589),
+                        ("source/lapack-netlib/SRC/sla_gbrcond.f", 10189),
+                        ("source/lapack-netlib/SRC/sla_gbrfsx_extended.f", 26020),
+                        ("source/lapack-netlib/SRC/sla_gbrpvgrw.f", 4724),
+                        ("source/lapack-netlib/SRC/sla_geamv.f", 12002),
+                        ("source/lapack-netlib/SRC/sla_gercond.f", 8990),
+                        ("source/lapack-netlib/SRC/sla_gerfsx_extended.f", 25315),
+                        ("source/lapack-netlib/SRC/sla_gerpvgrw.f", 3746),
+                        ("source/lapack-netlib/SRC/sla_lin_berr.f", 4466),
+                        ("source/lapack-netlib/SRC/sla_porcond.f", 8957),
+                        ("source/lapack-netlib/SRC/sla_porfsx_extended.f", 24839),
+                        ("source/lapack-netlib/SRC/sla_porpvgrw.f", 5988),
+                        ("source/lapack-netlib/SRC/sla_syamv.f", 12804),
+                        ("source/lapack-netlib/SRC/sla_syrcond.f", 9396),
+                        ("source/lapack-netlib/SRC/sla_syrfsx_extended.f", 25754),
+                        ("source/lapack-netlib/SRC/sla_syrpvgrw.f", 9584),
+                        ("source/lapack-netlib/SRC/sla_wwaddw.f", 2874),
+                        ("source/lapack-netlib/SRC/slabad.f", 3078),
+                        ("source/lapack-netlib/SRC/slabrd.f", 13798),
+                        ("source/lapack-netlib/SRC/slacn2.f", 7696),
+                        ("source/lapack-netlib/SRC/slacon.f", 7085),
+                        ("source/lapack-netlib/SRC/slacpy.f", 4094),
+                        ("source/lapack-netlib/SRC/sladiv.f", 5964),
+                        ("source/lapack-netlib/SRC/slae2.f", 4770),
+                        ("source/lapack-netlib/SRC/slaebz.f", 22457),
+                        ("source/lapack-netlib/SRC/slaed0.f", 13852),
+                        ("source/lapack-netlib/SRC/slaed1.f", 8454),
+                        ("source/lapack-netlib/SRC/slaed2.f", 15960),
+                        ("source/lapack-netlib/SRC/slaed3.f", 10887),
+                        ("source/lapack-netlib/SRC/slaed4.f", 26994),
+                        ("source/lapack-netlib/SRC/slaed5.f", 5329),
+                        ("source/lapack-netlib/SRC/slaed6.f", 11586),
+                        ("source/lapack-netlib/SRC/slaed7.f", 13218),
+                        ("source/lapack-netlib/SRC/slaed8.f", 15974),
+                        ("source/lapack-netlib/SRC/slaed9.f", 8604),
+                        ("source/lapack-netlib/SRC/slaeda.f", 9858),
+                        ("source/lapack-netlib/SRC/slaein.f", 19088),
+                        ("source/lapack-netlib/SRC/slaev2.f", 6139),
+                        ("source/lapack-netlib/SRC/slaexc.f", 12763),
+                        ("source/lapack-netlib/SRC/slag2.f", 12365),
+                        ("source/lapack-netlib/SRC/slag2d.f", 3518),
+                        ("source/lapack-netlib/SRC/slags2.f", 10116),
+                        ("source/lapack-netlib/SRC/slagtf.f", 8188),
+                        ("source/lapack-netlib/SRC/slagtm.f", 8293),
+                        ("source/lapack-netlib/SRC/slagts.f", 12462),
+                        ("source/lapack-netlib/SRC/slagv2.f", 10680),
+                        ("source/lapack-netlib/SRC/slahqr.f", 20059),
+                        ("source/lapack-netlib/SRC/slahr2.f", 10173),
+                        ("source/lapack-netlib/SRC/slaic1.f", 10055),
+                        ("source/lapack-netlib/SRC/slaisnan.f", 2587),
+                        ("source/lapack-netlib/SRC/slaln2.f", 18945),
+                        ("source/lapack-netlib/SRC/slals0.f", 16041),
+                        ("source/lapack-netlib/SRC/slalsa.f", 15599),
+                        ("source/lapack-netlib/SRC/slalsd.f", 16903),
+                        ("source/lapack-netlib/SRC/slamrg.f", 4570),
+                        ("source/lapack-netlib/SRC/slaneg.f", 6899),
+                        ("source/lapack-netlib/SRC/slangb.f", 6488),
+                        ("source/lapack-netlib/SRC/slange.f", 5846),
+                        ("source/lapack-netlib/SRC/slangt.f", 6119),
+                        ("source/lapack-netlib/SRC/slanhs.f", 5771),
+                        ("source/lapack-netlib/SRC/slansb.f", 7907),
+                        ("source/lapack-netlib/SRC/slansf.f", 33170),
+                        ("source/lapack-netlib/SRC/slansp.f", 7884),
+                        ("source/lapack-netlib/SRC/slanst.f", 5329),
+                        ("source/lapack-netlib/SRC/slansy.f", 7365),
+                        ("source/lapack-netlib/SRC/slantb.f", 11380),
+                        ("source/lapack-netlib/SRC/slantp.f", 10849),
+                        ("source/lapack-netlib/SRC/slantr.f", 11077),
+                        ("source/lapack-netlib/SRC/slanv2.f", 7577),
+                        ("source/lapack-netlib/SRC/slapll.f", 4325),
+                        ("source/lapack-netlib/SRC/slapmr.f", 4738),
+                        ("source/lapack-netlib/SRC/slapmt.f", 4747),
+                        ("source/lapack-netlib/SRC/slapy2.f", 2513),
+                        ("source/lapack-netlib/SRC/slapy3.f", 2727),
+                        ("source/lapack-netlib/SRC/slaqgb.f", 7091),
+                        ("source/lapack-netlib/SRC/slaqge.f", 6275),
+                        ("source/lapack-netlib/SRC/slaqp2.f", 7636),
+                        ("source/lapack-netlib/SRC/slaqps.f", 10522),
+                        ("source/lapack-netlib/SRC/slaqr0.f", 26801),
+                        ("source/lapack-netlib/SRC/slaqr1.f", 4952),
+                        ("source/lapack-netlib/SRC/slaqr2.f", 20929),
+                        ("source/lapack-netlib/SRC/slaqr3.f", 21369),
+                        ("source/lapack-netlib/SRC/slaqr4.f", 26823),
+                        ("source/lapack-netlib/SRC/slaqr5.f", 33779),
+                        ("source/lapack-netlib/SRC/slaqsb.f", 6327),
+                        ("source/lapack-netlib/SRC/slaqsp.f", 5763),
+                        ("source/lapack-netlib/SRC/slaqsy.f", 5908),
+                        ("source/lapack-netlib/SRC/slaqtr.f", 24047),
+                        ("source/lapack-netlib/SRC/slar1v.f", 14657),
+                        ("source/lapack-netlib/SRC/slar2v.f", 4177),
+                        ("source/lapack-netlib/SRC/slarf.f", 6184),
+                        ("source/lapack-netlib/SRC/slarfb.f", 21155),
+                        ("source/lapack-netlib/SRC/slarfg.f", 4966),
+                        ("source/lapack-netlib/SRC/slarfgp.f", 6499),
+                        ("source/lapack-netlib/SRC/slarft.f", 10255),
+                        ("source/lapack-netlib/SRC/slarfx.f", 19180),
+                        ("source/lapack-netlib/SRC/slargv.f", 4368),
+                        ("source/lapack-netlib/SRC/slarnv.f", 4795),
+                        ("source/lapack-netlib/SRC/slarra.f", 5883),
+                        ("source/lapack-netlib/SRC/slarrb.f", 12408),
+                        ("source/lapack-netlib/SRC/slarrc.f", 6467),
+                        ("source/lapack-netlib/SRC/slarrd.f", 29559),
+                        ("source/lapack-netlib/SRC/slarre.f", 31997),
+                        ("source/lapack-netlib/SRC/slarrf.f", 15289),
+                        ("source/lapack-netlib/SRC/slarrj.f", 11050),
+                        ("source/lapack-netlib/SRC/slarrk.f", 6599),
+                        ("source/lapack-netlib/SRC/slarrr.f", 5958),
+                        ("source/lapack-netlib/SRC/slarrv.f", 42525),
+                        ("source/lapack-netlib/SRC/slarscl2.f", 2984),
+                        ("source/lapack-netlib/SRC/slartg.f", 5476),
+                        ("source/lapack-netlib/SRC/slartgp.f", 5384),
+                        ("source/lapack-netlib/SRC/slartgs.f", 4160),
+                        ("source/lapack-netlib/SRC/slartv.f", 3771),
+                        ("source/lapack-netlib/SRC/slaruv.f", 18604),
+                        ("source/lapack-netlib/SRC/slarz.f", 6152),
+                        ("source/lapack-netlib/SRC/slarzb.f", 9050),
+                        ("source/lapack-netlib/SRC/slarzt.f", 7910),
+                        ("source/lapack-netlib/SRC/slas2.f", 5060),
+                        ("source/lapack-netlib/SRC/slascl.f", 9834),
+                        ("source/lapack-netlib/SRC/slascl2.f", 2948),
+                        ("source/lapack-netlib/SRC/slasd0.f", 9053),
+                        ("source/lapack-netlib/SRC/slasd1.f", 10023),
+                        ("source/lapack-netlib/SRC/slasd2.f", 19630),
+                        ("source/lapack-netlib/SRC/slasd3.f", 14913),
+                        ("source/lapack-netlib/SRC/slasd4.f", 33291),
+                        ("source/lapack-netlib/SRC/slasd5.f", 6884),
+                        ("source/lapack-netlib/SRC/slasd6.f", 14543),
+                        ("source/lapack-netlib/SRC/slasd7.f", 17435),
+                        ("source/lapack-netlib/SRC/slasd8.f", 10867),
+                        ("source/lapack-netlib/SRC/slasda.f", 17685),
+                        ("source/lapack-netlib/SRC/slasdq.f", 12917),
+                        ("source/lapack-netlib/SRC/slasdt.f", 4617),
+                        ("source/lapack-netlib/SRC/slaset.f", 4907),
+                        ("source/lapack-netlib/SRC/slasq1.f", 6665),
+                        ("source/lapack-netlib/SRC/slasq2.f", 17348),
+                        ("source/lapack-netlib/SRC/slasq3.f", 10620),
+                        ("source/lapack-netlib/SRC/slasq4.f", 11641),
+                        ("source/lapack-netlib/SRC/slasq5.f", 11718),
+                        ("source/lapack-netlib/SRC/slasq6.f", 6736),
+                        ("source/lapack-netlib/SRC/slasr.f", 15051),
+                        ("source/lapack-netlib/SRC/slasrt.f", 7897),
+                        ("source/lapack-netlib/SRC/slassq.f", 4322),
+                        ("source/lapack-netlib/SRC/slasv2.f", 8402),
+                        ("source/lapack-netlib/SRC/slaswp.f", 5041),
+                        ("source/lapack-netlib/SRC/slasy2.f", 14482),
+                        ("source/lapack-netlib/SRC/slasyf.f", 26516),
+                        ("source/lapack-netlib/SRC/slasyf_rook.f", 27257),
+                        ("source/lapack-netlib/SRC/slatbs.f", 25064),
+                        ("source/lapack-netlib/SRC/slatdf.f", 10579),
+                        ("source/lapack-netlib/SRC/slatps.f", 24381),
+                        ("source/lapack-netlib/SRC/slatrd.f", 11602),
+                        ("source/lapack-netlib/SRC/slatrs.f", 24232),
+                        ("source/lapack-netlib/SRC/slatrz.f", 5635),
+                        ("source/lapack-netlib/SRC/slauu2.f", 5514),
+                        ("source/lapack-netlib/SRC/slauum.f", 6471),
+                        ("source/lapack-netlib/SRC/sopgtr.f", 6037),
+                        ("source/lapack-netlib/SRC/sopmtr.f", 8682),
+                        ("source/lapack-netlib/SRC/sorbdb.f", 23482),
+                        ("source/lapack-netlib/SRC/sorbdb1.f", 9850),
+                        ("source/lapack-netlib/SRC/sorbdb2.f", 10208),
+                        ("source/lapack-netlib/SRC/sorbdb3.f", 10143),
+                        ("source/lapack-netlib/SRC/sorbdb4.f", 12185),
+                        ("source/lapack-netlib/SRC/sorbdb5.f", 7281),
+                        ("source/lapack-netlib/SRC/sorbdb6.f", 8287),
+                        ("source/lapack-netlib/SRC/sorcsd.f", 21028),
+                        ("source/lapack-netlib/SRC/sorcsd2by1.f", 25292),
+                        ("source/lapack-netlib/SRC/sorg2l.f", 5234),
+                        ("source/lapack-netlib/SRC/sorg2r.f", 5244),
+                        ("source/lapack-netlib/SRC/sorgbr.f", 9898),
+                        ("source/lapack-netlib/SRC/sorghr.f", 6548),
+                        ("source/lapack-netlib/SRC/sorgl2.f", 5221),
+                        ("source/lapack-netlib/SRC/sorglq.f", 8011),
+                        ("source/lapack-netlib/SRC/sorgql.f", 8176),
+                        ("source/lapack-netlib/SRC/sorgqr.f", 8050),
+                        ("source/lapack-netlib/SRC/sorgr2.f", 5311),
+                        ("source/lapack-netlib/SRC/sorgrq.f", 8123),
+                        ("source/lapack-netlib/SRC/sorgtr.f", 7037),
+                        ("source/lapack-netlib/SRC/sorm22.f", 13642),
+                        ("source/lapack-netlib/SRC/sorm2l.f", 7281),
+                        ("source/lapack-netlib/SRC/sorm2r.f", 7346),
+                        ("source/lapack-netlib/SRC/sormbr.f", 10914),
+                        ("source/lapack-netlib/SRC/sormhr.f", 8387),
+                        ("source/lapack-netlib/SRC/sorml2.f", 7373),
+                        ("source/lapack-netlib/SRC/sormlq.f", 9563),
+                        ("source/lapack-netlib/SRC/sormql.f", 9420),
+                        ("source/lapack-netlib/SRC/sormqr.f", 9395),
+                        ("source/lapack-netlib/SRC/sormr2.f", 7305),
+                        ("source/lapack-netlib/SRC/sormr3.f", 7857),
+                        ("source/lapack-netlib/SRC/sormrq.f", 9581),
+                        ("source/lapack-netlib/SRC/sormrz.f", 10348),
+                        ("source/lapack-netlib/SRC/sormtr.f", 8846),
+                        ("source/lapack-netlib/SRC/spbcon.f", 7687),
+                        ("source/lapack-netlib/SRC/spbequ.f", 6609),
+                        ("source/lapack-netlib/SRC/spbrfs.f", 13637),
+                        ("source/lapack-netlib/SRC/spbstf.f", 9178),
+                        ("source/lapack-netlib/SRC/spbsv.f", 6944),
+                        ("source/lapack-netlib/SRC/spbsvx.f", 18163),
+                        ("source/lapack-netlib/SRC/spbtf2.f", 7583),
+                        ("source/lapack-netlib/SRC/spbtrf.f", 13631),
+                        ("source/lapack-netlib/SRC/spbtrs.f", 6001),
+                        ("source/lapack-netlib/SRC/spftrf.f", 14552),
+                        ("source/lapack-netlib/SRC/spftri.f", 13420),
+                        ("source/lapack-netlib/SRC/spftrs.f", 8424),
+                        ("source/lapack-netlib/SRC/spocon.f", 6953),
+                        ("source/lapack-netlib/SRC/spoequ.f", 5485),
+                        ("source/lapack-netlib/SRC/spoequb.f", 5762),
+                        ("source/lapack-netlib/SRC/sporfs.f", 13126),
+                        ("source/lapack-netlib/SRC/sporfsx.f", 26187),
+                        ("source/lapack-netlib/SRC/sposv.f", 5688),
+                        ("source/lapack-netlib/SRC/sposvx.f", 16730),
+                        ("source/lapack-netlib/SRC/sposvxx.f", 26488),
+                        ("source/lapack-netlib/SRC/spotf2.f", 6558),
+                        ("source/lapack-netlib/SRC/spotrf.f", 7208),
+                        ("source/lapack-netlib/SRC/spotrf2.f", 6337),
+                        ("source/lapack-netlib/SRC/spotri.f", 4166),
+                        ("source/lapack-netlib/SRC/spotrs.f", 5371),
+                        ("source/lapack-netlib/SRC/sppcon.f", 6914),
+                        ("source/lapack-netlib/SRC/sppequ.f", 6448),
+                        ("source/lapack-netlib/SRC/spprfs.f", 12818),
+                        ("source/lapack-netlib/SRC/sppsv.f", 5917),
+                        ("source/lapack-netlib/SRC/sppsvx.f", 16592),
+                        ("source/lapack-netlib/SRC/spptrf.f", 6398),
+                        ("source/lapack-netlib/SRC/spptri.f", 5073),
+                        ("source/lapack-netlib/SRC/spptrs.f", 5398),
+                        ("source/lapack-netlib/SRC/spstf2.f", 10941),
+                        ("source/lapack-netlib/SRC/spstrf.f", 13144),
+                        ("source/lapack-netlib/SRC/sptcon.f", 5701),
+                        ("source/lapack-netlib/SRC/spteqr.f", 7711),
+                        ("source/lapack-netlib/SRC/sptrfs.f", 11720),
+                        ("source/lapack-netlib/SRC/sptsv.f", 4845),
+                        ("source/lapack-netlib/SRC/sptsvx.f", 10840),
+                        ("source/lapack-netlib/SRC/spttrf.f", 5405),
+                        ("source/lapack-netlib/SRC/spttrs.f", 4839),
+                        ("source/lapack-netlib/SRC/sptts2.f", 4345),
+                        ("source/lapack-netlib/SRC/srscl.f", 4353),
+                        ("source/lapack-netlib/SRC/ssbev.f", 8385),
+                        ("source/lapack-netlib/SRC/ssbevd.f", 11425),
+                        ("source/lapack-netlib/SRC/ssbevx.f", 17007),
+                        ("source/lapack-netlib/SRC/ssbgst.f", 47611),
+                        ("source/lapack-netlib/SRC/ssbgv.f", 8478),
+                        ("source/lapack-netlib/SRC/ssbgvd.f", 11830),
+                        ("source/lapack-netlib/SRC/ssbgvx.f", 16205),
+                        ("source/lapack-netlib/SRC/ssbtrd.f", 20734),
+                        ("source/lapack-netlib/SRC/ssfrk.f", 17237),
+                        ("source/lapack-netlib/SRC/sspcon.f", 6390),
+                        ("source/lapack-netlib/SRC/sspev.f", 7676),
+                        ("source/lapack-netlib/SRC/sspevd.f", 10755),
+                        ("source/lapack-netlib/SRC/sspevx.f", 15521),
+                        ("source/lapack-netlib/SRC/sspgst.f", 8277),
+                        ("source/lapack-netlib/SRC/sspgv.f", 8289),
+                        ("source/lapack-netlib/SRC/sspgvd.f", 11435),
+                        ("source/lapack-netlib/SRC/sspgvx.f", 12926),
+                        ("source/lapack-netlib/SRC/ssprfs.f", 13195),
+                        ("source/lapack-netlib/SRC/sspsv.f", 6925),
+                        ("source/lapack-netlib/SRC/sspsvx.f", 13111),
+                        ("source/lapack-netlib/SRC/ssptrd.f", 8749),
+                        ("source/lapack-netlib/SRC/ssptrf.f", 18915),
+                        ("source/lapack-netlib/SRC/ssptri.f", 11729),
+                        ("source/lapack-netlib/SRC/ssptrs.f", 12584),
+                        ("source/lapack-netlib/SRC/sstebz.f", 23658),
+                        ("source/lapack-netlib/SRC/sstedc.f", 15550),
+                        ("source/lapack-netlib/SRC/sstegr.f", 9723),
+                        ("source/lapack-netlib/SRC/sstein.f", 13377),
+                        ("source/lapack-netlib/SRC/sstemr.f", 26935),
+                        ("source/lapack-netlib/SRC/ssteqr.f", 15518),
+                        ("source/lapack-netlib/SRC/ssterf.f", 10612),
+                        ("source/lapack-netlib/SRC/sstev.f", 6423),
+                        ("source/lapack-netlib/SRC/sstevd.f", 9073),
+                        ("source/lapack-netlib/SRC/sstevr.f", 18860),
+                        ("source/lapack-netlib/SRC/sstevx.f", 14033),
+                        ("source/lapack-netlib/SRC/ssycon.f", 6527),
+                        ("source/lapack-netlib/SRC/ssycon_rook.f", 6988),
+                        ("source/lapack-netlib/SRC/ssyconv.f", 9091),
+                        ("source/lapack-netlib/SRC/ssyequb.f", 9709),
+                        ("source/lapack-netlib/SRC/ssyev.f", 8414),
+                        ("source/lapack-netlib/SRC/ssyevd.f", 11399),
+                        ("source/lapack-netlib/SRC/ssyevr.f", 23656),
+                        ("source/lapack-netlib/SRC/ssyevx.f", 17420),
+                        ("source/lapack-netlib/SRC/ssygs2.f", 8851),
+                        ("source/lapack-netlib/SRC/ssygst.f", 10978),
+                        ("source/lapack-netlib/SRC/ssygv.f", 9564),
+                        ("source/lapack-netlib/SRC/ssygvd.f", 12138),
+                        ("source/lapack-netlib/SRC/ssygvx.f", 14819),
+                        ("source/lapack-netlib/SRC/ssyrfs.f", 13574),
+                        ("source/lapack-netlib/SRC/ssyrfsx.f", 26491),
+                        ("source/lapack-netlib/SRC/ssysv.f", 8389),
+                        ("source/lapack-netlib/SRC/ssysv_rook.f", 9164),
+                        ("source/lapack-netlib/SRC/ssysvx.f", 14207),
+                        ("source/lapack-netlib/SRC/ssysvxx.f", 27014),
+                        ("source/lapack-netlib/SRC/ssyswapr.f", 5249),
+                        ("source/lapack-netlib/SRC/ssytd2.f", 9785),
+                        ("source/lapack-netlib/SRC/ssytf2.f", 18557),
+                        ("source/lapack-netlib/SRC/ssytf2_rook.f", 24905),
+                        ("source/lapack-netlib/SRC/ssytrd.f", 11448),
+                        ("source/lapack-netlib/SRC/ssytrf.f", 11095),
+                        ("source/lapack-netlib/SRC/ssytrf_rook.f", 12082),
+                        ("source/lapack-netlib/SRC/ssytri.f", 11079),
+                        ("source/lapack-netlib/SRC/ssytri2.f", 5983),
+                        ("source/lapack-netlib/SRC/ssytri2x.f", 16006),
+                        ("source/lapack-netlib/SRC/ssytri_rook.f", 13349),
+                        ("source/lapack-netlib/SRC/ssytrs.f", 12401),
+                        ("source/lapack-netlib/SRC/ssytrs2.f", 10420),
+                        ("source/lapack-netlib/SRC/ssytrs_rook.f", 13625),
+                        ("source/lapack-netlib/SRC/stbcon.f", 7984),
+                        ("source/lapack-netlib/SRC/stbrfs.f", 15132),
+                        ("source/lapack-netlib/SRC/stbtrs.f", 6771),
+                        ("source/lapack-netlib/SRC/stfsm.f", 34721),
+                        ("source/lapack-netlib/SRC/stftri.f", 15094),
+                        ("source/lapack-netlib/SRC/stfttp.f", 14798),
+                        ("source/lapack-netlib/SRC/stfttr.f", 13849),
+                        ("source/lapack-netlib/SRC/stgevc.f", 41250),
+                        ("source/lapack-netlib/SRC/stgex2.f", 24097),
+                        ("source/lapack-netlib/SRC/stgexc.f", 16127),
+                        ("source/lapack-netlib/SRC/stgsen.f", 29397),
+                        ("source/lapack-netlib/SRC/stgsja.f", 19459),
+                        ("source/lapack-netlib/SRC/stgsna.f", 24172),
+                        ("source/lapack-netlib/SRC/stgsy2.f", 36800),
+                        ("source/lapack-netlib/SRC/stgsyl.f", 22636),
+                        ("source/lapack-netlib/SRC/stpcon.f", 7433),
+                        ("source/lapack-netlib/SRC/stpmqrt.f", 10506),
+                        ("source/lapack-netlib/SRC/stpqrt.f", 7877),
+                        ("source/lapack-netlib/SRC/stpqrt2.f", 8676),
+                        ("source/lapack-netlib/SRC/stprfb.f", 26085),
+                        ("source/lapack-netlib/SRC/stprfs.f", 14626),
+                        ("source/lapack-netlib/SRC/stptri.f", 6643),
+                        ("source/lapack-netlib/SRC/stptrs.f", 6211),
+                        ("source/lapack-netlib/SRC/stpttf.f", 13836),
+                        ("source/lapack-netlib/SRC/stpttr.f", 4802),
+                        ("source/lapack-netlib/SRC/strcon.f", 7803),
+                        ("source/lapack-netlib/SRC/strevc.f", 36794),
+                        ("source/lapack-netlib/SRC/strexc.f", 12200),
+                        ("source/lapack-netlib/SRC/strrfs.f", 14634),
+                        ("source/lapack-netlib/SRC/strsen.f", 18240),
+                        ("source/lapack-netlib/SRC/strsna.f", 19798),
+                        ("source/lapack-netlib/SRC/strsyl.f", 35801),
+                        ("source/lapack-netlib/SRC/strti2.f", 5911),
+                        ("source/lapack-netlib/SRC/strtri.f", 6905),
+                        ("source/lapack-netlib/SRC/strtrs.f", 6369),
+                        ("source/lapack-netlib/SRC/strttf.f", 13750),
+                        ("source/lapack-netlib/SRC/strttp.f", 4793),
+                        ("source/lapack-netlib/SRC/stzrzf.f", 8530),
+                        (
+                            "source/lapack-netlib/SRC/VARIANTS/cholesky/RL/cpotrf.f",
+                            6677
+                        ),
+                        (
+                            "source/lapack-netlib/SRC/VARIANTS/cholesky/RL/dpotrf.f",
+                            6594
+                        ),
+                        (
+                            "source/lapack-netlib/SRC/VARIANTS/cholesky/RL/spotrf.f",
+                            6582
+                        ),
+                        (
+                            "source/lapack-netlib/SRC/VARIANTS/cholesky/RL/zpotrf.f",
+                            6686
+                        ),
+                        (
+                            "source/lapack-netlib/SRC/VARIANTS/cholesky/TOP/cpotrf.f",
+                            6440
+                        ),
+                        (
+                            "source/lapack-netlib/SRC/VARIANTS/cholesky/TOP/dpotrf.f",
+                            6402
+                        ),
+                        (
+                            "source/lapack-netlib/SRC/VARIANTS/cholesky/TOP/spotrf.f",
+                            6374
+                        ),
+                        (
+                            "source/lapack-netlib/SRC/VARIANTS/cholesky/TOP/zpotrf.f",
+                            6443
+                        ),
+                        ("source/lapack-netlib/SRC/VARIANTS/lu/CR/cgetrf.f", 6107),
+                        ("source/lapack-netlib/SRC/VARIANTS/lu/CR/dgetrf.f", 6104),
+                        ("source/lapack-netlib/SRC/VARIANTS/lu/CR/sgetrf.f", 6092),
+                        ("source/lapack-netlib/SRC/VARIANTS/lu/CR/zgetrf.f", 6110),
+                        ("source/lapack-netlib/SRC/VARIANTS/lu/LL/cgetrf.f", 6731),
+                        ("source/lapack-netlib/SRC/VARIANTS/lu/LL/dgetrf.f", 6728),
+                        ("source/lapack-netlib/SRC/VARIANTS/lu/LL/sgetrf.f", 6718),
+                        ("source/lapack-netlib/SRC/VARIANTS/lu/LL/zgetrf.f", 6734),
+                        ("source/lapack-netlib/SRC/VARIANTS/lu/REC/cgetrf.f", 8262),
+                        ("source/lapack-netlib/SRC/VARIANTS/lu/REC/dgetrf.f", 8143),
+                        ("source/lapack-netlib/SRC/VARIANTS/lu/REC/sgetrf.f", 8131),
+                        ("source/lapack-netlib/SRC/VARIANTS/lu/REC/zgetrf.f", 8265),
+                        ("source/lapack-netlib/SRC/VARIANTS/Makefile", 2384),
+                        ("source/lapack-netlib/SRC/VARIANTS/qr/LL/cgeqrf.f", 11933),
+                        ("source/lapack-netlib/SRC/VARIANTS/qr/LL/dgeqrf.f", 11961),
+                        ("source/lapack-netlib/SRC/VARIANTS/qr/LL/sceil.f", 1786),
+                        ("source/lapack-netlib/SRC/VARIANTS/qr/LL/sgeqrf.f", 11924),
+                        ("source/lapack-netlib/SRC/VARIANTS/qr/LL/zgeqrf.f", 11934),
+                        ("source/lapack-netlib/SRC/VARIANTS/README", 3069),
+                        ("source/lapack-netlib/SRC/xerbla.f", 2604),
+                        ("source/lapack-netlib/SRC/xerbla_array.f", 3684),
+                        ("source/lapack-netlib/SRC/zbbcsd.f", 39082),
+                        ("source/lapack-netlib/SRC/zbdsqr.f", 25964),
+                        ("source/lapack-netlib/SRC/zcgesv.f", 13663),
+                        ("source/lapack-netlib/SRC/zcposv.f", 13933),
+                        ("source/lapack-netlib/SRC/zdrscl.f", 4391),
+                        ("source/lapack-netlib/SRC/zgbbrd.f", 17692),
+                        ("source/lapack-netlib/SRC/zgbcon.f", 9077),
+                        ("source/lapack-netlib/SRC/zgbequ.f", 8969),
+                        ("source/lapack-netlib/SRC/zgbequb.f", 9741),
+                        ("source/lapack-netlib/SRC/zgbrfs.f", 14581),
+                        ("source/lapack-netlib/SRC/zgbrfsx.f", 29476),
+                        ("source/lapack-netlib/SRC/zgbsv.f", 7046),
+                        ("source/lapack-netlib/SRC/zgbsvx.f", 23127),
+                        ("source/lapack-netlib/SRC/zgbsvxx.f", 30998),
+                        ("source/lapack-netlib/SRC/zgbtf2.f", 8142),
+                        ("source/lapack-netlib/SRC/zgbtrf.f", 16344),
+                        ("source/lapack-netlib/SRC/zgbtrs.f", 8439),
+                        ("source/lapack-netlib/SRC/zgebak.f", 7295),
+                        ("source/lapack-netlib/SRC/zgebal.f", 10702),
+                        ("source/lapack-netlib/SRC/zgebd2.f", 10460),
+                        ("source/lapack-netlib/SRC/zgebrd.f", 11271),
+                        ("source/lapack-netlib/SRC/zgecon.f", 7378),
+                        ("source/lapack-netlib/SRC/zgeequ.f", 8283),
+                        ("source/lapack-netlib/SRC/zgeequb.f", 9034),
+                        ("source/lapack-netlib/SRC/zgees.f", 13381),
+                        ("source/lapack-netlib/SRC/zgeesx.f", 16493),
+                        ("source/lapack-netlib/SRC/zgeev.f", 15399),
+                        ("source/lapack-netlib/SRC/zgeevx.f", 22082),
+                        ("source/lapack-netlib/SRC/zgehd2.f", 6605),
+                        ("source/lapack-netlib/SRC/zgehrd.f", 10943),
+                        ("source/lapack-netlib/SRC/zgejsv.f", 76703),
+                        ("source/lapack-netlib/SRC/zgelq2.f", 5270),
+                        ("source/lapack-netlib/SRC/zgelqf.f", 7579),
+                        ("source/lapack-netlib/SRC/zgels.f", 15140),
+                        ("source/lapack-netlib/SRC/zgelsd.f", 22711),
+                        ("source/lapack-netlib/SRC/zgelss.f", 26471),
+                        ("source/lapack-netlib/SRC/zgelsy.f", 14992),
+                        ("source/lapack-netlib/SRC/zgemqrt.f", 8100),
+                        ("source/lapack-netlib/SRC/zgeql2.f", 5248),
+                        ("source/lapack-netlib/SRC/zgeqlf.f", 8110),
+                        ("source/lapack-netlib/SRC/zgeqp3.f", 10524),
+                        ("source/lapack-netlib/SRC/zgeqr2.f", 5178),
+                        ("source/lapack-netlib/SRC/zgeqr2p.f", 5387),
+                        ("source/lapack-netlib/SRC/zgeqrf.f", 7597),
+                        ("source/lapack-netlib/SRC/zgeqrfp.f", 7772),
+                        ("source/lapack-netlib/SRC/zgeqrt.f", 6151),
+                        ("source/lapack-netlib/SRC/zgeqrt2.f", 6300),
+                        ("source/lapack-netlib/SRC/zgeqrt3.f", 7390),
+                        ("source/lapack-netlib/SRC/zgerfs.f", 13399),
+                        ("source/lapack-netlib/SRC/zgerfsx.f", 28098),
+                        ("source/lapack-netlib/SRC/zgerq2.f", 5358),
+                        ("source/lapack-netlib/SRC/zgerqf.f", 8117),
+                        ("source/lapack-netlib/SRC/zgesc2.f", 5550),
+                        ("source/lapack-netlib/SRC/zgesdd.f", 78862),
+                        ("source/lapack-netlib/SRC/zgesv.f", 5169),
+                        ("source/lapack-netlib/SRC/zgesvd.f", 142127),
+                        ("source/lapack-netlib/SRC/zgesvdx.f", 27883),
+                        ("source/lapack-netlib/SRC/zgesvj.f", 55863),
+                        ("source/lapack-netlib/SRC/zgesvx.f", 21388),
+                        ("source/lapack-netlib/SRC/zgesvxx.f", 29944),
+                        ("source/lapack-netlib/SRC/zgetc2.f", 6380),
+                        ("source/lapack-netlib/SRC/zgetf2.f", 5942),
+                        ("source/lapack-netlib/SRC/zgetrf.f", 6319),
+                        ("source/lapack-netlib/SRC/zgetrf2.f", 7154),
+                        ("source/lapack-netlib/SRC/zgetri.f", 7429),
+                        ("source/lapack-netlib/SRC/zgetrs.f", 6067),
+                        ("source/lapack-netlib/SRC/zggbak.f", 8422),
+                        ("source/lapack-netlib/SRC/zggbal.f", 16167),
+                        ("source/lapack-netlib/SRC/zgges.f", 19277),
+                        ("source/lapack-netlib/SRC/zgges3.f", 19314),
+                        ("source/lapack-netlib/SRC/zggesx.f", 23680),
+                        ("source/lapack-netlib/SRC/zggev.f", 17459),
+                        ("source/lapack-netlib/SRC/zggev3.f", 17654),
+                        ("source/lapack-netlib/SRC/zggevx.f", 27033),
+                        ("source/lapack-netlib/SRC/zggglm.f", 10406),
+                        ("source/lapack-netlib/SRC/zgghd3.f", 32127),
+                        ("source/lapack-netlib/SRC/zgghrd.f", 10896),
+                        ("source/lapack-netlib/SRC/zgglse.f", 10674),
+                        ("source/lapack-netlib/SRC/zggqrf.f", 9393),
+                        ("source/lapack-netlib/SRC/zggrqf.f", 9405),
+                        ("source/lapack-netlib/SRC/zggsvd3.f", 15423),
+                        ("source/lapack-netlib/SRC/zggsvp3.f", 16325),
+                        ("source/lapack-netlib/SRC/zgsvj0.f", 35909),
+                        ("source/lapack-netlib/SRC/zgsvj1.f", 25789),
+                        ("source/lapack-netlib/SRC/zgtcon.f", 6952),
+                        ("source/lapack-netlib/SRC/zgtrfs.f", 15419),
+                        ("source/lapack-netlib/SRC/zgtsv.f", 6884),
+                        ("source/lapack-netlib/SRC/zgtsvx.f", 13976),
+                        ("source/lapack-netlib/SRC/zgttrf.f", 6809),
+                        ("source/lapack-netlib/SRC/zgttrs.f", 6248),
+                        ("source/lapack-netlib/SRC/zgtts2.f", 10470),
+                        ("source/lapack-netlib/SRC/zhbev.f", 8623),
+                        ("source/lapack-netlib/SRC/zhbevd.f", 13052),
+                        ("source/lapack-netlib/SRC/zhbevx.f", 17295),
+                        ("source/lapack-netlib/SRC/zhbgst.f", 49312),
+                        ("source/lapack-netlib/SRC/zhbgv.f", 8723),
+                        ("source/lapack-netlib/SRC/zhbgvd.f", 13318),
+                        ("source/lapack-netlib/SRC/zhbgvx.f", 16732),
+                        ("source/lapack-netlib/SRC/zhbtrd.f", 22157),
+                        ("source/lapack-netlib/SRC/zhecon.f", 6407),
+                        ("source/lapack-netlib/SRC/zhecon_rook.f", 7023),
+                        ("source/lapack-netlib/SRC/zheequb.f", 9628),
+                        ("source/lapack-netlib/SRC/zheev.f", 8822),
+                        ("source/lapack-netlib/SRC/zheevd.f", 13039),
+                        ("source/lapack-netlib/SRC/zheevr.f", 25113),
+                        ("source/lapack-netlib/SRC/zheevx.f", 17848),
+                        ("source/lapack-netlib/SRC/zhegs2.f", 9502),
+                        ("source/lapack-netlib/SRC/zhegst.f", 11430),
+                        ("source/lapack-netlib/SRC/zhegv.f", 9799),
+                        ("source/lapack-netlib/SRC/zhegvd.f", 13528),
+                        ("source/lapack-netlib/SRC/zhegvx.f", 15106),
+                        ("source/lapack-netlib/SRC/zherfs.f", 13831),
+                        ("source/lapack-netlib/SRC/zherfsx.f", 26828),
+                        ("source/lapack-netlib/SRC/zhesv.f", 8451),
+                        ("source/lapack-netlib/SRC/zhesv_rook.f", 9412),
+                        ("source/lapack-netlib/SRC/zhesvx.f", 14318),
+                        ("source/lapack-netlib/SRC/zhesvxx.f", 27074),
+                        ("source/lapack-netlib/SRC/zheswapr.f", 5467),
+                        ("source/lapack-netlib/SRC/zhetd2.f", 10203),
+                        ("source/lapack-netlib/SRC/zhetf2.f", 20683),
+                        ("source/lapack-netlib/SRC/zhetf2_rook.f", 29106),
+                        ("source/lapack-netlib/SRC/zhetrd.f", 11585),
+                        ("source/lapack-netlib/SRC/zhetrf.f", 10798),
+                        ("source/lapack-netlib/SRC/zhetrf_rook.f", 12362),
+                        ("source/lapack-netlib/SRC/zhetri.f", 11722),
+                        ("source/lapack-netlib/SRC/zhetri2.f", 5995),
+                        ("source/lapack-netlib/SRC/zhetri2x.f", 16224),
+                        ("source/lapack-netlib/SRC/zhetri_rook.f", 15134),
+                        ("source/lapack-netlib/SRC/zhetrs.f", 13484),
+                        ("source/lapack-netlib/SRC/zhetrs2.f", 10278),
+                        ("source/lapack-netlib/SRC/zhetrs_rook.f", 14730),
+                        ("source/lapack-netlib/SRC/zhfrk.f", 17718),
+                        ("source/lapack-netlib/SRC/zhgeqz.f", 28509),
+                        ("source/lapack-netlib/SRC/zhpcon.f", 6218),
+                        ("source/lapack-netlib/SRC/zhpev.f", 8119),
+                        ("source/lapack-netlib/SRC/zhpevd.f", 12330),
+                        ("source/lapack-netlib/SRC/zhpevx.f", 15979),
+                        ("source/lapack-netlib/SRC/zhpgst.f", 8562),
+                        ("source/lapack-netlib/SRC/zhpgv.f", 8481),
+                        ("source/lapack-netlib/SRC/zhpgvd.f", 12727),
+                        ("source/lapack-netlib/SRC/zhpgvx.f", 13147),
+                        ("source/lapack-netlib/SRC/zhprfs.f", 13506),
+                        ("source/lapack-netlib/SRC/zhpsv.f", 6952),
+                        ("source/lapack-netlib/SRC/zhpsvx.f", 13211),
+                        ("source/lapack-netlib/SRC/zhptrd.f", 9128),
+                        ("source/lapack-netlib/SRC/zhptrf.f", 20805),
+                        ("source/lapack-netlib/SRC/zhptri.f", 12251),
+                        ("source/lapack-netlib/SRC/zhptrs.f", 13669),
+                        ("source/lapack-netlib/SRC/zhsein.f", 14841),
+                        ("source/lapack-netlib/SRC/zhseqr.f", 17960),
+                        ("source/lapack-netlib/SRC/zla_gbamv.f", 13017),
+                        ("source/lapack-netlib/SRC/zla_gbrcond_c.f", 9861),
+                        ("source/lapack-netlib/SRC/zla_gbrcond_x.f", 9027),
+                        ("source/lapack-netlib/SRC/zla_gbrfsx_extended.f", 26510),
+                        ("source/lapack-netlib/SRC/zla_gbrpvgrw.f", 5039),
+                        ("source/lapack-netlib/SRC/zla_geamv.f", 12431),
+                        ("source/lapack-netlib/SRC/zla_gercond_c.f", 8682),
+                        ("source/lapack-netlib/SRC/zla_gercond_x.f", 7985),
+                        ("source/lapack-netlib/SRC/zla_gerfsx_extended.f", 25579),
+                        ("source/lapack-netlib/SRC/zla_gerpvgrw.f", 4138),
+                        ("source/lapack-netlib/SRC/zla_heamv.f", 13187),
+                        ("source/lapack-netlib/SRC/zla_hercond_c.f", 8904),
+                        ("source/lapack-netlib/SRC/zla_hercond_x.f", 7960),
+                        ("source/lapack-netlib/SRC/zla_herfsx_extended.f", 26293),
+                        ("source/lapack-netlib/SRC/zla_herpvgrw.f", 9896),
+                        ("source/lapack-netlib/SRC/zla_lin_berr.f", 4743),
+                        ("source/lapack-netlib/SRC/zla_porcond_c.f", 8645),
+                        ("source/lapack-netlib/SRC/zla_porcond_x.f", 7682),
+                        ("source/lapack-netlib/SRC/zla_porfsx_extended.f", 25373),
+                        ("source/lapack-netlib/SRC/zla_porpvgrw.f", 6431),
+                        ("source/lapack-netlib/SRC/zla_syamv.f", 13241),
+                        ("source/lapack-netlib/SRC/zla_syrcond_c.f", 8922),
+                        ("source/lapack-netlib/SRC/zla_syrcond_x.f", 7985),
+                        ("source/lapack-netlib/SRC/zla_syrfsx_extended.f", 26295),
+                        ("source/lapack-netlib/SRC/zla_syrpvgrw.f", 10028),
+                        ("source/lapack-netlib/SRC/zla_wwaddw.f", 2895),
+                        ("source/lapack-netlib/SRC/zlabrd.f", 15376),
+                        ("source/lapack-netlib/SRC/zlacgv.f", 2870),
+                        ("source/lapack-netlib/SRC/zlacn2.f", 7999),
+                        ("source/lapack-netlib/SRC/zlacon.f", 7379),
+                        ("source/lapack-netlib/SRC/zlacp2.f", 4168),
+                        ("source/lapack-netlib/SRC/zlacpy.f", 4094),
+                        ("source/lapack-netlib/SRC/zlacrm.f", 4829),
+                        ("source/lapack-netlib/SRC/zlacrt.f", 4020),
+                        ("source/lapack-netlib/SRC/zladiv.f", 2443),
+                        ("source/lapack-netlib/SRC/zlaed0.f", 11345),
+                        ("source/lapack-netlib/SRC/zlaed7.f", 12556),
+                        ("source/lapack-netlib/SRC/zlaed8.f", 15017),
+                        ("source/lapack-netlib/SRC/zlaein.f", 9735),
+                        ("source/lapack-netlib/SRC/zlaesy.f", 6383),
+                        ("source/lapack-netlib/SRC/zlaev2.f", 4515),
+                        ("source/lapack-netlib/SRC/zlag2c.f", 4338),
+                        ("source/lapack-netlib/SRC/zlags2.f", 11985),
+                        ("source/lapack-netlib/SRC/zlagtm.f", 10216),
+                        ("source/lapack-netlib/SRC/zlahef.f", 32389),
+                        ("source/lapack-netlib/SRC/zlahef_rook.f", 39785),
+                        ("source/lapack-netlib/SRC/zlahqr.f", 18501),
+                        ("source/lapack-netlib/SRC/zlahr2.f", 10384),
+                        ("source/lapack-netlib/SRC/zlaic1.f", 10463),
+                        ("source/lapack-netlib/SRC/zlals0.f", 18484),
+                        ("source/lapack-netlib/SRC/zlalsa.f", 20757),
+                        ("source/lapack-netlib/SRC/zlalsd.f", 23357),
+                        ("source/lapack-netlib/SRC/zlangb.f", 6558),
+                        ("source/lapack-netlib/SRC/zlange.f", 5921),
+                        ("source/lapack-netlib/SRC/zlangt.f", 6145),
+                        ("source/lapack-netlib/SRC/zlanhb.f", 8638),
+                        ("source/lapack-netlib/SRC/zlanhe.f", 8140),
+                        ("source/lapack-netlib/SRC/zlanhf.f", 57994),
+                        ("source/lapack-netlib/SRC/zlanhp.f", 8330),
+                        ("source/lapack-netlib/SRC/zlanhs.f", 5844),
+                        ("source/lapack-netlib/SRC/zlanht.f", 5423),
+                        ("source/lapack-netlib/SRC/zlansb.f", 7980),
+                        ("source/lapack-netlib/SRC/zlansp.f", 8289),
+                        ("source/lapack-netlib/SRC/zlansy.f", 7444),
+                        ("source/lapack-netlib/SRC/zlantb.f", 11453),
+                        ("source/lapack-netlib/SRC/zlantp.f", 10922),
+                        ("source/lapack-netlib/SRC/zlantr.f", 11150),
+                        ("source/lapack-netlib/SRC/zlapll.f", 4503),
+                        ("source/lapack-netlib/SRC/zlapmr.f", 4749),
+                        ("source/lapack-netlib/SRC/zlapmt.f", 4756),
+                        ("source/lapack-netlib/SRC/zlaqgb.f", 7212),
+                        ("source/lapack-netlib/SRC/zlaqge.f", 6396),
+                        ("source/lapack-netlib/SRC/zlaqhb.f", 6543),
+                        ("source/lapack-netlib/SRC/zlaqhe.f", 6134),
+                        ("source/lapack-netlib/SRC/zlaqhp.f", 5997),
+                        ("source/lapack-netlib/SRC/zlaqp2.f", 7830),
+                        ("source/lapack-netlib/SRC/zlaqps.f", 11068),
+                        ("source/lapack-netlib/SRC/zlaqr0.f", 25098),
+                        ("source/lapack-netlib/SRC/zlaqr1.f", 4871),
+                        ("source/lapack-netlib/SRC/zlaqr2.f", 17621),
+                        ("source/lapack-netlib/SRC/zlaqr3.f", 18052),
+                        ("source/lapack-netlib/SRC/zlaqr4.f", 25128),
+                        ("source/lapack-netlib/SRC/zlaqr5.f", 33713),
+                        ("source/lapack-netlib/SRC/zlaqsb.f", 6425),
+                        ("source/lapack-netlib/SRC/zlaqsp.f", 5860),
+                        ("source/lapack-netlib/SRC/zlaqsy.f", 6005),
+                        ("source/lapack-netlib/SRC/zlar1v.f", 14946),
+                        ("source/lapack-netlib/SRC/zlar2v.f", 4806),
+                        ("source/lapack-netlib/SRC/zlarcm.f", 4853),
+                        ("source/lapack-netlib/SRC/zlarf.f", 6345),
+                        ("source/lapack-netlib/SRC/zlarfb.f", 22201),
+                        ("source/lapack-netlib/SRC/zlarfg.f", 5417),
+                        ("source/lapack-netlib/SRC/zlarfgp.f", 7877),
+                        ("source/lapack-netlib/SRC/zlarft.f", 10530),
+                        ("source/lapack-netlib/SRC/zlarfx.f", 21002),
+                        ("source/lapack-netlib/SRC/zlargv.f", 9038),
+                        ("source/lapack-netlib/SRC/zlarnv.f", 5633),
+                        ("source/lapack-netlib/SRC/zlarrv.f", 43656),
+                        ("source/lapack-netlib/SRC/zlarscl2.f", 3075),
+                        ("source/lapack-netlib/SRC/zlartg.f", 7394),
+                        ("source/lapack-netlib/SRC/zlartv.f", 3926),
+                        ("source/lapack-netlib/SRC/zlarz.f", 6449),
+                        ("source/lapack-netlib/SRC/zlarzb.f", 9550),
+                        ("source/lapack-netlib/SRC/zlarzt.f", 8052),
+                        ("source/lapack-netlib/SRC/zlascl.f", 9873),
+                        ("source/lapack-netlib/SRC/zlascl2.f", 3039),
+                        ("source/lapack-netlib/SRC/zlaset.f", 4864),
+                        ("source/lapack-netlib/SRC/zlasr.f", 15164),
+                        ("source/lapack-netlib/SRC/zlassq.f", 4767),
+                        ("source/lapack-netlib/SRC/zlaswp.f", 5052),
+                        ("source/lapack-netlib/SRC/zlasyf.f", 26748),
+                        ("source/lapack-netlib/SRC/zlasyf_rook.f", 27666),
+                        ("source/lapack-netlib/SRC/zlat2c.f", 5163),
+                        ("source/lapack-netlib/SRC/zlatbs.f", 31166),
+                        ("source/lapack-netlib/SRC/zlatdf.f", 10840),
+                        ("source/lapack-netlib/SRC/zlatps.f", 30340),
+                        ("source/lapack-netlib/SRC/zlatrd.f", 12566),
+                        ("source/lapack-netlib/SRC/zlatrs.f", 30055),
+                        ("source/lapack-netlib/SRC/zlatrz.f", 5910),
+                        ("source/lapack-netlib/SRC/zlauu2.f", 5948),
+                        ("source/lapack-netlib/SRC/zlauum.f", 6710),
+                        ("source/lapack-netlib/SRC/zpbcon.f", 7911),
+                        ("source/lapack-netlib/SRC/zpbequ.f", 6728),
+                        ("source/lapack-netlib/SRC/zpbrfs.f", 13900),
+                        ("source/lapack-netlib/SRC/zpbstf.f", 9789),
+                        ("source/lapack-netlib/SRC/zpbsv.f", 6966),
+                        ("source/lapack-netlib/SRC/zpbsvx.f", 18207),
+                        ("source/lapack-netlib/SRC/zpbtf2.f", 7864),
+                        ("source/lapack-netlib/SRC/zpbtrf.f", 13989),
+                        ("source/lapack-netlib/SRC/zpbtrs.f", 6040),
+                        ("source/lapack-netlib/SRC/zpftrf.f", 15363),
+                        ("source/lapack-netlib/SRC/zpftri.f", 14259),
+                        ("source/lapack-netlib/SRC/zpftrs.f", 9217),
+                        ("source/lapack-netlib/SRC/zpocon.f", 7222),
+                        ("source/lapack-netlib/SRC/zpoequ.f", 5604),
+                        ("source/lapack-netlib/SRC/zpoequb.f", 5876),
+                        ("source/lapack-netlib/SRC/zporfs.f", 13413),
+                        ("source/lapack-netlib/SRC/zporfsx.f", 26454),
+                        ("source/lapack-netlib/SRC/zposv.f", 5711),
+                        ("source/lapack-netlib/SRC/zposvx.f", 16776),
+                        ("source/lapack-netlib/SRC/zposvxx.f", 26401),
+                        ("source/lapack-netlib/SRC/zpotf2.f", 6912),
+                        ("source/lapack-netlib/SRC/zpotrf.f", 7397),
+                        ("source/lapack-netlib/SRC/zpotrf2.f", 6485),
+                        ("source/lapack-netlib/SRC/zpotri.f", 4180),
+                        ("source/lapack-netlib/SRC/zpotrs.f", 5428),
+                        ("source/lapack-netlib/SRC/zppcon.f", 7184),
+                        ("source/lapack-netlib/SRC/zppequ.f", 6575),
+                        ("source/lapack-netlib/SRC/zpprfs.f", 13139),
+                        ("source/lapack-netlib/SRC/zppsv.f", 5937),
+                        ("source/lapack-netlib/SRC/zppsvx.f", 16700),
+                        ("source/lapack-netlib/SRC/zpptrf.f", 6478),
+                        ("source/lapack-netlib/SRC/zpptri.f", 5179),
+                        ("source/lapack-netlib/SRC/zpptrs.f", 5443),
+                        ("source/lapack-netlib/SRC/zpstf2.f", 11899),
+                        ("source/lapack-netlib/SRC/zpstrf.f", 14174),
+                        ("source/lapack-netlib/SRC/zptcon.f", 5832),
+                        ("source/lapack-netlib/SRC/zpteqr.f", 7847),
+                        ("source/lapack-netlib/SRC/zptrfs.f", 14749),
+                        ("source/lapack-netlib/SRC/zptsv.f", 4934),
+                        ("source/lapack-netlib/SRC/zptsvx.f", 11174),
+                        ("source/lapack-netlib/SRC/zpttrf.f", 6018),
+                        ("source/lapack-netlib/SRC/zpttrs.f", 5787),
+                        ("source/lapack-netlib/SRC/zptts2.f", 6946),
+                        ("source/lapack-netlib/SRC/zrot.f", 4206),
+                        ("source/lapack-netlib/SRC/zspcon.f", 6234),
+                        ("source/lapack-netlib/SRC/zspmv.f", 10008),
+                        ("source/lapack-netlib/SRC/zspr.f", 8395),
+                        ("source/lapack-netlib/SRC/zsprfs.f", 13465),
+                        ("source/lapack-netlib/SRC/zspsv.f", 6945),
+                        ("source/lapack-netlib/SRC/zspsvx.f", 13208),
+                        ("source/lapack-netlib/SRC/zsptrf.f", 19246),
+                        ("source/lapack-netlib/SRC/zsptri.f", 11846),
+                        ("source/lapack-netlib/SRC/zsptrs.f", 12629),
+                        ("source/lapack-netlib/SRC/zstedc.f", 16144),
+                        ("source/lapack-netlib/SRC/zstegr.f", 9818),
+                        ("source/lapack-netlib/SRC/zstein.f", 14126),
+                        ("source/lapack-netlib/SRC/zstemr.f", 27847),
+                        ("source/lapack-netlib/SRC/zsteqr.f", 15768),
+                        ("source/lapack-netlib/SRC/zsycon.f", 6423),
+                        ("source/lapack-netlib/SRC/zsycon_rook.f", 6981),
+                        ("source/lapack-netlib/SRC/zsyconv.f", 9387),
+                        ("source/lapack-netlib/SRC/zsyequb.f", 10098),
+                        ("source/lapack-netlib/SRC/zsymv.f", 9990),
+                        ("source/lapack-netlib/SRC/zsyr.f", 7776),
+                        ("source/lapack-netlib/SRC/zsyrfs.f", 13819),
+                        ("source/lapack-netlib/SRC/zsyrfsx.f", 26847),
+                        ("source/lapack-netlib/SRC/zsysv.f", 8415),
+                        ("source/lapack-netlib/SRC/zsysv_rook.f", 9204),
+                        ("source/lapack-netlib/SRC/zsysvx.f", 14318),
+                        ("source/lapack-netlib/SRC/zsysvxx.f", 27072),
+                        ("source/lapack-netlib/SRC/zsyswapr.f", 5177),
+                        ("source/lapack-netlib/SRC/zsytf2.f", 18758),
+                        ("source/lapack-netlib/SRC/zsytf2_rook.f", 25232),
+                        ("source/lapack-netlib/SRC/zsytrf.f", 11084),
+                        ("source/lapack-netlib/SRC/zsytrf_rook.f", 12102),
+                        ("source/lapack-netlib/SRC/zsytri.f", 11146),
+                        ("source/lapack-netlib/SRC/zsytri2.f", 6006),
+                        ("source/lapack-netlib/SRC/zsytri2x.f", 16066),
+                        ("source/lapack-netlib/SRC/zsytri_rook.f", 13437),
+                        ("source/lapack-netlib/SRC/zsytrs.f", 12446),
+                        ("source/lapack-netlib/SRC/zsytrs2.f", 10442),
+                        ("source/lapack-netlib/SRC/zsytrs_rook.f", 13693),
+                        ("source/lapack-netlib/SRC/ztbcon.f", 8252),
+                        ("source/lapack-netlib/SRC/ztbrfs.f", 15620),
+                        ("source/lapack-netlib/SRC/ztbtrs.f", 6826),
+                        ("source/lapack-netlib/SRC/ztfsm.f", 35670),
+                        ("source/lapack-netlib/SRC/ztftri.f", 15845),
+                        ("source/lapack-netlib/SRC/ztfttp.f", 15775),
+                        ("source/lapack-netlib/SRC/ztfttr.f", 15928),
+                        ("source/lapack-netlib/SRC/ztgevc.f", 23397),
+                        ("source/lapack-netlib/SRC/ztgex2.f", 11512),
+                        ("source/lapack-netlib/SRC/ztgexc.f", 8944),
+                        ("source/lapack-netlib/SRC/ztgsen.f", 26744),
+                        ("source/lapack-netlib/SRC/ztgsja.f", 20067),
+                        ("source/lapack-netlib/SRC/ztgsna.f", 16817),
+                        ("source/lapack-netlib/SRC/ztgsy2.f", 15203),
+                        ("source/lapack-netlib/SRC/ztgsyl.f", 23851),
+                        ("source/lapack-netlib/SRC/ztpcon.f", 7689),
+                        ("source/lapack-netlib/SRC/ztpmqrt.f", 10574),
+                        ("source/lapack-netlib/SRC/ztpqrt.f", 7922),
+                        ("source/lapack-netlib/SRC/ztpqrt2.f", 8760),
+                        ("source/lapack-netlib/SRC/ztprfb.f", 26311),
+                        ("source/lapack-netlib/SRC/ztprfs.f", 15096),
+                        ("source/lapack-netlib/SRC/ztptri.f", 6706),
+                        ("source/lapack-netlib/SRC/ztptrs.f", 6264),
+                        ("source/lapack-netlib/SRC/ztpttf.f", 15735),
+                        ("source/lapack-netlib/SRC/ztpttr.f", 4819),
+                        ("source/lapack-netlib/SRC/ztrcon.f", 8059),
+                        ("source/lapack-netlib/SRC/ztrevc.f", 14976),
+                        ("source/lapack-netlib/SRC/ztrexc.f", 6391),
+                        ("source/lapack-netlib/SRC/ztrrfs.f", 14955),
+                        ("source/lapack-netlib/SRC/ztrsen.f", 13907),
+                        ("source/lapack-netlib/SRC/ztrsna.f", 14291),
+                        ("source/lapack-netlib/SRC/ztrsyl.f", 13703),
+                        ("source/lapack-netlib/SRC/ztrti2.f", 5937),
+                        ("source/lapack-netlib/SRC/ztrtri.f", 6968),
+                        ("source/lapack-netlib/SRC/ztrtrs.f", 6458),
+                        ("source/lapack-netlib/SRC/ztrttf.f", 15914),
+                        ("source/lapack-netlib/SRC/ztrttp.f", 4817),
+                        ("source/lapack-netlib/SRC/ztzrzf.f", 8559),
+                        ("source/lapack-netlib/SRC/zunbdb.f", 23986),
+                        ("source/lapack-netlib/SRC/zunbdb1.f", 10122),
+                        ("source/lapack-netlib/SRC/zunbdb2.f", 10485),
+                        ("source/lapack-netlib/SRC/zunbdb3.f", 10406),
+                        ("source/lapack-netlib/SRC/zunbdb4.f", 12673),
+                        ("source/lapack-netlib/SRC/zunbdb5.f", 7340),
+                        ("source/lapack-netlib/SRC/zunbdb6.f", 8373),
+                        ("source/lapack-netlib/SRC/zuncsd.f", 22525),
+                        ("source/lapack-netlib/SRC/zuncsd2by1.f", 26385),
+                        ("source/lapack-netlib/SRC/zung2l.f", 5306),
+                        ("source/lapack-netlib/SRC/zung2r.f", 5200),
+                        ("source/lapack-netlib/SRC/zungbr.f", 9966),
+                        ("source/lapack-netlib/SRC/zunghr.f", 6615),
+                        ("source/lapack-netlib/SRC/zungl2.f", 5559),
+                        ("source/lapack-netlib/SRC/zunglq.f", 8069),
+                        ("source/lapack-netlib/SRC/zungql.f", 8214),
+                        ("source/lapack-netlib/SRC/zungqr.f", 8088),
+                        ("source/lapack-netlib/SRC/zungr2.f", 5531),
+                        ("source/lapack-netlib/SRC/zungrq.f", 8208),
+                        ("source/lapack-netlib/SRC/zungtr.f", 7089),
+                        ("source/lapack-netlib/SRC/zunm22.f", 13678),
+                        ("source/lapack-netlib/SRC/zunm2l.f", 7461),
+                        ("source/lapack-netlib/SRC/zunm2r.f", 7548),
+                        ("source/lapack-netlib/SRC/zunmbr.f", 11131),
+                        ("source/lapack-netlib/SRC/zunmhr.f", 8375),
+                        ("source/lapack-netlib/SRC/zunml2.f", 7738),
+                        ("source/lapack-netlib/SRC/zunmlq.f", 9555),
+                        ("source/lapack-netlib/SRC/zunmql.f", 9403),
+                        ("source/lapack-netlib/SRC/zunmqr.f", 9385),
+                        ("source/lapack-netlib/SRC/zunmr2.f", 7603),
+                        ("source/lapack-netlib/SRC/zunmr3.f", 8053),
+                        ("source/lapack-netlib/SRC/zunmrq.f", 9589),
+                        ("source/lapack-netlib/SRC/zunmrz.f", 10590),
+                        ("source/lapack-netlib/SRC/zunmtr.f", 8803),
+                        ("source/lapack-netlib/SRC/zupgtr.f", 6122),
+                        ("source/lapack-netlib/SRC/zupmtr.f", 9084),
+                        ("source/lapack-netlib/TESTING/cbak.in", 12158),
+                        ("source/lapack-netlib/TESTING/cbal.in", 19639),
+                        ("source/lapack-netlib/TESTING/cbb.in", 658),
+                        ("source/lapack-netlib/TESTING/cec.in", 27310),
+                        ("source/lapack-netlib/TESTING/ced.in", 29109),
+                        ("source/lapack-netlib/TESTING/cgbak.in", 28622),
+                        ("source/lapack-netlib/TESTING/cgbal.in", 40882),
+                        ("source/lapack-netlib/TESTING/cgd.in", 5920),
+                        ("source/lapack-netlib/TESTING/cgg.in", 955),
+                        ("source/lapack-netlib/TESTING/CMakeLists.txt", 6060),
+                        ("source/lapack-netlib/TESTING/csb.in", 477),
+                        ("source/lapack-netlib/TESTING/csd.in", 659),
+                        ("source/lapack-netlib/TESTING/csg.in", 761),
+                        ("source/lapack-netlib/TESTING/ctest.in", 2440),
+                        ("source/lapack-netlib/TESTING/ctest_rfp.in", 589),
+                        ("source/lapack-netlib/TESTING/dbak.in", 5991),
+                        ("source/lapack-netlib/TESTING/dbal.in", 10552),
+                        ("source/lapack-netlib/TESTING/dbb.in", 658),
+                        ("source/lapack-netlib/TESTING/dec.in", 53717),
+                        ("source/lapack-netlib/TESTING/ded.in", 48253),
+                        ("source/lapack-netlib/TESTING/dgbak.in", 11408),
+                        ("source/lapack-netlib/TESTING/dgbal.in", 15499),
+                        ("source/lapack-netlib/TESTING/dgd.in", 4398),
+                        ("source/lapack-netlib/TESTING/dgg.in", 955),
+                        ("source/lapack-netlib/TESTING/dsb.in", 477),
+                        ("source/lapack-netlib/TESTING/dsg.in", 761),
+                        ("source/lapack-netlib/TESTING/dstest.in", 784),
+                        ("source/lapack-netlib/TESTING/dtest.in", 2247),
+                        ("source/lapack-netlib/TESTING/dtest_rfp.in", 598),
+                        ("source/lapack-netlib/TESTING/EIG/alahdg.f", 10869),
+                        ("source/lapack-netlib/TESTING/EIG/alareq.f", 6212),
+                        ("source/lapack-netlib/TESTING/EIG/alarqg.f", 6212),
+                        ("source/lapack-netlib/TESTING/EIG/alasmg.f", 2575),
+                        ("source/lapack-netlib/TESTING/EIG/alasum.f", 2575),
+                        ("source/lapack-netlib/TESTING/EIG/alasvm.f", 2588),
+                        ("source/lapack-netlib/TESTING/EIG/cbdt01.f", 8606),
+                        ("source/lapack-netlib/TESTING/EIG/cbdt02.f", 5091),
+                        ("source/lapack-netlib/TESTING/EIG/cbdt03.f", 7624),
+                        ("source/lapack-netlib/TESTING/EIG/cbdt05.f", 5817),
+                        ("source/lapack-netlib/TESTING/EIG/cchkbb.f", 23492),
+                        ("source/lapack-netlib/TESTING/EIG/cchkbd.f", 33340),
+                        ("source/lapack-netlib/TESTING/EIG/cchkbk.f", 4296),
+                        ("source/lapack-netlib/TESTING/EIG/cchkbl.f", 4817),
+                        ("source/lapack-netlib/TESTING/EIG/cchkec.f", 5483),
+                        ("source/lapack-netlib/TESTING/EIG/cchkee.f", 89915),
+                        ("source/lapack-netlib/TESTING/EIG/cchkgg.f", 45328),
+                        ("source/lapack-netlib/TESTING/EIG/cchkgk.f", 7223),
+                        ("source/lapack-netlib/TESTING/EIG/cchkgl.f", 4956),
+                        ("source/lapack-netlib/TESTING/EIG/cchkhb.f", 24934),
+                        ("source/lapack-netlib/TESTING/EIG/cchkhs.f", 39298),
+                        ("source/lapack-netlib/TESTING/EIG/cchkst.f", 68880),
+                        ("source/lapack-netlib/TESTING/EIG/cckcsd.f", 12013),
+                        ("source/lapack-netlib/TESTING/EIG/cckglm.f", 9352),
+                        ("source/lapack-netlib/TESTING/EIG/cckgqr.f", 12525),
+                        ("source/lapack-netlib/TESTING/EIG/cckgsv.f", 9712),
+                        ("source/lapack-netlib/TESTING/EIG/ccklse.f", 10053),
+                        ("source/lapack-netlib/TESTING/EIG/ccsdts.f", 18134),
+                        ("source/lapack-netlib/TESTING/EIG/cdrges.f", 34109),
+                        ("source/lapack-netlib/TESTING/EIG/cdrges3.f", 34153),
+                        ("source/lapack-netlib/TESTING/EIG/cdrgev.f", 33997),
+                        ("source/lapack-netlib/TESTING/EIG/cdrgev3.f", 34110),
+                        ("source/lapack-netlib/TESTING/EIG/cdrgsx.f", 33148),
+                        ("source/lapack-netlib/TESTING/EIG/cdrgvx.f", 25143),
+                        ("source/lapack-netlib/TESTING/EIG/cdrvbd.f", 46560),
+                        ("source/lapack-netlib/TESTING/EIG/cdrves.f", 31886),
+                        ("source/lapack-netlib/TESTING/EIG/cdrvev.f", 33008),
+                        ("source/lapack-netlib/TESTING/EIG/cdrvsg.f", 47929),
+                        ("source/lapack-netlib/TESTING/EIG/cdrvst.f", 75073),
+                        ("source/lapack-netlib/TESTING/EIG/cdrvsx.f", 33159),
+                        ("source/lapack-netlib/TESTING/EIG/cdrvvx.f", 35223),
+                        ("source/lapack-netlib/TESTING/EIG/cerrbd.f", 9123),
+                        ("source/lapack-netlib/TESTING/EIG/cerrec.f", 8883),
+                        ("source/lapack-netlib/TESTING/EIG/cerred.f", 19319),
+                        ("source/lapack-netlib/TESTING/EIG/cerrgg.f", 50887),
+                        ("source/lapack-netlib/TESTING/EIG/cerrhs.f", 14693),
+                        ("source/lapack-netlib/TESTING/EIG/cerrst.f", 30896),
+                        ("source/lapack-netlib/TESTING/EIG/cget02.f", 5954),
+                        ("source/lapack-netlib/TESTING/EIG/cget10.f", 4196),
+                        ("source/lapack-netlib/TESTING/EIG/cget22.f", 8575),
+                        ("source/lapack-netlib/TESTING/EIG/cget23.f", 27301),
+                        ("source/lapack-netlib/TESTING/EIG/cget24.f", 30403),
+                        ("source/lapack-netlib/TESTING/EIG/cget35.f", 7874),
+                        ("source/lapack-netlib/TESTING/EIG/cget36.f", 5826),
+                        ("source/lapack-netlib/TESTING/EIG/cget37.f", 18701),
+                        ("source/lapack-netlib/TESTING/EIG/cget38.f", 15905),
+                        ("source/lapack-netlib/TESTING/EIG/cget51.f", 7330),
+                        ("source/lapack-netlib/TESTING/EIG/cget52.f", 8527),
+                        ("source/lapack-netlib/TESTING/EIG/cget54.f", 6758),
+                        ("source/lapack-netlib/TESTING/EIG/cglmts.f", 6201),
+                        ("source/lapack-netlib/TESTING/EIG/cgqrts.f", 9809),
+                        ("source/lapack-netlib/TESTING/EIG/cgrqts.f", 9813),
+                        ("source/lapack-netlib/TESTING/EIG/cgsvts3.f", 11254),
+                        ("source/lapack-netlib/TESTING/EIG/chbt21.f", 8054),
+                        ("source/lapack-netlib/TESTING/EIG/chet21.f", 13216),
+                        ("source/lapack-netlib/TESTING/EIG/chet22.f", 8403),
+                        ("source/lapack-netlib/TESTING/EIG/chkxer.f", 1638),
+                        ("source/lapack-netlib/TESTING/EIG/chpt21.f", 14471),
+                        ("source/lapack-netlib/TESTING/EIG/chst01.f", 6165),
+                        ("source/lapack-netlib/TESTING/EIG/clarfy.f", 4029),
+                        ("source/lapack-netlib/TESTING/EIG/clarhs.f", 13501),
+                        ("source/lapack-netlib/TESTING/EIG/clatm4.f", 11715),
+                        ("source/lapack-netlib/TESTING/EIG/clctes.f", 2782),
+                        ("source/lapack-netlib/TESTING/EIG/clctsx.f", 2792),
+                        ("source/lapack-netlib/TESTING/EIG/clsets.f", 5511),
+                        ("source/lapack-netlib/TESTING/EIG/CMakeLists.txt", 5422),
+                        ("source/lapack-netlib/TESTING/EIG/csbmv.f", 10728),
+                        ("source/lapack-netlib/TESTING/EIG/csgt01.f", 6817),
+                        ("source/lapack-netlib/TESTING/EIG/cslect.f", 2805),
+                        ("source/lapack-netlib/TESTING/EIG/cstt21.f", 6826),
+                        ("source/lapack-netlib/TESTING/EIG/cstt22.f", 7394),
+                        ("source/lapack-netlib/TESTING/EIG/cunt01.f", 6887),
+                        ("source/lapack-netlib/TESTING/EIG/cunt03.f", 8511),
+                        ("source/lapack-netlib/TESTING/EIG/dbdt01.f", 8393),
+                        ("source/lapack-netlib/TESTING/EIG/dbdt02.f", 4869),
+                        ("source/lapack-netlib/TESTING/EIG/dbdt03.f", 7634),
+                        ("source/lapack-netlib/TESTING/EIG/dbdt04.f", 6681),
+                        ("source/lapack-netlib/TESTING/EIG/dbdt05.f", 5634),
+                        ("source/lapack-netlib/TESTING/EIG/dchkbb.f", 23201),
+                        ("source/lapack-netlib/TESTING/EIG/dchkbd.f", 53366),
+                        ("source/lapack-netlib/TESTING/EIG/dchkbk.f", 4033),
+                        ("source/lapack-netlib/TESTING/EIG/dchkbl.f", 4566),
+                        ("source/lapack-netlib/TESTING/EIG/dchkec.f", 7610),
+                        ("source/lapack-netlib/TESTING/EIG/dchkee.f", 89775),
+                        ("source/lapack-netlib/TESTING/EIG/dchkgg.f", 45262),
+                        ("source/lapack-netlib/TESTING/EIG/dchkgk.f", 6775),
+                        ("source/lapack-netlib/TESTING/EIG/dchkgl.f", 4940),
+                        ("source/lapack-netlib/TESTING/EIG/dchkhs.f", 40987),
+                        ("source/lapack-netlib/TESTING/EIG/dchksb.f", 24708),
+                        ("source/lapack-netlib/TESTING/EIG/dchkst.f", 68000),
+                        ("source/lapack-netlib/TESTING/EIG/dckcsd.f", 11903),
+                        ("source/lapack-netlib/TESTING/EIG/dckglm.f", 9379),
+                        ("source/lapack-netlib/TESTING/EIG/dckgqr.f", 12788),
+                        ("source/lapack-netlib/TESTING/EIG/dckgsv.f", 9801),
+                        ("source/lapack-netlib/TESTING/EIG/dcklse.f", 10080),
+                        ("source/lapack-netlib/TESTING/EIG/dcsdts.f", 17997),
+                        ("source/lapack-netlib/TESTING/EIG/ddrges.f", 37118),
+                        ("source/lapack-netlib/TESTING/EIG/ddrges3.f", 37140),
+                        ("source/lapack-netlib/TESTING/EIG/ddrgev.f", 34064),
+                        ("source/lapack-netlib/TESTING/EIG/ddrgev3.f", 34086),
+                        ("source/lapack-netlib/TESTING/EIG/ddrgsx.f", 36255),
+                        ("source/lapack-netlib/TESTING/EIG/ddrgvx.f", 25322),
+                        ("source/lapack-netlib/TESTING/EIG/ddrvbd.f", 42932),
+                        ("source/lapack-netlib/TESTING/EIG/ddrves.f", 34304),
+                        ("source/lapack-netlib/TESTING/EIG/ddrvev.f", 34327),
+                        ("source/lapack-netlib/TESTING/EIG/ddrvsg.f", 47083),
+                        ("source/lapack-netlib/TESTING/EIG/ddrvst.f", 105211),
+                        ("source/lapack-netlib/TESTING/EIG/ddrvsx.f", 33858),
+                        ("source/lapack-netlib/TESTING/EIG/ddrvvx.f", 36155),
+                        ("source/lapack-netlib/TESTING/EIG/derrbd.f", 13088),
+                        ("source/lapack-netlib/TESTING/EIG/derrec.f", 9467),
+                        ("source/lapack-netlib/TESTING/EIG/derred.f", 19169),
+                        ("source/lapack-netlib/TESTING/EIG/derrgg.f", 50305),
+                        ("source/lapack-netlib/TESTING/EIG/derrhs.f", 14767),
+                        ("source/lapack-netlib/TESTING/EIG/derrst.f", 36526),
+                        ("source/lapack-netlib/TESTING/EIG/dget02.f", 5919),
+                        ("source/lapack-netlib/TESTING/EIG/dget10.f", 4030),
+                        ("source/lapack-netlib/TESTING/EIG/dget22.f", 10856),
+                        ("source/lapack-netlib/TESTING/EIG/dget23.f", 28176),
+                        ("source/lapack-netlib/TESTING/EIG/dget24.f", 32521),
+                        ("source/lapack-netlib/TESTING/EIG/dget31.f", 22396),
+                        ("source/lapack-netlib/TESTING/EIG/dget32.f", 18269),
+                        ("source/lapack-netlib/TESTING/EIG/dget33.f", 7408),
+                        ("source/lapack-netlib/TESTING/EIG/dget34.f", 15918),
+                        ("source/lapack-netlib/TESTING/EIG/dget35.f", 9338),
+                        ("source/lapack-netlib/TESTING/EIG/dget36.f", 6481),
+                        ("source/lapack-netlib/TESTING/EIG/dget37.f", 19258),
+                        ("source/lapack-netlib/TESTING/EIG/dget38.f", 15952),
+                        ("source/lapack-netlib/TESTING/EIG/dget39.f", 12759),
+                        ("source/lapack-netlib/TESTING/EIG/dget51.f", 7061),
+                        ("source/lapack-netlib/TESTING/EIG/dget52.f", 12869),
+                        ("source/lapack-netlib/TESTING/EIG/dget53.f", 7159),
+                        ("source/lapack-netlib/TESTING/EIG/dget54.f", 6671),
+                        ("source/lapack-netlib/TESTING/EIG/dglmts.f", 6002),
+                        ("source/lapack-netlib/TESTING/EIG/dgqrts.f", 9795),
+                        ("source/lapack-netlib/TESTING/EIG/dgrqts.f", 9808),
+                        ("source/lapack-netlib/TESTING/EIG/dgsvts3.f", 11224),
+                        ("source/lapack-netlib/TESTING/EIG/dhst01.f", 5950),
+                        ("source/lapack-netlib/TESTING/EIG/dlafts.f", 5956),
+                        ("source/lapack-netlib/TESTING/EIG/dlahd2.f", 21252),
+                        ("source/lapack-netlib/TESTING/EIG/dlarfy.f", 3975),
+                        ("source/lapack-netlib/TESTING/EIG/dlarhs.f", 12467),
+                        ("source/lapack-netlib/TESTING/EIG/dlasum.f", 1750),
+                        ("source/lapack-netlib/TESTING/EIG/dlatb9.f", 9404),
+                        ("source/lapack-netlib/TESTING/EIG/dlatm4.f", 13306),
+                        ("source/lapack-netlib/TESTING/EIG/dlctes.f", 2431),
+                        ("source/lapack-netlib/TESTING/EIG/dlctsx.f", 2872),
+                        ("source/lapack-netlib/TESTING/EIG/dlsets.f", 5365),
+                        ("source/lapack-netlib/TESTING/EIG/dort01.f", 6323),
+                        ("source/lapack-netlib/TESTING/EIG/dort03.f", 7707),
+                        ("source/lapack-netlib/TESTING/EIG/dsbt21.f", 7862),
+                        ("source/lapack-netlib/TESTING/EIG/dsgt01.f", 6528),
+                        ("source/lapack-netlib/TESTING/EIG/dslect.f", 3038),
+                        ("source/lapack-netlib/TESTING/EIG/dspt21.f", 14115),
+                        ("source/lapack-netlib/TESTING/EIG/dstech.f", 6105),
+                        ("source/lapack-netlib/TESTING/EIG/dstect.f", 4541),
+                        ("source/lapack-netlib/TESTING/EIG/dstt21.f", 6540),
+                        ("source/lapack-netlib/TESTING/EIG/dstt22.f", 7138),
+                        ("source/lapack-netlib/TESTING/EIG/dsvdch.f", 5781),
+                        ("source/lapack-netlib/TESTING/EIG/dsvdct.f", 5363),
+                        ("source/lapack-netlib/TESTING/EIG/dsxt1.f", 4108),
+                        ("source/lapack-netlib/TESTING/EIG/dsyt21.f", 12941),
+                        ("source/lapack-netlib/TESTING/EIG/dsyt22.f", 8199),
+                        ("source/lapack-netlib/TESTING/EIG/ilaenv.f", 10260),
+                        ("source/lapack-netlib/TESTING/EIG/Makefile", 6403),
+                        ("source/lapack-netlib/TESTING/EIG/sbdt01.f", 8309),
+                        ("source/lapack-netlib/TESTING/EIG/sbdt02.f", 4809),
+                        ("source/lapack-netlib/TESTING/EIG/sbdt03.f", 7550),
+                        ("source/lapack-netlib/TESTING/EIG/sbdt04.f", 6597),
+                        ("source/lapack-netlib/TESTING/EIG/sbdt05.f", 5562),
+                        ("source/lapack-netlib/TESTING/EIG/schkbb.f", 23069),
+                        ("source/lapack-netlib/TESTING/EIG/schkbd.f", 53198),
+                        ("source/lapack-netlib/TESTING/EIG/schkbk.f", 4033),
+                        ("source/lapack-netlib/TESTING/EIG/schkbl.f", 4566),
+                        ("source/lapack-netlib/TESTING/EIG/schkec.f", 7598),
+                        ("source/lapack-netlib/TESTING/EIG/schkee.f", 89792),
+                        ("source/lapack-netlib/TESTING/EIG/schkgg.f", 44968),
+                        ("source/lapack-netlib/TESTING/EIG/schkgk.f", 6775),
+                        ("source/lapack-netlib/TESTING/EIG/schkgl.f", 4940),
+                        ("source/lapack-netlib/TESTING/EIG/schkhs.f", 40719),
+                        ("source/lapack-netlib/TESTING/EIG/schksb.f", 24624),
+                        ("source/lapack-netlib/TESTING/EIG/schkst.f", 67748),
+                        ("source/lapack-netlib/TESTING/EIG/sckcsd.f", 11782),
+                        ("source/lapack-netlib/TESTING/EIG/sckglm.f", 9283),
+                        ("source/lapack-netlib/TESTING/EIG/sckgqr.f", 12620),
+                        ("source/lapack-netlib/TESTING/EIG/sckgsv.f", 9645),
+                        ("source/lapack-netlib/TESTING/EIG/scklse.f", 9984),
+                        ("source/lapack-netlib/TESTING/EIG/scsdts.f", 17873),
+                        ("source/lapack-netlib/TESTING/EIG/sdrges.f", 36972),
+                        ("source/lapack-netlib/TESTING/EIG/sdrges3.f", 36996),
+                        ("source/lapack-netlib/TESTING/EIG/sdrgev.f", 33880),
+                        ("source/lapack-netlib/TESTING/EIG/sdrgev3.f", 33906),
+                        ("source/lapack-netlib/TESTING/EIG/sdrgsx.f", 36166),
+                        ("source/lapack-netlib/TESTING/EIG/sdrgvx.f", 25160),
+                        ("source/lapack-netlib/TESTING/EIG/sdrvbd.f", 42801),
+                        ("source/lapack-netlib/TESTING/EIG/sdrves.f", 34172),
+                        ("source/lapack-netlib/TESTING/EIG/sdrvev.f", 34183),
+                        ("source/lapack-netlib/TESTING/EIG/sdrvsg.f", 46951),
+                        ("source/lapack-netlib/TESTING/EIG/sdrvst.f", 105019),
+                        ("source/lapack-netlib/TESTING/EIG/sdrvsx.f", 33690),
+                        ("source/lapack-netlib/TESTING/EIG/sdrvvx.f", 35912),
+                        ("source/lapack-netlib/TESTING/EIG/serrbd.f", 13088),
+                        ("source/lapack-netlib/TESTING/EIG/serrec.f", 9455),
+                        ("source/lapack-netlib/TESTING/EIG/serred.f", 19159),
+                        ("source/lapack-netlib/TESTING/EIG/serrgg.f", 50240),
+                        ("source/lapack-netlib/TESTING/EIG/serrhs.f", 14742),
+                        ("source/lapack-netlib/TESTING/EIG/serrst.f", 36068),
+                        ("source/lapack-netlib/TESTING/EIG/sget02.f", 5859),
+                        ("source/lapack-netlib/TESTING/EIG/sget10.f", 3982),
+                        ("source/lapack-netlib/TESTING/EIG/sget22.f", 10780),
+                        ("source/lapack-netlib/TESTING/EIG/sget23.f", 27936),
+                        ("source/lapack-netlib/TESTING/EIG/sget24.f", 32329),
+                        ("source/lapack-netlib/TESTING/EIG/sget31.f", 22384),
+                        ("source/lapack-netlib/TESTING/EIG/sget32.f", 18257),
+                        ("source/lapack-netlib/TESTING/EIG/sget33.f", 7396),
+                        ("source/lapack-netlib/TESTING/EIG/sget34.f", 15890),
+                        ("source/lapack-netlib/TESTING/EIG/sget35.f", 9318),
+                        ("source/lapack-netlib/TESTING/EIG/sget36.f", 6469),
+                        ("source/lapack-netlib/TESTING/EIG/sget37.f", 19246),
+                        ("source/lapack-netlib/TESTING/EIG/sget38.f", 15940),
+                        ("source/lapack-netlib/TESTING/EIG/sget39.f", 12743),
+                        ("source/lapack-netlib/TESTING/EIG/sget51.f", 6987),
+                        ("source/lapack-netlib/TESTING/EIG/sget52.f", 12768),
+                        ("source/lapack-netlib/TESTING/EIG/sget53.f", 7083),
+                        ("source/lapack-netlib/TESTING/EIG/sget54.f", 6575),
+                        ("source/lapack-netlib/TESTING/EIG/sglmts.f", 6062),
+                        ("source/lapack-netlib/TESTING/EIG/sgqrts.f", 9563),
+                        ("source/lapack-netlib/TESTING/EIG/sgrqts.f", 9631),
+                        ("source/lapack-netlib/TESTING/EIG/sgsvts3.f", 11068),
+                        ("source/lapack-netlib/TESTING/EIG/shst01.f", 5890),
+                        ("source/lapack-netlib/TESTING/EIG/slafts.f", 5928),
+                        ("source/lapack-netlib/TESTING/EIG/slahd2.f", 21252),
+                        ("source/lapack-netlib/TESTING/EIG/slarfy.f", 3927),
+                        ("source/lapack-netlib/TESTING/EIG/slarhs.f", 12431),
+                        ("source/lapack-netlib/TESTING/EIG/slasum.f", 1698),
+                        ("source/lapack-netlib/TESTING/EIG/slatb9.f", 9346),
+                        ("source/lapack-netlib/TESTING/EIG/slatm4.f", 13258),
+                        ("source/lapack-netlib/TESTING/EIG/slctes.f", 2395),
+                        ("source/lapack-netlib/TESTING/EIG/slctsx.f", 2836),
+                        ("source/lapack-netlib/TESTING/EIG/slsets.f", 5482),
+                        ("source/lapack-netlib/TESTING/EIG/sort01.f", 6282),
+                        ("source/lapack-netlib/TESTING/EIG/sort03.f", 7659),
+                        ("source/lapack-netlib/TESTING/EIG/ssbt21.f", 7790),
+                        ("source/lapack-netlib/TESTING/EIG/ssgt01.f", 6456),
+                        ("source/lapack-netlib/TESTING/EIG/sslect.f", 3014),
+                        ("source/lapack-netlib/TESTING/EIG/sspt21.f", 14019),
+                        ("source/lapack-netlib/TESTING/EIG/sstech.f", 6045),
+                        ("source/lapack-netlib/TESTING/EIG/sstect.f", 4505),
+                        ("source/lapack-netlib/TESTING/EIG/sstt21.f", 6456),
+                        ("source/lapack-netlib/TESTING/EIG/sstt22.f", 7054),
+                        ("source/lapack-netlib/TESTING/EIG/ssvdch.f", 5733),
+                        ("source/lapack-netlib/TESTING/EIG/ssvdct.f", 5327),
+                        ("source/lapack-netlib/TESTING/EIG/ssxt1.f", 4048),
+                        ("source/lapack-netlib/TESTING/EIG/ssyt21.f", 12845),
+                        ("source/lapack-netlib/TESTING/EIG/ssyt22.f", 8095),
+                        ("source/lapack-netlib/TESTING/EIG/xerbla.f", 3664),
+                        ("source/lapack-netlib/TESTING/EIG/xlaenv.f", 3625),
+                        ("source/lapack-netlib/TESTING/EIG/zbdt01.f", 8679),
+                        ("source/lapack-netlib/TESTING/EIG/zbdt02.f", 5132),
+                        ("source/lapack-netlib/TESTING/EIG/zbdt03.f", 7690),
+                        ("source/lapack-netlib/TESTING/EIG/zbdt05.f", 5854),
+                        ("source/lapack-netlib/TESTING/EIG/zchkbb.f", 23593),
+                        ("source/lapack-netlib/TESTING/EIG/zchkbd.f", 33441),
+                        ("source/lapack-netlib/TESTING/EIG/zchkbk.f", 4298),
+                        ("source/lapack-netlib/TESTING/EIG/zchkbl.f", 4819),
+                        ("source/lapack-netlib/TESTING/EIG/zchkec.f", 5499),
+                        ("source/lapack-netlib/TESTING/EIG/zchkee.f", 89908),
+                        ("source/lapack-netlib/TESTING/EIG/zchkgg.f", 45440),
+                        ("source/lapack-netlib/TESTING/EIG/zchkgk.f", 7225),
+                        ("source/lapack-netlib/TESTING/EIG/zchkgl.f", 4958),
+                        ("source/lapack-netlib/TESTING/EIG/zchkhb.f", 25007),
+                        ("source/lapack-netlib/TESTING/EIG/zchkhs.f", 39384),
+                        ("source/lapack-netlib/TESTING/EIG/zchkst.f", 69064),
+                        ("source/lapack-netlib/TESTING/EIG/zckcsd.f", 12076),
+                        ("source/lapack-netlib/TESTING/EIG/zckglm.f", 9396),
+                        ("source/lapack-netlib/TESTING/EIG/zckgqr.f", 12587),
+                        ("source/lapack-netlib/TESTING/EIG/zckgsv.f", 9789),
+                        ("source/lapack-netlib/TESTING/EIG/zcklse.f", 10097),
+                        ("source/lapack-netlib/TESTING/EIG/zcsdts.f", 18197),
+                        ("source/lapack-netlib/TESTING/EIG/zdrges.f", 34179),
+                        ("source/lapack-netlib/TESTING/EIG/zdrges3.f", 34222),
+                        ("source/lapack-netlib/TESTING/EIG/zdrgev.f", 34076),
+                        ("source/lapack-netlib/TESTING/EIG/zdrgev3.f", 34107),
+                        ("source/lapack-netlib/TESTING/EIG/zdrgsx.f", 33235),
+                        ("source/lapack-netlib/TESTING/EIG/zdrgvx.f", 25236),
+                        ("source/lapack-netlib/TESTING/EIG/zdrvbd.f", 46645),
+                        ("source/lapack-netlib/TESTING/EIG/zdrves.f", 31948),
+                        ("source/lapack-netlib/TESTING/EIG/zdrvev.f", 33073),
+                        ("source/lapack-netlib/TESTING/EIG/zdrvsg.f", 48003),
+                        ("source/lapack-netlib/TESTING/EIG/zdrvst.f", 75201),
+                        ("source/lapack-netlib/TESTING/EIG/zdrvsx.f", 33224),
+                        ("source/lapack-netlib/TESTING/EIG/zdrvvx.f", 35383),
+                        ("source/lapack-netlib/TESTING/EIG/zerrbd.f", 9127),
+                        ("source/lapack-netlib/TESTING/EIG/zerrec.f", 8897),
+                        ("source/lapack-netlib/TESTING/EIG/zerred.f", 19343),
+                        ("source/lapack-netlib/TESTING/EIG/zerrgg.f", 50873),
+                        ("source/lapack-netlib/TESTING/EIG/zerrhs.f", 14499),
+                        ("source/lapack-netlib/TESTING/EIG/zerrst.f", 31122),
+                        ("source/lapack-netlib/TESTING/EIG/zget02.f", 5995),
+                        ("source/lapack-netlib/TESTING/EIG/zget10.f", 4231),
+                        ("source/lapack-netlib/TESTING/EIG/zget22.f", 8616),
+                        ("source/lapack-netlib/TESTING/EIG/zget23.f", 27459),
+                        ("source/lapack-netlib/TESTING/EIG/zget24.f", 30492),
+                        ("source/lapack-netlib/TESTING/EIG/zget35.f", 7896),
+                        ("source/lapack-netlib/TESTING/EIG/zget36.f", 5840),
+                        ("source/lapack-netlib/TESTING/EIG/zget37.f", 18715),
+                        ("source/lapack-netlib/TESTING/EIG/zget38.f", 15919),
+                        ("source/lapack-netlib/TESTING/EIG/zget51.f", 7371),
+                        ("source/lapack-netlib/TESTING/EIG/zget52.f", 8577),
+                        ("source/lapack-netlib/TESTING/EIG/zget54.f", 6793),
+                        ("source/lapack-netlib/TESTING/EIG/zglmts.f", 6074),
+                        ("source/lapack-netlib/TESTING/EIG/zgqrts.f", 9935),
+                        ("source/lapack-netlib/TESTING/EIG/zgrqts.f", 9944),
+                        ("source/lapack-netlib/TESTING/EIG/zgsvts3.f", 11331),
+                        ("source/lapack-netlib/TESTING/EIG/zhbt21.f", 8115),
+                        ("source/lapack-netlib/TESTING/EIG/zhet21.f", 13283),
+                        ("source/lapack-netlib/TESTING/EIG/zhet22.f", 8476),
+                        ("source/lapack-netlib/TESTING/EIG/zhpt21.f", 14547),
+                        ("source/lapack-netlib/TESTING/EIG/zhst01.f", 6208),
+                        ("source/lapack-netlib/TESTING/EIG/zlarfy.f", 4043),
+                        ("source/lapack-netlib/TESTING/EIG/zlarhs.f", 13521),
+                        ("source/lapack-netlib/TESTING/EIG/zlatm4.f", 11762),
+                        ("source/lapack-netlib/TESTING/EIG/zlctes.f", 2790),
+                        ("source/lapack-netlib/TESTING/EIG/zlctsx.f", 2815),
+                        ("source/lapack-netlib/TESTING/EIG/zlsets.f", 5332),
+                        ("source/lapack-netlib/TESTING/EIG/zsbmv.f", 10745),
+                        ("source/lapack-netlib/TESTING/EIG/zsgt01.f", 6867),
+                        ("source/lapack-netlib/TESTING/EIG/zslect.f", 2813),
+                        ("source/lapack-netlib/TESTING/EIG/zstt21.f", 6908),
+                        ("source/lapack-netlib/TESTING/EIG/zstt22.f", 7483),
+                        ("source/lapack-netlib/TESTING/EIG/zunt01.f", 6922),
+                        ("source/lapack-netlib/TESTING/EIG/zunt03.f", 8551),
+                        ("source/lapack-netlib/TESTING/glm.in", 581),
+                        ("source/lapack-netlib/TESTING/gqr.in", 498),
+                        ("source/lapack-netlib/TESTING/gsv.in", 537),
+                        ("source/lapack-netlib/TESTING/LIN/aladhd.f", 16829),
+                        ("source/lapack-netlib/TESTING/LIN/alaerh.f", 38022),
+                        ("source/lapack-netlib/TESTING/LIN/alaesm.f", 2154),
+                        ("source/lapack-netlib/TESTING/LIN/alahd.f", 37256),
+                        ("source/lapack-netlib/TESTING/LIN/alareq.f", 6212),
+                        ("source/lapack-netlib/TESTING/LIN/alasum.f", 2575),
+                        ("source/lapack-netlib/TESTING/LIN/alasvm.f", 2588),
+                        ("source/lapack-netlib/TESTING/LIN/cchkaa.f", 33641),
+                        ("source/lapack-netlib/TESTING/LIN/cchkeq.f", 16288),
+                        ("source/lapack-netlib/TESTING/LIN/cchkgb.f", 25512),
+                        ("source/lapack-netlib/TESTING/LIN/cchkge.f", 20030),
+                        ("source/lapack-netlib/TESTING/LIN/cchkgt.f", 17662),
+                        ("source/lapack-netlib/TESTING/LIN/cchkhe.f", 22429),
+                        ("source/lapack-netlib/TESTING/LIN/cchkhe_rook.f", 27445),
+                        ("source/lapack-netlib/TESTING/LIN/cchkhp.f", 18092),
+                        ("source/lapack-netlib/TESTING/LIN/cchklq.f", 13331),
+                        ("source/lapack-netlib/TESTING/LIN/cchkpb.f", 20115),
+                        ("source/lapack-netlib/TESTING/LIN/cchkpo.f", 16856),
+                        ("source/lapack-netlib/TESTING/LIN/cchkpp.f", 15817),
+                        ("source/lapack-netlib/TESTING/LIN/cchkps.f", 10528),
+                        ("source/lapack-netlib/TESTING/LIN/cchkpt.f", 16940),
+                        ("source/lapack-netlib/TESTING/LIN/cchkq3.f", 11082),
+                        ("source/lapack-netlib/TESTING/LIN/cchkql.f", 13340),
+                        ("source/lapack-netlib/TESTING/LIN/cchkqr.f", 13926),
+                        ("source/lapack-netlib/TESTING/LIN/cchkqrt.f", 5378),
+                        ("source/lapack-netlib/TESTING/LIN/cchkqrtp.f", 5538),
+                        ("source/lapack-netlib/TESTING/LIN/cchkrfp.f", 8973),
+                        ("source/lapack-netlib/TESTING/LIN/cchkrq.f", 13484),
+                        ("source/lapack-netlib/TESTING/LIN/cchksp.f", 18327),
+                        ("source/lapack-netlib/TESTING/LIN/cchksy.f", 22833),
+                        ("source/lapack-netlib/TESTING/LIN/cchksy_rook.f", 27591),
+                        ("source/lapack-netlib/TESTING/LIN/cchktb.f", 19609),
+                        ("source/lapack-netlib/TESTING/LIN/cchktp.f", 17939),
+                        ("source/lapack-netlib/TESTING/LIN/cchktr.f", 19316),
+                        ("source/lapack-netlib/TESTING/LIN/cchktz.f", 9368),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvgb.f", 32429),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvgbx.f", 40745),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvge.f", 25398),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvgex.f", 33048),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvgt.f", 19296),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvhe.f", 19671),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvhe_rook.f", 16565),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvhex.f", 23890),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvhp.f", 19762),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvls.f", 24674),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvpb.f", 24762),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvpo.f", 20767),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvpox.f", 25631),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvpp.f", 20727),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvpt.f", 18028),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvrf1.f", 8075),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvrf2.f", 7076),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvrf3.f", 12540),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvrf4.f", 10967),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvrfp.f", 19738),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvsp.f", 20063),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvsy.f", 20076),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvsy_rook.f", 16795),
+                        ("source/lapack-netlib/TESTING/LIN/cdrvsyx.f", 24301),
+                        ("source/lapack-netlib/TESTING/LIN/cebchvxx.f", 18871),
+                        ("source/lapack-netlib/TESTING/LIN/cerrge.f", 13637),
+                        ("source/lapack-netlib/TESTING/LIN/cerrgex.f", 20795),
+                        ("source/lapack-netlib/TESTING/LIN/cerrgt.f", 7667),
+                        ("source/lapack-netlib/TESTING/LIN/cerrhe.f", 13761),
+                        ("source/lapack-netlib/TESTING/LIN/cerrhex.f", 16251),
+                        ("source/lapack-netlib/TESTING/LIN/cerrlq.f", 9465),
+                        ("source/lapack-netlib/TESTING/LIN/cerrls.f", 7100),
+                        ("source/lapack-netlib/TESTING/LIN/cerrpo.f", 15430),
+                        ("source/lapack-netlib/TESTING/LIN/cerrpox.f", 18185),
+                        ("source/lapack-netlib/TESTING/LIN/cerrps.f", 3792),
+                        ("source/lapack-netlib/TESTING/LIN/cerrql.f", 9465),
+                        ("source/lapack-netlib/TESTING/LIN/cerrqp.f", 3575),
+                        ("source/lapack-netlib/TESTING/LIN/cerrqr.f", 10415),
+                        ("source/lapack-netlib/TESTING/LIN/cerrqrt.f", 6199),
+                        ("source/lapack-netlib/TESTING/LIN/cerrqrtp.f", 7018),
+                        ("source/lapack-netlib/TESTING/LIN/cerrrfp.f", 9083),
+                        ("source/lapack-netlib/TESTING/LIN/cerrrq.f", 9465),
+                        ("source/lapack-netlib/TESTING/LIN/cerrsy.f", 13750),
+                        ("source/lapack-netlib/TESTING/LIN/cerrsyx.f", 16244),
+                        ("source/lapack-netlib/TESTING/LIN/cerrtr.f", 17199),
+                        ("source/lapack-netlib/TESTING/LIN/cerrtz.f", 3591),
+                        ("source/lapack-netlib/TESTING/LIN/cerrvx.f", 32457),
+                        ("source/lapack-netlib/TESTING/LIN/cerrvxx.f", 49323),
+                        ("source/lapack-netlib/TESTING/LIN/cgbt01.f", 6733),
+                        ("source/lapack-netlib/TESTING/LIN/cgbt02.f", 6240),
+                        ("source/lapack-netlib/TESTING/LIN/cgbt05.f", 9063),
+                        ("source/lapack-netlib/TESTING/LIN/cgelqs.f", 5003),
+                        ("source/lapack-netlib/TESTING/LIN/cgennd.f", 2296),
+                        ("source/lapack-netlib/TESTING/LIN/cgeqls.f", 4847),
+                        ("source/lapack-netlib/TESTING/LIN/cgeqrs.f", 4783),
+                        ("source/lapack-netlib/TESTING/LIN/cgerqs.f", 5063),
+                        ("source/lapack-netlib/TESTING/LIN/cget01.f", 5843),
+                        ("source/lapack-netlib/TESTING/LIN/cget02.f", 5964),
+                        ("source/lapack-netlib/TESTING/LIN/cget03.f", 4954),
+                        ("source/lapack-netlib/TESTING/LIN/cget04.f", 4859),
+                        ("source/lapack-netlib/TESTING/LIN/cget07.f", 8680),
+                        ("source/lapack-netlib/TESTING/LIN/cgtt01.f", 6911),
+                        ("source/lapack-netlib/TESTING/LIN/cgtt02.f", 5350),
+                        ("source/lapack-netlib/TESTING/LIN/cgtt05.f", 9715),
+                        ("source/lapack-netlib/TESTING/LIN/chet01.f", 6494),
+                        ("source/lapack-netlib/TESTING/LIN/chet01_rook.f", 6571),
+                        ("source/lapack-netlib/TESTING/LIN/chkxer.f", 2110),
+                        ("source/lapack-netlib/TESTING/LIN/chpt01.f", 6576),
+                        ("source/lapack-netlib/TESTING/LIN/clahilb.f", 8030),
+                        ("source/lapack-netlib/TESTING/LIN/claipd.f", 3357),
+                        ("source/lapack-netlib/TESTING/LIN/claptm.f", 7869),
+                        ("source/lapack-netlib/TESTING/LIN/clarhs.f", 13499),
+                        ("source/lapack-netlib/TESTING/LIN/clatb4.f", 12468),
+                        ("source/lapack-netlib/TESTING/LIN/clatb5.f", 5684),
+                        ("source/lapack-netlib/TESTING/LIN/clatsp.f", 7315),
+                        ("source/lapack-netlib/TESTING/LIN/clatsy.f", 7154),
+                        ("source/lapack-netlib/TESTING/LIN/clattb.f", 22623),
+                        ("source/lapack-netlib/TESTING/LIN/clattp.f", 25492),
+                        ("source/lapack-netlib/TESTING/LIN/clattr.f", 23022),
+                        ("source/lapack-netlib/TESTING/LIN/clavhe.f", 17089),
+                        ("source/lapack-netlib/TESTING/LIN/clavhe_rook.f", 18395),
+                        ("source/lapack-netlib/TESTING/LIN/clavhp.f", 17556),
+                        ("source/lapack-netlib/TESTING/LIN/clavsp.f", 16819),
+                        ("source/lapack-netlib/TESTING/LIN/clavsy.f", 16137),
+                        ("source/lapack-netlib/TESTING/LIN/clavsy_rook.f", 17452),
+                        ("source/lapack-netlib/TESTING/LIN/clqt01.f", 6228),
+                        ("source/lapack-netlib/TESTING/LIN/clqt02.f", 6408),
+                        ("source/lapack-netlib/TESTING/LIN/clqt03.f", 7441),
+                        ("source/lapack-netlib/TESTING/LIN/CMakeLists.txt", 8924),
+                        ("source/lapack-netlib/TESTING/LIN/cpbt01.f", 7444),
+                        ("source/lapack-netlib/TESTING/LIN/cpbt02.f", 6006),
+                        ("source/lapack-netlib/TESTING/LIN/cpbt05.f", 9380),
+                        ("source/lapack-netlib/TESTING/LIN/cpot01.f", 6383),
+                        ("source/lapack-netlib/TESTING/LIN/cpot02.f", 5399),
+                        ("source/lapack-netlib/TESTING/LIN/cpot03.f", 6178),
+                        ("source/lapack-netlib/TESTING/LIN/cpot05.f", 9014),
+                        ("source/lapack-netlib/TESTING/LIN/cppt01.f", 6637),
+                        ("source/lapack-netlib/TESTING/LIN/cppt02.f", 5433),
+                        ("source/lapack-netlib/TESTING/LIN/cppt03.f", 6763),
+                        ("source/lapack-netlib/TESTING/LIN/cppt05.f", 8893),
+                        ("source/lapack-netlib/TESTING/LIN/cpst01.f", 8737),
+                        ("source/lapack-netlib/TESTING/LIN/cptt01.f", 4465),
+                        ("source/lapack-netlib/TESTING/LIN/cptt02.f", 5031),
+                        ("source/lapack-netlib/TESTING/LIN/cptt05.f", 8005),
+                        ("source/lapack-netlib/TESTING/LIN/cqlt01.f", 6904),
+                        ("source/lapack-netlib/TESTING/LIN/cqlt02.f", 6987),
+                        ("source/lapack-netlib/TESTING/LIN/cqlt03.f", 7996),
+                        ("source/lapack-netlib/TESTING/LIN/cqpt01.f", 5586),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt01.f", 6206),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt01p.f", 6219),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt02.f", 6427),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt03.f", 7444),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt04.f", 6732),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt05.f", 7494),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt11.f", 4315),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt12.f", 5931),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt13.f", 4241),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt14.f", 7176),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt15.f", 8655),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt16.f", 6064),
+                        ("source/lapack-netlib/TESTING/LIN/cqrt17.f", 7051),
+                        ("source/lapack-netlib/TESTING/LIN/crqt01.f", 6904),
+                        ("source/lapack-netlib/TESTING/LIN/crqt02.f", 6965),
+                        ("source/lapack-netlib/TESTING/LIN/crqt03.f", 7994),
+                        ("source/lapack-netlib/TESTING/LIN/crzt01.f", 4534),
+                        ("source/lapack-netlib/TESTING/LIN/crzt02.f", 4042),
+                        ("source/lapack-netlib/TESTING/LIN/csbmv.f", 10728),
+                        ("source/lapack-netlib/TESTING/LIN/cspt01.f", 5784),
+                        ("source/lapack-netlib/TESTING/LIN/cspt02.f", 5458),
+                        ("source/lapack-netlib/TESTING/LIN/cspt03.f", 7956),
+                        ("source/lapack-netlib/TESTING/LIN/csyt01.f", 6100),
+                        ("source/lapack-netlib/TESTING/LIN/csyt01_rook.f", 6163),
+                        ("source/lapack-netlib/TESTING/LIN/csyt02.f", 5446),
+                        ("source/lapack-netlib/TESTING/LIN/csyt03.f", 6211),
+                        ("source/lapack-netlib/TESTING/LIN/ctbt02.f", 7093),
+                        ("source/lapack-netlib/TESTING/LIN/ctbt03.f", 8488),
+                        ("source/lapack-netlib/TESTING/LIN/ctbt05.f", 10561),
+                        ("source/lapack-netlib/TESTING/LIN/ctbt06.f", 5657),
+                        ("source/lapack-netlib/TESTING/LIN/ctpt01.f", 5835),
+                        ("source/lapack-netlib/TESTING/LIN/ctpt02.f", 6687),
+                        ("source/lapack-netlib/TESTING/LIN/ctpt03.f", 8067),
+                        ("source/lapack-netlib/TESTING/LIN/ctpt05.f", 10200),
+                        ("source/lapack-netlib/TESTING/LIN/ctpt06.f", 5201),
+                        ("source/lapack-netlib/TESTING/LIN/ctrt01.f", 6194),
+                        ("source/lapack-netlib/TESTING/LIN/ctrt02.f", 7047),
+                        ("source/lapack-netlib/TESTING/LIN/ctrt03.f", 8179),
+                        ("source/lapack-netlib/TESTING/LIN/ctrt05.f", 10165),
+                        ("source/lapack-netlib/TESTING/LIN/ctrt06.f", 5646),
+                        ("source/lapack-netlib/TESTING/LIN/dchkaa.f", 30677),
+                        ("source/lapack-netlib/TESTING/LIN/dchkab.f", 10821),
+                        ("source/lapack-netlib/TESTING/LIN/dchkeq.f", 16119),
+                        ("source/lapack-netlib/TESTING/LIN/dchkgb.f", 25469),
+                        ("source/lapack-netlib/TESTING/LIN/dchkge.f", 20042),
+                        ("source/lapack-netlib/TESTING/LIN/dchkgt.f", 17639),
+                        ("source/lapack-netlib/TESTING/LIN/dchklq.f", 13830),
+                        ("source/lapack-netlib/TESTING/LIN/dchkpb.f", 19998),
+                        ("source/lapack-netlib/TESTING/LIN/dchkpo.f", 16923),
+                        ("source/lapack-netlib/TESTING/LIN/dchkpp.f", 15746),
+                        ("source/lapack-netlib/TESTING/LIN/dchkps.f", 10613),
+                        ("source/lapack-netlib/TESTING/LIN/dchkpt.f", 16285),
+                        ("source/lapack-netlib/TESTING/LIN/dchkq3.f", 11032),
+                        ("source/lapack-netlib/TESTING/LIN/dchkql.f", 13454),
+                        ("source/lapack-netlib/TESTING/LIN/dchkqr.f", 14042),
+                        ("source/lapack-netlib/TESTING/LIN/dchkqrt.f", 5384),
+                        ("source/lapack-netlib/TESTING/LIN/dchkqrtp.f", 5550),
+                        ("source/lapack-netlib/TESTING/LIN/dchkrfp.f", 8934),
+                        ("source/lapack-netlib/TESTING/LIN/dchkrq.f", 13599),
+                        ("source/lapack-netlib/TESTING/LIN/dchksp.f", 17872),
+                        ("source/lapack-netlib/TESTING/LIN/dchksy.f", 22292),
+                        ("source/lapack-netlib/TESTING/LIN/dchksy_rook.f", 26790),
+                        ("source/lapack-netlib/TESTING/LIN/dchktb.f", 19787),
+                        ("source/lapack-netlib/TESTING/LIN/dchktp.f", 18092),
+                        ("source/lapack-netlib/TESTING/LIN/dchktr.f", 19444),
+                        ("source/lapack-netlib/TESTING/LIN/dchktz.f", 9218),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvab.f", 13237),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvac.f", 14136),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvgb.f", 32400),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvgbx.f", 40550),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvge.f", 25373),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvgex.f", 33032),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvgt.f", 19274),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvls.f", 24631),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvpb.f", 24692),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvpo.f", 20780),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvpox.f", 25520),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvpp.f", 20689),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvpt.f", 17935),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvrf1.f", 8032),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvrf2.f", 7109),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvrf3.f", 12092),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvrf4.f", 11010),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvrfp.f", 19667),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvsp.f", 19351),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvsy.f", 19457),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvsy_rook.f", 16431),
+                        ("source/lapack-netlib/TESTING/LIN/ddrvsyx.f", 23597),
+                        ("source/lapack-netlib/TESTING/LIN/debchvxx.f", 18376),
+                        ("source/lapack-netlib/TESTING/LIN/derrab.f", 3749),
+                        ("source/lapack-netlib/TESTING/LIN/derrac.f", 3842),
+                        ("source/lapack-netlib/TESTING/LIN/derrge.f", 13588),
+                        ("source/lapack-netlib/TESTING/LIN/derrgex.f", 20440),
+                        ("source/lapack-netlib/TESTING/LIN/derrgt.f", 7139),
+                        ("source/lapack-netlib/TESTING/LIN/derrlq.f", 9420),
+                        ("source/lapack-netlib/TESTING/LIN/derrls.f", 6852),
+                        ("source/lapack-netlib/TESTING/LIN/derrpo.f", 15094),
+                        ("source/lapack-netlib/TESTING/LIN/derrpox.f", 17858),
+                        ("source/lapack-netlib/TESTING/LIN/derrps.f", 3776),
+                        ("source/lapack-netlib/TESTING/LIN/derrql.f", 9420),
+                        ("source/lapack-netlib/TESTING/LIN/derrqp.f", 3351),
+                        ("source/lapack-netlib/TESTING/LIN/derrqr.f", 10370),
+                        ("source/lapack-netlib/TESTING/LIN/derrqrt.f", 6164),
+                        ("source/lapack-netlib/TESTING/LIN/derrqrtp.f", 6965),
+                        ("source/lapack-netlib/TESTING/LIN/derrrfp.f", 8977),
+                        ("source/lapack-netlib/TESTING/LIN/derrrq.f", 9420),
+                        ("source/lapack-netlib/TESTING/LIN/derrsy.f", 13776),
+                        ("source/lapack-netlib/TESTING/LIN/derrsyx.f", 16265),
+                        ("source/lapack-netlib/TESTING/LIN/derrtr.f", 17462),
+                        ("source/lapack-netlib/TESTING/LIN/derrtz.f", 3423),
+                        ("source/lapack-netlib/TESTING/LIN/derrvx.f", 27370),
+                        ("source/lapack-netlib/TESTING/LIN/derrvxx.f", 40540),
+                        ("source/lapack-netlib/TESTING/LIN/dgbt01.f", 6727),
+                        ("source/lapack-netlib/TESTING/LIN/dgbt02.f", 6192),
+                        ("source/lapack-netlib/TESTING/LIN/dgbt05.f", 8840),
+                        ("source/lapack-netlib/TESTING/LIN/dgelqs.f", 4950),
+                        ("source/lapack-netlib/TESTING/LIN/dgennd.f", 2234),
+                        ("source/lapack-netlib/TESTING/LIN/dgeqls.f", 4860),
+                        ("source/lapack-netlib/TESTING/LIN/dgeqrs.f", 4796),
+                        ("source/lapack-netlib/TESTING/LIN/dgerqs.f", 5032),
+                        ("source/lapack-netlib/TESTING/LIN/dget01.f", 5701),
+                        ("source/lapack-netlib/TESTING/LIN/dget02.f", 5917),
+                        ("source/lapack-netlib/TESTING/LIN/dget03.f", 4822),
+                        ("source/lapack-netlib/TESTING/LIN/dget04.f", 4672),
+                        ("source/lapack-netlib/TESTING/LIN/dget06.f", 2493),
+                        ("source/lapack-netlib/TESTING/LIN/dget07.f", 8455),
+                        ("source/lapack-netlib/TESTING/LIN/dget08.f", 5984),
+                        ("source/lapack-netlib/TESTING/LIN/dgtt01.f", 6984),
+                        ("source/lapack-netlib/TESTING/LIN/dgtt02.f", 5405),
+                        ("source/lapack-netlib/TESTING/LIN/dgtt05.f", 9198),
+                        ("source/lapack-netlib/TESTING/LIN/dlahilb.f", 6326),
+                        ("source/lapack-netlib/TESTING/LIN/dlaord.f", 3519),
+                        ("source/lapack-netlib/TESTING/LIN/dlaptm.f", 5444),
+                        ("source/lapack-netlib/TESTING/LIN/dlarhs.f", 12465),
+                        ("source/lapack-netlib/TESTING/LIN/dlatb4.f", 12415),
+                        ("source/lapack-netlib/TESTING/LIN/dlatb5.f", 5710),
+                        ("source/lapack-netlib/TESTING/LIN/dlattb.f", 22075),
+                        ("source/lapack-netlib/TESTING/LIN/dlattp.f", 24650),
+                        ("source/lapack-netlib/TESTING/LIN/dlattr.f", 22378),
+                        ("source/lapack-netlib/TESTING/LIN/dlavsp.f", 15603),
+                        ("source/lapack-netlib/TESTING/LIN/dlavsy.f", 16239),
+                        ("source/lapack-netlib/TESTING/LIN/dlavsy_rook.f", 17548),
+                        ("source/lapack-netlib/TESTING/LIN/dlqt01.f", 6222),
+                        ("source/lapack-netlib/TESTING/LIN/dlqt02.f", 6402),
+                        ("source/lapack-netlib/TESTING/LIN/dlqt03.f", 7388),
+                        ("source/lapack-netlib/TESTING/LIN/dpbt01.f", 6871),
+                        ("source/lapack-netlib/TESTING/LIN/dpbt02.f", 5973),
+                        ("source/lapack-netlib/TESTING/LIN/dpbt05.f", 8972),
+                        ("source/lapack-netlib/TESTING/LIN/dpot01.f", 5832),
+                        ("source/lapack-netlib/TESTING/LIN/dpot02.f", 5366),
+                        ("source/lapack-netlib/TESTING/LIN/dpot03.f", 6021),
+                        ("source/lapack-netlib/TESTING/LIN/dpot05.f", 8631),
+                        ("source/lapack-netlib/TESTING/LIN/dpot06.f", 5637),
+                        ("source/lapack-netlib/TESTING/LIN/dppt01.f", 5455),
+                        ("source/lapack-netlib/TESTING/LIN/dppt02.f", 5327),
+                        ("source/lapack-netlib/TESTING/LIN/dppt03.f", 6524),
+                        ("source/lapack-netlib/TESTING/LIN/dppt05.f", 8506),
+                        ("source/lapack-netlib/TESTING/LIN/dpst01.f", 8079),
+                        ("source/lapack-netlib/TESTING/LIN/dptt01.f", 4437),
+                        ("source/lapack-netlib/TESTING/LIN/dptt02.f", 4652),
+                        ("source/lapack-netlib/TESTING/LIN/dptt05.f", 7771),
+                        ("source/lapack-netlib/TESTING/LIN/dqlt01.f", 6888),
+                        ("source/lapack-netlib/TESTING/LIN/dqlt02.f", 6934),
+                        ("source/lapack-netlib/TESTING/LIN/dqlt03.f", 7964),
+                        ("source/lapack-netlib/TESTING/LIN/dqpt01.f", 5605),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt01.f", 6190),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt01p.f", 6203),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt02.f", 6411),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt03.f", 7391),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt04.f", 6742),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt05.f", 7481),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt11.f", 4306),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt12.f", 5800),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt13.f", 4228),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt14.f", 7180),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt15.f", 8424),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt16.f", 6011),
+                        ("source/lapack-netlib/TESTING/LIN/dqrt17.f", 7032),
+                        ("source/lapack-netlib/TESTING/LIN/drqt01.f", 6898),
+                        ("source/lapack-netlib/TESTING/LIN/drqt02.f", 6940),
+                        ("source/lapack-netlib/TESTING/LIN/drqt03.f", 7961),
+                        ("source/lapack-netlib/TESTING/LIN/drzt01.f", 4518),
+                        ("source/lapack-netlib/TESTING/LIN/drzt02.f", 4036),
+                        ("source/lapack-netlib/TESTING/LIN/dspt01.f", 5647),
+                        ("source/lapack-netlib/TESTING/LIN/dsyt01.f", 5929),
+                        ("source/lapack-netlib/TESTING/LIN/dsyt01_rook.f", 5991),
+                        ("source/lapack-netlib/TESTING/LIN/dtbt02.f", 6846),
+                        ("source/lapack-netlib/TESTING/LIN/dtbt03.f", 8494),
+                        ("source/lapack-netlib/TESTING/LIN/dtbt05.f", 10316),
+                        ("source/lapack-netlib/TESTING/LIN/dtbt06.f", 5802),
+                        ("source/lapack-netlib/TESTING/LIN/dtpt01.f", 5791),
+                        ("source/lapack-netlib/TESTING/LIN/dtpt02.f", 6391),
+                        ("source/lapack-netlib/TESTING/LIN/dtpt03.f", 8140),
+                        ("source/lapack-netlib/TESTING/LIN/dtpt05.f", 9931),
+                        ("source/lapack-netlib/TESTING/LIN/dtpt06.f", 5346),
+                        ("source/lapack-netlib/TESTING/LIN/dtrt01.f", 6192),
+                        ("source/lapack-netlib/TESTING/LIN/dtrt02.f", 6815),
+                        ("source/lapack-netlib/TESTING/LIN/dtrt03.f", 8194),
+                        ("source/lapack-netlib/TESTING/LIN/dtrt05.f", 9924),
+                        ("source/lapack-netlib/TESTING/LIN/dtrt06.f", 5791),
+                        ("source/lapack-netlib/TESTING/LIN/icopy.f", 3270),
+                        ("source/lapack-netlib/TESTING/LIN/ilaenv.f", 6981),
+                        ("source/lapack-netlib/TESTING/LIN/Makefile", 12404),
+                        ("source/lapack-netlib/TESTING/LIN/schkaa.f", 30632),
+                        ("source/lapack-netlib/TESTING/LIN/schkeq.f", 16105),
+                        ("source/lapack-netlib/TESTING/LIN/schkgb.f", 25373),
+                        ("source/lapack-netlib/TESTING/LIN/schkge.f", 19928),
+                        ("source/lapack-netlib/TESTING/LIN/schkgt.f", 17543),
+                        ("source/lapack-netlib/TESTING/LIN/schklq.f", 13301),
+                        ("source/lapack-netlib/TESTING/LIN/schkpb.f", 19890),
+                        ("source/lapack-netlib/TESTING/LIN/schkpo.f", 16815),
+                        ("source/lapack-netlib/TESTING/LIN/schkpp.f", 15638),
+                        ("source/lapack-netlib/TESTING/LIN/schkps.f", 10542),
+                        ("source/lapack-netlib/TESTING/LIN/schkpt.f", 16177),
+                        ("source/lapack-netlib/TESTING/LIN/schkq3.f", 10960),
+                        ("source/lapack-netlib/TESTING/LIN/schkql.f", 13310),
+                        ("source/lapack-netlib/TESTING/LIN/schkqr.f", 13898),
+                        ("source/lapack-netlib/TESTING/LIN/schkqrt.f", 5273),
+                        ("source/lapack-netlib/TESTING/LIN/schkqrtp.f", 5553),
+                        ("source/lapack-netlib/TESTING/LIN/schkrfp.f", 8909),
+                        ("source/lapack-netlib/TESTING/LIN/schkrq.f", 13454),
+                        ("source/lapack-netlib/TESTING/LIN/schksp.f", 17764),
+                        ("source/lapack-netlib/TESTING/LIN/schksy.f", 22196),
+                        ("source/lapack-netlib/TESTING/LIN/schksy_rook.f", 26681),
+                        ("source/lapack-netlib/TESTING/LIN/schktb.f", 19691),
+                        ("source/lapack-netlib/TESTING/LIN/schktp.f", 17996),
+                        ("source/lapack-netlib/TESTING/LIN/schktr.f", 19348),
+                        ("source/lapack-netlib/TESTING/LIN/schktz.f", 9146),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvgb.f", 32268),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvgbx.f", 40458),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvge.f", 25241),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvgex.f", 32910),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvgt.f", 19178),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvls.f", 24457),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvpb.f", 24560),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvpo.f", 20648),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvpox.f", 25388),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvpp.f", 20557),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvpt.f", 17827),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvrf1.f", 8070),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvrf2.f", 7062),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvrf3.f", 11996),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvrf4.f", 10938),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvrfp.f", 19438),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvsp.f", 19243),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvsy.f", 19349),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvsy_rook.f", 16359),
+                        ("source/lapack-netlib/TESTING/LIN/sdrvsyx.f", 23488),
+                        ("source/lapack-netlib/TESTING/LIN/sebchvxx.f", 18214),
+                        ("source/lapack-netlib/TESTING/LIN/serrge.f", 13562),
+                        ("source/lapack-netlib/TESTING/LIN/serrgex.f", 20411),
+                        ("source/lapack-netlib/TESTING/LIN/serrgt.f", 7109),
+                        ("source/lapack-netlib/TESTING/LIN/serrlq.f", 9398),
+                        ("source/lapack-netlib/TESTING/LIN/serrls.f", 6840),
+                        ("source/lapack-netlib/TESTING/LIN/serrpo.f", 15068),
+                        ("source/lapack-netlib/TESTING/LIN/serrpox.f", 17831),
+                        ("source/lapack-netlib/TESTING/LIN/serrps.f", 3754),
+                        ("source/lapack-netlib/TESTING/LIN/serrql.f", 9398),
+                        ("source/lapack-netlib/TESTING/LIN/serrqp.f", 3351),
+                        ("source/lapack-netlib/TESTING/LIN/serrqr.f", 10348),
+                        ("source/lapack-netlib/TESTING/LIN/serrqrt.f", 6152),
+                        ("source/lapack-netlib/TESTING/LIN/serrqrtp.f", 6966),
+                        ("source/lapack-netlib/TESTING/LIN/serrrfp.f", 8941),
+                        ("source/lapack-netlib/TESTING/LIN/serrrq.f", 9398),
+                        ("source/lapack-netlib/TESTING/LIN/serrsy.f", 13741),
+                        ("source/lapack-netlib/TESTING/LIN/serrsyx.f", 16224),
+                        ("source/lapack-netlib/TESTING/LIN/serrtr.f", 17442),
+                        ("source/lapack-netlib/TESTING/LIN/serrtz.f", 3423),
+                        ("source/lapack-netlib/TESTING/LIN/serrvx.f", 27340),
+                        ("source/lapack-netlib/TESTING/LIN/serrvxx.f", 41182),
+                        ("source/lapack-netlib/TESTING/LIN/sgbt01.f", 6679),
+                        ("source/lapack-netlib/TESTING/LIN/sgbt02.f", 6144),
+                        ("source/lapack-netlib/TESTING/LIN/sgbt05.f", 8756),
+                        ("source/lapack-netlib/TESTING/LIN/sgelqs.f", 4902),
+                        ("source/lapack-netlib/TESTING/LIN/sgennd.f", 2198),
+                        ("source/lapack-netlib/TESTING/LIN/sgeqls.f", 4812),
+                        ("source/lapack-netlib/TESTING/LIN/sgeqrs.f", 4748),
+                        ("source/lapack-netlib/TESTING/LIN/sgerqs.f", 4984),
+                        ("source/lapack-netlib/TESTING/LIN/sget01.f", 5653),
+                        ("source/lapack-netlib/TESTING/LIN/sget02.f", 5857),
+                        ("source/lapack-netlib/TESTING/LIN/sget03.f", 4743),
+                        ("source/lapack-netlib/TESTING/LIN/sget04.f", 4618),
+                        ("source/lapack-netlib/TESTING/LIN/sget06.f", 2469),
+                        ("source/lapack-netlib/TESTING/LIN/sget07.f", 8371),
+                        ("source/lapack-netlib/TESTING/LIN/sgtt01.f", 6864),
+                        ("source/lapack-netlib/TESTING/LIN/sgtt02.f", 5333),
+                        ("source/lapack-netlib/TESTING/LIN/sgtt05.f", 9090),
+                        ("source/lapack-netlib/TESTING/LIN/slahilb.f", 6213),
+                        ("source/lapack-netlib/TESTING/LIN/slaord.f", 3507),
+                        ("source/lapack-netlib/TESTING/LIN/slaptm.f", 5372),
+                        ("source/lapack-netlib/TESTING/LIN/slarhs.f", 12429),
+                        ("source/lapack-netlib/TESTING/LIN/slatb4.f", 12391),
+                        ("source/lapack-netlib/TESTING/LIN/slatb5.f", 5683),
+                        ("source/lapack-netlib/TESTING/LIN/slattb.f", 22039),
+                        ("source/lapack-netlib/TESTING/LIN/slattp.f", 24610),
+                        ("source/lapack-netlib/TESTING/LIN/slattr.f", 22322),
+                        ("source/lapack-netlib/TESTING/LIN/slavsp.f", 15579),
+                        ("source/lapack-netlib/TESTING/LIN/slavsy.f", 16215),
+                        ("source/lapack-netlib/TESTING/LIN/slavsy_rook.f", 17524),
+                        ("source/lapack-netlib/TESTING/LIN/slqt01.f", 6126),
+                        ("source/lapack-netlib/TESTING/LIN/slqt02.f", 6306),
+                        ("source/lapack-netlib/TESTING/LIN/slqt03.f", 7290),
+                        ("source/lapack-netlib/TESTING/LIN/spbt01.f", 6823),
+                        ("source/lapack-netlib/TESTING/LIN/spbt02.f", 5913),
+                        ("source/lapack-netlib/TESTING/LIN/spbt05.f", 8888),
+                        ("source/lapack-netlib/TESTING/LIN/spot01.f", 5784),
+                        ("source/lapack-netlib/TESTING/LIN/spot02.f", 5306),
+                        ("source/lapack-netlib/TESTING/LIN/spot03.f", 5949),
+                        ("source/lapack-netlib/TESTING/LIN/spot05.f", 8547),
+                        ("source/lapack-netlib/TESTING/LIN/sppt01.f", 5407),
+                        ("source/lapack-netlib/TESTING/LIN/sppt02.f", 5267),
+                        ("source/lapack-netlib/TESTING/LIN/sppt03.f", 6452),
+                        ("source/lapack-netlib/TESTING/LIN/sppt05.f", 8422),
+                        ("source/lapack-netlib/TESTING/LIN/spst01.f", 8019),
+                        ("source/lapack-netlib/TESTING/LIN/sptt01.f", 4365),
+                        ("source/lapack-netlib/TESTING/LIN/sptt02.f", 4592),
+                        ("source/lapack-netlib/TESTING/LIN/sptt05.f", 7675),
+                        ("source/lapack-netlib/TESTING/LIN/sqlt01.f", 6792),
+                        ("source/lapack-netlib/TESTING/LIN/sqlt02.f", 6838),
+                        ("source/lapack-netlib/TESTING/LIN/sqlt03.f", 7866),
+                        ("source/lapack-netlib/TESTING/LIN/sqpt01.f", 5557),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt01.f", 6094),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt01p.f", 6107),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt02.f", 6315),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt03.f", 7293),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt04.f", 6669),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt05.f", 7387),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt11.f", 4270),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt12.f", 5764),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt13.f", 4204),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt14.f", 7144),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt15.f", 8352),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt16.f", 5951),
+                        ("source/lapack-netlib/TESTING/LIN/sqrt17.f", 6972),
+                        ("source/lapack-netlib/TESTING/LIN/srqt01.f", 6802),
+                        ("source/lapack-netlib/TESTING/LIN/srqt02.f", 6844),
+                        ("source/lapack-netlib/TESTING/LIN/srqt03.f", 7863),
+                        ("source/lapack-netlib/TESTING/LIN/srzt01.f", 4470),
+                        ("source/lapack-netlib/TESTING/LIN/srzt02.f", 4000),
+                        ("source/lapack-netlib/TESTING/LIN/sspt01.f", 5587),
+                        ("source/lapack-netlib/TESTING/LIN/ssyt01.f", 5869),
+                        ("source/lapack-netlib/TESTING/LIN/ssyt01_rook.f", 5932),
+                        ("source/lapack-netlib/TESTING/LIN/stbt02.f", 6786),
+                        ("source/lapack-netlib/TESTING/LIN/stbt03.f", 8398),
+                        ("source/lapack-netlib/TESTING/LIN/stbt05.f", 10232),
+                        ("source/lapack-netlib/TESTING/LIN/stbt06.f", 5742),
+                        ("source/lapack-netlib/TESTING/LIN/stpt01.f", 5731),
+                        ("source/lapack-netlib/TESTING/LIN/stpt02.f", 6331),
+                        ("source/lapack-netlib/TESTING/LIN/stpt03.f", 8044),
+                        ("source/lapack-netlib/TESTING/LIN/stpt05.f", 9847),
+                        ("source/lapack-netlib/TESTING/LIN/stpt06.f", 5286),
+                        ("source/lapack-netlib/TESTING/LIN/strt01.f", 6132),
+                        ("source/lapack-netlib/TESTING/LIN/strt02.f", 6755),
+                        ("source/lapack-netlib/TESTING/LIN/strt03.f", 8098),
+                        ("source/lapack-netlib/TESTING/LIN/strt05.f", 9840),
+                        ("source/lapack-netlib/TESTING/LIN/strt06.f", 5731),
+                        ("source/lapack-netlib/TESTING/LIN/xerbla.f", 3664),
+                        ("source/lapack-netlib/TESTING/LIN/xlaenv.f", 3489),
+                        ("source/lapack-netlib/TESTING/LIN/zchkaa.f", 33552),
+                        ("source/lapack-netlib/TESTING/LIN/zchkab.f", 10826),
+                        ("source/lapack-netlib/TESTING/LIN/zchkeq.f", 16304),
+                        ("source/lapack-netlib/TESTING/LIN/zchkgb.f", 25561),
+                        ("source/lapack-netlib/TESTING/LIN/zchkge.f", 20080),
+                        ("source/lapack-netlib/TESTING/LIN/zchkgt.f", 17675),
+                        ("source/lapack-netlib/TESTING/LIN/zchkhe.f", 22081),
+                        ("source/lapack-netlib/TESTING/LIN/zchkhe_rook.f", 27494),
+                        ("source/lapack-netlib/TESTING/LIN/zchkhp.f", 18139),
+                        ("source/lapack-netlib/TESTING/LIN/zchklq.f", 13387),
+                        ("source/lapack-netlib/TESTING/LIN/zchkpb.f", 20228),
+                        ("source/lapack-netlib/TESTING/LIN/zchkpo.f", 16903),
+                        ("source/lapack-netlib/TESTING/LIN/zchkpp.f", 15864),
+                        ("source/lapack-netlib/TESTING/LIN/zchkps.f", 10566),
+                        ("source/lapack-netlib/TESTING/LIN/zchkpt.f", 16996),
+                        ("source/lapack-netlib/TESTING/LIN/zchkq3.f", 11132),
+                        ("source/lapack-netlib/TESTING/LIN/zchkql.f", 13396),
+                        ("source/lapack-netlib/TESTING/LIN/zchkqr.f", 13983),
+                        ("source/lapack-netlib/TESTING/LIN/zchkqrt.f", 5397),
+                        ("source/lapack-netlib/TESTING/LIN/zchkqrtp.f", 5557),
+                        ("source/lapack-netlib/TESTING/LIN/zchkrfp.f", 8980),
+                        ("source/lapack-netlib/TESTING/LIN/zchkrq.f", 13539),
+                        ("source/lapack-netlib/TESTING/LIN/zchksp.f", 18374),
+                        ("source/lapack-netlib/TESTING/LIN/zchksy.f", 22891),
+                        ("source/lapack-netlib/TESTING/LIN/zchksy_rook.f", 27634),
+                        ("source/lapack-netlib/TESTING/LIN/zchktb.f", 19656),
+                        ("source/lapack-netlib/TESTING/LIN/zchktp.f", 17983),
+                        ("source/lapack-netlib/TESTING/LIN/zchktr.f", 19360),
+                        ("source/lapack-netlib/TESTING/LIN/zchktz.f", 9423),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvab.f", 13278),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvac.f", 14174),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvgb.f", 32498),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvgbx.f", 40816),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvge.f", 25467),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvgex.f", 33130),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvgt.f", 19343),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvhe.f", 19723),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvhe_rook.f", 16613),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvhex.f", 23941),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvhp.f", 19814),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvls.f", 24693),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvpb.f", 24831),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvpo.f", 20834),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvpox.f", 25699),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvpp.f", 20794),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvpt.f", 18087),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvrf1.f", 8104),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvrf2.f", 7087),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvrf3.f", 12568),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvrf4.f", 11008),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvrfp.f", 19857),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvsp.f", 20115),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvsy.f", 20128),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvsy_rook.f", 16846),
+                        ("source/lapack-netlib/TESTING/LIN/zdrvsyx.f", 24353),
+                        ("source/lapack-netlib/TESTING/LIN/zebchvxx.f", 18984),
+                        ("source/lapack-netlib/TESTING/LIN/zerrab.f", 3856),
+                        ("source/lapack-netlib/TESTING/LIN/zerrac.f", 3920),
+                        ("source/lapack-netlib/TESTING/LIN/zerrge.f", 13712),
+                        ("source/lapack-netlib/TESTING/LIN/zerrgex.f", 20741),
+                        ("source/lapack-netlib/TESTING/LIN/zerrgt.f", 7682),
+                        ("source/lapack-netlib/TESTING/LIN/zerrhe.f", 13863),
+                        ("source/lapack-netlib/TESTING/LIN/zerrhex.f", 16337),
+                        ("source/lapack-netlib/TESTING/LIN/zerrlq.f", 9536),
+                        ("source/lapack-netlib/TESTING/LIN/zerrls.f", 7105),
+                        ("source/lapack-netlib/TESTING/LIN/zerrpo.f", 15507),
+                        ("source/lapack-netlib/TESTING/LIN/zerrpox.f", 18264),
+                        ("source/lapack-netlib/TESTING/LIN/zerrps.f", 3804),
+                        ("source/lapack-netlib/TESTING/LIN/zerrql.f", 9536),
+                        ("source/lapack-netlib/TESTING/LIN/zerrqp.f", 3582),
+                        ("source/lapack-netlib/TESTING/LIN/zerrqr.f", 10487),
+                        ("source/lapack-netlib/TESTING/LIN/zerrqrt.f", 6217),
+                        ("source/lapack-netlib/TESTING/LIN/zerrqrtp.f", 7035),
+                        ("source/lapack-netlib/TESTING/LIN/zerrrfp.f", 9152),
+                        ("source/lapack-netlib/TESTING/LIN/zerrrq.f", 9536),
+                        ("source/lapack-netlib/TESTING/LIN/zerrsy.f", 13820),
+                        ("source/lapack-netlib/TESTING/LIN/zerrsyx.f", 16310),
+                        ("source/lapack-netlib/TESTING/LIN/zerrtr.f", 17212),
+                        ("source/lapack-netlib/TESTING/LIN/zerrtz.f", 3600),
+                        ("source/lapack-netlib/TESTING/LIN/zerrvx.f", 32556),
+                        ("source/lapack-netlib/TESTING/LIN/zerrvxx.f", 50337),
+                        ("source/lapack-netlib/TESTING/LIN/zgbt01.f", 6758),
+                        ("source/lapack-netlib/TESTING/LIN/zgbt02.f", 6269),
+                        ("source/lapack-netlib/TESTING/LIN/zgbt05.f", 9113),
+                        ("source/lapack-netlib/TESTING/LIN/zgelqs.f", 5017),
+                        ("source/lapack-netlib/TESTING/LIN/zgennd.f", 2310),
+                        ("source/lapack-netlib/TESTING/LIN/zgeqls.f", 4861),
+                        ("source/lapack-netlib/TESTING/LIN/zgeqrs.f", 4797),
+                        ("source/lapack-netlib/TESTING/LIN/zgerqs.f", 5077),
+                        ("source/lapack-netlib/TESTING/LIN/zget01.f", 5878),
+                        ("source/lapack-netlib/TESTING/LIN/zget02.f", 6005),
+                        ("source/lapack-netlib/TESTING/LIN/zget03.f", 5005),
+                        ("source/lapack-netlib/TESTING/LIN/zget04.f", 4897),
+                        ("source/lapack-netlib/TESTING/LIN/zget07.f", 8730),
+                        ("source/lapack-netlib/TESTING/LIN/zget08.f", 6302),
+                        ("source/lapack-netlib/TESTING/LIN/zgtt01.f", 6961),
+                        ("source/lapack-netlib/TESTING/LIN/zgtt02.f", 5379),
+                        ("source/lapack-netlib/TESTING/LIN/zgtt05.f", 9771),
+                        ("source/lapack-netlib/TESTING/LIN/zhet01.f", 6529),
+                        ("source/lapack-netlib/TESTING/LIN/zhet01_rook.f", 6606),
+                        ("source/lapack-netlib/TESTING/LIN/zhpt01.f", 6611),
+                        ("source/lapack-netlib/TESTING/LIN/zlahilb.f", 8002),
+                        ("source/lapack-netlib/TESTING/LIN/zlaipd.f", 3364),
+                        ("source/lapack-netlib/TESTING/LIN/zlaptm.f", 7925),
+                        ("source/lapack-netlib/TESTING/LIN/zlarhs.f", 13519),
+                        ("source/lapack-netlib/TESTING/LIN/zlatb4.f", 12494),
+                        ("source/lapack-netlib/TESTING/LIN/zlatb5.f", 5713),
+                        ("source/lapack-netlib/TESTING/LIN/zlatsp.f", 7360),
+                        ("source/lapack-netlib/TESTING/LIN/zlatsy.f", 7201),
+                        ("source/lapack-netlib/TESTING/LIN/zlattb.f", 22651),
+                        ("source/lapack-netlib/TESTING/LIN/zlattp.f", 25528),
+                        ("source/lapack-netlib/TESTING/LIN/zlattr.f", 23072),
+                        ("source/lapack-netlib/TESTING/LIN/zlavhe.f", 17116),
+                        ("source/lapack-netlib/TESTING/LIN/zlavhe_rook.f", 18375),
+                        ("source/lapack-netlib/TESTING/LIN/zlavhp.f", 17590),
+                        ("source/lapack-netlib/TESTING/LIN/zlavsp.f", 16848),
+                        ("source/lapack-netlib/TESTING/LIN/zlavsy.f", 16167),
+                        ("source/lapack-netlib/TESTING/LIN/zlavsy_rook.f", 17481),
+                        ("source/lapack-netlib/TESTING/LIN/zlqt01.f", 6316),
+                        ("source/lapack-netlib/TESTING/LIN/zlqt02.f", 6496),
+                        ("source/lapack-netlib/TESTING/LIN/zlqt03.f", 7490),
+                        ("source/lapack-netlib/TESTING/LIN/zpbt01.f", 7476),
+                        ("source/lapack-netlib/TESTING/LIN/zpbt02.f", 6047),
+                        ("source/lapack-netlib/TESTING/LIN/zpbt05.f", 9430),
+                        ("source/lapack-netlib/TESTING/LIN/zpot01.f", 6415),
+                        ("source/lapack-netlib/TESTING/LIN/zpot02.f", 5440),
+                        ("source/lapack-netlib/TESTING/LIN/zpot03.f", 6232),
+                        ("source/lapack-netlib/TESTING/LIN/zpot05.f", 9064),
+                        ("source/lapack-netlib/TESTING/LIN/zpot06.f", 6004),
+                        ("source/lapack-netlib/TESTING/LIN/zppt01.f", 6669),
+                        ("source/lapack-netlib/TESTING/LIN/zppt02.f", 5474),
+                        ("source/lapack-netlib/TESTING/LIN/zppt03.f", 6819),
+                        ("source/lapack-netlib/TESTING/LIN/zppt05.f", 8943),
+                        ("source/lapack-netlib/TESTING/LIN/zpst01.f", 8775),
+                        ("source/lapack-netlib/TESTING/LIN/zptt01.f", 4514),
+                        ("source/lapack-netlib/TESTING/LIN/zptt02.f", 5066),
+                        ("source/lapack-netlib/TESTING/LIN/zptt05.f", 8067),
+                        ("source/lapack-netlib/TESTING/LIN/zqlt01.f", 6992),
+                        ("source/lapack-netlib/TESTING/LIN/zqlt02.f", 7038),
+                        ("source/lapack-netlib/TESTING/LIN/zqlt03.f", 8046),
+                        ("source/lapack-netlib/TESTING/LIN/zqpt01.f", 5602),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt01.f", 6294),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt01p.f", 6307),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt02.f", 6515),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt03.f", 7493),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt04.f", 6825),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt05.f", 7586),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt11.f", 4348),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt12.f", 5986),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt13.f", 4260),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt14.f", 7189),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt15.f", 8704),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt16.f", 6099),
+                        ("source/lapack-netlib/TESTING/LIN/zqrt17.f", 7091),
+                        ("source/lapack-netlib/TESTING/LIN/zrqt01.f", 6992),
+                        ("source/lapack-netlib/TESTING/LIN/zrqt02.f", 7016),
+                        ("source/lapack-netlib/TESTING/LIN/zrqt03.f", 8043),
+                        ("source/lapack-netlib/TESTING/LIN/zrzt01.f", 4571),
+                        ("source/lapack-netlib/TESTING/LIN/zrzt02.f", 4075),
+                        ("source/lapack-netlib/TESTING/LIN/zsbmv.f", 10745),
+                        ("source/lapack-netlib/TESTING/LIN/zspt01.f", 5823),
+                        ("source/lapack-netlib/TESTING/LIN/zspt02.f", 5499),
+                        ("source/lapack-netlib/TESTING/LIN/zspt03.f", 8007),
+                        ("source/lapack-netlib/TESTING/LIN/zsyt01.f", 6139),
+                        ("source/lapack-netlib/TESTING/LIN/zsyt01_rook.f", 6202),
+                        ("source/lapack-netlib/TESTING/LIN/zsyt02.f", 5487),
+                        ("source/lapack-netlib/TESTING/LIN/zsyt03.f", 6262),
+                        ("source/lapack-netlib/TESTING/LIN/ztbt02.f", 7133),
+                        ("source/lapack-netlib/TESTING/LIN/ztbt03.f", 8552),
+                        ("source/lapack-netlib/TESTING/LIN/ztbt05.f", 10611),
+                        ("source/lapack-netlib/TESTING/LIN/ztbt06.f", 5710),
+                        ("source/lapack-netlib/TESTING/LIN/ztpt01.f", 5879),
+                        ("source/lapack-netlib/TESTING/LIN/ztpt02.f", 6727),
+                        ("source/lapack-netlib/TESTING/LIN/ztpt03.f", 8129),
+                        ("source/lapack-netlib/TESTING/LIN/ztpt05.f", 10250),
+                        ("source/lapack-netlib/TESTING/LIN/ztpt06.f", 5254),
+                        ("source/lapack-netlib/TESTING/LIN/ztrt01.f", 6238),
+                        ("source/lapack-netlib/TESTING/LIN/ztrt02.f", 7087),
+                        ("source/lapack-netlib/TESTING/LIN/ztrt03.f", 8243),
+                        ("source/lapack-netlib/TESTING/LIN/ztrt05.f", 10215),
+                        ("source/lapack-netlib/TESTING/LIN/ztrt06.f", 5699),
+                        ("source/lapack-netlib/TESTING/lse.in", 513),
+                        ("source/lapack-netlib/TESTING/Makefile", 16872),
+                        ("source/lapack-netlib/TESTING/MATGEN/clagge.f", 11152),
+                        ("source/lapack-netlib/TESTING/MATGEN/claghe.f", 7257),
+                        ("source/lapack-netlib/TESTING/MATGEN/clagsy.f", 7942),
+                        ("source/lapack-netlib/TESTING/MATGEN/clahilb.f", 8051),
+                        ("source/lapack-netlib/TESTING/MATGEN/clakf2.f", 4249),
+                        ("source/lapack-netlib/TESTING/MATGEN/clarge.f", 4654),
+                        ("source/lapack-netlib/TESTING/MATGEN/clarnd.f", 3907),
+                        ("source/lapack-netlib/TESTING/MATGEN/claror.f", 10611),
+                        ("source/lapack-netlib/TESTING/MATGEN/clarot.f", 11219),
+                        ("source/lapack-netlib/TESTING/MATGEN/clatm1.f", 8571),
+                        ("source/lapack-netlib/TESTING/MATGEN/clatm2.f", 9654),
+                        ("source/lapack-netlib/TESTING/MATGEN/clatm3.f", 10290),
+                        ("source/lapack-netlib/TESTING/MATGEN/clatm5.f", 14985),
+                        ("source/lapack-netlib/TESTING/MATGEN/clatm6.f", 8819),
+                        ("source/lapack-netlib/TESTING/MATGEN/clatme.f", 20104),
+                        ("source/lapack-netlib/TESTING/MATGEN/clatmr.f", 48231),
+                        ("source/lapack-netlib/TESTING/MATGEN/clatms.f", 45450),
+                        ("source/lapack-netlib/TESTING/MATGEN/clatmt.f", 45724),
+                        ("source/lapack-netlib/TESTING/MATGEN/CMakeLists.txt", 2792),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlagge.f", 10740),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlagsy.f", 7017),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlahilb.f", 6289),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlakf2.f", 4281),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlaran.f", 4113),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlarge.f", 4559),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlarnd.f", 3223),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlaror.f", 9092),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlarot.f", 10530),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlatm1.f", 8396),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlatm2.f", 9116),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlatm3.f", 9761),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlatm5.f", 14917),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlatm6.f", 9683),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlatm7.f", 8581),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlatme.f", 22677),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlatmr.f", 42994),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlatms.f", 40287),
+                        ("source/lapack-netlib/TESTING/MATGEN/dlatmt.f", 40567),
+                        ("source/lapack-netlib/TESTING/MATGEN/Makefile", 3189),
+                        ("source/lapack-netlib/TESTING/MATGEN/slagge.f", 10702),
+                        ("source/lapack-netlib/TESTING/MATGEN/slagsy.f", 6979),
+                        ("source/lapack-netlib/TESTING/MATGEN/slahilb.f", 6212),
+                        ("source/lapack-netlib/TESTING/MATGEN/slakf2.f", 4219),
+                        ("source/lapack-netlib/TESTING/MATGEN/slaran.f", 4181),
+                        ("source/lapack-netlib/TESTING/MATGEN/slarge.f", 4533),
+                        ("source/lapack-netlib/TESTING/MATGEN/slarnd.f", 3221),
+                        ("source/lapack-netlib/TESTING/MATGEN/slaror.f", 9066),
+                        ("source/lapack-netlib/TESTING/MATGEN/slarot.f", 10480),
+                        ("source/lapack-netlib/TESTING/MATGEN/slatm1.f", 8370),
+                        ("source/lapack-netlib/TESTING/MATGEN/slatm2.f", 9066),
+                        ("source/lapack-netlib/TESTING/MATGEN/slatm3.f", 9711),
+                        ("source/lapack-netlib/TESTING/MATGEN/slatm5.f", 14807),
+                        ("source/lapack-netlib/TESTING/MATGEN/slatm6.f", 9561),
+                        ("source/lapack-netlib/TESTING/MATGEN/slatm7.f", 8558),
+                        ("source/lapack-netlib/TESTING/MATGEN/slatme.f", 22579),
+                        ("source/lapack-netlib/TESTING/MATGEN/slatmr.f", 42871),
+                        ("source/lapack-netlib/TESTING/MATGEN/slatms.f", 40223),
+                        ("source/lapack-netlib/TESTING/MATGEN/slatmt.f", 40503),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlagge.f", 11172),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlaghe.f", 7279),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlagsy.f", 7962),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlahilb.f", 8018),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlakf2.f", 4266),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlarge.f", 4662),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlarnd.f", 3925),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlaror.f", 10649),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlarot.f", 11238),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlatm1.f", 8588),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlatm2.f", 9654),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlatm3.f", 10293),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlatm5.f", 15039),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlatm6.f", 8913),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlatme.f", 20173),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlatmr.f", 48323),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlatms.f", 45527),
+                        ("source/lapack-netlib/TESTING/MATGEN/zlatmt.f", 45801),
+                        ("source/lapack-netlib/TESTING/nep.in", 1114),
+                        ("source/lapack-netlib/TESTING/runtest.cmake", 1307),
+                        ("source/lapack-netlib/TESTING/sbak.in", 5991),
+                        ("source/lapack-netlib/TESTING/sbal.in", 9789),
+                        ("source/lapack-netlib/TESTING/sbb.in", 658),
+                        ("source/lapack-netlib/TESTING/sec.in", 53717),
+                        ("source/lapack-netlib/TESTING/sed.in", 48269),
+                        ("source/lapack-netlib/TESTING/sep.in", 802),
+                        ("source/lapack-netlib/TESTING/sgbak.in", 11408),
+                        ("source/lapack-netlib/TESTING/sgbal.in", 15499),
+                        ("source/lapack-netlib/TESTING/sgd.in", 4416),
+                        ("source/lapack-netlib/TESTING/sgg.in", 955),
+                        ("source/lapack-netlib/TESTING/ssb.in", 477),
+                        ("source/lapack-netlib/TESTING/ssg.in", 761),
+                        ("source/lapack-netlib/TESTING/stest.in", 2235),
+                        ("source/lapack-netlib/TESTING/stest_rfp.in", 586),
+                        ("source/lapack-netlib/TESTING/svd.in", 992),
+                        ("source/lapack-netlib/TESTING/zbak.in", 12158),
+                        ("source/lapack-netlib/TESTING/zbal.in", 20663),
+                        ("source/lapack-netlib/TESTING/zbb.in", 658),
+                        ("source/lapack-netlib/TESTING/zctest.in", 783),
+                        ("source/lapack-netlib/TESTING/zec.in", 27311),
+                        ("source/lapack-netlib/TESTING/zed.in", 29109),
+                        ("source/lapack-netlib/TESTING/zgbak.in", 28622),
+                        ("source/lapack-netlib/TESTING/zgbal.in", 40882),
+                        ("source/lapack-netlib/TESTING/zgd.in", 5920),
+                        ("source/lapack-netlib/TESTING/zgg.in", 955),
+                        ("source/lapack-netlib/TESTING/zsb.in", 477),
+                        ("source/lapack-netlib/TESTING/zsg.in", 761),
+                        ("source/lapack-netlib/TESTING/ztest.in", 2443),
+                        ("source/lapack-netlib/TESTING/ztest_rfp.in", 592),
+                        ("source/lapack/CMakeLists.txt", 2696),
+                        ("source/lapack/getf2/getf2_k.c", 4239),
+                        ("source/lapack/getf2/Makefile", 1275),
+                        ("source/lapack/getf2/zgetf2_k.c", 4755),
+                        ("source/lapack/getrf/getrf_parallel.c", 23361),
+                        ("source/lapack/getrf/getrf_parallel_omp.c", 7276),
+                        ("source/lapack/getrf/getrf_single.c", 5879),
+                        ("source/lapack/getrf/Makefile", 3144),
+                        ("source/lapack/getrs/getrs_parallel.c", 4780),
+                        ("source/lapack/getrs/getrs_single.c", 3603),
+                        ("source/lapack/getrs/Makefile", 8978),
+                        ("source/lapack/getrs/zgetrs_parallel.c", 5451),
+                        ("source/lapack/getrs/zgetrs_single.c", 3708),
+                        ("source/lapack/laswp/alpha/Makefile", 146),
+                        ("source/lapack/laswp/arm/Makefile", 563),
+                        ("source/lapack/laswp/arm64/Makefile", 563),
+                        ("source/lapack/laswp/generic/laswp_k.c", 2866),
+                        ("source/lapack/laswp/generic/laswp_k_1.c", 6189),
+                        ("source/lapack/laswp/generic/laswp_k_2.c", 9103),
+                        ("source/lapack/laswp/generic/laswp_k_4.c", 13528),
+                        ("source/lapack/laswp/generic/laswp_k_8.c", 23176),
+                        ("source/lapack/laswp/generic/Makefile", 2780),
+                        ("source/lapack/laswp/generic/zlaswp_k.c", 2821),
+                        ("source/lapack/laswp/generic/zlaswp_k_1.c", 7925),
+                        ("source/lapack/laswp/generic/zlaswp_k_2.c", 14075),
+                        ("source/lapack/laswp/generic/zlaswp_k_4.c", 24249),
+                        ("source/lapack/laswp/ia64/Makefile", 81),
+                        ("source/lapack/laswp/Makefile", 1033),
+                        ("source/lapack/laswp/mips64/Makefile", 146),
+                        ("source/lapack/laswp/power/Makefile", 146),
+                        ("source/lapack/laswp/sparc/Makefile", 146),
+                        ("source/lapack/laswp/x86/Makefile", 563),
+                        ("source/lapack/laswp/x86_64/Makefile", 657),
+                        ("source/lapack/lauu2/lauu2_L.c", 3491),
+                        ("source/lapack/lauu2/lauu2_U.c", 3503),
+                        ("source/lapack/lauu2/Makefile", 2399),
+                        ("source/lapack/lauu2/zlauu2_L.c", 3686),
+                        ("source/lapack/lauu2/zlauu2_U.c", 3698),
+                        ("source/lapack/lauum/lauum_L_parallel.c", 4565),
+                        ("source/lapack/lauum/lauum_L_single.c", 6770),
+                        ("source/lapack/lauum/lauum_U_parallel.c", 4578),
+                        ("source/lapack/lauum/lauum_U_single.c", 7607),
+                        ("source/lapack/lauum/Makefile", 5682),
+                        ("source/lapack/Makefile", 722),
+                        ("source/lapack/potf2/Makefile", 2399),
+                        ("source/lapack/potf2/potf2_L.c", 3683),
+                        ("source/lapack/potf2/potf2_U.c", 3603),
+                        ("source/lapack/potf2/zpotf2_L.c", 3824),
+                        ("source/lapack/potf2/zpotf2_U.c", 3718),
+                        ("source/lapack/potrf/Makefile", 5682),
+                        ("source/lapack/potrf/potrf_L_parallel.c", 4914),
+                        ("source/lapack/potrf/potrf_L_single.c", 6547),
+                        ("source/lapack/potrf/potrf_parallel.c", 17091),
+                        ("source/lapack/potrf/potrf_U_parallel.c", 4885),
+                        ("source/lapack/potrf/potrf_U_single.c", 5905),
+                        ("source/lapack/trti2/Makefile", 5059),
+                        ("source/lapack/trti2/trti2_L.c", 3476),
+                        ("source/lapack/trti2/trti2_U.c", 3419),
+                        ("source/lapack/trti2/ztrti2_L.c", 4008),
+                        ("source/lapack/trti2/ztrti2_U.c", 3946),
+                        ("source/lapack/trtri/Makefile", 11944),
+                        ("source/lapack/trtri/trtri_L_parallel.c", 5125),
+                        ("source/lapack/trtri/trtri_L_single.c", 3423),
+                        ("source/lapack/trtri/trtri_U_parallel.c", 5024),
+                        ("source/lapack/trtri/trtri_U_single.c", 3313),
+                        ("source/LICENSE", 1548),
+                        ("source/make.inc", 85),
+                        ("source/Makefile", 9750),
+                        ("source/Makefile.alpha", 1110),
+                        ("source/Makefile.arm", 1001),
+                        ("source/Makefile.arm64", 257),
+                        ("source/Makefile.generic", 30),
+                        ("source/Makefile.ia64", 863),
+                        ("source/Makefile.install", 6374),
+                        ("source/Makefile.mips64", 26),
+                        ("source/Makefile.power", 1930),
+                        ("source/Makefile.prebuild", 1289),
+                        ("source/Makefile.rule", 5823),
+                        ("source/Makefile.sparc", 819),
+                        ("source/Makefile.system", 20936),
+                        ("source/Makefile.tail", 21482),
+                        ("source/Makefile.x86", 1836),
+                        ("source/Makefile.x86_64", 3295),
+                        ("source/openblas_config_template.h", 3366),
+                        ("source/param.h", 59920),
+                        ("source/quickbuild.32bit", 33),
+                        ("source/quickbuild.64bit", 28),
+                        ("source/quickbuild.win32", 155),
+                        ("source/quickbuild.win64", 155),
+                        ("source/README.md", 6013),
+                        ("source/reference/caxpycf.f", 898),
+                        ("source/reference/caxpyf.f", 852),
+                        ("source/reference/ccopyf.f", 762),
+                        ("source/reference/cdotcf.f", 945),
+                        ("source/reference/cdotuf.f", 894),
+                        ("source/reference/cgbmvf.f", 14201),
+                        ("source/reference/cgemm3mf.f", 12984),
+                        ("source/reference/cgemmf.f", 13034),
+                        ("source/reference/cgemvf.f", 10127),
+                        ("source/reference/cgercf.f", 4413),
+                        ("source/reference/cgeruf.f", 4379),
+                        ("source/reference/cgesvf.f", 3322),
+                        ("source/reference/cgetf2f.f", 3859),
+                        ("source/reference/cgetrff.f", 4600),
+                        ("source/reference/cgetrsf.f", 4236),
+                        ("source/reference/chbmvf.f", 10143),
+                        ("source/reference/chemm3mf.f", 10323),
+                        ("source/reference/chemmf.f", 10321),
+                        ("source/reference/chemvf.f", 10919),
+                        ("source/reference/cher2f.f", 8418),
+                        ("source/reference/cher2kf.f", 13510),
+                        ("source/reference/cherf.f", 6799),
+                        ("source/reference/cherkf.f", 10953),
+                        ("source/reference/chpmvf.f", 8572),
+                        ("source/reference/chpr2f.f", 8524),
+                        ("source/reference/chprf.f", 7029),
+                        ("source/reference/claswpf.f", 3310),
+                        ("source/reference/clauu2f.f", 4250),
+                        ("source/reference/clauumf.f", 5047),
+                        ("source/reference/cpotf2f.f", 5211),
+                        ("source/reference/cpotrff.f", 5784),
+                        ("source/reference/cpotrif.f", 2587),
+                        ("source/reference/crotgf.f", 527),
+                        ("source/reference/csbmvf.f", 9627),
+                        ("source/reference/cscalf.f", 630),
+                        ("source/reference/cspmvf.f", 8045),
+                        ("source/reference/cspr2f.f", 7321),
+                        ("source/reference/csprf.f", 6648),
+                        ("source/reference/csrotf.f", 973),
+                        ("source/reference/csscalf.f", 712),
+                        ("source/reference/cswapf.f", 844),
+                        ("source/reference/csymm3mf.f", 9898),
+                        ("source/reference/csymmf.f", 9897),
+                        ("source/reference/csymvf.f", 7999),
+                        ("source/reference/csyr2f.f", 7363),
+                        ("source/reference/csyr2kf.f", 10922),
+                        ("source/reference/csyrf.f", 5980),
+                        ("source/reference/csyrkf.f", 9287),
+                        ("source/reference/ctbmvf.f", 12954),
+                        ("source/reference/ctbsvf.f", 12688),
+                        ("source/reference/ctpmvf.f", 12708),
+                        ("source/reference/ctpsvf.f", 12848),
+                        ("source/reference/ctrmmf.f", 14570),
+                        ("source/reference/ctrmvf.f", 11866),
+                        ("source/reference/ctrsmf.f", 15648),
+                        ("source/reference/ctrsvf.f", 12045),
+                        ("source/reference/ctrti2f.f", 4208),
+                        ("source/reference/ctrtrif.f", 5291),
+                        ("source/reference/damaxf.f", 857),
+                        ("source/reference/daminf.f", 857),
+                        ("source/reference/dasumf.f", 1067),
+                        ("source/reference/daxpyf.f", 1224),
+                        ("source/reference/dcopyf.f", 1195),
+                        ("source/reference/ddotf.f", 1257),
+                        ("source/reference/dgbmvf.f", 9295),
+                        ("source/reference/dgemmf.f", 9637),
+                        ("source/reference/dgemvf.f", 7356),
+                        ("source/reference/dgerf.f", 4368),
+                        ("source/reference/dgesvf.f", 3337),
+                        ("source/reference/dgetf2f.f", 3811),
+                        ("source/reference/dgetrff.f", 4593),
+                        ("source/reference/dgetrsf.f", 4211),
+                        ("source/reference/dlaswpf.f", 3319),
+                        ("source/reference/dlauu2f.f", 3839),
+                        ("source/reference/dlauumf.f", 4787),
+                        ("source/reference/dmaxf.f", 813),
+                        ("source/reference/dminf.f", 813),
+                        ("source/reference/dnrm2f.f", 1661),
+                        ("source/reference/dpotf2f.f", 4876),
+                        ("source/reference/dpotrff.f", 5614),
+                        ("source/reference/dpotrif.f", 2593),
+                        ("source/reference/drotf.f", 949),
+                        ("source/reference/drotgf.f", 702),
+                        ("source/reference/drotmf.f", 3259),
+                        ("source/reference/drotmgf.f", 4907),
+                        ("source/reference/dsbmvf.f", 9833),
+                        ("source/reference/dscalf.f", 1016),
+                        ("source/reference/dsdotf.f", 2557),
+                        ("source/reference/dspmvf.f", 8200),
+                        ("source/reference/dspr2f.f", 7281),
+                        ("source/reference/dsprf.f", 6004),
+                        ("source/reference/dswapf.f", 1303),
+                        ("source/reference/dsymmf.f", 9833),
+                        ("source/reference/dsymvf.f", 8073),
+                        ("source/reference/dsyr2f.f", 7343),
+                        ("source/reference/dsyr2kf.f", 11013),
+                        ("source/reference/dsyrf.f", 5965),
+                        ("source/reference/dsyrkf.f", 9350),
+                        ("source/reference/dtbmvf.f", 11355),
+                        ("source/reference/dtbsvf.f", 11162),
+                        ("source/reference/dtpmvf.f", 9444),
+                        ("source/reference/dtpsvf.f", 9613),
+                        ("source/reference/dtrmmf.f", 11478),
+                        ("source/reference/dtrmvf.f", 8863),
+                        ("source/reference/dtrsmf.f", 12282),
+                        ("source/reference/dtrsvf.f", 9020),
+                        ("source/reference/dtrti2f.f", 4202),
+                        ("source/reference/dtrtrif.f", 5244),
+                        ("source/reference/dzamaxf.f", 986),
+                        ("source/reference/dzaminf.f", 944),
+                        ("source/reference/dzasumf.f", 795),
+                        ("source/reference/dznrm2f.f", 1973),
+                        ("source/reference/icamaxf.f", 967),
+                        ("source/reference/icaminf.f", 967),
+                        ("source/reference/idamaxf.f", 935),
+                        ("source/reference/idaminf.f", 935),
+                        ("source/reference/idmaxf.f", 885),
+                        ("source/reference/idminf.f", 885),
+                        ("source/reference/iqamaxf.f", 1059),
+                        ("source/reference/iqaminf.f", 1060),
+                        ("source/reference/iqmaxf.f", 876),
+                        ("source/reference/iqminf.f", 876),
+                        ("source/reference/isamaxf.f", 917),
+                        ("source/reference/isaminf.f", 917),
+                        ("source/reference/ismaxf.f", 873),
+                        ("source/reference/isminf.f", 873),
+                        ("source/reference/ixamaxf.f", 966),
+                        ("source/reference/ixaminf.f", 966),
+                        ("source/reference/izamaxf.f", 988),
+                        ("source/reference/izaminf.f", 988),
+                        ("source/reference/LICENSE", 963),
+                        ("source/reference/lsamef.f", 2478),
+                        ("source/reference/Makefile", 6347),
+                        ("source/reference/samaxf.f", 842),
+                        ("source/reference/saminf.f", 841),
+                        ("source/reference/sasumf.f", 1089),
+                        ("source/reference/saxpyf.f", 1209),
+                        ("source/reference/scamaxf.f", 975),
+                        ("source/reference/scaminf.f", 933),
+                        ("source/reference/scasumf.f", 872),
+                        ("source/reference/scnrm2f.f", 1973),
+                        ("source/reference/scopyf.f", 1180),
+                        ("source/reference/sdotf.f", 1233),
+                        ("source/reference/sdsdotf.f", 2703),
+                        ("source/reference/sgbmvf.f", 9295),
+                        ("source/reference/sgemmf.f", 9589),
+                        ("source/reference/sgemvf.f", 7357),
+                        ("source/reference/sgerf.f", 4367),
+                        ("source/reference/sgesvf.f", 3313),
+                        ("source/reference/sgetf2f.f", 3799),
+                        ("source/reference/sgetrff.f", 4581),
+                        ("source/reference/sgetrsf.f", 4187),
+                        ("source/reference/slaswpf.f", 3307),
+                        ("source/reference/slauu2f.f", 3827),
+                        ("source/reference/slauumf.f", 4815),
+                        ("source/reference/smaxf.f", 803),
+                        ("source/reference/sminf.f", 803),
+                        ("source/reference/snrm2f.f", 1660),
+                        ("source/reference/spotf2f.f", 4864),
+                        ("source/reference/spotrff.f", 5601),
+                        ("source/reference/spotrif.f", 2581),
+                        ("source/reference/srotf.f", 936),
+                        ("source/reference/srotgf.f", 662),
+                        ("source/reference/srotmf.f", 3183),
+                        ("source/reference/srotmgf.f", 4749),
+                        ("source/reference/ssbmvf.f", 9833),
+                        ("source/reference/sscalf.f", 1001),
+                        ("source/reference/sspmvf.f", 8200),
+                        ("source/reference/sspr2f.f", 7281),
+                        ("source/reference/ssprf.f", 6004),
+                        ("source/reference/sswapf.f", 1291),
+                        ("source/reference/ssymmf.f", 9833),
+                        ("source/reference/ssymvf.f", 8073),
+                        ("source/reference/ssyr2f.f", 7343),
+                        ("source/reference/ssyr2kf.f", 11013),
+                        ("source/reference/ssyrf.f", 5965),
+                        ("source/reference/ssyrkf.f", 9350),
+                        ("source/reference/stbmvf.f", 11355),
+                        ("source/reference/stbsvf.f", 11126),
+                        ("source/reference/stpmvf.f", 9444),
+                        ("source/reference/stpsvf.f", 9613),
+                        ("source/reference/strmmf.f", 11478),
+                        ("source/reference/strmvf.f", 8863),
+                        ("source/reference/strsmf.f", 12282),
+                        ("source/reference/strsvf.f", 9020),
+                        ("source/reference/strti2f.f", 4190),
+                        ("source/reference/strtrif.f", 5232),
+                        ("source/reference/zaxpycf.f", 910),
+                        ("source/reference/zaxpyf.f", 860),
+                        ("source/reference/zcopyf.f", 769),
+                        ("source/reference/zdotcf.f", 918),
+                        ("source/reference/zdotuf.f", 905),
+                        ("source/reference/zdrotf.f", 1011),
+                        ("source/reference/zdscalf.f", 684),
+                        ("source/reference/zgbmvf.f", 14223),
+                        ("source/reference/zgemm3mf.f", 13026),
+                        ("source/reference/zgemmf.f", 13076),
+                        ("source/reference/zgemvf.f", 10160),
+                        ("source/reference/zgercf.f", 4416),
+                        ("source/reference/zgeruf.f", 4379),
+                        ("source/reference/zgesvf.f", 3328),
+                        ("source/reference/zgetf2f.f", 3862),
+                        ("source/reference/zgetrff.f", 4603),
+                        ("source/reference/zgetrsf.f", 4242),
+                        ("source/reference/zhbmvf.f", 13197),
+                        ("source/reference/zhemm3mf.f", 10326),
+                        ("source/reference/zhemmf.f", 10324),
+                        ("source/reference/zhemvf.f", 10945),
+                        ("source/reference/zher2f.f", 8427),
+                        ("source/reference/zher2kf.f", 13292),
+                        ("source/reference/zherf.f", 6804),
+                        ("source/reference/zherkf.f", 10887),
+                        ("source/reference/zhpmvf.f", 8577),
+                        ("source/reference/zhpr2f.f", 8533),
+                        ("source/reference/zhprf.f", 7034),
+                        ("source/reference/zlaswpf.f", 3313),
+                        ("source/reference/zlauu2f.f", 4256),
+                        ("source/reference/zlauumf.f", 5010),
+                        ("source/reference/zpotf2f.f", 5214),
+                        ("source/reference/zpotrff.f", 5787),
+                        ("source/reference/zpotrif.f", 2590),
+                        ("source/reference/zrotgf.f", 645),
+                        ("source/reference/zsbmvf.f", 9642),
+                        ("source/reference/zscalf.f", 632),
+                        ("source/reference/zspmvf.f", 8060),
+                        ("source/reference/zspr2f.f", 7257),
+                        ("source/reference/zsprf.f", 6657),
+                        ("source/reference/zswapf.f", 842),
+                        ("source/reference/zsymm3mf.f", 9898),
+                        ("source/reference/zsymmf.f", 9897),
+                        ("source/reference/zsymvf.f", 8014),
+                        ("source/reference/zsyr2f.f", 7319),
+                        ("source/reference/zsyr2kf.f", 10922),
+                        ("source/reference/zsyrf.f", 5989),
+                        ("source/reference/zsyrkf.f", 9287),
+                        ("source/reference/ztbmvf.f", 13056),
+                        ("source/reference/ztbsvf.f", 12718),
+                        ("source/reference/ztpmvf.f", 12729),
+                        ("source/reference/ztpsvf.f", 12865),
+                        ("source/reference/ztrmmf.f", 14587),
+                        ("source/reference/ztrmvf.f", 11880),
+                        ("source/reference/ztrsmf.f", 15679),
+                        ("source/reference/ztrsvf.f", 12064),
+                        ("source/reference/ztrti2f.f", 4211),
+                        ("source/reference/ztrtrif.f", 5294),
+                        ("source/segfaults.patch", 387),
+                        ("source/symcopy.h", 30165),
+                        ("source/TargetList.txt", 678),
+                        ("source/test/cblat1.f", 31188),
+                        ("source/test/cblat2.dat", 1546),
+                        ("source/test/cblat2.f", 115732),
+                        ("source/test/cblat3.dat", 1046),
+                        ("source/test/cblat3.f", 130308),
+                        ("source/test/cblat3_3m.dat", 1058),
+                        ("source/test/cblat3_3m.f", 130467),
+                        ("source/test/CMakeLists.txt", 1222),
+                        ("source/test/dblat1.f", 31203),
+                        ("source/test/dblat2.dat", 1466),
+                        ("source/test/dblat2.f", 111388),
+                        ("source/test/dblat3.dat", 882),
+                        ("source/test/dblat3.f", 103029),
+                        ("source/test/get_threading_model.c", 391),
+                        ("source/test/LICENSE", 963),
+                        ("source/test/Makefile", 6838),
+                        ("source/test/sblat1.f", 31203),
+                        ("source/test/sblat2.dat", 1466),
+                        ("source/test/sblat2.f", 111314),
+                        ("source/test/sblat3.dat", 882),
+                        ("source/test/sblat3.f", 102977),
+                        ("source/test/zblat1.f", 31188),
+                        ("source/test/zblat2.dat", 1546),
+                        ("source/test/zblat2.f", 116080),
+                        ("source/test/zblat3.dat", 1046),
+                        ("source/test/zblat3.f", 130598),
+                        ("source/test/zblat3_3m.dat", 1058),
+                        ("source/test/zblat3_3m.f", 130757),
+                        ("source/USAGE.md", 6768),
+                        ("source/utest/CMakeLists.txt", 1125),
+                        ("source/utest/ctest.h", 22036),
+                        ("source/utest/Makefile", 492),
+                        ("source/utest/openblas_utest.h", 1904),
+                        ("source/utest/test_amax.c", 1977),
+                        ("source/utest/test_axpy.c", 3811),
+                        ("source/utest/test_dotu.c", 2864),
+                        ("source/utest/test_dsdot.c", 2034),
+                        ("source/utest/test_fork.c", 4176),
+                        ("source/utest/test_potrs.c", 12438),
+                        ("source/utest/test_rot.c", 3719),
+                        ("source/utest/test_rotmg.c", 3291),
+                        ("source/utest/test_swap.c", 3591),
+                        ("source/utest/utest_main.c", 1922),
+                        ("source/version.h", 4452),
+                        ("source/lapack-netlib/INSTALL/testdlamch", 13408),
+                        ("source/lapack-netlib/INSTALL/testdsecnd", 13320),
+                        ("source/lapack-netlib/INSTALL/testieee", 21616),
+                        ("source/lapack-netlib/INSTALL/testlsame", 13320),
+                        ("source/lapack-netlib/INSTALL/testsecond", 13320),
+                        ("source/lapack-netlib/INSTALL/testslamch", 13408),
+                        ("source/lapack-netlib/INSTALL/testversion", 9224),
+                        ("src/lib.rs", 0)
+                    ]
+                    .iter()
+                    .map(|(p, s)| (p.to_string(), *s))
+                    .collect()
+                }),
+                has_build_script: true
+            })
+        }
+    );
+}
+
+#[test]
 fn curl_sys_get_more_info_from_build_script() {
     assert_eq!(
         Report::from_result("a", "1", task_result("curl_sys-0.4.27-extract_crate-1.0.0")),

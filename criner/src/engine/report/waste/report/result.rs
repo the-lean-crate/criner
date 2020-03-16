@@ -474,6 +474,12 @@ fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)
                     .expect("valid utf8")
                     .to_string()
                 })
+                .filter(|p| {
+                    !(p.contains('{')
+                        || p.starts_with("cargo:")
+                        || p.starts_with("CARGO_")
+                        || *p == "OUT_DIR")
+                })
                 .collect();
             let dirs = BTreeSet::from_iter(v.iter().filter_map(|p| {
                 Path::new(p)
@@ -485,7 +491,10 @@ fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)
                 v.extend(v.clone().into_iter().map(|p| format!("{}/*", p)));
                 v
             } else {
-                optimize_directories(dirs.into_iter().map(|d| format!("{}/*", d)).collect())
+                let mut dirs =
+                    optimize_directories(dirs.into_iter().map(|d| format!("{}/*", d)).collect());
+                dirs.extend(v.clone().into_iter().map(|p| format!("{}/*", p)));
+                dirs
             };
             possible_patterns
                 .into_iter()
@@ -554,7 +563,14 @@ impl Report {
         build_script_name: Option<String>,
         compile_time_include: Option<Patterns>,
     ) -> (Option<Fix>, Vec<TarHeader>) {
-        let compile_time_include = compile_time_include.unwrap_or_default();
+        let mut compile_time_include = compile_time_include.unwrap_or_default();
+        let has_build_script = match build_script_name {
+            Some(build_script_name) => {
+                compile_time_include.push(build_script_name);
+                true
+            }
+            None => false,
+        };
         let include_globs = globset_from_globs_and_patterns(
             &STANDARD_INCLUDE_GLOBS,
             compile_time_include.iter().map(|s| s.as_str()),
@@ -566,20 +582,13 @@ impl Report {
             .iter()
             .map(|s| (s.as_str(), make_glob(s).compile_matcher()))
             .collect();
-        let mut include_patterns = simplify_includes(
+        let include_patterns = simplify_includes(
             STANDARD_INCLUDE_MATCHERS
                 .iter()
                 .chain(compile_time_include_matchers.iter()),
             included_entries.clone(),
         );
         let potential = potential_negated_includes(included_entries, None);
-        let has_build_script = match build_script_name {
-            Some(build_script_name) => {
-                include_patterns.push(build_script_name);
-                true
-            }
-            None => false,
-        };
 
         (
             if excluded_entries.is_empty() && potential.is_none() {
