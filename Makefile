@@ -15,6 +15,11 @@ $(bare_index_path):
 $(EXECUTABLE): $(RUST_SRC_FILES)
 	cargo build --all-features
 
+##@ Dataset
+
+update-crate-db: crates-io-db-dump.tar.gz ## Pull all DB data from crates.io - updated every 24h
+    curl --progress https://static.crates.io/db-dump.tar.gz > $@
+
 ##@ Testing
 
 run: $(EXECUTABLE) ## Run the CLI with user interface
