@@ -21,3 +21,4 @@ criner/Cargo.lock
 /criner.db/
 /*.sqlite
 /criner/tests/fixtures/extracted/
+/crates-io-db-dump.tar.gz

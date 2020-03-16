@@ -17,8 +17,10 @@ $(EXECUTABLE): $(RUST_SRC_FILES)
 
 ##@ Dataset
 
+crates-io-db-dump.tar.gz:
+	curl --progress https://static.crates.io/db-dump.tar.gz > $@
+
 update-crate-db: crates-io-db-dump.tar.gz ## Pull all DB data from crates.io - updated every 24h
-    curl --progress https://static.crates.io/db-dump.tar.gz > $@
 
 ##@ Testing
 
