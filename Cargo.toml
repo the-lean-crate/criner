@@ -35,6 +35,10 @@ members = ["criner"]
 # Turn on when needed to have faster debug builds
 [profile.dev.package."*"]
 debug = false
+
+# We need fast regex for tests
+[profile.test.package."*"]
+debug = false
 opt-level = 2
 
 [profile.release]

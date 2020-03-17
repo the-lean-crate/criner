@@ -340,20 +340,25 @@ fn matches_in_set_a_but_not_in_set_b(
     mut entries: Vec<TarHeader>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
     let set_a_len = patterns_to_amend.len();
+    let all_entries = entries.clone();
     for (pattern_a, glob_a) in set_a {
         if entries
             .iter()
             .any(|e| glob_a.is_match(tar_path_to_utf8_str(&e.path)))
         {
+            entries.retain(|e| !glob_a.is_match(tar_path_to_utf8_str(&e.path)));
+            if entries.is_empty() {
+                break;
+            }
+            if set_b.is_empty() {
+                patterns_to_amend.push(pattern_a.to_string());
+                continue;
+            }
+
             if entries
                 .iter()
                 .any(|e| set_b.is_match(tar_path_to_utf8_str(&e.path)))
             {
-                entries.retain(|e| !glob_a.is_match(tar_path_to_utf8_str(&e.path)));
-                if entries.is_empty() {
-                    break;
-                }
-            } else {
                 patterns_to_amend.push(pattern_a.to_string());
             }
         }
@@ -363,6 +368,10 @@ fn matches_in_set_a_but_not_in_set_b(
         .get(set_a_len..)
         .map(|v| v.to_vec())
         .unwrap_or_else(Vec::new);
+    let (entries, _) = split_to_matched_and_unmatched(
+        all_entries,
+        &globset_from_patterns(&patterns_in_set_a_which_do_not_match_a_pattern_in_set_b),
+    );
     (
         entries,
         patterns_to_amend,
@@ -514,13 +523,12 @@ fn potential_negated_includes(
         &patters_to_avoid.unwrap_or_else(|| globset_from_patterns(&Vec::<&str>::new())),
         entries,
     );
-    let potential_negated_excludes: Vec<_> =
-        patterns.into_iter().map(|s| format!("!{}", s)).collect();
-    if potential_negated_excludes.is_empty() {
+    let negated_patterns: Vec<_> = patterns.into_iter().map(|s| format!("!{}", s)).collect();
+    if negated_patterns.is_empty() {
         None
     } else {
         Some(PotentialWaste {
-            patterns_to_fix: potential_negated_excludes,
+            patterns_to_fix: negated_patterns,
             potential_waste: Report::convert_to_wasted_files(entries_we_would_remove),
         })
     }
