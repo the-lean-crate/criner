@@ -244,6 +244,7 @@ impl RenderOnce for Report {
                 wasted_by_extension,
             } => {
                 let gains = potential_savings(&info_by_version);
+                let no_prefix = String::new();
                 tmpl << html! {
                     : doctype::HTML;
                     html {
@@ -254,7 +255,7 @@ impl RenderOnce for Report {
                                 : total_section(total_size_in_bytes, total_files);
                                 : savings_section(gains);
                                 : by_extension_section(wasted_by_extension);
-                                : child_items_section("Versions", info_by_version, format!("{}/", crate_name), ".html", SortOrder::Name);
+                                : child_items_section("Versions", info_by_version, no_prefix, ".html", SortOrder::Name);
                             }
                         }
                         : page_footer();
