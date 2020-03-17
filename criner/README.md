@@ -2,7 +2,8 @@
 
 ## Possible Tasks
 
-* [ ] Make usage of crates-io database easy and integrate with criner to allow using download counts and other meta-data
+* [ ] Detect presence of git in report and auto-commit & push with progress
+* [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data
 * [ ] Only show potential savings if it is the most recent version
 * [ ] Count negation patterns in includes and excludes. The latter don't seem to be working, and if nobody is using them, Cargo can either make it work or
       reject them properly. Maybe. Maybe first create an issue for that and see what they think.

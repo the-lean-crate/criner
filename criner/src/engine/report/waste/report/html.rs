@@ -4,7 +4,7 @@ use super::{
 };
 use crate::engine::report::waste::AggregateFileInfo;
 use bytesize::ByteSize;
-use horrorshow::{box_html, html, Render, RenderBox, RenderOnce, TemplateBuffer};
+use horrorshow::{box_html, helper::doctype, html, Render, RenderBox, RenderOnce, TemplateBuffer};
 use std::iter::FromIterator;
 
 // TODO: fix these unnecessary clones while maintaining composability
@@ -201,36 +201,39 @@ impl RenderOnce for Report {
                 wasted_files.sort_by_key(|(_, s)| *s);
                 let title = format!("{}:{}", crate_name, crate_version);
                 tmpl << html! {
-                    : page_head(title.clone());
-                    body {
-                        article {
-                            : title_section(title);
-                            : total_section(total_size_in_bytes, total_files);
-                            : savings_section(fix_to_wasted_files_aggregate(suggested_fix.clone()));
-                            @ if suggested_fix.is_some() {
-                                section {
-                                    h3: "Fix";
+                    : doctype::HTML;
+                    html {
+                        : page_head(title.clone());
+                        body {
+                            article {
+                                : title_section(title);
+                                : total_section(total_size_in_bytes, total_files);
+                                : savings_section(fix_to_wasted_files_aggregate(suggested_fix.clone()));
+                                @ if suggested_fix.is_some() {
                                     section {
-                                        |t| write!(t, "{:#?}", suggested_fix.unwrap())
+                                        h3: "Fix";
+                                        section {
+                                            |t| write!(t, "{:#?}", suggested_fix.unwrap())
+                                        }
                                     }
+                                } else {
+                                    p: "Perfectly lean!"
                                 }
-                            } else {
-                                p: "Perfectly lean!"
-                            }
-                            @ if !wasted_files.is_empty() {
-                                section {
-                                    h3: format!("{} wasted files", wasted_files.len());
-                                    p: format!("total waste: {}", ByteSize(wasted_files.iter().map(|(_, s)| *s).sum::<u64>()));
-                                    ol {
-                                        @ for (path, size) in wasted_files.into_iter().rev() {
-                                            li : format_args!("{} : {}", path, ByteSize(size))
+                                @ if !wasted_files.is_empty() {
+                                    section {
+                                        h3: format!("{} wasted files", wasted_files.len());
+                                        p: format!("total waste: {}", ByteSize(wasted_files.iter().map(|(_, s)| *s).sum::<u64>()));
+                                        ol {
+                                            @ for (path, size) in wasted_files.into_iter().rev() {
+                                                li : format_args!("{} : {}", path, ByteSize(size))
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                        : page_footer();
                     }
-                    : page_footer();
                 }
             }
             Crate {
@@ -242,17 +245,20 @@ impl RenderOnce for Report {
             } => {
                 let gains = potential_savings(&info_by_version);
                 tmpl << html! {
-                    : page_head(crate_name.clone());
-                    body {
-                        article {
-                            : title_section(crate_name.clone());
-                            : total_section(total_size_in_bytes, total_files);
-                            : savings_section(gains);
-                            : by_extension_section(wasted_by_extension);
-                            : child_items_section("Versions", info_by_version, format!("{}/", crate_name), ".html", SortOrder::Name);
+                    : doctype::HTML;
+                    html {
+                        : page_head(crate_name.clone());
+                        body {
+                            article {
+                                : title_section(crate_name.clone());
+                                : total_section(total_size_in_bytes, total_files);
+                                : savings_section(gains);
+                                : by_extension_section(wasted_by_extension);
+                                : child_items_section("Versions", info_by_version, format!("{}/", crate_name), ".html", SortOrder::Name);
+                            }
                         }
+                        : page_footer();
                     }
-                    : page_footer();
                 }
             }
             CrateCollection {
@@ -272,20 +278,23 @@ impl RenderOnce for Report {
                             (waste_bytes + e.1.total_bytes, waste_files + e.1.total_files)
                         });
                 tmpl << html! {
-                    : page_head(title);
-                    body {
-                        article {
-                            : title_section(title);
-                            : total_section(total_size_in_bytes, total_files);
-                            section {
-                                h3: format!("{} wasted in {} files", ByteSize(waste_in_bytes), wasted_files_count);
+                    : doctype::HTML;
+                    html {
+                        : page_head(title);
+                        body {
+                            article {
+                                : title_section(title);
+                                : total_section(total_size_in_bytes, total_files);
+                                section {
+                                    h3: format!("{} wasted in {} files", ByteSize(waste_in_bytes), wasted_files_count);
+                                }
+                                : savings_section(gains);
+                                : by_extension_section(wasted_by_extension);
+                                : child_items_section("Crates", info_by_crate, no_prefix, no_suffix, SortOrder::Waste);
                             }
-                            : savings_section(gains);
-                            : by_extension_section(wasted_by_extension);
-                            : child_items_section("Crates", info_by_crate, no_prefix, no_suffix, SortOrder::Waste);
                         }
+                        : page_footer();
                     }
-                    : page_footer();
                 }
             }
         }
