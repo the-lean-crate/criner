@@ -50,9 +50,7 @@ fn savings_section(d: Option<AggregateFileInfo>) -> Box<dyn Render> {
 fn title_section(title: impl Into<String>) -> Box<dyn RenderBox> {
     let title = title.into();
     box_html! {
-        head {
-            title: title
-        }
+        title: title
     }
 }
 
@@ -60,7 +58,8 @@ fn page_head(title: impl Into<String>) -> Box<dyn RenderBox> {
     let title = title.into();
     box_html! {
         head {
-            title: title
+            title: title;
+            span(style="position: fixed; top: 1em; right: 1em; color: pink"): "Ugly Alpha 1";
         }
     }
 }
