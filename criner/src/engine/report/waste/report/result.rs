@@ -598,7 +598,12 @@ impl Report {
                 .chain(compile_time_include_matchers.iter()),
             included_entries.clone(),
         );
-        let potential = potential_negated_includes(included_entries, None);
+        let potential = potential_negated_includes(
+            included_entries,
+            Some(globset_from_patterns(
+                compile_time_include.iter().filter(|p| !p.starts_with('*')),
+            )),
+        );
 
         (
             if excluded_entries.is_empty() && potential.is_none() {
