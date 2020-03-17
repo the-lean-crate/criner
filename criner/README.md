@@ -3,7 +3,7 @@
 ## Tasks
 
 * [ ] Make usage of crates-io database easy and integrate with criner to allow using download counts and other meta-data
-* [ ] Put potential savings per version on crate level, instead of aggregate.
+* [ ] Only show potential savings if it is the most recent version
 * [ ] Count negation patterns in includes and excludes. The latter don't seem to be working, and if nobody is using them, Cargo can either make it work or
       reject them properly. Maybe. Maybe first create an issue for that and see what they think.
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down

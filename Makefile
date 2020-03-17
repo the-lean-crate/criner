@@ -15,6 +15,9 @@ $(bare_index_path):
 $(EXECUTABLE): $(RUST_SRC_FILES)
 	cargo build --all-features
 
+sloc: ## Count lines of code, without tests
+	tokei -e '*_test*'
+
 ##@ Dataset
 
 crates-io-db-dump.tar.gz:
