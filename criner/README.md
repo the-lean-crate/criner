@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/crates-io/criner.svg?branch=master)](https://travis-ci.org/crates-io/criner)
 
-## Tasks
+## Possible Tasks
 
 * [ ] Make usage of crates-io database easy and integrate with criner to allow using download counts and other meta-data
 * [ ] Only show potential savings if it is the most recent version

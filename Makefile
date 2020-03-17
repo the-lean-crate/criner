@@ -8,6 +8,10 @@ EXECUTABLE = target/debug/criner
 RUST_SRC_FILES = $(shell find src -name "*.rs")
 bare_index_path = index-bare
 
+DB = criner.db
+REPORTS = $(DB)/reports
+WASTE_REPORT = $(REPORTS)/waste
+
 $(bare_index_path):
 	mkdir -p $(dir $@)
 	git clone --bare https://github.com/rust-lang/crates.io-index $@
@@ -17,6 +21,15 @@ $(EXECUTABLE): $(RUST_SRC_FILES)
 
 sloc: ## Count lines of code, without tests
 	tokei -e '*_test*'
+
+
+$(WASTE_REPORT):
+		mkdir -p $(REPORTS)
+		git clone https://github.com/crates-io/waste $@
+
+##@ Running Criner
+
+init: $(WASTE_REPORT) ## Clone output repositories for report generation. Only needed if you have write permissions to https://github.com/crates-io
 
 ##@ Dataset
 
