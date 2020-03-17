@@ -1,11 +1,10 @@
 use super::{
     merge::{fix_to_wasted_files_aggregate, NO_EXT_MARKER},
-    Dict, Report, VersionInfo,
+    AggregateFileInfo, Dict, Report, VersionInfo,
 };
-use crate::engine::report::waste::AggregateFileInfo;
 use bytesize::ByteSize;
 use horrorshow::{box_html, helper::doctype, html, Render, RenderBox, RenderOnce, TemplateBuffer};
-use std::iter::FromIterator;
+use std::{iter::FromIterator, time::SystemTime};
 
 // TODO: fix these unnecessary clones while maintaining composability
 
@@ -91,13 +90,16 @@ fn info_section(info: VersionInfo) -> Box<dyn RenderBox> {
 fn page_footer() -> impl Render {
     html! {
         footer {
-            p {
+            span {
                 : "Created by ";
                 a(href="https://github.com/Byron/"): "Byron";
             }
-            p {
+            : " | ";
+            span {
                 a(href="https://github.com/crates-io/criner/issues/new"): "Provide feedback";
             }
+            : " | ";
+            span: format!("Generated {}", humantime::format_rfc3339(SystemTime::now()));
         }
     }
 }
