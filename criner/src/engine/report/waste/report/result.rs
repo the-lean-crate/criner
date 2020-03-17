@@ -558,7 +558,7 @@ fn non_greedy_patterns<S: AsRef<str>>(
 ) -> impl Iterator<Item = S> {
     patterns
         .into_iter()
-        .filter(|p| !p.as_ref().starts_with('*'))
+        .filter(|p| !p.as_ref().starts_with('*') && p.as_ref().ends_with('*'))
 }
 
 impl Report {
