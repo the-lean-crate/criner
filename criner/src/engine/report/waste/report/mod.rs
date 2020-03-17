@@ -17,7 +17,7 @@ pub type Patterns = Vec<String>;
 #[derive(PartialEq, Eq, Debug, Clone, Deserialize, Serialize)]
 pub struct PotentialWaste {
     pub patterns_to_fix: Patterns,
-    pub potential_waste: Vec<WastedFile>,
+    pub potential_waste: Vec<TarHeader>,
 }
 
 #[derive(PartialEq, Eq, Debug, Clone, Deserialize, Serialize)]
@@ -35,7 +35,6 @@ pub enum Fix {
     },
     NewInclude {
         include: Patterns,
-        potential: Option<PotentialWaste>,
         has_build_script: bool,
     },
     RemoveExcludeAndUseInclude {
@@ -44,6 +43,37 @@ pub enum Fix {
         include_removed: Patterns,
     },
     RemoveExclude,
+}
+
+impl Fix {
+    pub fn merge(
+        self,
+        rhs: Option<PotentialWaste>,
+        mut waste: Vec<TarHeader>,
+    ) -> (Fix, Vec<TarHeader>) {
+        match (self, rhs) {
+            (
+                Fix::NewInclude {
+                    mut include,
+                    has_build_script,
+                },
+                Some(potential),
+            ) => (
+                Fix::NewInclude {
+                    has_build_script,
+                    include: {
+                        include.extend(potential.patterns_to_fix);
+                        include
+                    },
+                },
+                {
+                    waste.extend(potential.potential_waste);
+                    waste
+                },
+            ),
+            (lhs, _) => (lhs, waste),
+        }
+    }
 }
 
 #[derive(Default, Deserialize)]

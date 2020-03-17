@@ -531,7 +531,7 @@ fn potential_negated_includes(
     } else {
         Some(PotentialWaste {
             patterns_to_fix: negated_patterns,
-            potential_waste: Report::convert_to_wasted_files(entries_we_would_remove),
+            potential_waste: entries_we_would_remove,
         })
     }
 }
@@ -611,18 +611,16 @@ impl Report {
             globset_from_patterns(non_greedy_patterns(&compile_time_include)),
         );
 
-        (
-            if excluded_entries.is_empty() && potential.is_none() {
-                None
-            } else {
-                Some(Fix::NewInclude {
-                    include: include_patterns,
-                    potential,
-                    has_build_script,
-                })
-            },
-            excluded_entries,
-        )
+        if excluded_entries.is_empty() && potential.is_none() {
+            (None, Vec::new())
+        } else {
+            let (fix, waste) = Fix::NewInclude {
+                include: include_patterns,
+                has_build_script,
+            }
+            .merge(potential, excluded_entries);
+            (Some(fix), waste)
+        }
     }
 
     pub(crate) fn compute_includes_from_includes_and_excludes(

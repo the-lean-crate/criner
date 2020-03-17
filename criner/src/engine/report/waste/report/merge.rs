@@ -55,11 +55,7 @@ pub fn vec_into_map_by_extension(
 
 pub fn fix_to_wasted_files_aggregate(fix: Option<Fix>) -> Option<AggregateFileInfo> {
     match fix.unwrap_or(Fix::RemoveExclude) {
-        Fix::NewInclude {
-            potential: Some(potential),
-            ..
-        }
-        | Fix::ImprovedInclude {
+        Fix::ImprovedInclude {
             potential: Some(potential),
             ..
         } => Some(potential.potential_waste),
@@ -67,9 +63,9 @@ pub fn fix_to_wasted_files_aggregate(fix: Option<Fix>) -> Option<AggregateFileIn
     }
     .map(|v| {
         v.into_iter()
-            .fold(AggregateFileInfo::default(), |mut a, (_, s)| {
+            .fold(AggregateFileInfo::default(), |mut a, e| {
                 a.total_files += 1;
-                a.total_bytes += s;
+                a.total_bytes += e.size;
                 a
             })
     })

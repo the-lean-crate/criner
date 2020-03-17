@@ -1,6 +1,7 @@
 use super::super::{AggregateFileInfo, Fix, Report, VersionInfo};
 use crate::engine::report::generic::Aggregate;
 use crate::engine::report::waste::PotentialWaste;
+use crate::model::TarHeader;
 use common_macros::b_tree_map;
 use std::collections::BTreeMap;
 
@@ -276,10 +277,6 @@ fn two_versions_of_same_crate() {
             ],
             suggested_fix: Some(Fix::NewInclude {
                 include: vec![],
-                potential: Some(PotentialWaste {
-                    patterns_to_fix: vec![],
-                    potential_waste: vec![("e/f.g".into(), 100), ("f/a.b".into(), 200)]
-                }),
                 has_build_script: false
             })
         }),
@@ -297,10 +294,7 @@ fn two_versions_of_same_crate() {
                                 waste: AggregateFileInfo { total_files: 3, total_bytes: 180 },
                               },
             },
-            potential_savings: Some(AggregateFileInfo {
-                total_files: 2,
-                total_bytes: 300
-            }),
+            potential_savings: None,
             wasted_by_extension: b_tree_map! {
                 "a".into()  => AggregateFileInfo {total_files: 2, total_bytes: 60},
                 "b".into()  => AggregateFileInfo {total_files: 3, total_bytes: 80},
@@ -328,7 +322,11 @@ fn two_versions_of_different_crate() {
                 include_removed: vec![],
                 potential: Some(PotentialWaste {
                     patterns_to_fix: vec![],
-                    potential_waste: vec![("a/b.c".into(), 10)]
+                    potential_waste: vec![TarHeader {
+                        path: (&b"a/b.c"[..]).into(),
+                        size: 10,
+                        entry_type: 0
+                    }]
                 }),
                 has_build_script: false
             })
@@ -348,7 +346,11 @@ fn two_versions_of_different_crate() {
                 include_removed: vec![],
                 potential: Some(PotentialWaste {
                     patterns_to_fix: vec![],
-                    potential_waste: vec![("b/d.c".into(), 100)]
+                    potential_waste: vec![TarHeader {
+                        path: (&b"a/d.c"[..]).into(),
+                        size: 100,
+                        entry_type: 0
+                    }]
                 }),
                 has_build_script: false
             })
@@ -356,10 +358,7 @@ fn two_versions_of_different_crate() {
         Report::CrateCollection {
             total_size_in_bytes: 3,
             total_files: 9,
-            potential_savings: Some(AggregateFileInfo {
-                total_bytes: 110,
-                total_files: 2
-            }),
+            potential_savings: None,
             info_by_crate: b_tree_map! {
                  "a".into() => VersionInfo {
                                 all: AggregateFileInfo { total_files: 4, total_bytes: 1 },

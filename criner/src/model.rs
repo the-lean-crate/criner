@@ -203,7 +203,7 @@ impl Default for Task {
 }
 
 /// An entry in a tar archive, including the most important meta-data
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct TarHeader {
     /// The normalized path of the entry. May not be unicode encoded.
     pub path: Vec<u8>,
