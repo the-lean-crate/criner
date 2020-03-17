@@ -517,12 +517,12 @@ fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)
 
 fn potential_negated_includes(
     entries: Vec<TarHeader>,
-    patters_to_avoid: Option<globset::GlobSet>,
+    patters_to_avoid: globset::GlobSet,
 ) -> Option<PotentialWaste> {
     let (entries_we_would_remove, patterns, _) = matches_in_set_a_but_not_in_set_b(
         Vec::new(),
         &STANDARD_EXCLUDE_MATCHERS,
-        &patters_to_avoid.unwrap_or_else(|| globset_from_patterns(&Vec::<&str>::new())),
+        &patters_to_avoid,
         entries,
     );
     let negated_patterns: Vec<_> = patterns.into_iter().map(|s| format!("!{}", s)).collect();
@@ -552,6 +552,14 @@ fn add_to_includes_if_non_default(file_path: &str, include: &mut Patterns) {
                 .to_string(),
         )
     }
+}
+
+fn non_greedy_patterns<S: AsRef<str>>(
+    patterns: impl IntoIterator<Item = S>,
+) -> impl Iterator<Item = S> {
+    patterns
+        .into_iter()
+        .filter(|p| !p.as_ref().starts_with('*'))
 }
 
 impl Report {
@@ -600,9 +608,7 @@ impl Report {
         );
         let potential = potential_negated_includes(
             included_entries,
-            Some(globset_from_patterns(
-                compile_time_include.iter().filter(|p| !p.starts_with('*')),
-            )),
+            globset_from_patterns(non_greedy_patterns(&compile_time_include)),
         );
 
         (
@@ -672,11 +678,15 @@ impl Report {
             if include_removed.is_empty() {
                 None
             } else {
+                let potential = potential_negated_includes(
+                    entries,
+                    globset_from_patterns(non_greedy_patterns(&include)),
+                );
                 Some(Fix::ImprovedInclude {
                     include,
                     include_removed,
                     has_build_script,
-                    potential: potential_negated_includes(entries, None),
+                    potential,
                 })
             },
             Vec::new(),
