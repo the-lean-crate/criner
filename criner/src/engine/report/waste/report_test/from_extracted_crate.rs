@@ -241,12 +241,7 @@ fn curl_sys_get_more_info_from_build_script() {
             total_files: 3176,
             wasted_files: vec![],
             suggested_fix: Some(Fix::NewInclude {
-                include: vec![
-                    "LICENSE".into(),
-                    "**/*.rs".into(),
-                    "curl/*".into(),
-                    "build.rs".into()
-                ],
+                include: vec!["LICENSE".into(), "**/*.rs".into(), "curl/*".into(),],
                 potential: Some(PotentialWaste {
                     patterns_to_fix: vec![
                         "!**/docs/*".into(),
