@@ -103,7 +103,7 @@ pub async fn non_blocking(
     ))?;
 
     let stage = report_settings;
-    repeat_every_s(
+    let report_handle = pool.spawn_with_handle(repeat_every_s(
         stage.run.every.as_secs() as u32,
         {
             let p = progress.clone();
@@ -129,8 +129,9 @@ pub async fn non_blocking(
                 )
             }
         },
-    )
-    .await?;
+    ))?;
+
+    report_handle.await?;
     fetch_handle.await?;
     processing_handle.await
 }
