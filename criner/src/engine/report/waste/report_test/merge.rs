@@ -21,7 +21,6 @@ fn crate_merging_version_equivalent_to_version_merging_crate() {
         total_size_in_bytes: 3,
         total_files: 9,
         info_by_version: BTreeMap::new(),
-        potential_savings: None,
         wasted_by_extension: b_tree_map! {
             "a".into()  => AggregateFileInfo {total_files: 2, total_bytes: 60},
             "b".into()  => AggregateFileInfo {total_files: 3, total_bytes: 80},
@@ -38,18 +37,19 @@ fn crate_and_crate_of_different_name() {
             crate_name: "a".into(),
             total_size_in_bytes: 3,
             total_files: 9,
-            potential_savings: Some(AggregateFileInfo {
-                total_bytes: 2,
-                total_files: 8
-            }),
             info_by_version: b_tree_map! {
                 "1".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 4, total_bytes: 1 },
                     waste: AggregateFileInfo { total_files: 3, total_bytes: 50 },
+                    potential_gains: Some(AggregateFileInfo {
+                        total_bytes: 2,
+                        total_files: 8
+                    })
                 },
                 "2".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 4, total_bytes: 1 },
                     waste: AggregateFileInfo { total_files: 3, total_bytes: 50 },
+                    potential_gains: None
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -62,11 +62,11 @@ fn crate_and_crate_of_different_name() {
             crate_name: "b".into(),
             total_size_in_bytes: 9,
             total_files: 3,
-            potential_savings: None,
             info_by_version: b_tree_map! {
                 "2".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
                     waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
+                    potential_gains: None
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -78,18 +78,19 @@ fn crate_and_crate_of_different_name() {
         Report::CrateCollection {
             total_size_in_bytes: 12,
             total_files: 12,
-            potential_savings: Some(AggregateFileInfo {
-                total_bytes: 2,
-                total_files: 8
-            }),
             info_by_crate: b_tree_map! {
                 "a".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 4*2, total_bytes: 1*2},
                     waste: AggregateFileInfo { total_files: 3*2, total_bytes: 50*2},
+                    potential_gains: Some(AggregateFileInfo {
+                        total_bytes: 2,
+                        total_files: 8
+                    })
                 },
                 "b".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
                     waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
+                    potential_gains: None
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -107,14 +108,14 @@ fn two_crate_collections() {
     let lhs_collection = Report::CrateCollection {
         total_size_in_bytes: 12,
         total_files: 10,
-        potential_savings: Some(AggregateFileInfo {
-            total_files: 5,
-            total_bytes: 10,
-        }),
         info_by_crate: b_tree_map! {
             "a".into() => VersionInfo {
                 all: AggregateFileInfo { total_files: 4, total_bytes: 1},
                 waste: AggregateFileInfo { total_files: 3, total_bytes: 50},
+                potential_gains: Some(AggregateFileInfo {
+                    total_files: 5,
+                    total_bytes: 10,
+                })
             },
         },
         wasted_by_extension: b_tree_map! {
@@ -127,18 +128,19 @@ fn two_crate_collections() {
     let rhs_collection = Report::CrateCollection {
         total_size_in_bytes: 12,
         total_files: 10,
-        potential_savings: Some(AggregateFileInfo {
-            total_files: 50,
-            total_bytes: 100,
-        }),
         info_by_crate: b_tree_map! {
             "a".into() => VersionInfo {
                 all: AggregateFileInfo { total_files: 40, total_bytes: 10},
                 waste: AggregateFileInfo { total_files: 30, total_bytes: 500},
+                potential_gains: Some(AggregateFileInfo {
+                    total_files: 50,
+                    total_bytes: 100,
+                })
             },
             "b".into() => VersionInfo {
                 all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
                 waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
+                potential_gains: None
             },
         },
         wasted_by_extension: b_tree_map! {
@@ -154,18 +156,19 @@ fn two_crate_collections() {
         Report::CrateCollection {
             total_size_in_bytes: 24,
             total_files: 20,
-            potential_savings: Some(AggregateFileInfo {
-                total_files: 55,
-                total_bytes: 110
-            }),
             info_by_crate: b_tree_map! {
                 "a".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 40+4, total_bytes: 10 +1},
                     waste: AggregateFileInfo { total_files: 30+3, total_bytes: 500+50},
+                    potential_gains: Some(AggregateFileInfo {
+                total_files: 55,
+                total_bytes: 110
+            })
                 },
                 "b".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
                     waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
+                    potential_gains: None
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -186,14 +189,14 @@ fn crate_and_crate_of_same_name() {
             crate_name: "a".into(),
             total_size_in_bytes: 3,
             total_files: 9,
-            potential_savings: Some(AggregateFileInfo {
-                total_files: 50,
-                total_bytes: 100
-            }),
             info_by_version: b_tree_map! {
                 "1".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 4, total_bytes: 1 },
                     waste: AggregateFileInfo { total_files: 3, total_bytes: 50 },
+                    potential_gains:Some(AggregateFileInfo {
+                total_files: 50,
+                total_bytes: 100
+            })
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -206,14 +209,14 @@ fn crate_and_crate_of_same_name() {
             crate_name: "a".into(),
             total_size_in_bytes: 9,
             total_files: 3,
-            potential_savings: Some(AggregateFileInfo {
-                total_files: 5,
-                total_bytes: 10
-            }),
             info_by_version: b_tree_map! {
                 "2".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
                     waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
+                    potential_gains: Some(AggregateFileInfo {
+                total_files: 5,
+                total_bytes: 10
+            })
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -226,18 +229,22 @@ fn crate_and_crate_of_same_name() {
             crate_name: "a".to_string(),
             total_size_in_bytes: 12,
             total_files: 12,
-            potential_savings: Some(AggregateFileInfo {
-                total_files: 55,
-                total_bytes: 110
-            }),
             info_by_version: b_tree_map! {
                 "1".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 4, total_bytes: 1 },
                     waste: AggregateFileInfo { total_files: 3, total_bytes: 50 },
+                    potential_gains:Some(AggregateFileInfo {
+                        total_files: 50,
+                        total_bytes: 100
+                    })
                 },
                 "2".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
                     waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
+                    potential_gains: Some(AggregateFileInfo {
+                        total_files: 5,
+                        total_bytes: 10
+                    })
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -263,7 +270,19 @@ fn two_versions_of_same_crate() {
                 ("b/a.b".into(), 20),
                 ("c/a.b".into(), 10)
             ],
-            suggested_fix: Some(Fix::RemoveExclude)
+            suggested_fix: Some(Fix::ImprovedInclude {
+                include: vec![],
+                include_removed: vec![],
+                potential: Some(PotentialWaste {
+                    patterns_to_fix: vec![],
+                    potential_waste: vec![TarHeader {
+                        path: (&b"a/d.c"[..]).into(),
+                        size: 10,
+                        entry_type: 0
+                    }]
+                }),
+                has_build_script: false
+            })
         }
         .merge(Report::Version {
             crate_name: "a".into(),
@@ -275,8 +294,17 @@ fn two_versions_of_same_crate() {
                 ("c/a.b".into(), 50),
                 ("d/a.c".into(), 90)
             ],
-            suggested_fix: Some(Fix::NewInclude {
+            suggested_fix: Some(Fix::ImprovedInclude {
                 include: vec![],
+                include_removed: vec![],
+                potential: Some(PotentialWaste {
+                    patterns_to_fix: vec![],
+                    potential_waste: vec![TarHeader {
+                        path: (&b"a/d.c"[..]).into(),
+                        size: 100,
+                        entry_type: 0
+                    }]
+                }),
                 has_build_script: false
             })
         }),
@@ -288,13 +316,14 @@ fn two_versions_of_same_crate() {
                  "1".into() => VersionInfo {
                                 all: AggregateFileInfo { total_files: 4, total_bytes: 1 },
                                 waste: AggregateFileInfo { total_files: 3, total_bytes: 50 },
+                                potential_gains: Some(AggregateFileInfo {total_files: 1, total_bytes: 10})
                               },
                  "2".into() => VersionInfo {
                                 all: AggregateFileInfo { total_files: 5, total_bytes: 2 },
                                 waste: AggregateFileInfo { total_files: 3, total_bytes: 180 },
+                                potential_gains: Some(AggregateFileInfo {total_files: 1, total_bytes: 100})
                               },
             },
-            potential_savings: None,
             wasted_by_extension: b_tree_map! {
                 "a".into()  => AggregateFileInfo {total_files: 2, total_bytes: 60},
                 "b".into()  => AggregateFileInfo {total_files: 3, total_bytes: 80},
@@ -358,15 +387,16 @@ fn two_versions_of_different_crate() {
         Report::CrateCollection {
             total_size_in_bytes: 3,
             total_files: 9,
-            potential_savings: None,
             info_by_crate: b_tree_map! {
                  "a".into() => VersionInfo {
                                 all: AggregateFileInfo { total_files: 4, total_bytes: 1 },
                                 waste: AggregateFileInfo { total_files: 3, total_bytes: 50 },
+                                potential_gains: Some(AggregateFileInfo{total_files: 1, total_bytes: 10})
                               },
                  "b".into() => VersionInfo {
                                 all: AggregateFileInfo { total_files: 5, total_bytes: 2 },
                                 waste: AggregateFileInfo { total_files: 3, total_bytes: 180 },
+                                potential_gains: Some(AggregateFileInfo{total_files: 1, total_bytes: 100})
                               },
             },
             wasted_by_extension: b_tree_map! {

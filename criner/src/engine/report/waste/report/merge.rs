@@ -5,15 +5,26 @@ use std::{collections::BTreeMap, path::PathBuf};
 
 impl std::ops::AddAssign for AggregateFileInfo {
     fn add_assign(&mut self, rhs: Self) {
-        self.total_bytes += rhs.total_bytes;
-        self.total_files += rhs.total_files;
+        let Self {
+            total_bytes,
+            total_files,
+        } = rhs;
+        self.total_bytes += total_bytes;
+        self.total_files += total_files;
     }
 }
 
 impl std::ops::AddAssign for VersionInfo {
     fn add_assign(&mut self, rhs: Self) {
-        self.all += rhs.all;
-        self.waste += rhs.waste;
+        let Self {
+            all,
+            waste,
+            potential_gains,
+        } = rhs;
+        self.all += all;
+        self.waste += waste;
+        self.potential_gains =
+            add_optional_aggregate(self.potential_gains.clone(), potential_gains);
     }
 }
 
@@ -95,6 +106,7 @@ pub fn version_to_new_version_map(
     total_size_in_bytes: u64,
     total_files: u64,
     wasted_files: &[WastedFile],
+    potential_gains: Option<AggregateFileInfo>,
 ) -> Dict<VersionInfo> {
     let mut m = BTreeMap::new();
     m.insert(
@@ -108,6 +120,7 @@ pub fn version_to_new_version_map(
                 total_bytes: byte_count(&wasted_files),
                 total_files: wasted_files.len() as u64,
             },
+            potential_gains,
         },
     );
     m
@@ -120,8 +133,14 @@ pub fn crate_info_from_version_info(
     let v = info_by_version
         .into_iter()
         .fold(AggregateVersionInfo::default(), |mut a, (_, v)| {
-            a.waste.add_assign(v.waste);
-            a.all.add_assign(v.all);
+            let VersionInfo {
+                waste,
+                all,
+                potential_gains,
+            } = v;
+            a.waste.add_assign(waste);
+            a.all.add_assign(all);
+            a.potential_gains = add_optional_aggregate(a.potential_gains.clone(), potential_gains);
             a
         });
 
@@ -136,14 +155,12 @@ pub fn collection_from_crate(
     total_files: u64,
     info_by_version: Dict<VersionInfo>,
     wasted_by_extension: Dict<AggregateFileInfo>,
-    potential_savings: Option<AggregateFileInfo>,
 ) -> Report {
     Report::CrateCollection {
         total_size_in_bytes,
         total_files,
         info_by_crate: crate_info_from_version_info(crate_name, info_by_version),
         wasted_by_extension,
-        potential_savings,
     }
 }
 
@@ -163,8 +180,8 @@ pub fn crate_from_version(version: Report) -> Report {
                 total_size_in_bytes,
                 total_files,
                 &wasted_files,
+                fix_to_wasted_files_aggregate(suggested_fix),
             ),
-            potential_savings: fix_to_wasted_files_aggregate(suggested_fix),
             total_size_in_bytes,
             total_files,
             wasted_by_extension: into_map_by_extension(wasted_files),

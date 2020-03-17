@@ -9,6 +9,20 @@ use std::iter::FromIterator;
 
 // TODO: fix these unnecessary clones while maintaining composability
 
+fn potential_savings(info_by_crate: &Dict<VersionInfo>) -> Option<AggregateFileInfo> {
+    let gains = info_by_crate
+        .iter()
+        .fold(AggregateFileInfo::default(), |mut s, (_, e)| {
+            s += e.potential_gains.clone().unwrap_or_default();
+            s
+        });
+    if gains.total_bytes > 0 {
+        Some(gains)
+    } else {
+        None
+    }
+}
+
 fn total_section(bytes: u64, files: u64) -> Box<dyn Render> {
     box_html! {
         section {
@@ -52,7 +66,11 @@ fn page_head(title: impl Into<String>) -> Box<dyn RenderBox> {
 }
 
 fn info_section(info: VersionInfo) -> Box<dyn RenderBox> {
-    let VersionInfo { all, waste } = info;
+    let VersionInfo {
+        all,
+        waste,
+        potential_gains,
+    } = info;
     box_html! {
         section {
             h3: "Total";
@@ -61,6 +79,12 @@ fn info_section(info: VersionInfo) -> Box<dyn RenderBox> {
         section {
             h3: "Waste";
             p: format!("{} wasted in {} files", ByteSize(waste.total_bytes), waste.total_files);
+        }
+        @ if let Some(gains) = potential_gains {
+            section {
+                h3: "Potential Gains";
+                p: format!("{} potentially gained in {} files", ByteSize(gains.total_bytes), gains.total_files);
+            }
         }
     }
 }
@@ -216,15 +240,15 @@ impl RenderOnce for Report {
                 total_files,
                 info_by_version,
                 wasted_by_extension,
-                potential_savings,
             } => {
+                let gains = potential_savings(&info_by_version);
                 tmpl << html! {
                     : page_head(crate_name.clone());
                     body {
                         article {
                             : title_section(crate_name.clone());
                             : total_section(total_size_in_bytes, total_files);
-                            : savings_section(potential_savings);
+                            : savings_section(gains);
                             : by_extension_section(wasted_by_extension);
                             : child_items_section("Versions", info_by_version, format!("{}/", crate_name), ".html", SortOrder::Name);
                         }
@@ -237,11 +261,11 @@ impl RenderOnce for Report {
                 total_files,
                 info_by_crate,
                 wasted_by_extension,
-                potential_savings,
             } => {
                 let title = "crates.io";
                 let no_prefix = String::new();
                 let no_suffix = String::new();
+                let gains = potential_savings(&info_by_crate);
                 let (waste_in_bytes, wasted_files_count) =
                     wasted_by_extension
                         .iter()
@@ -257,7 +281,7 @@ impl RenderOnce for Report {
                             section {
                                 h3: format!("{} wasted in {} files", ByteSize(waste_in_bytes), wasted_files_count);
                             }
-                            : savings_section(potential_savings);
+                            : savings_section(gains);
                             : by_extension_section(wasted_by_extension);
                             : child_items_section("Crates", info_by_crate, no_prefix, no_suffix, SortOrder::Waste);
                         }
