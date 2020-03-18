@@ -1,12 +1,15 @@
 [![Build Status](https://travis-ci.org/crates-io/criner.svg?branch=master)](https://travis-ci.org/crates-io/criner)
 
-## Possible Tasks
+## TODO
 
+* [ ] Sort top-level waste report by waste of the most recent version only (the past cannot change)
 * [ ] Be sure we handle YANKED crates correctly by skipping them when reporting at least and when downloading.
 * [ ] Detect presence of git in report and auto-commit & push with progress
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data
 * [ ] Only show potential savings if it is the most recent version
 * [ ] More reporting - right now the context gathering to see how much time is spent where is neglected.
+
+## Possible Tasks
 * [ ] Count negation patterns in includes and excludes. The latter don't seem to be working, and if nobody is using them, Cargo can either make it work or
       reject them properly. Maybe. Maybe first create an issue for that and see what they think.
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down
