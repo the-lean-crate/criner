@@ -140,6 +140,7 @@ pub struct AggregateFileInfo {
 pub struct VersionInfo {
     pub all: AggregateFileInfo,
     pub waste: AggregateFileInfo,
+    pub waste_latest_version: Option<(String, AggregateFileInfo)>,
     pub potential_gains: Option<AggregateFileInfo>,
 }
 

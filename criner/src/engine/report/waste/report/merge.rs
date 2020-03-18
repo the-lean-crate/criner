@@ -23,12 +23,28 @@ impl std::ops::AddAssign for VersionInfo {
             all,
             waste,
             potential_gains,
+            waste_latest_version,
         } = rhs;
         self.all += all;
         self.waste += waste;
         self.potential_gains =
             add_optional_aggregate(self.potential_gains.clone(), potential_gains);
+        self.waste_latest_version =
+            add_named_optional_aggregate(self.waste_latest_version.clone(), waste_latest_version);
     }
+}
+
+pub fn add_named_optional_aggregate(
+    lhs: Option<(String, AggregateFileInfo)>,
+    rhs: Option<(String, AggregateFileInfo)>,
+) -> Option<(String, AggregateFileInfo)> {
+    Some(match (lhs, rhs) {
+        (Some((lhs_name, lhs)), Some((rhs_name, _))) if lhs_name > rhs_name => (lhs_name, lhs),
+        (Some(_), Some((rhs_name, rhs))) => (rhs_name, rhs),
+        (Some(v), None) => v,
+        (None, Some(v)) => v,
+        (None, None) => return None,
+    })
 }
 
 pub fn add_optional_aggregate(
@@ -124,28 +140,37 @@ pub fn version_to_new_version_map(
                 total_files: wasted_files.len() as u64,
             },
             potential_gains,
+            waste_latest_version: None,
         },
     );
     m
 }
 
-pub fn crate_info_from_version_info(
+pub fn crate_collection_info_from_version_info(
     crate_name: String,
     info_by_version: Dict<VersionInfo>,
 ) -> Dict<AggregateVersionInfo> {
-    let v = info_by_version
-        .into_iter()
-        .fold(AggregateVersionInfo::default(), |mut a, (_, v)| {
+    let (_, v) = info_by_version.into_iter().fold(
+        (String::new(), AggregateVersionInfo::default()),
+        |(mut previous_name, mut a), (version_name, v)| {
             let VersionInfo {
                 waste,
                 all,
                 potential_gains,
+                waste_latest_version: _unused_and_always_none,
             } = v;
-            a.waste.add_assign(waste);
+            a.waste.add_assign(waste.clone());
             a.all.add_assign(all);
             a.potential_gains = add_optional_aggregate(a.potential_gains.clone(), potential_gains);
-            a
-        });
+            a.waste_latest_version = if version_name > previous_name {
+                previous_name = version_name.clone();
+                Some((version_name, waste))
+            } else {
+                a.waste_latest_version
+            };
+            (previous_name, a)
+        },
+    );
 
     let mut m = BTreeMap::new();
     m.insert(crate_name, v);
@@ -162,7 +187,7 @@ pub fn collection_from_crate(
     Report::CrateCollection {
         total_size_in_bytes,
         total_files,
-        info_by_crate: crate_info_from_version_info(crate_name, info_by_version),
+        info_by_crate: crate_collection_info_from_version_info(crate_name, info_by_version),
         wasted_by_extension,
     }
 }
@@ -337,7 +362,7 @@ impl crate::engine::report::generic::Aggregate for Report {
                 wasted_by_extension: map_into_map(lhs_wbe, rhs_wbe),
                 info_by_crate: map_into_map(
                     info_by_crate,
-                    crate_info_from_version_info(crate_name, info_by_version),
+                    crate_collection_info_from_version_info(crate_name, info_by_version),
                 ),
             },
         }

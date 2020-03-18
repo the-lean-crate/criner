@@ -63,11 +63,12 @@ fn page_head(title: impl Into<String>) -> Box<dyn RenderBox> {
     }
 }
 
-fn info_section(info: VersionInfo) -> Box<dyn RenderBox> {
+fn info_section(name: String, info: VersionInfo) -> Box<dyn RenderBox> {
     let VersionInfo {
         all,
         waste,
         potential_gains,
+        waste_latest_version,
     } = info;
     box_html! {
         section {
@@ -75,8 +76,17 @@ fn info_section(info: VersionInfo) -> Box<dyn RenderBox> {
             p: format!("{} total in {} files", ByteSize(all.total_bytes), all.total_files);
         }
         section {
-            h3: "Waste";
+            h3: "Waste in all versions";
             p: format!("{} wasted in {} files", ByteSize(waste.total_bytes), waste.total_files);
+        }
+        @ if let Some((child_name, info)) = waste_latest_version {
+            section {
+                h3 {
+                    : "Waste in ";
+                    a(href=format!("{}/{}.html", name, child_name)): child_name;
+                }
+                p: format!("{} wasted in {} files", ByteSize(info.total_bytes), info.total_files);
+            }
         }
         @ if let Some(gains) = potential_gains {
             section {
@@ -126,7 +136,10 @@ fn child_items_section(
     let mut sorted: Vec<_> = Vec::from_iter(info_by_child.into_iter());
     sorted.sort_by(|(ln, le), (rn, re)| match order {
         SortOrder::Name => ln.cmp(rn),
-        SortOrder::Waste => le.waste.total_bytes.cmp(&re.waste.total_bytes),
+        SortOrder::Waste => match (&le.waste_latest_version, &re.waste_latest_version) {
+            (Some(le), Some(re)) => le.1.total_bytes.cmp(&re.1.total_bytes),
+            _ => le.waste.total_bytes.cmp(&re.waste.total_bytes),
+        },
     });
     box_html! {
         section {
@@ -136,10 +149,10 @@ fn child_items_section(
                     li {
                         h3 {
                             a(href=format!("{}{}{}", prefix, name, suffix)) {
-                                : name
+                                : name.clone()
                             }
                         }
-                        : info_section(info);
+                        : info_section(name, info);
                     }
                 }
             }

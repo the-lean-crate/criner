@@ -44,12 +44,14 @@ fn crate_and_crate_of_different_name() {
                     potential_gains: Some(AggregateFileInfo {
                         total_bytes: 2,
                         total_files: 8
-                    })
+                    }),
+                    waste_latest_version: None,
                 },
                 "2".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 4, total_bytes: 1 },
                     waste: AggregateFileInfo { total_files: 3, total_bytes: 50 },
-                    potential_gains: None
+                    potential_gains: None,
+                    waste_latest_version: None,
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -66,7 +68,8 @@ fn crate_and_crate_of_different_name() {
                 "2".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
                     waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
-                    potential_gains: None
+                    potential_gains: None,
+                    waste_latest_version: None,
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -85,12 +88,14 @@ fn crate_and_crate_of_different_name() {
                     potential_gains: Some(AggregateFileInfo {
                         total_bytes: 2,
                         total_files: 8
-                    })
+                    }),
+                    waste_latest_version: Some(("2".into(), AggregateFileInfo { total_files: 3, total_bytes: 50 }))
                 },
                 "b".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
                     waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
-                    potential_gains: None
+                    potential_gains: None,
+                    waste_latest_version: Some(("2".into(), AggregateFileInfo { total_files: 6, total_bytes: 150 }))
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -115,7 +120,8 @@ fn two_crate_collections() {
                 potential_gains: Some(AggregateFileInfo {
                     total_files: 5,
                     total_bytes: 10,
-                })
+                }),
+                waste_latest_version: Some(("3".into(), AggregateFileInfo { total_files: 1, total_bytes: 20},))
             },
         },
         wasted_by_extension: b_tree_map! {
@@ -135,12 +141,14 @@ fn two_crate_collections() {
                 potential_gains: Some(AggregateFileInfo {
                     total_files: 50,
                     total_bytes: 100,
-                })
+                }),
+                waste_latest_version: Some(("4".into(), AggregateFileInfo { total_files: 2, total_bytes: 40}))
             },
             "b".into() => VersionInfo {
                 all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
                 waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
-                potential_gains: None
+                potential_gains: None,
+                waste_latest_version: Some(("1".into(), AggregateFileInfo { total_files: 3, total_bytes: 50}))
             },
         },
         wasted_by_extension: b_tree_map! {
@@ -161,14 +169,16 @@ fn two_crate_collections() {
                     all: AggregateFileInfo { total_files: 40+4, total_bytes: 10 +1},
                     waste: AggregateFileInfo { total_files: 30+3, total_bytes: 500+50},
                     potential_gains: Some(AggregateFileInfo {
-                total_files: 55,
-                total_bytes: 110
-            })
+                        total_files: 55,
+                        total_bytes: 110
+                    }),
+                    waste_latest_version: Some(("4".into(), AggregateFileInfo { total_files: 2, total_bytes: 40}))
                 },
                 "b".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
                     waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
-                    potential_gains: None
+                    potential_gains: None,
+                    waste_latest_version: Some(("1".into(), AggregateFileInfo { total_files: 3, total_bytes: 50}))
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -193,10 +203,11 @@ fn crate_and_crate_of_same_name() {
                 "1".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 4, total_bytes: 1 },
                     waste: AggregateFileInfo { total_files: 3, total_bytes: 50 },
-                    potential_gains:Some(AggregateFileInfo {
-                total_files: 50,
-                total_bytes: 100
-            })
+                    potential_gains: Some(AggregateFileInfo {
+                        total_files: 50,
+                        total_bytes: 100
+                    }),
+                    waste_latest_version: None,
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -214,9 +225,10 @@ fn crate_and_crate_of_same_name() {
                     all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
                     waste: AggregateFileInfo { total_files: 6, total_bytes: 150 },
                     potential_gains: Some(AggregateFileInfo {
-                total_files: 5,
-                total_bytes: 10
-            })
+                        total_files: 5,
+                        total_bytes: 10
+                    }),
+                    waste_latest_version: None,
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -236,7 +248,8 @@ fn crate_and_crate_of_same_name() {
                     potential_gains:Some(AggregateFileInfo {
                         total_files: 50,
                         total_bytes: 100
-                    })
+                    }),
+                    waste_latest_version: None,
                 },
                 "2".into() => VersionInfo {
                     all: AggregateFileInfo { total_files: 8, total_bytes: 10 },
@@ -244,7 +257,8 @@ fn crate_and_crate_of_same_name() {
                     potential_gains: Some(AggregateFileInfo {
                         total_files: 5,
                         total_bytes: 10
-                    })
+                    }),
+                    waste_latest_version: None,
                 }
             },
             wasted_by_extension: b_tree_map! {
@@ -316,12 +330,14 @@ fn two_versions_of_same_crate() {
                  "1".into() => VersionInfo {
                                 all: AggregateFileInfo { total_files: 4, total_bytes: 1 },
                                 waste: AggregateFileInfo { total_files: 3, total_bytes: 50 },
-                                potential_gains: Some(AggregateFileInfo {total_files: 1, total_bytes: 10})
+                                potential_gains: Some(AggregateFileInfo {total_files: 1, total_bytes: 10}),
+                                waste_latest_version: None,
                               },
                  "2".into() => VersionInfo {
                                 all: AggregateFileInfo { total_files: 5, total_bytes: 2 },
                                 waste: AggregateFileInfo { total_files: 3, total_bytes: 180 },
-                                potential_gains: Some(AggregateFileInfo {total_files: 1, total_bytes: 100})
+                                potential_gains: Some(AggregateFileInfo {total_files: 1, total_bytes: 100}),
+                                waste_latest_version: None,
                               },
             },
             wasted_by_extension: b_tree_map! {
@@ -391,12 +407,14 @@ fn two_versions_of_different_crate() {
                  "a".into() => VersionInfo {
                                 all: AggregateFileInfo { total_files: 4, total_bytes: 1 },
                                 waste: AggregateFileInfo { total_files: 3, total_bytes: 50 },
-                                potential_gains: Some(AggregateFileInfo{total_files: 1, total_bytes: 10})
+                                potential_gains: Some(AggregateFileInfo{total_files: 1, total_bytes: 10}),
+                                waste_latest_version: Some(("1".into(), AggregateFileInfo { total_files: 3, total_bytes: 50 }))
                               },
                  "b".into() => VersionInfo {
                                 all: AggregateFileInfo { total_files: 5, total_bytes: 2 },
                                 waste: AggregateFileInfo { total_files: 3, total_bytes: 180 },
-                                potential_gains: Some(AggregateFileInfo{total_files: 1, total_bytes: 100})
+                                potential_gains: Some(AggregateFileInfo{total_files: 1, total_bytes: 100}),
+                                waste_latest_version: Some(("1".into(), AggregateFileInfo { total_files: 3, total_bytes: 180 }))
                               },
             },
             wasted_by_extension: b_tree_map! {
