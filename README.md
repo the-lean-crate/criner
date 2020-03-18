@@ -21,7 +21,7 @@ _Criner_ currently operates in three stages when executed with `criner mine`:
 * **input**
   * **new versions crates-io repository**
     * Use the crates.io git index to learn about new crates incrementally
-  * **[PLANNED] Download the crates.io SQL dump** for more meta-data and download counts
+  * _[PLANNED]_ **Download the crates.io SQL dump** for more meta-data and download counts
 * **processing**
   * **traverse all crate versions** and **schedule** tasks or re-schedule failed tasks. Tasks will spawn other tasks if task processors are free,
     to keep all processors busy. A **processor** is a light-weight future which receives tasks by a channnel. Once a task is done, it will not
@@ -30,19 +30,19 @@ _Criner_ currently operates in three stages when executed with `criner mine`:
     * **download** - downloads the crate archive and stores it on disk. This will need 39GB as of 2020-03-18. 
     * **extraction** - extract the crate in memory and store all paths metadata, and some interesting files like `Cargo.toml` in full up to 128kb in size.
       As of 2018-03-18 it takes 10min to process all 215k crate versions on a 5year old MBPro with 4 physical cores.
-    * **[PLANNED] Sloc** - count using tokei.
-    * **[PLANNED] Geiger** - count (amount of unsafe code) using `cargo geiger`.
+    * _[PLANNED]_ **Sloc** - count using tokei.
+    * _[PLANNED]_ **Geiger** - count (amount of unsafe code) using `cargo geiger`.
 * **reporting**
   * Traverse all crate versions and write a report file for each one. Aggregate all versions of a crate and write a report for each crate. Aggregate all
     crates and write a report for all crates on crates.io and all their versions. This works incrementally by leveraging the fact that crate versions are
     immutable, and that only new ones are added.
   * **report types**
     * **Waste** - aggregate the amount additional files which are not needed to build the package.
-    * **[PLANNED] Geiger** - Show the amount of unsafe code in a crate version and possibly its dependencies.
-    * **[POSSIBLE] Build Time** - Using the sloc count of the crate and its dependencies, how much build time will be added to your project by using it 
+    * _[PLANNED]_ **Geiger** - Show the amount of unsafe code in a crate version and possibly its dependencies.
+    * _[POSSIBLE]_ **Speed** - Using the sloc count of the crate and its dependencies, how much build time will be added to your project by using it 
      (in the worst case). The MVP might just be the SLOC count of a crate version and it's dependencies, similar to what lib.rs offers.
 * **sharing**
-  * **[PLANNED] Auto-commit & push reports** - That way as reports are updated, they are pushed to github with minimial delay and while providing progress to the user.
+  * _[PLANNED]_ **Auto-commit & push reports** - That way as reports are updated, they are pushed to github with minimial delay and while providing progress to the user.
   
 **Running Criner at home**
 
@@ -56,7 +56,39 @@ can be operated using SQL. This process is non-incremental and takes about 5 min
 Possible improvements are along export performance - it could probably be parallel and incremental - and along not having to mine yourself for an initial database state.
 Criner could upload its database once a day to an S3 bucket for instance - it's about 800MB gzipped.
 
+# The Lean Crate Initiative
+
+Is my attempt to improve build times by reducing download and extraction times. This makes the ecosystem more approachable to people or regions with slow internet and thus
+is very relevant for inclusiveness and extending Rusts reach.
+
+This is facilitated by three means:
+
+* **The Criner Waste Report** - Analyse the current state of waste within all crate versions of crates.io and offer a **fix**.
+* _[PLANNED]_ **The 'cargo-diet' companion program** - Start lean by default and compute optimial includes and exludes before publishing to crates.io.
+* _[PLANNED]_ **The 'lean crate'** badge - Show off that you care and present the badge on crates.io and in README files.
+
 # The Criner Waste Report
+
+As the first part of _The Lean Crate Initiative_, this report provides the data needed to see if this is a problem worth solving in the first place.
+And as of 2020-03-18, initial numbers show that out of 147GB of uncompressed crates data, 64GB or 44% are _probably_ not required to build a crate.
+
+The report operates on the following assumptions:
+
+* crates.io is a distribution platform for Rust source code
+* the source code is distributed for the purpose of compiling the crates and should be self-contained
+
+From these assumptions, some conclusions can be drawn.
+There is no need for…
+
+* …benchmarks
+* …tests
+* …docs
+* …fixtures
+* …anything else that is used for development
+* …packagers can use source archives from Github or clone repositories for the data they need
+
+Based on these assumptions and conclusion, _The Criner Waste Report_ computes a suggestions for new `include` or `exclude` directives which prevent
+unnecessary data to be put into the crate archive.
 
 ## FAQ
 
@@ -81,12 +113,9 @@ people have better control over the includes they make.
 ## Limitations of Waste Reporting
 
 * only extracts strings and 'rerun-if' directives from build.rs files.
-* It does not know renamed `build.rs`, `lib.rs` or `main.rs` files.
-  * It could learn about renamed files by changing it's algorithm when gathering crate information.
-* it does not handle negated include patterns, but it also is not disturbed by them
+* it does not handle negated include patterns, but it also is not disturbed by them.
 * When replacing an exclude which is not specific enough with an include that is, it always resolves to all desirable files and is unable 
-  to generate a glob pattern from that. This can result in many files suggested as include.
-
+  to generate a glob pattern from that. This can result in [many files suggested as include](https://crates-io.github.io/waste/gnir/0.9.7.html).
 
 ## Fun facts
 
