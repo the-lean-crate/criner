@@ -274,7 +274,7 @@ impl RenderOnce for Report {
                 info_by_crate,
                 wasted_by_extension,
             } => {
-                let title = "crates.io";
+                let title = "Crates.io Waste Report";
                 let no_prefix = String::new();
                 let no_suffix = String::new();
                 let gains = potential_savings(&info_by_crate);
