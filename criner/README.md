@@ -2,7 +2,6 @@
 
 ## TODO
 
-* [ ] Prettify html output to allow better diffing/better compression in git
 * [ ] Be sure we handle YANKED crates correctly by skipping them when reporting at least and when downloading.
 * [ ] Detect presence of git in report and auto-commit & push with progress
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data
