@@ -70,7 +70,7 @@ This is facilitated by three means:
 # The Criner Waste Report
 
 As the first part of _The Lean Crate Initiative_, this report provides the data needed to see if this is a problem worth solving in the first place.
-And as of 2020-03-18, initial numbers show that out of 147GB of uncompressed crates data, 64GB or 44% are _probably_ not required to build a crate.
+And as of 2020-03-18, initial numbers show that out of 147GB of uncompressed crates data, 64GB or 44% are _most probably_ not required to build a crate.
 
 The report operates on the following assumptions:
 
@@ -85,14 +85,28 @@ There is no need for…
 * …docs
 * …fixtures
 * …anything else that is used for development
-* …packagers can use source archives from Github or clone repositories for the data they need
+* …packagers can use source archives from Github or clone repositories for the data they need to run tests
 
-Based on these assumptions and conclusion, _The Criner Waste Report_ computes a suggestions for new `include` or `exclude` directives which prevent
+Based on these assumptions and conclusions, _The Criner Waste Report_ computes a suggestions for new `include` or `exclude` directives which prevent
 unnecessary data to be put into the crate archive.
+
+Due to the way Cargo handles these directives, `include` directives are deemed most powerful in the persuit of keeping the amount of patterns small, using
+negative patterns where needed. Thus these will be recommended whenever possible. 
 
 ## FAQ
 
-### It claims my crate is full of waste because it doesn't see what the build-script requires…
+### How dare you call anything in my crate 'Waste' ??!
+
+Apologies, the term was proposed by the marketing department who believed that 'The Criner Waste Report' will do better than 
+'The Criner Report of files you do not need to build a crate'.
+
+The author does not have any feelings towards crates that are bigger than they _probably_ have to be, and is happy to help get your crate
+off the index. Some files listed are certainly false positivies due to [limitations], read on in this FAQ to learn how to remove these
+false positives.
+
+[limitations]: https://github.com/crates-io/criner#limitations-of-waste-reporting
+
+### It claims my crate is full of waste because it doesn't see what the build-script requires ?!
 
 Indeed the Waste Report does its best to extract names from build scripts, but won't be able to resolve things like `format!("C-lib-1.0.23-{}", suffix)`.
 To resolve this, set your own `include` directive. The Criner Waste Report will help finding even better includes from that point on, but it will merely
