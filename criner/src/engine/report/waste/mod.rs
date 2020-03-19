@@ -63,26 +63,11 @@ impl super::generic::Generator for Generator {
             .create(true)
             .open(out)
             .await?
-            .write_all(prettify(buf).as_slice())
+            .write_all(buf.as_bytes())
             .await
             .map_err(crate::Error::from)?;
         Ok(report)
     }
-}
-
-pub fn prettify(xml: String) -> Vec<u8> {
-    let mut rd = quick_xml::Reader::from_reader(std::io::Cursor::new(xml.as_bytes()));
-    rd.trim_text(true);
-    let mut out = quick_xml::Writer::new_with_indent(std::io::Cursor::new(Vec::new()), b' ', 4);
-    let mut buf = Vec::new();
-    while let Ok(ev) = rd.read_event(&mut buf) {
-        match ev {
-            quick_xml::events::Event::Eof => break,
-            ev => out.write_event(ev).expect("to never run out of memory"),
-        };
-        buf.clear();
-    }
-    out.into_inner().into_inner()
 }
 
 #[cfg(test)]

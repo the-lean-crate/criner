@@ -1,6 +1,6 @@
 use super::{AggregateFileInfo, Dict, Report, VersionInfo, WastedFile};
 use crate::{
-    engine::report::waste::{prettify, AggregateVersionInfo, Fix},
+    engine::report::waste::{AggregateVersionInfo, Fix},
     Result,
 };
 use async_trait::async_trait;
@@ -383,7 +383,7 @@ impl crate::engine::report::generic::Aggregate for Report {
             .create(true)
             .open(out_dir.join("index.html"))
             .await?
-            .write_all(prettify(buf).as_slice())
+            .write_all(buf.as_bytes())
             .await
             .map_err(crate::Error::from)
     }
