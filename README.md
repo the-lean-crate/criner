@@ -92,6 +92,12 @@ unnecessary data to be put into the crate archive.
 
 ## FAQ
 
+### It claims my crate is full of waste because it doesn't see what the build-script requires…
+
+Indeed the Waste Report does its best to extract names from build scripts, but won't be able to resolve things like `format!("C-lib-1.0.23-{}", suffix)`.
+To resolve this, set your own `include` directive. The Criner Waste Report will help finding even better includes from that point on, but it will merely
+be a suggestion, trusting that you set includes exactly the way they are needed.
+
 ### It keeps claiming that my included files are waste !?
 
 It detecs files included via `include_str!(…)` and `include_bytes!(…)`, but only so in in `lib.rs` and `main.rs`, or other binary targets.
