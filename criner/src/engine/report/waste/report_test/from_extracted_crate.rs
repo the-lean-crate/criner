@@ -4049,7 +4049,7 @@ fn lw_webdriver_with_big_binaries() {
             .collect(),
             suggested_fix: Some(Fix::NewInclude {
                 include: vec!["src/**/*".into(), "README.md".into()],
-                has_build_script: true
+                has_build_script: false
             })
         }
     );
@@ -4071,7 +4071,7 @@ fn falcon_raptor_typescript_with_false_positive_potential_waste() {
             wasted_files: vec![(".gitignore".into(), 24)],
             suggested_fix: Some(Fix::NewInclude {
                 include: vec!["README.md".into(), "lib/**/*.rs".into()],
-                has_build_script: true
+                has_build_script: false
             })
         },
         "we rather allow this false positive for now than to miss out on a ton of potential include optimizations (see curl-sys)"
@@ -4125,7 +4125,7 @@ fn cookie_factory() {
                 .collect(),
                 include_removed: vec!["Cargo.toml".into()],
                 potential: None,
-                has_build_script: true
+                has_build_script: false
             })
         }
     );
