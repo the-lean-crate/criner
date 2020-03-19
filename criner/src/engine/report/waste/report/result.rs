@@ -752,8 +752,11 @@ impl Report {
 
             let build_script_name = config.actual_or_expected_build_script_path();
             let maybe_data = find_in_entries(&entries_with_buffer, &entries, build_script_name);
-            maybe_build_script_path =
-                maybe_build_script_path.or_else(|| Some(build_script_name.to_owned()));
+            maybe_build_script_path = maybe_build_script_path.or_else(|| {
+                maybe_data
+                    .as_ref()
+                    .and_then(|_| Some(build_script_name.to_owned()))
+            });
             includes_parsed_from_files.extend(find_paths_mentioned_in_build_script(maybe_data));
 
             if includes_parsed_from_files.is_empty() {
