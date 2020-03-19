@@ -118,8 +118,9 @@ people have better control over the includes they make.
     
 ## Limitations of Waste Reporting
 
-* only extracts strings and 'rerun-if' directives from build.rs files.
-* it does not handle negated include patterns, but it also is not disturbed by them.
+* It Only extracts strings and 'rerun-if' directives from build.rs files. Thus it won't be able to deal with runtime generated strings or paths
+  very well. Additionally it does have filter logic to reduce the input set of extracted strings which might yield false positives.
+* It does not handle negated include patterns, but it also is not disturbed by them.
 * When replacing an exclude which is not specific enough with an include that is, it always resolves to all desirable files and is unable 
   to generate a glob pattern from that. This can result in [many files suggested as include](https://crates-io.github.io/waste/gnir/0.9.7.html).
 
