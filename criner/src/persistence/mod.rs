@@ -25,7 +25,6 @@ impl Db {
                 PRAGMA synchronous = NORMAL;        -- fsync only in critical moments
                 PRAGMA wal_autocheckpoint = 1000;   -- write WAL changes back every 1000 pages, for an in average 1MB WAL file. May affect readers if number is increased
                 PRAGMA wal_checkpoint(TRUNCATE);    -- free some space by truncating possibly massive WAL files from the last run.
-                PRAGMA mmap_size=4718592000;        -- allow mmapping the whole database for faster reads
             ")?;
 
             let transaction = connection.transaction()?;
