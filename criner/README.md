@@ -7,7 +7,7 @@
 * [ ] Only show potential savings if it is the most recent version
 * [ ] More reporting - right now the context gathering to see how much time is spent where is neglected.
 
-## Possible Tasks
+## Possible Improvements
 * [ ] Count negation patterns in includes and excludes. The latter don't seem to be working, and if nobody is using them, Cargo can either make it work or
       reject them properly. Maybe. Maybe first create an issue for that and see what they think.
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down
