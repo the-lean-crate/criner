@@ -67,7 +67,7 @@ This is facilitated by three means:
 * _[PLANNED]_ **The 'cargo-diet' companion program** - Start lean by default and compute optimial includes and exludes before publishing to crates.io.
 * _[PLANNED]_ **The 'lean crate'** badge - Show off that you care and present the badge on crates.io and in README files.
 
-# The Criner Waste Report
+# [The Criner Waste Report](https://crates-io.github.io/waste/)
 
 As the first part of _The Lean Crate Initiative_, this report provides the data needed to see if this is a problem worth solving in the first place.
 And as of 2020-03-18, initial numbers show that out of 147GB of uncompressed crates data, 60GB or 40% are _most probably_ not required to build a crate.
