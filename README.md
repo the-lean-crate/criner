@@ -70,7 +70,7 @@ This is facilitated by three means:
 # The Criner Waste Report
 
 As the first part of _The Lean Crate Initiative_, this report provides the data needed to see if this is a problem worth solving in the first place.
-And as of 2020-03-18, initial numbers show that out of 147GB of uncompressed crates data, 64GB or 44% are _most probably_ not required to build a crate.
+And as of 2020-03-18, initial numbers show that out of 147GB of uncompressed crates data, 60GB or 40% are _most probably_ not required to build a crate.
 
 The report operates on the following assumptions:
 

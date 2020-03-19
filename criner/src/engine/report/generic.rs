@@ -1,4 +1,4 @@
-use crate::persistence::TableAccess;
+use crate::persistence::{CrateVersionTable, TableAccess};
 use crate::{
     error::Result,
     model, persistence,
@@ -7,6 +7,37 @@ use crate::{
 use async_trait::async_trait;
 use rusqlite::{params, TransactionBehavior};
 use std::path::{Path, PathBuf};
+
+fn all_but_recently_yanked(
+    crate_name: &str,
+    versions: &[String],
+    table: &CrateVersionTable,
+    progress: &mut prodash::tree::Item,
+    key_buf: &mut String,
+) -> Result<usize> {
+    let mut num_yanked = 0;
+    for version in versions.iter().rev() {
+        key_buf.clear();
+        model::CrateVersion::key_from(&crate_name, &version, key_buf);
+
+        let is_yanked = table
+            .get(&key_buf)?
+            .map(|v| v.kind == crates_index_diff::ChangeKind::Yanked)
+            .unwrap_or(true);
+        if is_yanked {
+            num_yanked += 1;
+        } else {
+            break;
+        }
+    }
+    if num_yanked > 0 {
+        progress.info(format!(
+            "Skipped {} latest yanked versions of crate {}",
+            num_yanked, crate_name
+        ));
+    }
+    Ok(versions.len() - num_yanked)
+}
 
 #[async_trait]
 pub trait Aggregate
@@ -125,22 +156,19 @@ pub trait Generator {
                 progress.set_name(&name);
 
                 let mut crate_report = None::<Self::Report>;
-                for (vid, version) in c.versions.iter().enumerate() {
+                for (vid, version) in c
+                    .versions
+                    .iter()
+                    .take(all_but_recently_yanked(
+                        &name,
+                        &c.versions,
+                        &crate_versions,
+                        &mut progress,
+                        &mut key_buf,
+                    )?)
+                    .enumerate()
+                {
                     progress.set((vid + 1) as u32);
-
-                    key_buf.clear();
-                    model::CrateVersion::key_from(&name, &version, &mut key_buf);
-                    let is_yanked = crate_versions
-                        .get(&key_buf)?
-                        .map(|v| v.kind == crates_index_diff::ChangeKind::Yanked)
-                        .unwrap_or(true);
-                    if is_yanked && vid + 1 == c.versions.len() {
-                        progress.info(format!(
-                            "Skipped latest yanked crate version {}:{}",
-                            name, version
-                        ));
-                        continue;
-                    }
 
                     key_buf.clear();
                     Self::fq_report_key(&name, &version, &mut key_buf);
