@@ -3,7 +3,7 @@
 ## TODO
 
 * [ ] Be sure we handle YANKED crates correctly by skipping them when reporting at least and when downloading.
-* [ ] Detect presence of git in report and auto-commit & push with progress
+* [ ] Detect presence of git in report and auto-commit & push with progress, with ultra-high performance please!
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data
 * [ ] Only show potential savings if it is the most recent version
 * [ ] More reporting - right now the context gathering to see how much time is spent where is neglected.
@@ -25,6 +25,7 @@
 * async_std channel blocks if there is no receiver, which can definitely bite you if your processors are down. Also I don't know why this is desirable behaviour.
 * sqlite needs a lot of massaging to work acceptably in concurrent applications. Takeaway: WAL_mode, and when writting, always use immediate transactions
   when writing. Retry yourself while waiting and set a busy handler which waits.
+* Trying to optimize output HTML for git by prettifying failed - I just couldn't see it improve anything. For debugging HTML, it's easiest to use the browser.
 
 ### When migrating to Sqlite
 
