@@ -3,7 +3,8 @@
 ## TODO
 
 * [ ] Detect presence of git in report and auto-commit & push with progress, with ultra-high performance please!
-* [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data
+* [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data, like release date
+  * [ ] Consider extracting the release date from git and upgrade `crates-index-diff` to support that.
 * [ ] Only show potential savings if it is the most recent version
 * [ ] More reporting - right now the context gathering to see how much time is spent where is neglected.
 

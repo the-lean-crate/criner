@@ -67,10 +67,10 @@ This is facilitated by three means:
 * _[PLANNED]_ **The 'cargo-diet' companion program** - Start lean by default and compute optimial includes and exludes before publishing to crates.io.
 * _[PLANNED]_ **The 'lean crate'** badge - Show off that you care and present the badge on crates.io and in README files.
 
-# [The Criner Waste Report](https://crates-io.github.io/waste/)
+# [The Criner Waste Report][waste-io]
 
 As the first part of _The Lean Crate Initiative_, this report provides the data needed to see if this is a problem worth solving in the first place.
-And as of 2020-03-18, initial numbers show that out of 147GB of uncompressed crates data, 60GB or 40% are _most probably_ not required to build a crate.
+And as of 2020-03-18, initial numbers show that out of 147GB of uncompressed crates data, 59GB or 40% are _most probably_ not required to build a crate.
 
 The report operates on the following assumptions:
 
@@ -93,6 +93,11 @@ unnecessary data to be put into the crate archive.
 Due to the way Cargo handles these directives, `include` directives are deemed most powerful in the persuit of keeping the amount of patterns small, using
 negative patterns where needed. Thus these will be recommended whenever possible. 
 
+This part of the initiative is [still under heavy development][criner-todo].
+
+[criner-todo]: https://github.com/crates-io/criner/tree/master/criner#todo
+[waste-io]: https://crates-io.github.io/waste/
+
 ## FAQ
 
 ### How dare you call anything in my crate 'Waste' ??!
@@ -100,7 +105,7 @@ negative patterns where needed. Thus these will be recommended whenever possible
 Apologies, the term was proposed by the marketing department who believed that 'The Criner Waste Report' will do better than 
 'The Criner Report of files you do not need to build a crate'.
 
-The author does not have any feelings towards crates that are bigger than they _probably_ have to be, and is happy to help get your crate
+The author does shame crates that are bigger than they _probably_ have to be, and is happy to help get your crate
 off the index. Some files listed are certainly false positivies due to [limitations], read on in this FAQ to learn how to remove these
 false positives.
 
@@ -119,7 +124,7 @@ It detecs files included via `include_str!(…)` and `include_bytes!(…)`, but 
 ### How can I just make it stop complaining ?
 
 Add the `include = […]` that it proposes, possibly altered to your liking and needs. It will still provide you with potential negated include
-patterns to exclude tests, docs.
+patterns to exclude, for instance, tests and docs.
 
 ### What's better, exclude directives or include directives?
 
