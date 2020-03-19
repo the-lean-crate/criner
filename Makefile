@@ -47,7 +47,7 @@ force-report-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the reporting
 ##@ Waste Report Maintenance
 
 waste-report-push-changes: $(WASTE_REPORT) ## add, commit and push all changed report pages
-		cd $(WASTE_REPORT) && git add . && git commit -m "update" && git push origin HEAD:master
+		cd $(WASTE_REPORT) && git add . && git commit -m "update" && git push origin +HEAD:master
 
 waste-report-reset-history-and-push: $(WASTE_REPORT) ## clear the history of the waste report repository to reduce its size, and push everything
 		cd $(WASTE_REPORT); git checkout -b foo; git branch -D tmp; git checkout --orphan tmp; git branch -D foo;
