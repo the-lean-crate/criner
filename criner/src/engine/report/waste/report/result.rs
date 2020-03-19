@@ -732,7 +732,7 @@ impl Report {
         Option<Patterns>,
         Option<String>,
     ) {
-        let maybe_build_script_name = config.build_script_path().map(|s| s.to_owned());
+        let mut maybe_build_script_path = config.build_script_path().map(|s| s.to_owned());
         let compile_time_includes = {
             let mut includes_parsed_from_files = Vec::new();
             includes_parsed_from_files.extend(included_paths_of(find_in_entries(
@@ -750,10 +750,11 @@ impl Report {
                 add_to_includes_if_non_default(path, &mut includes_parsed_from_files);
             }
 
-            if let Some(build_path) = maybe_build_script_name.as_ref() {
-                let maybe_data = find_in_entries(&entries_with_buffer, &entries, build_path);
-                includes_parsed_from_files.extend(find_paths_mentioned_in_build_script(maybe_data));
-            }
+            let build_script_name = config.actual_or_expected_build_script_path();
+            let maybe_data = find_in_entries(&entries_with_buffer, &entries, build_script_name);
+            maybe_build_script_path =
+                maybe_build_script_path.or_else(|| Some(build_script_name.to_owned()));
+            includes_parsed_from_files.extend(find_paths_mentioned_in_build_script(maybe_data));
 
             if includes_parsed_from_files.is_empty() {
                 None
@@ -767,7 +768,7 @@ impl Report {
             package.include,
             package.exclude,
             compile_time_includes,
-            maybe_build_script_name,
+            maybe_build_script_path,
         )
     }
 }
