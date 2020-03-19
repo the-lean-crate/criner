@@ -106,7 +106,9 @@ fn page_footer() -> impl Render {
             }
             : " | ";
             span {
-                a(href="https://github.com/crates-io/criner/issues/new"): "Provide feedback";
+                a(href="https://github.com/crates-io/criner/issues/new?labels=bug&template=waste-report-incorrect.md&title=%5BINCORRECT+WASTE+REPORT%5D+%3CCrate+Name%3E",
+                  target="_blank",
+                  rel="noopener noreferrer"): "Provide feedback";
             }
             : " | ";
             span {
