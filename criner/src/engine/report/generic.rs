@@ -1,3 +1,4 @@
+use crate::persistence::TableAccess;
 use crate::{
     error::Result,
     model, persistence,
@@ -109,6 +110,7 @@ pub trait Generator {
         mut progress: prodash::tree::Item,
     ) -> Result<Option<Self::Report>> {
         let mut chunk_report = None::<Self::Report>;
+        let crate_versions = db.open_crate_versions()?;
         let mut results_to_update = Vec::new();
         {
             let connection = db.open_connection()?;
@@ -125,6 +127,20 @@ pub trait Generator {
                 let mut crate_report = None::<Self::Report>;
                 for (vid, version) in c.versions.iter().enumerate() {
                     progress.set((vid + 1) as u32);
+
+                    key_buf.clear();
+                    model::CrateVersion::key_from(&name, &version, &mut key_buf);
+                    let is_yanked = crate_versions
+                        .get(&key_buf)?
+                        .map(|v| v.kind == crates_index_diff::ChangeKind::Yanked)
+                        .unwrap_or(true);
+                    if is_yanked && vid + 1 == c.versions.len() {
+                        progress.info(format!(
+                            "Skipped latest yanked crate version {}:{}",
+                            name, version
+                        ));
+                        continue;
+                    }
 
                     key_buf.clear();
                     Self::fq_report_key(&name, &version, &mut key_buf);
