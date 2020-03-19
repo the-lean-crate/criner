@@ -2,7 +2,6 @@
 
 ## TODO
 
-* [ ] Be sure we handle YANKED crates correctly by skipping them when reporting at least and when downloading.
 * [ ] Detect presence of git in report and auto-commit & push with progress, with ultra-high performance please!
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data
 * [ ] Only show potential savings if it is the most recent version
