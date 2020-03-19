@@ -6,7 +6,7 @@ help:  ## Display this help
 
 EXECUTABLE = target/debug/criner
 RELEASE_EXECUTABLE = target/release/criner
-RUST_SRC_FILES = $(shell find src -name "*.rs")
+RUST_SRC_FILES = $(shell find src criner/src -name "*.rs")
 bare_index_path = index-bare
 
 DB = criner.db
@@ -37,11 +37,11 @@ $(WASTE_REPORT):
 init: $(WASTE_REPORT) ## Clone output repositories for report generation. Only needed if you have write permissions to https://github.com/crates-io
 fetch-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the fetch stage once
 		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) -F 1 -P 0 -R 0 $(DB)
-process-only: $(bare_index_path) ## Run the processing stage once
+process-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the processing stage once
 		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --io 1 --cpu 2  -F 0 -P 1 -R 0 $(DB)
-report-only: $(bare_index_path) ## Run the reporting stage once
+report-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the reporting stage once
 		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --cpu-o 10  -F 0 -P 0 -R 1 $(DB)
-force-report-only: $(bare_index_path) ## Run the reporting stage once, forcibly, rewriting everything and ignoring caches
+force-report-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the reporting stage once, forcibly, rewriting everything and ignoring caches
 		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --cpu-o 10  -F 0 -P 0 -R 1 -g '*' $(DB)
 
 ##@ Waste Report Maintenance
