@@ -24,11 +24,11 @@ fn potential_savings(info_by_crate: &Dict<VersionInfo>) -> Option<AggregateFileI
 
 fn total_section(bytes: u64, files: u64) -> Box<dyn Render> {
     box_html! {
-        section {
+        section(id="total-bytes") {
             h3: "total uncompressed bytes";
             p: format!("{}", ByteSize(bytes))
         }
-        section {
+        section(id="total-files") {
             h3: "total files";
             p: files
         }
@@ -38,7 +38,7 @@ fn total_section(bytes: u64, files: u64) -> Box<dyn Render> {
 fn savings_section(d: Option<AggregateFileInfo>) -> Box<dyn Render> {
     box_html! {
         @ if let Some(all) = d.as_ref() {
-            section {
+            section(id="potential-savings") {
                 h3: "potential savings";
                 p: format!("{} total in {} files", ByteSize(all.total_bytes), all.total_files);
             }
@@ -71,16 +71,16 @@ fn info_section(name: String, info: VersionInfo) -> Box<dyn RenderBox> {
         waste_latest_version,
     } = info;
     box_html! {
-        section {
+        section(id="child-total") {
             h3: "Total";
             p: format!("{} total in {} files", ByteSize(all.total_bytes), all.total_files);
         }
-        section {
+        section(id="child-waste") {
             h3: "Waste in all versions";
             p: format!("{} wasted in {} files", ByteSize(waste.total_bytes), waste.total_files);
         }
         @ if let Some((child_name, info)) = waste_latest_version {
-            section {
+            section(id="child-waste-latest-version") {
                 h3 {
                     : "Waste in ";
                     a(href=format!("{}/{}.html", name, child_name)): child_name;
@@ -89,7 +89,7 @@ fn info_section(name: String, info: VersionInfo) -> Box<dyn RenderBox> {
             }
         }
         @ if let Some(gains) = potential_gains {
-            section {
+            section(id="child-gains") {
                 h3: "Potential Gains";
                 p: format!("{} potentially gained in {} files", ByteSize(gains.total_bytes), gains.total_files);
             }
@@ -144,7 +144,7 @@ fn child_items_section(
         },
     });
     box_html! {
-        section {
+        section(id="children") {
             h1: title;
             ol {
                 @ for (name, info) in sorted.into_iter().rev() {
