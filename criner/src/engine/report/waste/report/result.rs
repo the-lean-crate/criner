@@ -486,7 +486,7 @@ fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)
                     !(p.contains('{')
                         || p.contains(' ')
                         || p.contains('@')
-                        || &p.to_uppercase() == p // probably environment variable
+                        || (!p.as_bytes().iter().any(|b| b.is_ascii_digit()) && &p.to_uppercase() == p) // probably environment variable
                         || p.starts_with("cargo:")
                         || p.starts_with("-"))
                 })
