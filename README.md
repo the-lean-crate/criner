@@ -62,9 +62,13 @@ Due to the way Cargo handles these directives, `include` directives are deemed m
 
 This part of the initiative is [still under heavy development][criner-todo], but available as _ugly alpha_.
 
+Please do note that _your feedback_ on whether or not these assumptions and conclusions are correct is much appreciated, everything can be changed
+to make _The Criner Waste Report_ better in a [collaborative][code-of-conduct], community driven effort.
+
 [criner-todo]: https://github.com/crates-io/criner/tree/master/criner#todo
 [waste-io]: https://crates-io.github.io/waste/
 [negative-include]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-exclude-and-include-fields
+[code-of-conduct]: https://github.com/crates-io/criner/blob/master/CODE_OF_CONDUCT.md
 
 ## FAQ
 
@@ -82,7 +86,7 @@ false positives.
 ### It claims my crate is full of waste because it doesn't see what the build-script requires ?!
 
 Indeed the Waste Report does its best to extract names from build scripts, but won't be able to resolve things like `format!("C-lib-1.0.23-{}", suffix)`.
-To resolve this, set your own `include` directive. The Criner Waste Report will help finding even better includes from that point on, but it will merely
+To resolve this, set your own `include` directive. _The Criner Waste Report_ will help finding even better includes from that point on, but it will merely
 be a suggestion, trusting that you set includes exactly the way they are needed.
 
 ### It keeps claiming that my included files are waste !?
@@ -102,6 +106,17 @@ by excluding tests, docs and the likes.
 When excludes are present, it makes recommendations mandatory, and considers all files that don't are included despites those recommendations to
 be waste. The reason is that whitelists, i.e. include directives, are better supported by cargo due to the presence of negations, so it assumes
 people have better control over the includes they make.
+
+### What are "potential savings"?
+
+It's our way to hint at the possibility of making your crate smaller while acknowledging that your `include` directive is probably exactly what you
+had in mind when designing it.
+
+However, right now we believe that certain kinds of files are not needed to build a crate and thus may have additional negation patterns that would
+exclude these files. Common examples are tests, which are easily included by the typical `src/**/*.rs` include directive.
+
+Potential savings do not count as 'Waste', but currently prevent the [crate version](https://crates-io.github.io/waste/zfs-core/0.2.0.html) 
+from achieving the `perfectly lean` status.
     
 ## Limitations of Waste Reporting
 
@@ -136,7 +151,7 @@ I live in China and learned to live with slow and flaky internet connections. Ev
 
 I made _Criner_ to help me reduce the average download size of crates, triggered by the realization that [`nushell`][nu] sent me 3MB of 
 images in a 4MB download. The [fix][nu-fix] was trivial, and I wondered how much more there was to
-gain by simple fixes. The idea for *The Criner Waste Report* was born.
+gain by simple fixes. The idea for _The Criner Waste Report_ was born.
 
 [nu]: https://github.com/nushell/nushell
 [nu-fix]: https://github.com/nushell/nushell/pull/1316
