@@ -11,6 +11,29 @@ This is facilitated by three means:
 * _[PLANNED]_ **The 'cargo-diet' companion program** - Start lean by default and compute optimial includes and exludes before publishing to crates.io.
 * _[PLANNED]_ **The 'lean crate' badge** - Show off that you care and present the badge on crates.io and in README files.
 
+# How you can help right now
+
+First of all, thanks so much for your willingness to help! Let's get started.
+
+Head over to The [Criner Waste Report][waste-io] and find your crate. See if a lot of 'waste' is detected, and validate and try the suggested fix. If something is wrong
+or not working, click the **Provide Feedback** link at the bottom of your crates page.
+
+## Example: There is some 'Waste' to be removed
+
+* Head over to [your most recent published crate version](https://crates-io.github.io/waste/rusty-leveldb/0.3.3.html)
+* Create a new `include` directive, with values suggested by the page above, i.e. `include = ["src/**/*", "LICENSE", "README.md", "!**/benches/*"]`.
+* See if it works for you. And if it does, publish a new version. This will adjust the crate ranking next time the Criner authors update the website, currently once a day.
+
+## Example: The crate is lean - there is nothing to do, or is there?
+
+* Head over to [your most recent published crate version](https://crates-io.github.io/waste/ripgrep/12.0.0.html) just to see the crate is perfectly lean!
+* Maybe check if Criner might have missed something - a way to do this is to check the package it would upload
+   * `cargo package --offline --allow-dirty --no-verify`
+   * Find the package in `target/package` and untar+gz it using `tar -xzf target/package/<crate-version>.crate`.
+   * Browse the extracted content and see if there is more than you think should be there.
+* If you found files that are not required and you think _The Criner Waste Report_ should pick them up, use the **Provide Feedback** link at the bottom
+  of the page and report the issue. 
+
 # [The Criner Waste Report][waste-io]
 
 As the first part of _The Lean Crate Initiative_, this report provides the data needed to see if this is a problem worth solving in the first place.
