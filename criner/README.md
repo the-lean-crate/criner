@@ -3,6 +3,7 @@
 ## TODO
 
 * [ ] Detect presence of git in report and auto-commit & push with progress, with ultra-high performance please!
+* [ ] Suggest 'top-level' globs like `/README.md` if we know the matched file is on the top-level. Otherwise the pattern `README.md` will actually match `*/README.md`.
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data, like release date
   * [ ] Consider extracting the release date from git and upgrade `crates-index-diff` to support that.
 * [ ] Only show potential savings if it is the most recent version

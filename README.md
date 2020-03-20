@@ -87,6 +87,9 @@ people have better control over the includes they make.
 * It does not handle negated include patterns, but it also is not disturbed by them.
 * When replacing an exclude which is not specific enough with an include that is, it always resolves to all desirable files and is unable 
   to generate a glob pattern from that. This can result in [many files suggested as include](https://crates-io.github.io/waste/gnir/0.9.7.html).
+* Cargo traverses the entire manifest directory and applies its globsset. The globs in that globsset are very greedy, so that what looks like a file
+  `README.md` will actually match everything that matches `*/README.md`  or `**/README.md`. This may include unwanted files and we will not detect these.
+  Circumvent this yourself by using a prefix slash, such as in `/README.md` indicating the file must be in the top level.
 
 ## Fun facts
 
