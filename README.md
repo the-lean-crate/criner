@@ -11,20 +11,34 @@ This is facilitated by three means:
 * _[PLANNED]_ **The 'cargo-diet' companion program** - Start lean by default and compute optimial includes and exludes before publishing to crates.io.
 * _[PLANNED]_ **The 'lean crate' badge** - Show off that you care and present the badge on crates.io and in README files.
 
-# How you can help right now
+## Motivation
+
+I live in China and learned to live with slow and flaky internet connections. Every byte that reaches my computer makes me shed a tear in joy.
+
+This initiative was motivated by a [`nushell`][nu] update which took forever and failed multiple times when trying to send me 3MB of 
+images in a 4MB download. The [fix][nu-fix] was trivial, and I wondered how much more there was to gain by simple fixes like that.
+The idea for _The Criner Waste Report_ was born, which soon turned into a multi-step plan to tackle this problem.
+
+Nowadays, `nushell` is [perfectly lean][nu-lean], and I hope we will have more of these crates as the initiative progresses.
+
+[nu]: https://github.com/nushell/nushell
+[nu-fix]: https://github.com/nushell/nushell/pull/1316
+[nu-lean]: https://crates-io.github.io/waste/nu/0.11.0.html
+
+## How you can help right now
 
 First of all, thanks so much for your willingness to help! Let's get started.
 
 Head over to The [Criner Waste Report][waste-io] and find your crate. See if a lot of 'waste' is detected, and validate and try the suggested fix. If something is wrong
 or not working, click the **Provide Feedback** link at the bottom of your crates page.
 
-## Example: There is some 'Waste' to be removed
+### Example: There is some 'Waste' to be removed
 
 * Head over to [your most recent published crate version](https://crates-io.github.io/waste/rusty-leveldb/0.3.3.html)
 * Create a new `include` directive, with values suggested by the page above, i.e. `include = ["src/**/*", "LICENSE", "README.md", "!**/benches/*"]`.
 * See if it works for you. And if it does, publish a new version. This will adjust the crate ranking next time the Criner authors update the website, currently once a day.
 
-## Example: The crate is lean - there is nothing to do, or is there?
+### Example: The crate is lean - there is nothing to do, or is there?
 
 * Head over to [your most recent published crate version](https://crates-io.github.io/waste/ripgrep/12.0.0.html) just to see the crate is perfectly lean!
 * Maybe check if Criner might have missed something - a way to do this is to check the package it would upload
@@ -144,17 +158,6 @@ from achieving the `perfectly lean` status.
 
 _Criner_ is a platform to make incrementally mining crates.io easy and affordable for everyone. _Criner_ is fast, configurable to use all
 available bandwidth and CPU, while keeping the memory footprint low enough to comfortably run on small devices with less than 512MB of RAM.
-
-## Motivation
-
-I live in China and learned to live with slow and flaky internet connections. Every byte that reaches my computer makes me shed a tear in joy.
-
-I made _Criner_ to help me reduce the average download size of crates, triggered by the realization that [`nushell`][nu] sent me 3MB of 
-images in a 4MB download. The [fix][nu-fix] was trivial, and I wondered how much more there was to
-gain by simple fixes. The idea for _The Criner Waste Report_ was born.
-
-[nu]: https://github.com/nushell/nushell
-[nu-fix]: https://github.com/nushell/nushell/pull/1316
 
 ## How it works
 
