@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-* [ ] Yes, I have read the [limitations](https://github.com/crates-io/criner#limitations-of-waste-reporting) section and believe this issue can be fixed, or my crate does not have a build script.
+* [ ] Yes, I have read the [limitations](https://github.com/the-lean-crate/criner#limitations-of-waste-reporting) section and believe this issue can be fixed, or my crate does not have a build script.
 * **<crate name>**
 * <URL to https://crates-io.github.io/waste/... showing the erroneous page>
 

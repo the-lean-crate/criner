@@ -32,7 +32,7 @@ sloc: ## Count lines of code, without tests
 
 $(WASTE_REPORT):
 		mkdir -p $(REPORTS)
-		git clone https://github.com/crates-io/waste $@
+		git clone https://github.com/the-lean-crate/waste $@
 
 init: $(WASTE_REPORT) ## Clone output repositories for report generation. Only needed if you have write permissions to https://github.com/crates-io
 fetch-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the fetch stage once

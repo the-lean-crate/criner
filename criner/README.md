@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/crates-io/criner.svg?branch=master)](https://travis-ci.org/crates-io/criner)
+[![Build Status](https://travis-ci.org/the-lean-crate/criner.svg?branch=master)](https://travis-ci.org/the-lean-crate/criner)
 
 ## TODO
 

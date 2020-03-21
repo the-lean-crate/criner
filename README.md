@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/crates-io/criner.svg?branch=master)](https://travis-ci.org/crates-io/criner)
+[![Build Status](https://travis-ci.org/the-lean-crate/criner.svg?branch=master)](https://travis-ci.org/the-lean-crate/criner)
 
 # The Lean Crate Initiative
 
@@ -80,10 +80,10 @@ This part of the initiative is [still under heavy development][criner-todo], but
 Please do note that _your feedback_ on whether or not these assumptions and conclusions are correct is much appreciated, everything can be changed
 to make _The Criner Waste Report_ better in a [collaborative][code-of-conduct], community driven effort.
 
-[criner-todo]: https://github.com/crates-io/criner/tree/master/criner#todo
+[criner-todo]: https://github.com/the-lean-crate/criner/tree/master/criner#todo
 [waste-io]: https://crates-io.github.io/waste/
 [negative-include]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-exclude-and-include-fields
-[code-of-conduct]: https://github.com/crates-io/criner/blob/master/CODE_OF_CONDUCT.md
+[code-of-conduct]: https://github.com/the-lean-crate/criner/blob/master/CODE_OF_CONDUCT.md
 
 ## FAQ
 
@@ -96,7 +96,7 @@ The author does shame crates that are bigger than they _probably_ have to be, an
 off the index. Some files listed are certainly false positivies due to [limitations], read on in this FAQ to learn how to remove these
 false positives.
 
-[limitations]: https://github.com/crates-io/criner#limitations-of-waste-reporting
+[limitations]: https://github.com/the-lean-crate/criner#limitations-of-waste-reporting
 
 ### It claims my crate is full of waste because it doesn't see what the build-script requires ?!
 
