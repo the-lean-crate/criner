@@ -29,8 +29,9 @@ Nowadays, `nushell` is [perfectly lean][nu-lean], and I hope we will have more o
 
 First of all, thanks so much for your willingness to help! Let's get started.
 
-Head over to The [Criner Waste Report][waste-io] and find your crate. See if a lot of 'waste' is detected, and validate and try the suggested fix. If something is wrong
-or not working, click the **Provide Feedback** link at the bottom of your crates page.
+Head over to The [Criner Waste Report][waste-io] and find your crate or jump to your crate directly using `https://crates-io.github.io/waste/<your-crate>`. 
+See if a lot of 'waste' is detected, and validate and try the suggested fix. If something is wrong or not working, click the **Provide Feedback** link 
+at the bottom of your crates page.
 
 ### Example: There is some 'Waste' to be removed
 
