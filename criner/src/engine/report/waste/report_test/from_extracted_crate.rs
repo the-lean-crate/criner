@@ -15,6 +15,21 @@ fn task_result(file_name: &str) -> TaskResult {
 }
 
 #[test]
+fn ripgrep_perfectly_lean_which_is_unexpected_actually() {
+    assert_eq!(
+        Report::from_result("a", "1", task_result("ripgrep-12.0.0-extract_crate-1.0.0")),
+        Report::Version {
+            crate_name: "a".into(),
+            crate_version: "1".to_string(),
+            total_size_in_bytes: 1369472,
+            total_files: 89,
+            wasted_files: vec![],
+            suggested_fix: None
+        }
+    );
+}
+
+#[test]
 fn avr_libc_missing_build_script_even_though_it_is_there() {
     assert_eq!(
         Report::from_result("a", "1", task_result("avr_libc-0.1.3extract_crate-1.0.0")),
