@@ -6,7 +6,7 @@ edition = "2018"
 description = "A command-line interface for the 'Criner' crates mining platform"
 include = ["/src/**/*", "/Cargo.*", "/README.md", "/LICENSE.md"]
 license = "MIT"
-repository = "https://github.com/crates-io/criner"
+repository = "https://github.com/the-lean-crate/criner"
 readme = "README.md"
 
 [[bin]]
