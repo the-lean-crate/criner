@@ -286,6 +286,7 @@ dependencies = [
  "bytesize",
  "common_macros",
  "crates-index-diff",
+ "dia-semver",
  "futures",
  "futures-timer 3.0.2",
  "globset",
@@ -404,6 +405,12 @@ dependencies = [
  "cfg-if",
  "num_cpus",
 ]
+
+[[package]]
+name = "dia-semver"
+version = "8.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc1e34102c27e3f4820ba0653e13fd994d1c24e1a4ebe6410a3b9310ce7b16df"
 
 [[package]]
 name = "dtoa"

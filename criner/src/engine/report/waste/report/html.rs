@@ -2,6 +2,7 @@ use super::{
     merge::{fix_to_wasted_files_aggregate, NO_EXT_MARKER},
     AggregateFileInfo, Dict, Report, VersionInfo,
 };
+use crate::utils::parse_semver;
 use bytesize::ByteSize;
 use horrorshow::{box_html, helper::doctype, html, Render, RenderBox, RenderOnce, TemplateBuffer};
 use std::{iter::FromIterator, time::SystemTime};
@@ -122,7 +123,7 @@ fn page_footer() -> impl Render {
 
 #[derive(Clone, Copy)]
 enum SortOrder {
-    Name,
+    Semver,
     Waste,
 }
 
@@ -137,7 +138,7 @@ fn child_items_section(
     let suffix = suffix.into();
     let mut sorted: Vec<_> = Vec::from_iter(info_by_child.into_iter());
     sorted.sort_by(|(ln, le), (rn, re)| match order {
-        SortOrder::Name => ln.cmp(rn),
+        SortOrder::Semver => parse_semver(ln).cmp(&parse_semver(rn)),
         SortOrder::Waste => match (&le.waste_latest_version, &re.waste_latest_version) {
             (Some(le), Some(re)) => le.1.total_bytes.cmp(&re.1.total_bytes),
             _ => le.waste.total_bytes.cmp(&re.waste.total_bytes),
@@ -276,7 +277,7 @@ impl RenderOnce for Report {
                                 : total_section(total_size_in_bytes, total_files);
                                 : savings_section(gains);
                                 : by_extension_section(wasted_by_extension);
-                                : child_items_section("Versions", info_by_version, no_prefix, ".html", SortOrder::Name);
+                                : child_items_section("Versions", info_by_version, no_prefix, ".html", SortOrder::Semver);
                             }
                         }
                         : page_footer();

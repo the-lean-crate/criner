@@ -1,5 +1,5 @@
-use crate::model;
-use crate::model::{Context, CrateVersion, Task};
+use crate::model::{self, Context, CrateVersion, Task};
+use crate::utils::parse_semver;
 
 pub trait Merge<T> {
     fn merge(self, other: &T) -> Self;
@@ -44,12 +44,16 @@ impl Merge<model::Context> for model::Context {
     }
 }
 
+fn sort_semver(versions: &mut Vec<String>) {
+    versions.sort_by_key(|v| parse_semver(&v));
+}
+
 impl Merge<model::CrateVersion> for model::Crate {
     fn merge(mut self, other: &CrateVersion) -> Self {
         if !self.versions.contains(&other.version) {
             self.versions.push(other.version.to_owned());
         }
-        self.versions.sort();
+        sort_semver(&mut self.versions);
         self
     }
 }
@@ -59,7 +63,7 @@ impl model::Crate {
         if !self.versions.contains(&other.version) {
             self.versions.push(other.version.to_owned());
         }
-        self.versions.sort();
+        sort_semver(&mut self.versions);
         self
     }
 }

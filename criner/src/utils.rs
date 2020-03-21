@@ -1,4 +1,5 @@
 use crate::error::{Error, FormatDeadline, Result};
+use dia_semver::Semver;
 use futures::task::SpawnExt;
 use futures::{
     future::{self, Either},
@@ -6,6 +7,20 @@ use futures::{
 };
 use futures_timer::Delay;
 use std::{future::Future, time::Duration, time::SystemTime};
+
+pub fn parse_semver(version: &str) -> Semver {
+    use std::str::FromStr;
+    Semver::from_str(&version)
+        .or_else(|_| {
+            Semver::from_str(
+                &version[..version
+                    .find('-')
+                    .or_else(|| version.find('+'))
+                    .expect("some prerelease version")],
+            )
+        })
+        .expect("semver parsing to work if violating prerelease versions are stripped")
+}
 
 pub async fn wait_with_progress(
     duration_s: u32,
