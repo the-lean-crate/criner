@@ -1,4 +1,3 @@
-use crate::engine::report::generic::WriteCallback;
 use crate::persistence::new_key_value_query_old_to_new_filtered;
 use crate::{
     engine::{report, work},
@@ -53,109 +52,121 @@ mod git {
                 let (tx, rx) = flume::bounded(processors as usize);
                 let is_bare_repo = repo.is_bare();
                 let handle = std::thread::spawn(move || -> Result<()> {
-                    progress.init(None, Some("files stored in index"));
-                    let mut index = repo.index()?;
-                    let mut req_count = 0;
-                    for WriteRequest { path, content } in rx.iter() {
-                        req_count += 1;
-                        let entry = file_index_entry(path, content.len());
-                        index.add_frombuffer(&entry, &content)?;
-                        progress.set(req_count as u32);
-                    }
-                    progress.init(Some(5), Some("steps"));
-                    let tree_oid = {
-                        progress.set(1);
-                        progress.blocked("writing tree", None);
-                        progress.info(format!(
-                            "writing tree with {} new entries and a total of {} entries",
-                            req_count,
-                            index.len()
-                        ));
-                        index.write_tree()?
-                    };
-
-                    {
-                        progress.set(2);
-                        progress.blocked("writing new index", None);
-                        repo.set_index(&mut index)?;
-                    }
-
-                    {
-                        progress.set(3);
-                        progress.blocked("writing commit", None);
-                        let current_time = git2::Time::new(
-                            SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() as i64,
-                            0,
-                        );
-                        let signature = git2::Signature::new(
-                            "Criner",
-                            "https://github.com/the-lean-crate/criner",
-                            &current_time,
-                        )?;
-                        let parent = repo
-                            .head()
-                            .and_then(|h| h.resolve())
-                            .and_then(|h| h.peel_to_commit())
-                            .ok();
-                        let mut parent_store = Vec::with_capacity(1);
-
-                        repo.commit(
-                            Some("HEAD"),
-                            &signature,
-                            &signature,
-                            &format!("update {} reports", req_count),
-                            &repo
-                                .find_tree(tree_oid)
-                                .expect("tree just written to be found"),
-                            match parent.as_ref() {
-                                Some(parent) => {
-                                    parent_store.push(parent);
-                                    &parent_store
-                                }
-                                None => &[],
-                            },
-                        )?;
-                    }
-                    {
-                        progress.set(4);
-                        progress.blocked("pushing changes", None);
-                        let remote_name = repo
-                            .branch_upstream_remote(
-                                repo.head()
-                                    .and_then(|h| h.resolve())?
-                                    .name()
-                                    .expect("branch name is valid utf8"),
-                            )
-                            .map(|b| b.as_str().expect("valid utf8").to_string())
-                            .unwrap_or_else(|_| "origin".into());
-                        let mut remote = repo.find_remote(&remote_name)?;
-                        let mut callbacks = git2::RemoteCallbacks::new();
-                        callbacks.transfer_progress(|p| {
-                            progress.set_name(format!(
-                                "Pushing changes ({} received)",
-                                bytesize::ByteSize(p.received_bytes() as u64)
+                    let res = (|| {
+                        progress.init(None, Some("files stored in index"));
+                        let mut index = repo.index()?;
+                        let mut req_count = 0;
+                        for WriteRequest { path, content } in rx.iter() {
+                            req_count += 1;
+                            let entry = file_index_entry(path, content.len());
+                            index.add_frombuffer(&entry, &content)?;
+                            progress.set(req_count as u32);
+                        }
+                        progress.init(Some(5), Some("steps"));
+                        let tree_oid = {
+                            progress.set(1);
+                            progress.blocked("writing tree", None);
+                            progress.info(format!(
+                                "writing tree with {} new entries and a total of {} entries",
+                                req_count,
+                                index.len()
                             ));
-                            progress.init(
-                                Some((p.total_deltas() + p.total_objects()) as u32),
-                                Some("objects"),
-                            );
-                            progress.set((p.indexed_deltas() + p.received_objects()) as u32);
-                            true
-                        });
-                        callbacks.credentials(|_url, _username_from_url, _allowed_types| {
-                            git2::Cred::default()
-                        });
-                        remote.push(
-                            &remote
-                                .push_refspecs()?
-                                .iter()
-                                .filter_map(std::convert::identity)
-                                .collect::<Vec<_>>(),
-                            Some(git2::PushOptions::new().remote_callbacks(callbacks)),
-                        )?;
-                    }
+                            let oid = index.write_tree()?;
+                            progress.done("Tree written successfully");
+                            oid
+                        };
 
-                    Ok(())
+                        {
+                            progress.set(2);
+                            progress.blocked("writing new index", None);
+                            repo.set_index(&mut index)?;
+                        }
+
+                        {
+                            progress.set(3);
+                            progress.blocked("writing commit", None);
+                            let current_time = git2::Time::new(
+                                SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() as i64,
+                                0,
+                            );
+                            let signature = git2::Signature::new(
+                                "Criner",
+                                "https://github.com/the-lean-crate/criner",
+                                &current_time,
+                            )?;
+                            let parent = repo
+                                .head()
+                                .and_then(|h| h.resolve())
+                                .and_then(|h| h.peel_to_commit())
+                                .ok();
+                            let mut parent_store = Vec::with_capacity(1);
+
+                            repo.commit(
+                                Some("HEAD"),
+                                &signature,
+                                &signature,
+                                &format!("update {} reports", req_count),
+                                &repo
+                                    .find_tree(tree_oid)
+                                    .expect("tree just written to be found"),
+                                match parent.as_ref() {
+                                    Some(parent) => {
+                                        parent_store.push(parent);
+                                        &parent_store
+                                    }
+                                    None => &[],
+                                },
+                            )?;
+                            progress.done("Commit created");
+                        }
+                        {
+                            progress.set(4);
+                            progress.blocked("pushing changes", None);
+                            let remote_name = repo
+                                .branch_upstream_remote(
+                                    repo.head()
+                                        .and_then(|h| h.resolve())?
+                                        .name()
+                                        .expect("branch name is valid utf8"),
+                                )
+                                .map(|b| b.as_str().expect("valid utf8").to_string())
+                                .unwrap_or_else(|_| "origin".into());
+                            let mut remote = repo.find_remote(&remote_name)?;
+                            let mut callbacks = git2::RemoteCallbacks::new();
+                            callbacks.transfer_progress(|p| {
+                                progress.set_name(format!(
+                                    "Git pushing changes ({} received)",
+                                    bytesize::ByteSize(p.received_bytes() as u64)
+                                ));
+                                progress.init(
+                                    Some((p.total_deltas() + p.total_objects()) as u32),
+                                    Some("objects"),
+                                );
+                                progress.set((p.indexed_deltas() + p.received_objects()) as u32);
+                                true
+                            });
+                            callbacks.credentials(|url, _username_from_url, _allowed_types| {
+                                git2::Cred::credential_helper(
+                                    &repo.config().expect("config"),
+                                    url,
+                                    None,
+                                )
+                            });
+                            remote.push(
+                                &remote
+                                    .push_refspecs()?
+                                    .iter()
+                                    .filter_map(std::convert::identity)
+                                    .collect::<Vec<_>>(),
+                                Some(git2::PushOptions::new().remote_callbacks(callbacks)),
+                            )?;
+                        }
+                        Ok(())
+                    })();
+                    res.map_err(|err| {
+                        progress.fail(format!("{}", err));
+                        err
+                    })
                 });
                 (
                     if is_bare_repo {
@@ -238,8 +249,18 @@ pub async fn generate(
 
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
     async_std::fs::create_dir_all(&waste_report_dir).await?;
+    // DEBUG: allow using git while using globs
+    // use crate::engine::report::generic::WriteCallback;
     let (cache_dir, (git_handle, git_state, maybe_join_handle)) = match glob.as_ref() {
-        Some(_) => (None, (git::not_available as WriteCallback, None, None)),
+        // Some(_) => (None, (git::not_available as WriteCallback, None, None)),
+        Some(_) => (
+            None,
+            git::select_callback(
+                cpu_o_bound_processors,
+                &waste_report_dir,
+                progress.add_child("git"),
+            ),
+        ),
         None => {
             let cd = waste_report_dir.join("__incremental_cache__");
             async_std::fs::create_dir_all(&cd).await?;
