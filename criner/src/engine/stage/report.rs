@@ -53,7 +53,7 @@ mod git {
                 let (tx, rx) = flume::bounded(processors as usize);
                 let is_bare_repo = repo.is_bare();
                 let handle = std::thread::spawn(move || -> Result<()> {
-                    progress.init(None, Some("file write requests"));
+                    progress.init(None, Some("files stored in index"));
                     let mut index = repo.index()?;
                     let mut req_count = 0;
                     for WriteRequest { path, content } in rx.iter() {
@@ -62,48 +62,62 @@ mod git {
                         index.add_frombuffer(&entry, &content)?;
                         progress.set(req_count as u32);
                     }
-                    progress.init(Some(3), Some("steps"));
-                    progress.set(0);
-                    progress.blocked("writing tree", None);
-                    progress.info(format!(
-                        "writing tree with {} new entries and a total of {} entries",
-                        req_count,
-                        index.len()
-                    ));
-                    let tree_oid = index.write_tree()?;
+                    progress.init(Some(5), Some("steps"));
+                    let tree_oid = {
+                        progress.set(1);
+                        progress.blocked("writing tree", None);
+                        progress.info(format!(
+                            "writing tree with {} new entries and a total of {} entries",
+                            req_count,
+                            index.len()
+                        ));
+                        index.write_tree()?
+                    };
 
-                    progress.set(1);
-                    progress.blocked("writing commit", None);
-                    let current_time = git2::Time::new(
-                        SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() as i64,
-                        0,
-                    );
-                    let signature = git2::Signature::new(
-                        "Criner",
-                        "https://github.com/the-lean-crate/criner",
-                        &current_time,
-                    )?;
-                    let parent = repo.head().and_then(|h| h.peel_to_commit()).ok();
-                    let mut parent_store = Vec::with_capacity(1);
+                    {
+                        progress.set(2);
+                        progress.blocked("writing new index", None);
+                        repo.set_index(&mut index)?;
+                    }
 
-                    repo.commit(
-                        Some("HEAD"),
-                        &signature,
-                        &signature,
-                        &format!("update {} reports", req_count),
-                        &repo
-                            .find_tree(tree_oid)
-                            .expect("tree just written to be found"),
-                        match parent.as_ref() {
-                            Some(parent) => {
-                                parent_store.push(parent);
-                                &parent_store
-                            }
-                            None => &[],
-                        },
-                    )?;
+                    {
+                        progress.set(3);
+                        progress.blocked("writing commit", None);
+                        let current_time = git2::Time::new(
+                            SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() as i64,
+                            0,
+                        );
+                        let signature = git2::Signature::new(
+                            "Criner",
+                            "https://github.com/the-lean-crate/criner",
+                            &current_time,
+                        )?;
+                        let parent = repo
+                            .head()
+                            .and_then(|h| h.resolve())
+                            .and_then(|h| h.peel_to_commit())
+                            .ok();
+                        let mut parent_store = Vec::with_capacity(1);
 
-                    progress.set(2);
+                        repo.commit(
+                            Some("HEAD"),
+                            &signature,
+                            &signature,
+                            &format!("update {} reports", req_count),
+                            &repo
+                                .find_tree(tree_oid)
+                                .expect("tree just written to be found"),
+                            match parent.as_ref() {
+                                Some(parent) => {
+                                    parent_store.push(parent);
+                                    &parent_store
+                                }
+                                None => &[],
+                            },
+                        )?;
+                    }
+
+                    progress.set(4);
                     progress.blocked("pushing changes", None);
 
                     Ok(())

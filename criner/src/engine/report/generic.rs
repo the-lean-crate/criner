@@ -329,6 +329,7 @@ async fn complete_and_write_report(
 ) -> Result<Vec<u8>> {
     out.clear();
     report.complete(progress, &mut out).await?;
+    progress.blocked("sending report to writer", None);
     match write(
         WriteRequest {
             path: path.as_ref().to_path_buf(),
