@@ -20,23 +20,42 @@ mod git {
     use std::path::Path;
 
     pub fn select_callback(
+        cpu_o_bound_processors: u32,
         report_dir: &Path,
-        progress: prodash::tree::Item,
+        mut progress: prodash::tree::Item,
     ) -> (
         WriteCallback,
         WriteCallbackState,
         Option<std::thread::JoinHandle<()>>,
     ) {
         match git2::Repository::open(report_dir) {
-            Ok(repo) => (
-                if repo.is_bare() {
-                    repo_bare
-                } else {
-                    repo_with_working_dir
-                },
-                None,
-                None,
-            ),
+            Ok(repo) => {
+                let (tx, rx) = flume::bounded(cpu_o_bound_processors as usize);
+                let handle = std::thread::spawn(move || {
+                    progress.init(None, Some("file write request"));
+                    for (
+                        req_id,
+                        WriteRequest {
+                            path: _,
+                            content: _,
+                        },
+                    ) in rx.iter().enumerate()
+                    {
+                        progress.set((req_id + 1) as u32);
+                    }
+                });
+                (
+                    if repo.is_bare() {
+                        log::info!("Writing into bare git repo only, local writes disabled");
+                        repo_bare
+                    } else {
+                        log::info!("Writing into git repo and working dir");
+                        repo_with_working_dir
+                    },
+                    Some(tx),
+                    Some(handle),
+                )
+            }
             Err(err) => {
                 log::info!(
                     "no git available in '{}', will write files only (error is '{}')",
@@ -52,19 +71,17 @@ mod git {
         req: WriteRequest,
         send: &WriteCallbackState,
     ) -> Result<WriteInstruction> {
-        futures::executor::block_on(
-            send.as_ref()
-                .expect("send to be available if a repo is available")
-                .send(req.clone()),
-        );
+        send.as_ref()
+            .expect("send to be available if a repo is available")
+            .send(req.clone())
+            .map_err(|_| crate::Error::Message("Could not send git request".into()))?;
         Ok(WriteInstruction::DoWrite(req))
     }
     pub fn repo_bare(req: WriteRequest, send: &WriteCallbackState) -> Result<WriteInstruction> {
-        futures::executor::block_on(
-            send.as_ref()
-                .expect("send to be available if a repo is available")
-                .send(req),
-        );
+        send.as_ref()
+            .expect("send to be available if a repo is available")
+            .send(req)
+            .map_err(|_| crate::Error::Message("Could not send git request".into()))?;
         Ok(WriteInstruction::Skip)
     }
 
@@ -116,8 +133,11 @@ pub async fn generate(
             Some(cd)
         }
     };
-    let (git_handle, git_state, maybe_join_handle) =
-        git::select_callback(&waste_report_dir, progress.add_child("git"));
+    let (git_handle, git_state, maybe_join_handle) = git::select_callback(
+        cpu_o_bound_processors,
+        &waste_report_dir,
+        progress.add_child("git"),
+    );
     let merge_reports = pool.spawn_with_handle({
         let mut merge_progress = progress.add_child("report aggregator");
         merge_progress.init(Some(num_crates / chunk_size), Some("Reports"));
