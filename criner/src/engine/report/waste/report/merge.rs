@@ -370,12 +370,11 @@ impl crate::engine::report::generic::Aggregate for Report {
 
     async fn complete(
         &mut self,
-        progress: &mut prodash::tree::Item,
+        _progress: &mut prodash::tree::Item,
         out: &mut Vec<u8>,
     ) -> Result<()> {
         use horrorshow::Template;
 
-        progress.blocked("writing report to disk", None);
         let report = self.clone();
         report.write_to_io(out)?;
         Ok(())

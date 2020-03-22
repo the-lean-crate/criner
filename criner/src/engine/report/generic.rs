@@ -338,6 +338,7 @@ async fn complete_and_write_report(
     )? {
         WriteInstruction::DoWrite(WriteRequest { path, content }) => {
             let p: &Path = path.as_ref();
+            progress.blocked("writing report to disk", None);
             async_std::fs::write(p, &content).await?;
             Ok(content)
         }
