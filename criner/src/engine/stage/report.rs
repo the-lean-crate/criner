@@ -39,8 +39,9 @@ mod git {
             ),
             Err(err) => {
                 log::info!(
-                    "no git available in '{}', will write files only",
-                    report_dir.display()
+                    "no git available in '{}', will write files only (error is '{}')",
+                    report_dir.display(),
+                    err,
                 );
                 (not_available, None, None)
             }
@@ -49,12 +50,22 @@ mod git {
 
     pub fn repo_with_working_dir(
         req: WriteRequest,
-        _state: &WriteCallbackState,
+        send: &WriteCallbackState,
     ) -> Result<WriteInstruction> {
-        unimplemented!("repo with working dir")
+        futures::executor::block_on(
+            send.as_ref()
+                .expect("send to be available if a repo is available")
+                .send(req.clone()),
+        );
+        Ok(WriteInstruction::DoWrite(req))
     }
-    pub fn repo_bare(req: WriteRequest, _state: &WriteCallbackState) -> Result<WriteInstruction> {
-        unimplemented!("bare repo")
+    pub fn repo_bare(req: WriteRequest, send: &WriteCallbackState) -> Result<WriteInstruction> {
+        futures::executor::block_on(
+            send.as_ref()
+                .expect("send to be available if a repo is available")
+                .send(req),
+        );
+        Ok(WriteInstruction::Skip)
     }
 
     pub fn not_available(
