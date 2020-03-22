@@ -38,6 +38,18 @@ mod git {
         }
     }
 
+    fn env_var(name: &str) -> Result<String> {
+        std::env::var(name).map_err(|e| match e {
+            std::env::VarError::NotPresent => {
+                crate::Error::Message(format!("environment variable {:?} must be set", name))
+            }
+            std::env::VarError::NotUnicode(_) => crate::Error::Message(format!(
+                "environment variable {:?} was set but couldn't be decoded as UTF-8",
+                name
+            )),
+        })
+    }
+
     pub fn select_callback(
         processors: u32,
         report_dir: &Path,
@@ -133,6 +145,8 @@ mod git {
                                 .unwrap_or_else(|_| "origin".into());
                             let mut remote = repo.find_remote(&remote_name)?;
                             let mut callbacks = git2::RemoteCallbacks::new();
+                            let mut subprogress = progress.add_child("credentials");
+                            let mut sideband = progress.add_child("sideband");
                             callbacks.transfer_progress(|p| {
                                 progress.set_name(format!(
                                     "Git pushing changes ({} received)",
@@ -145,20 +159,21 @@ mod git {
                                 progress.set((p.indexed_deltas() + p.received_objects()) as u32);
                                 true
                             });
-                            callbacks.credentials(|url, _username_from_url, _allowed_types| {
-                                git2::Cred::credential_helper(
-                                    &repo.config().expect("config"),
-                                    url,
-                                    None,
-                                )
+                            callbacks.sideband_progress(move |line| {
+                                sideband.set_name(std::str::from_utf8(line).unwrap_or(""));
+                                true
                             });
+                            {
+                                let username = env_var("CRINER_REPORT_PUSH_HTTP_USERNAME")?;
+                                let password = env_var("CRINER_REPORT_PUSH_HTTP_PASSWORD")?;
+                                callbacks.credentials(move |url, username_from_url, allowed_types| {
+                                    subprogress.info(format!("Setting userpass plaintext credentials, allowed are {:?} for {:?} (username = {:?}", allowed_types, url, username_from_url));
+                                    git2::Cred::userpass_plaintext(&username, &password)
+                                });
+                            }
                             remote.push(
-                                &remote
-                                    .push_refspecs()?
-                                    .iter()
-                                    .filter_map(std::convert::identity)
-                                    .collect::<Vec<_>>(),
-                                Some(git2::PushOptions::new().remote_callbacks(callbacks)),
+                                &["HEAD:refs/heads/master"],
+                                Some(git2::PushOptions::new().packbuilder_parallelism(0).remote_callbacks(callbacks)),
                             )?;
                         }
                         Ok(())
