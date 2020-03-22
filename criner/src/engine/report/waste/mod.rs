@@ -1,7 +1,6 @@
 use crate::persistence::TableAccess;
 use crate::{error::Result, model::TaskResult, persistence};
 use async_trait::async_trait;
-use std::path::Path;
 
 mod report;
 pub use report::*;
@@ -43,30 +42,13 @@ impl super::generic::Generator for Generator {
         table.get(&key_buf)
     }
 
-    async fn generate_single_file(
-        out: &Path,
+    async fn generate_report(
         crate_name: &str,
         crate_version: &str,
         result: TaskResult,
         _progress: &mut prodash::tree::Item,
     ) -> Result<Self::Report> {
-        use async_std::prelude::*;
-        use horrorshow::Template;
-
-        let report = Report::from_result(crate_name, crate_version, result);
-        let mut buf = String::new();
-        report.clone().write_to_string(&mut buf)?;
-
-        async_std::fs::OpenOptions::new()
-            .truncate(true)
-            .write(true)
-            .create(true)
-            .open(out)
-            .await?
-            .write_all(buf.as_bytes())
-            .await
-            .map_err(crate::Error::from)?;
-        Ok(report)
+        Ok(Report::from_result(crate_name, crate_version, result))
     }
 }
 

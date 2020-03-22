@@ -368,24 +368,17 @@ impl crate::engine::report::generic::Aggregate for Report {
         }
     }
 
-    async fn complete(&mut self, out_dir: &Path, progress: &mut prodash::tree::Item) -> Result<()> {
-        use async_std::prelude::*;
+    async fn complete(
+        &mut self,
+        progress: &mut prodash::tree::Item,
+        out: &mut Vec<u8>,
+    ) -> Result<()> {
         use horrorshow::Template;
 
         progress.blocked("writing report to disk", None);
         let report = self.clone();
-        let mut buf = String::new();
-        report.write_to_string(&mut buf)?;
-
-        async_std::fs::OpenOptions::new()
-            .truncate(true)
-            .write(true)
-            .create(true)
-            .open(out_dir.join("index.html"))
-            .await?
-            .write_all(buf.as_bytes())
-            .await
-            .map_err(crate::Error::from)
+        report.write_to_io(out)?;
+        Ok(())
     }
     async fn load_previous_state(
         &self,

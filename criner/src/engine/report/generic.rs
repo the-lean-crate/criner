@@ -45,7 +45,11 @@ where
     Self: Sized,
 {
     fn merge(self, other: Self) -> Self;
-    async fn complete(&mut self, out_dir: &Path, progress: &mut prodash::tree::Item) -> Result<()>;
+    async fn complete(
+        &mut self,
+        progress: &mut prodash::tree::Item,
+        out: &mut Vec<u8>,
+    ) -> Result<()>;
     async fn load_previous_state(
         &self,
         out_dir: &Path,
@@ -117,7 +121,16 @@ pub trait Generator {
                 Some(previous_report) => previous_report.merge(report),
                 None => report,
             };
-            report.complete(&out_dir, &mut progress).await?;
+            {
+                let mut out = Vec::new();
+                complete_and_write_report(
+                    &mut report,
+                    &mut out,
+                    &mut progress,
+                    out_dir.join("index.html"),
+                )
+                .await?;
+            }
             if let Some(cd) = cache_dir {
                 report.store_current_state(&cd, &mut progress).await?;
             }
@@ -125,8 +138,7 @@ pub trait Generator {
         Ok(())
     }
 
-    async fn generate_single_file(
-        out: &Path,
+    async fn generate_report(
         crate_name: &str,
         crate_version: &str,
         result: Self::DBResult,
@@ -143,6 +155,7 @@ pub trait Generator {
         let mut chunk_report = None::<Self::Report>;
         let crate_versions = db.open_crate_versions()?;
         let mut results_to_update = Vec::new();
+        let mut out_buf = Vec::new();
         {
             let connection = db.open_connection()?;
             let reports = db.open_reports()?;
@@ -184,15 +197,18 @@ pub trait Generator {
                         if let Some(result) =
                             Self::get_result(connection.clone(), &name, &version, &mut key_buf)?
                         {
-                            let out_file = output_file_html(&crate_dir, &version);
-                            let version_report = Self::generate_single_file(
-                                &out_file,
-                                &name,
-                                &version,
-                                result,
+                            let mut version_report =
+                                Self::generate_report(&name, &version, result, &mut progress)
+                                    .await?;
+
+                            complete_and_write_report(
+                                &mut version_report,
+                                &mut out_buf,
                                 &mut progress,
+                                version_html_path(&crate_dir, &version),
                             )
                             .await?;
+
                             crate_report = Some(match crate_report {
                                 Some(crate_report) => crate_report.merge(version_report),
                                 None => version_report,
@@ -210,7 +226,13 @@ pub trait Generator {
                     match previous_state {
                         Some(previous_state) => {
                             let mut absolute_state = previous_state.merge(crate_report.clone());
-                            absolute_state.complete(&crate_dir, &mut progress).await?;
+                            complete_and_write_report(
+                                &mut absolute_state,
+                                &mut out_buf,
+                                &mut progress,
+                                crate_html_path(&crate_dir),
+                            )
+                            .await?;
                             if let Some(cd) = cache_dir.as_ref() {
                                 absolute_state
                                     .store_current_state(&cd, &mut progress)
@@ -218,7 +240,13 @@ pub trait Generator {
                             };
                         }
                         None => {
-                            crate_report.complete(&crate_dir, &mut progress).await?;
+                            complete_and_write_report(
+                                &mut crate_report,
+                                &mut out_buf,
+                                &mut progress,
+                                crate_html_path(&crate_dir),
+                            )
+                            .await?;
                             if let Some(cd) = cache_dir.as_ref() {
                                 crate_report.store_current_state(&cd, &mut progress).await?;
                             }
@@ -258,6 +286,22 @@ fn crate_dir(base: &Path, crate_name: &str) -> PathBuf {
     base.join(crate_name)
 }
 
-fn output_file_html(crate_dir: &Path, version: &str) -> PathBuf {
+fn version_html_path(crate_dir: &Path, version: &str) -> PathBuf {
     crate_dir.join(format!("{}.html", version))
+}
+fn crate_html_path(crate_dir: &Path) -> PathBuf {
+    crate_dir.join("index.html")
+}
+
+async fn complete_and_write_report(
+    report: &mut impl Aggregate,
+    out: &mut Vec<u8>,
+    progress: &mut prodash::tree::Item,
+    path: impl AsRef<Path>,
+) -> Result<()> {
+    out.clear();
+    report.complete(progress, out).await?;
+    async_std::fs::write(path.as_ref(), out)
+        .await
+        .map_err(crate::Error::from)
 }
