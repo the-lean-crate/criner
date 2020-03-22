@@ -116,9 +116,44 @@ mod git {
                             },
                         )?;
                     }
-
-                    progress.set(4);
-                    progress.blocked("pushing changes", None);
+                    {
+                        progress.set(4);
+                        progress.blocked("pushing changes", None);
+                        let remote_name = repo
+                            .branch_upstream_remote(
+                                repo.head()
+                                    .and_then(|h| h.resolve())?
+                                    .name()
+                                    .expect("branch name is valid utf8"),
+                            )
+                            .map(|b| b.as_str().expect("valid utf8").to_string())
+                            .unwrap_or_else(|_| "origin".into());
+                        let mut remote = repo.find_remote(&remote_name)?;
+                        let mut callbacks = git2::RemoteCallbacks::new();
+                        callbacks.transfer_progress(|p| {
+                            progress.set_name(format!(
+                                "Pushing changes ({} received)",
+                                bytesize::ByteSize(p.received_bytes() as u64)
+                            ));
+                            progress.init(
+                                Some((p.total_deltas() + p.total_objects()) as u32),
+                                Some("objects"),
+                            );
+                            progress.set((p.indexed_deltas() + p.received_objects()) as u32);
+                            true
+                        });
+                        callbacks.credentials(|_url, _username_from_url, _allowed_types| {
+                            git2::Cred::default()
+                        });
+                        remote.push(
+                            &remote
+                                .push_refspecs()?
+                                .iter()
+                                .filter_map(std::convert::identity)
+                                .collect::<Vec<_>>(),
+                            Some(git2::PushOptions::new().remote_callbacks(callbacks)),
+                        )?;
+                    }
 
                     Ok(())
                 });
