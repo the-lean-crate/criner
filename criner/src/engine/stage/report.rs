@@ -11,9 +11,51 @@ use std::{path::PathBuf, time::SystemTime};
 
 mod git {
     use crate::{
-        engine::report::generic::{WriteCallbackState, WriteInstruction, WriteRequest},
+        engine::report::generic::{
+            WriteCallback, WriteCallbackState, WriteInstruction, WriteRequest,
+        },
         Result,
     };
+    use crates_index_diff::git2;
+    use std::path::Path;
+
+    pub fn select_callback(
+        report_dir: &Path,
+        progress: prodash::tree::Item,
+    ) -> (
+        WriteCallback,
+        WriteCallbackState,
+        Option<std::thread::JoinHandle<()>>,
+    ) {
+        match git2::Repository::open(report_dir) {
+            Ok(repo) => (
+                if repo.is_bare() {
+                    repo_bare
+                } else {
+                    repo_with_working_dir
+                },
+                None,
+                None,
+            ),
+            Err(err) => {
+                log::info!(
+                    "no git available in '{}', will write files only",
+                    report_dir.display()
+                );
+                (not_available, None, None)
+            }
+        }
+    }
+
+    pub fn repo_with_working_dir(
+        req: WriteRequest,
+        _state: &WriteCallbackState,
+    ) -> Result<WriteInstruction> {
+        unimplemented!("repo with working dir")
+    }
+    pub fn repo_bare(req: WriteRequest, _state: &WriteCallbackState) -> Result<WriteInstruction> {
+        unimplemented!("bare repo")
+    }
 
     pub fn not_available(
         req: WriteRequest,
@@ -63,6 +105,8 @@ pub async fn generate(
             Some(cd)
         }
     };
+    let (git_handle, git_state, maybe_join_handle) =
+        git::select_callback(&waste_report_dir, progress.add_child("git"));
     let merge_reports = pool.spawn_with_handle({
         let mut merge_progress = progress.add_child("report aggregator");
         merge_progress.init(Some(num_crates / chunk_size), Some("Reports"));
@@ -71,8 +115,8 @@ pub async fn generate(
             cache_dir.clone(),
             merge_progress,
             rx_result,
-            git::not_available,
-            None,
+            git_handle,
+            git_state.clone(),
         )
         .map(|_| ())
         .boxed()
@@ -115,8 +159,8 @@ pub async fn generate(
                 cache_dir.clone(),
                 chunk,
                 progress.add_child(""),
-                git::not_available,
-                None,
+                git_handle,
+                git_state.clone(),
             )
             .boxed(),
         )
@@ -126,9 +170,17 @@ pub async fn generate(
             break;
         }
     }
+    drop(git_state);
     drop(tx);
     progress.set(num_crates);
     merge_reports.await;
     progress.done("Generating and merging waste report done");
+
+    if let Some(handle) = maybe_join_handle {
+        progress.blocked("waiting for git to finish", None);
+        if handle.join().is_err() {
+            progress.fail("git failed with unknown error");
+        }
+    };
     Ok(())
 }
