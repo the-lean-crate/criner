@@ -1,3 +1,4 @@
+use crate::engine::report::generic::WriteCallback;
 use crate::persistence::new_key_value_query_old_to_new_filtered;
 use crate::{
     engine::{report, work},
@@ -20,7 +21,7 @@ mod git {
     use std::path::Path;
 
     pub fn select_callback(
-        cpu_o_bound_processors: u32,
+        processors: u32,
         report_dir: &Path,
         mut progress: prodash::tree::Item,
     ) -> (
@@ -30,7 +31,7 @@ mod git {
     ) {
         match git2::Repository::open(report_dir) {
             Ok(repo) => {
-                let (tx, rx) = flume::bounded(cpu_o_bound_processors as usize);
+                let (tx, rx) = flume::bounded(processors as usize);
                 let handle = std::thread::spawn(move || {
                     progress.init(None, Some("file write request"));
                     for (
@@ -125,19 +126,21 @@ pub async fn generate(
 
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
     async_std::fs::create_dir_all(&waste_report_dir).await?;
-    let cache_dir = match glob.as_ref() {
-        Some(_) => None,
+    let (cache_dir, (git_handle, git_state, maybe_join_handle)) = match glob.as_ref() {
+        Some(_) => (None, (git::not_available as WriteCallback, None, None)),
         None => {
             let cd = waste_report_dir.join("__incremental_cache__");
             async_std::fs::create_dir_all(&cd).await?;
-            Some(cd)
+            (
+                Some(cd),
+                git::select_callback(
+                    cpu_o_bound_processors,
+                    &waste_report_dir,
+                    progress.add_child("git"),
+                ),
+            )
         }
     };
-    let (git_handle, git_state, maybe_join_handle) = git::select_callback(
-        cpu_o_bound_processors,
-        &waste_report_dir,
-        progress.add_child("git"),
-    );
     let merge_reports = pool.spawn_with_handle({
         let mut merge_progress = progress.add_child("report aggregator");
         merge_progress.init(Some(num_crates / chunk_size), Some("Reports"));
