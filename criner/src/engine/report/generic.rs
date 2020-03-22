@@ -39,6 +39,21 @@ fn all_but_recently_yanked(
     Ok(versions.len() - num_yanked)
 }
 
+#[derive(Clone)]
+pub struct WriteRequest {
+    pub path: PathBuf,
+    pub content: Vec<u8>,
+}
+
+#[derive(Clone)]
+pub enum WriteInstruction {
+    Skip,
+    DoWrite(WriteRequest),
+}
+
+pub type WriteCallbackState = Option<async_std::sync::Sender<WriteRequest>>;
+pub type WriteCallback = fn(WriteRequest, &WriteCallbackState) -> Result<WriteInstruction>;
+
 #[async_trait]
 pub trait Aggregate
 where
@@ -93,6 +108,8 @@ pub trait Generator {
         cache_dir: Option<PathBuf>,
         mut progress: prodash::tree::Item,
         reports: async_std::sync::Receiver<Result<Option<Self::Report>>>,
+        write: WriteCallback,
+        write_state: WriteCallbackState,
     ) -> Result<()> {
         let mut report = None::<Self::Report>;
         let mut count = 0;
@@ -122,12 +139,13 @@ pub trait Generator {
                 None => report,
             };
             {
-                let mut out = Vec::new();
                 complete_and_write_report(
                     &mut report,
-                    &mut out,
+                    Vec::new(),
                     &mut progress,
                     out_dir.join("index.html"),
+                    write,
+                    &write_state,
                 )
                 .await?;
             }
@@ -151,6 +169,8 @@ pub trait Generator {
         cache_dir: Option<PathBuf>,
         krates: Vec<(String, Vec<u8>)>,
         mut progress: prodash::tree::Item,
+        write: WriteCallback,
+        write_state: WriteCallbackState,
     ) -> Result<Option<Self::Report>> {
         let mut chunk_report = None::<Self::Report>;
         let crate_versions = db.open_crate_versions()?;
@@ -201,11 +221,13 @@ pub trait Generator {
                                 Self::generate_report(&name, &version, result, &mut progress)
                                     .await?;
 
-                            complete_and_write_report(
+                            out_buf = complete_and_write_report(
                                 &mut version_report,
-                                &mut out_buf,
+                                out_buf,
                                 &mut progress,
                                 version_html_path(&crate_dir, &version),
+                                write,
+                                &write_state,
                             )
                             .await?;
 
@@ -226,11 +248,13 @@ pub trait Generator {
                     match previous_state {
                         Some(previous_state) => {
                             let mut absolute_state = previous_state.merge(crate_report.clone());
-                            complete_and_write_report(
+                            out_buf = complete_and_write_report(
                                 &mut absolute_state,
-                                &mut out_buf,
+                                out_buf,
                                 &mut progress,
                                 crate_html_path(&crate_dir),
+                                write,
+                                &write_state,
                             )
                             .await?;
                             if let Some(cd) = cache_dir.as_ref() {
@@ -240,11 +264,13 @@ pub trait Generator {
                             };
                         }
                         None => {
-                            complete_and_write_report(
+                            out_buf = complete_and_write_report(
                                 &mut crate_report,
-                                &mut out_buf,
+                                out_buf,
                                 &mut progress,
                                 crate_html_path(&crate_dir),
+                                write,
+                                &write_state,
                             )
                             .await?;
                             if let Some(cd) = cache_dir.as_ref() {
@@ -295,13 +321,26 @@ fn crate_html_path(crate_dir: &Path) -> PathBuf {
 
 async fn complete_and_write_report(
     report: &mut impl Aggregate,
-    out: &mut Vec<u8>,
+    mut out: Vec<u8>,
     progress: &mut prodash::tree::Item,
     path: impl AsRef<Path>,
-) -> Result<()> {
+    write: WriteCallback,
+    write_state: &WriteCallbackState,
+) -> Result<Vec<u8>> {
     out.clear();
-    report.complete(progress, out).await?;
-    async_std::fs::write(path.as_ref(), out)
-        .await
-        .map_err(crate::Error::from)
+    report.complete(progress, &mut out).await?;
+    match write(
+        WriteRequest {
+            path: path.as_ref().to_path_buf(),
+            content: out,
+        },
+        write_state,
+    )? {
+        WriteInstruction::DoWrite(WriteRequest { path, content }) => {
+            let p: &Path = path.as_ref();
+            async_std::fs::write(p, &content).await?;
+            Ok(content)
+        }
+        WriteInstruction::Skip => Ok(Vec::new()),
+    }
 }
