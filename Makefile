@@ -10,6 +10,7 @@ RUST_SRC_FILES = $(shell find src criner/src -name "*.rs")
 bare_index_path = index-bare
 
 DB = criner.db
+SQLITE_DB = $(DB)/db.msgpack.sqlite
 REPORTS = $(DB)/reports
 WASTE_REPORT = $(REPORTS)/waste
 
@@ -52,6 +53,10 @@ waste-report-push-changes: $(WASTE_REPORT) ## add, commit and push all changed r
 waste-report-reset-history-and-push: $(WASTE_REPORT) ## clear the history of the waste report repository to reduce its size, and push everything
 		cd $(WASTE_REPORT); git checkout -b foo; git branch -D tmp; git checkout --orphan tmp; git branch -D foo;
 		$(MAKE) waste-report-push-changes;
+
+waste-report-clear-state: $(SQLITE_DB) $(WASTE_REPORT) ## clear database state and local state for waste reporting, but leave all html files
+		-sqlite3 $< 'drop table report_done;'
+		-rm -Rf $(WASTE_REPORT)/__incremental_cache__
 
 ##@ Testing
 
