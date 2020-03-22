@@ -1,4 +1,3 @@
-use crate::engine::report::generic::{WriteCallbackState, WriteInstruction, WriteRequest};
 use crate::persistence::new_key_value_query_old_to_new_filtered;
 use crate::{
     engine::{report, work},
@@ -10,11 +9,18 @@ use futures::{task::Spawn, task::SpawnExt, FutureExt};
 use rusqlite::NO_PARAMS;
 use std::{path::PathBuf, time::SystemTime};
 
-fn no_git_so_write_local(
-    req: WriteRequest,
-    _state: &WriteCallbackState,
-) -> Result<WriteInstruction> {
-    Ok(WriteInstruction::DoWrite(req))
+mod git {
+    use crate::{
+        engine::report::generic::{WriteCallbackState, WriteInstruction, WriteRequest},
+        Result,
+    };
+
+    pub fn not_available(
+        req: WriteRequest,
+        _state: &WriteCallbackState,
+    ) -> Result<WriteInstruction> {
+        Ok(WriteInstruction::DoWrite(req))
+    }
 }
 
 pub async fn generate(
@@ -65,7 +71,7 @@ pub async fn generate(
             cache_dir.clone(),
             merge_progress,
             rx_result,
-            no_git_so_write_local,
+            git::not_available,
             None,
         )
         .map(|_| ())
@@ -109,7 +115,7 @@ pub async fn generate(
                 cache_dir.clone(),
                 chunk,
                 progress.add_child(""),
-                no_git_so_write_local,
+                git::not_available,
                 None,
             )
             .boxed(),
