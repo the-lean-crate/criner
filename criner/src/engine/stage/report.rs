@@ -147,30 +147,29 @@ mod git {
                             let mut callbacks = git2::RemoteCallbacks::new();
                             let mut subprogress = progress.add_child("git credentials");
                             let mut sideband = progress.add_child("git sideband");
-                            callbacks.transfer_progress(|p| {
-                                progress.set_name(format!(
-                                    "Git pushing changes ({} received)",
-                                    bytesize::ByteSize(p.received_bytes() as u64)
-                                ));
-                                progress.init(
-                                    Some((p.total_deltas() + p.total_objects()) as u32),
-                                    Some("objects"),
-                                );
-                                progress.set((p.indexed_deltas() + p.received_objects()) as u32);
-                                true
-                            });
-                            callbacks.sideband_progress(move |line| {
-                                sideband.set_name(std::str::from_utf8(line).unwrap_or(""));
-                                true
-                            });
-                            {
-                                let username = env_var("CRINER_REPORT_PUSH_HTTP_USERNAME")?;
-                                let password = env_var("CRINER_REPORT_PUSH_HTTP_PASSWORD")?;
-                                callbacks.credentials(move |url, username_from_url, allowed_types| {
+                            let username = env_var("CRINER_REPORT_PUSH_HTTP_USERNAME")?;
+                            let password = env_var("CRINER_REPORT_PUSH_HTTP_PASSWORD")?;
+                            callbacks
+                                .transfer_progress(|p| {
+                                    progress.set_name(format!(
+                                        "Git pushing changes ({} received)",
+                                        bytesize::ByteSize(p.received_bytes() as u64)
+                                    ));
+                                    progress.init(
+                                        Some((p.total_deltas() + p.total_objects()) as u32),
+                                        Some("objects"),
+                                    );
+                                    progress
+                                        .set((p.indexed_deltas() + p.received_objects()) as u32);
+                                    true
+                                })
+                                .sideband_progress(move |line| {
+                                    sideband.set_name(std::str::from_utf8(line).unwrap_or(""));
+                                    true
+                                }).credentials(move |url, username_from_url, allowed_types| {
                                     subprogress.info(format!("Setting userpass plaintext credentials, allowed are {:?} for {:?} (username = {:?}", allowed_types, url, username_from_url));
                                     git2::Cred::userpass_plaintext(&username, &password)
                                 });
-                            }
 
                             remote.push(
                                 &["HEAD:refs/heads/master"],
