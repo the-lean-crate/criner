@@ -1,17 +1,20 @@
 use crate::{
-    model::{self, Task},
+    model,
     persistence::{self, TableAccess},
     Error, Result,
 };
 use bytesize::ByteSize;
 use std::{
     path::{Path, PathBuf},
-    time::Duration,
     time::SystemTime,
 };
 use tokio::io::AsyncWriteExt;
 
+use crate::utils::enforce;
 use async_trait::async_trait;
+use futures::FutureExt;
+use std::ops::Add;
+use std::time::Duration;
 
 struct ProcessingState {
     url: String,
@@ -34,15 +37,7 @@ impl Agent {
         db: &persistence::Db,
         channel: async_std::sync::Sender<super::cpubound::ExtractRequest>,
     ) -> Result<Agent> {
-        let max_observed_crate_size = 40_000;
-        let slowest_supported_download_speed_in_kb_per_s = 10;
-        let client = reqwest::ClientBuilder::new()
-            .connect_timeout(Duration::from_secs(120))
-            .timeout(Duration::from_secs(
-                max_observed_crate_size / slowest_supported_download_speed_in_kb_per_s,
-            ))
-            .gzip(true)
-            .build()?;
+        let client = reqwest::ClientBuilder::new().gzip(true).build()?;
 
         let results = db.open_results()?;
         Ok(Agent {
@@ -65,7 +60,7 @@ impl crate::engine::work::generic::Processor for Agent {
         request: Self::Item,
         out_key: &mut String,
         progress: &mut prodash::tree::Item,
-    ) -> Result<(Task, String)> {
+    ) -> Result<(model::Task, String)> {
         progress.init(None, None);
         match request {
             DownloadRequest {
@@ -180,7 +175,11 @@ async fn download_file_and_store_result(
     out_file: PathBuf,
 ) -> Result<()> {
     progress.blocked("fetch HEAD", None);
-    let mut res = client.get(url).send().await?;
+    let mut res = enforce(
+        Some(SystemTime::now().add(Duration::from_secs(30))),
+        client.get(url).send(),
+    )
+    .await??;
     let size: u32 = res
         .content_length()
         .ok_or(Error::InvalidHeader("expected content-length"))? as u32;
@@ -200,7 +199,12 @@ async fn download_file_and_store_result(
         .open(out_file)
         .await?;
 
-    while let Some(chunk) = res.chunk().await? {
+    while let Some(chunk) = enforce(
+        Some(SystemTime::now().add(Duration::from_secs(15))),
+        res.chunk().boxed(),
+    )
+    .await??
+    {
         out.write(&chunk).await?;
         // body_buf.extend(chunk);
         bytes_received += chunk.len();

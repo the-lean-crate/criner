@@ -29,6 +29,7 @@ pub async fn processor<T>(
 ) -> Result<()> {
     let mut key = String::with_capacity(32);
     let tasks = db.open_tasks()?;
+    let max_retries_on_timeout = 10;
 
     while let Some(request) = r.recv().await {
         key.clear();
@@ -42,19 +43,31 @@ pub async fn processor<T>(
             t
         })?;
 
-        progress.blocked("working", None);
-        let res = agent.process(&mut progress).await;
+        let mut try_count = 0;
+        loop {
+            try_count += 1;
+            progress.blocked("working", None);
+            let res = agent.process(&mut progress).await;
 
-        task.state = match res {
-            Ok(_) => {
-                agent.schedule_next(&mut progress).await.ok();
-                model::TaskState::Complete
-            }
-            Err((err, msg)) => {
-                progress.fail(format!("{}: {}", msg, err));
-                model::TaskState::AttemptsWithFailure(vec![err.to_string()])
-            }
-        };
+            task.state = match res {
+                Err((Error::DeadlineExceeded(info), _)) if try_count < max_retries_on_timeout => {
+                    progress.fail(format!(
+                        "{} - retrying ({}/{})",
+                        info, try_count, max_retries_on_timeout
+                    ));
+                    continue;
+                }
+                Err((err, msg)) => {
+                    progress.fail(format!("{}: {}", msg, err));
+                    model::TaskState::AttemptsWithFailure(vec![err.to_string()])
+                }
+                Ok(_) => {
+                    agent.schedule_next(&mut progress).await.ok();
+                    model::TaskState::Complete
+                }
+            };
+            break;
+        }
 
         tasks.upsert(&mut progress, &key, &task)?;
         progress.set_name(agent.idle_message());
