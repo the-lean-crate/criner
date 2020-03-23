@@ -171,12 +171,15 @@ mod git {
                                     git2::Cred::userpass_plaintext(&username, &password)
                                 });
                             }
-                            let mut options = git2::PushOptions::new();
-                            options
-                                .packbuilder_parallelism(0)
-                                .remote_callbacks(callbacks);
-                            remote.push(&["HEAD:refs/heads/master"], Some(&mut options))?;
-                            drop(options);
+
+                            remote.push(
+                                &["HEAD:refs/heads/master"],
+                                Some(
+                                    git2::PushOptions::new()
+                                        .packbuilder_parallelism(0)
+                                        .remote_callbacks(callbacks),
+                                ),
+                            )?;
                             progress.done("Pushed changes");
                         }
                         Ok(())
