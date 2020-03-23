@@ -147,6 +147,7 @@ impl crate::engine::work::generic::Processor for Agent {
     }
 }
 
+#[derive(Clone)]
 pub struct DownloadRequest {
     pub crate_name: String,
     pub crate_version: String,

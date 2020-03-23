@@ -100,6 +100,7 @@ impl crate::engine::work::generic::Processor for Agent {
     }
 }
 
+#[derive(Clone)]
 pub struct ExtractRequest {
     pub download_task: model::Task,
     pub crate_name: String,

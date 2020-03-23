@@ -21,7 +21,7 @@ pub trait Processor {
     }
 }
 
-pub async fn processor<T>(
+pub async fn processor<T: Clone>(
     db: persistence::Db,
     mut progress: prodash::tree::Item,
     r: async_std::sync::Receiver<T>,
@@ -32,19 +32,20 @@ pub async fn processor<T>(
     let max_retries_on_timeout = 10;
 
     while let Some(request) = r.recv().await {
-        key.clear();
-        let (dummy_task, progress_info) = agent.set(request, &mut key, &mut progress)?;
-        progress.set_name(progress_info);
-
-        let mut task = tasks.update(Some(&mut progress), &key, |mut t| {
-            t.process = dummy_task.process.clone();
-            t.version = dummy_task.version.clone();
-            t.state.merge_with(&model::TaskState::InProgress(None));
-            t
-        })?;
-
         let mut try_count = 0;
-        loop {
+        let task = loop {
+            key.clear();
+            let (dummy_task, progress_info) =
+                agent.set(request.clone(), &mut key, &mut progress)?;
+            progress.set_name(progress_info);
+
+            let mut task = tasks.update(Some(&mut progress), &key, |mut t| {
+                t.process = dummy_task.process.clone();
+                t.version = dummy_task.version.clone();
+                t.state.merge_with(&model::TaskState::InProgress(None));
+                t
+            })?;
+
             try_count += 1;
             progress.blocked("working", None);
             let res = agent.process(&mut progress).await;
@@ -66,8 +67,8 @@ pub async fn processor<T>(
                     model::TaskState::Complete
                 }
             };
-            break;
-        }
+            break task;
+        };
 
         tasks.upsert(&mut progress, &key, &task)?;
         progress.set_name(agent.idle_message());
