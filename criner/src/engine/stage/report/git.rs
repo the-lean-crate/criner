@@ -10,7 +10,6 @@ use std::{
 };
 
 static TOTAL_LOOSE_OBJECTS_WRITTEN: AtomicU64 = AtomicU64::new(0);
-const PACK_THRESHOLD: u64 = 10_000; // like git auto gc
 
 fn file_index_entry(path: PathBuf, file_size: usize) -> git2::IndexEntry {
     use std::os::unix::ffi::OsStringExt;
@@ -55,7 +54,6 @@ pub fn select_callback(
         Ok(repo) => {
             let (tx, rx) = flume::bounded(processors as usize);
             let is_bare_repo = repo.is_bare();
-            let report_dir = report_dir.to_owned();
             let handle = std::thread::spawn(move || -> Result<()> {
                 let res = (|| {
                     progress.init(None, Some("files stored in index"));
@@ -82,25 +80,11 @@ pub fn select_callback(
                         oid
                     };
 
-                    {
-                        TOTAL_LOOSE_OBJECTS_WRITTEN.fetch_add(req_count, Ordering::SeqCst);
-                        progress.info(format!(
-                            "Wrote {} loose objects since last packing",
-                            TOTAL_LOOSE_OBJECTS_WRITTEN.load(Ordering::Relaxed)
-                        ));
-                        if TOTAL_LOOSE_OBJECTS_WRITTEN.load(Ordering::Relaxed) > PACK_THRESHOLD {
-                            use std::process::Stdio;
-                            progress.blocked("Packing loose objects - this can take a while", None);
-                            let res = std::process::Command::new("git")
-                                .current_dir(report_dir)
-                                .arg("gc")
-                                .stdin(Stdio::null())
-                                .stdout(Stdio::null())
-                                .stderr(Stdio::null())
-                                .status();
-                            progress.info(format!("'git gc' exited with {:?}", res));
-                        }
-                    }
+                    TOTAL_LOOSE_OBJECTS_WRITTEN.fetch_add(req_count, Ordering::SeqCst);
+                    progress.info(format!(
+                        "Wrote {} loose objects since last packing",
+                        TOTAL_LOOSE_OBJECTS_WRITTEN.load(Ordering::Relaxed)
+                    ));
 
                     {
                         progress.set(2);
