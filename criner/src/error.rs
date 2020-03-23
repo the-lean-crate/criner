@@ -35,6 +35,9 @@ quick_error! {
         DeadlineExceeded(d: FormatDeadline) {
             display("Stopped computation as deadline was reached {}.", d)
         }
+        Timeout(d: std::time::Duration, msg: String) {
+            display("{} - timeout after {:?}.", msg, d)
+        }
         Spawn(err: futures::task::SpawnError) {
             from()
             cause(err)

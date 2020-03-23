@@ -80,6 +80,17 @@ pub fn check(deadline: Option<SystemTime>) -> Result<()> {
         .unwrap_or(Ok(()))
 }
 
+pub async fn timeout_after<F, T>(duration: Duration, msg: impl Into<String>, f: F) -> Result<T>
+where
+    F: Future<Output = T> + Unpin,
+{
+    let selector = future::select(Delay::new(duration), f);
+    match selector.await {
+        Either::Left((_, _f)) => Err(Error::Timeout(duration, msg.into())),
+        Either::Right((r, _delay)) => Ok(r),
+    }
+}
+
 pub async fn enforce<F, T>(deadline: Option<SystemTime>, f: F) -> Result<T>
 where
     F: Future<Output = T> + Unpin,

@@ -51,10 +51,10 @@ pub async fn processor<T: Clone>(
             let res = agent.process(&mut progress).await;
 
             task.state = match res {
-                Err((Error::DeadlineExceeded(info), _)) if try_count < max_retries_on_timeout => {
+                Err((err @ Error::Timeout(_, _), _)) if try_count < max_retries_on_timeout => {
                     progress.fail(format!(
-                        "{} - retrying ({}/{})",
-                        info, try_count, max_retries_on_timeout
+                        "{} → retrying ({}/{})",
+                        err, try_count, max_retries_on_timeout
                     ));
                     continue;
                 }

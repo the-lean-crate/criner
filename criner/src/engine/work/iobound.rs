@@ -10,10 +10,9 @@ use std::{
 };
 use tokio::io::AsyncWriteExt;
 
-use crate::utils::enforce;
+use crate::utils::timeout_after;
 use async_trait::async_trait;
 use futures::FutureExt;
-use std::ops::Add;
 use std::time::Duration;
 
 struct ProcessingState {
@@ -176,8 +175,9 @@ async fn download_file_and_store_result(
     out_file: PathBuf,
 ) -> Result<()> {
     progress.blocked("fetch HEAD", None);
-    let mut res = enforce(
-        Some(SystemTime::now().add(Duration::from_secs(30))),
+    let mut res = timeout_after(
+        Duration::from_secs(30),
+        "fetching HEAD",
         client.get(url).send(),
     )
     .await??;
@@ -191,7 +191,7 @@ async fn download_file_and_store_result(
         ByteSize(size.into())
     ));
 
-    let mut bytes_received = 0;
+    let mut bytes_received = 0usize;
     tokio::fs::create_dir_all(&out_file.parent().expect("parent directory")).await?;
     let mut out = tokio::fs::OpenOptions::new()
         .create(true)
@@ -200,8 +200,13 @@ async fn download_file_and_store_result(
         .open(out_file)
         .await?;
 
-    while let Some(chunk) = enforce(
-        Some(SystemTime::now().add(Duration::from_secs(15))),
+    while let Some(chunk) = timeout_after(
+        Duration::from_secs(15),
+        format!(
+            "fetching {} of {}",
+            ByteSize(bytes_received as u64),
+            ByteSize(size.into())
+        ),
         res.chunk().boxed(),
     )
     .await??
