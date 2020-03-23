@@ -23,3 +23,6 @@ criner/Cargo.lock
 /criner/tests/fixtures/extracted/
 /crates-io-db-dump.tar.gz
 /????-??-??-??????/
+
+# for standard variables that are required for pushing reports
+/.env

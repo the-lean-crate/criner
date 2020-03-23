@@ -484,10 +484,11 @@ dependencies = [
 
 [[package]]
 name = "flume"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da4ca3d4152ed3cd9d9cc36580897bbfea2fedf869950c685b6dc5a841612cc6"
+checksum = "855e285c3835897065a6ba6f9463b44553eb9f29c7988d692f3d41283b47388b"
 dependencies = [
+ "futures",
  "spin",
 ]
 
@@ -1302,9 +1303,9 @@ dependencies = [
 
 [[package]]
 name = "prodash"
-version = "2.0.0"
+version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "787bb25d285ff7aff8243c6e691b560e2774732e07c8c4c7d74c6359b4c0c216"
+checksum = "b61566cda05cd1d6aba950b0dcfa91107ba77fe0b0f1f418406dc78ff9c1cfe9"
 dependencies = [
  "dashmap",
  "futures",

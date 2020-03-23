@@ -145,8 +145,8 @@ mod git {
                                 .unwrap_or_else(|_| "origin".into());
                             let mut remote = repo.find_remote(&remote_name)?;
                             let mut callbacks = git2::RemoteCallbacks::new();
-                            let mut subprogress = progress.add_child("credentials");
-                            let mut sideband = progress.add_child("sideband");
+                            let mut subprogress = progress.add_child("git credentials");
+                            let mut sideband = progress.add_child("git sideband");
                             callbacks.transfer_progress(|p| {
                                 progress.set_name(format!(
                                     "Git pushing changes ({} received)",
@@ -171,10 +171,13 @@ mod git {
                                     git2::Cred::userpass_plaintext(&username, &password)
                                 });
                             }
-                            remote.push(
-                                &["HEAD:refs/heads/master"],
-                                Some(git2::PushOptions::new().packbuilder_parallelism(0).remote_callbacks(callbacks)),
-                            )?;
+                            let mut options = git2::PushOptions::new();
+                            options
+                                .packbuilder_parallelism(0)
+                                .remote_callbacks(callbacks);
+                            remote.push(&["HEAD:refs/heads/master"], Some(&mut options))?;
+                            drop(options);
+                            progress.done("Pushed changes");
                         }
                         Ok(())
                     })();
