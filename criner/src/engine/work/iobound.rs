@@ -1,8 +1,7 @@
 use crate::{
-    error::{Error, Result},
-    model,
-    model::Task,
+    model::{self, Task},
     persistence::{self, TableAccess},
+    Error, Result,
 };
 use bytesize::ByteSize;
 use std::{
@@ -111,23 +110,6 @@ impl crate::engine::work::generic::Processor for Agent {
         }
     }
 
-    async fn schedule_next(
-        &mut self,
-        progress: &mut prodash::tree::Item,
-    ) -> std::result::Result<(), Error> {
-        let extract_request = self
-            .extraction_request
-            .take()
-            .expect("this to be set when we are called");
-        progress.blocked("schedule crate extraction", None);
-        // Here we risk doing this work twice, but must of the time, we don't. And since it's fast,
-        // we take the risk of duplicate work for keeping more precessors busy.
-        // And yes, this send is blocking the source processor, but should not be an issue as CPU
-        // processors are so fast - slow producer, fast consumer.
-        self.channel.send(extract_request).await;
-        Ok(())
-    }
-
     fn idle_message(&self) -> String {
         "↓ IDLE".into()
     }
@@ -153,6 +135,20 @@ impl crate::engine::work::generic::Processor for Agent {
         )
         .await
         .map_err(|err| (err, format!("Failed to download '{}'", url)))
+    }
+
+    async fn schedule_next(&mut self, progress: &mut prodash::tree::Item) -> Result<()> {
+        let extract_request = self
+            .extraction_request
+            .take()
+            .expect("this to be set when we are called");
+        progress.blocked("schedule crate extraction", None);
+        // Here we risk doing this work twice, but must of the time, we don't. And since it's fast,
+        // we take the risk of duplicate work for keeping more precessors busy.
+        // And yes, this send is blocking the source processor, but should not be an issue as CPU
+        // processors are so fast - slow producer, fast consumer.
+        self.channel.send(extract_request).await;
+        Ok(())
     }
 }
 

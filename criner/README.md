@@ -2,10 +2,11 @@
 
 ## TODO
 
-* [ ] See why RipGrep doesn't get any suggestions
-* [ ] Suggest 'top-level' globs like `/README.md` if we know the matched file is on the top-level. Otherwise the pattern `README.md` will actually match `*/README.md`.
+* [ ] Set 30s/10s timeouts for chunk awaits and head awaits (on top of total timeout set in reqwest). That should make it way more reliable
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data, like release date
   * [ ] Consider extracting the release date from git and upgrade `crates-index-diff` to support that.
+* [ ] See why RipGrep doesn't get any suggestions
+* [ ] Suggest 'top-level' globs like `/README.md` if we know the matched file is on the top-level. Otherwise the pattern `README.md` will actually match `*/README.md`.
 * [ ] Only show potential savings if it is the most recent version
 * [ ] More reporting - right now the context gathering to see how much time is spent where is neglected.
 

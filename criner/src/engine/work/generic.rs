@@ -1,8 +1,4 @@
-use crate::{
-    error::{Error, Result},
-    model, persistence,
-    persistence::TableAccess,
-};
+use crate::{model, persistence, persistence::TableAccess, Error, Result};
 use async_trait::async_trait;
 
 #[async_trait]
@@ -20,10 +16,7 @@ pub trait Processor {
         &mut self,
         progress: &mut prodash::tree::Item,
     ) -> std::result::Result<(), (Error, String)>;
-    async fn schedule_next(
-        &mut self,
-        _progress: &mut prodash::tree::Item,
-    ) -> std::result::Result<(), Error> {
+    async fn schedule_next(&mut self, _progress: &mut prodash::tree::Item) -> Result<()> {
         Ok(())
     }
 }
