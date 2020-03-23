@@ -3,8 +3,14 @@ use crate::{
     Result,
 };
 use crates_index_diff::git2;
-use std::path::{Path, PathBuf};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::{
+    path::{Path, PathBuf},
+    sync::atomic::{AtomicU64, Ordering},
+    time::{SystemTime, UNIX_EPOCH},
+};
+
+static TOTAL_LOOSE_OBJECTS_WRITTEN: AtomicU64 = AtomicU64::new(0);
+const PACK_THRESHOLD: u64 = 10_000; // like git auto gc
 
 fn file_index_entry(path: PathBuf, file_size: usize) -> git2::IndexEntry {
     use std::os::unix::ffi::OsStringExt;
@@ -53,13 +59,14 @@ pub fn select_callback(
                 let res = (|| {
                     progress.init(None, Some("files stored in index"));
                     let mut index = repo.index()?;
-                    let mut req_count = 0;
+                    let mut req_count = 0u64;
                     for WriteRequest { path, content } in rx.iter() {
                         req_count += 1;
                         let entry = file_index_entry(path, content.len());
                         index.add_frombuffer(&entry, &content)?;
                         progress.set(req_count as u32);
                     }
+
                     progress.init(Some(5), Some("steps"));
                     let tree_oid = {
                         progress.set(1);
@@ -73,6 +80,37 @@ pub fn select_callback(
                         progress.done("Tree written successfully");
                         oid
                     };
+
+                    {
+                        TOTAL_LOOSE_OBJECTS_WRITTEN.fetch_add(req_count, Ordering::SeqCst);
+                        progress.info(format!(
+                            "Wrote {} loose objects since last packing",
+                            TOTAL_LOOSE_OBJECTS_WRITTEN.load(Ordering::Relaxed)
+                        ));
+                        if TOTAL_LOOSE_OBJECTS_WRITTEN.load(Ordering::Relaxed) > PACK_THRESHOLD {
+                            progress.blocked("Gathering loose suitable for packing", None);
+                            let mut packer = repo.packbuilder()?;
+                            packer.set_threads(0);
+                            packer.insert_tree(tree_oid)?;
+                            if let Ok(commit_oid) =
+                                repo.head().and_then(|h| h.peel_to_commit().map(|c| c.id()))
+                            {
+                                packer.insert_recursive(commit_oid, None)?;
+                            }
+                            progress.blocked("Packing loose objects - this can take a while", None);
+                            progress.init(None, Some("seconds"));
+                            let name = progress.name().unwrap_or_else(|| "git".into());
+                            progress.set_name("Waiting for pack write");
+                            let mut seconds_waited = 0;
+                            while packer.object_count() != packer.written() {
+                                seconds_waited += 1;
+                                progress.set(seconds_waited);
+                                std::thread::sleep(std::time::Duration::from_secs(1));
+                            }
+                            progress.set_name(name);
+                            TOTAL_LOOSE_OBJECTS_WRITTEN.store(0, Ordering::SeqCst);
+                        }
+                    }
 
                     {
                         progress.set(2);
