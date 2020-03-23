@@ -15,6 +15,9 @@ use async_trait::async_trait;
 use futures::FutureExt;
 use std::time::Duration;
 
+const CONNECT_AND_FETCH_HEAD_TIMEOUT: Duration = Duration::from_secs(30);
+const FETCH_CHUNK_TIMEOUT_SECONDS: Duration = Duration::from_secs(20);
+
 struct ProcessingState {
     url: String,
     kind: &'static str,
@@ -176,7 +179,7 @@ async fn download_file_and_store_result(
 ) -> Result<()> {
     progress.blocked("fetch HEAD", None);
     let mut res = timeout_after(
-        Duration::from_secs(30),
+        CONNECT_AND_FETCH_HEAD_TIMEOUT,
         "fetching HEAD",
         client.get(url).send(),
     )
@@ -201,7 +204,7 @@ async fn download_file_and_store_result(
         .await?;
 
     while let Some(chunk) = timeout_after(
-        Duration::from_secs(15),
+        FETCH_CHUNK_TIMEOUT_SECONDS,
         format!(
             "fetching {} of {}",
             ByteSize(bytes_received as u64),

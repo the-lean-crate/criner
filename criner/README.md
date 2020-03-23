@@ -2,7 +2,6 @@
 
 ## TODO
 
-* [ ] Set 30s/10s timeouts for chunk awaits and head awaits (on top of total timeout set in reqwest). That should make it way more reliable
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data, like release date
   * [ ] Consider extracting the release date from git and upgrade `crates-index-diff` to support that.
 * [ ] See why RipGrep doesn't get any suggestions

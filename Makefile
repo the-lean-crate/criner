@@ -39,9 +39,9 @@ init: $(WASTE_REPORT) ## Clone output repositories for report generation. Only n
 fetch-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the fetch stage once
 		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) -F 1 -P 0 -R 0 $(DB)
 process-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the processing stage once
-		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --io 1 --cpu 2  -F 0 -P 1 -R 0 $(DB)
+		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --io 10 --cpu 2  -F 0 -P 1 -R 0 $(DB)
 process-only-nonstop: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the processing stage continuously
-		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --io 1 --cpu 2  -F 0 -p 5min -R 0 $(DB)
+		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --io 10 --cpu 2  -F 0 -p 5min -R 0 $(DB)
 report-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the reporting stage once
 		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --cpu-o 10  -F 0 -P 0 -R 1 $(DB)
 force-report-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the reporting stage once, forcibly, rewriting everything and ignoring caches
