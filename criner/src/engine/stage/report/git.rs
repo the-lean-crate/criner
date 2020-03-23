@@ -80,6 +80,15 @@ pub fn select_callback(
                         repo.set_index(&mut index)?;
                     }
 
+                    if let Ok(current_tree) =
+                        repo.head().and_then(|h| h.peel_to_tree()).map(|t| t.id())
+                    {
+                        if current_tree == tree_oid {
+                            progress.info("Skipping git commit as there was no change");
+                            return Ok(());
+                        }
+                    }
+
                     {
                         progress.set(3);
                         progress.blocked("writing commit", None);

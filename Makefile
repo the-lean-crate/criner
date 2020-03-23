@@ -46,6 +46,8 @@ report-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the reporting stage
 		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --cpu-o 10  -F 0 -P 0 -R 1 $(DB)
 force-report-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the reporting stage once, forcibly, rewriting everything and ignoring caches
 		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --cpu-o 10  -F 0 -P 0 -R 1 -g '*' $(DB)
+mine-nonstop: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run all operations continuously, fully automated
+		$(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --io 10 --cpu 2 --cpu-o 10 $(DB)
 
 ##@ Waste Report Maintenance
 

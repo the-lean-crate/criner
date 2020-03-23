@@ -61,7 +61,7 @@ pub enum SubCommands {
         time_limit: Option<humantime::Duration>,
 
         /// The time between each fetch operation, specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
-        #[structopt(long, short = "f", default_value = "60s")]
+        #[structopt(long, short = "f", default_value = "5min")]
         fetch_every: humantime::Duration,
 
         /// If set, the amount of times the fetch stage will run. If set to 0, it will never run.
@@ -69,7 +69,7 @@ pub enum SubCommands {
         fetch_at_most: Option<usize>,
 
         /// The time between each processing run, specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
-        #[structopt(long, short = "p", default_value = "60s")]
+        #[structopt(long, short = "p", default_value = "5min")]
         process_every: humantime::Duration,
 
         /// If set, the amount of times the process stage will run. If set to 0, they will never run.
@@ -77,7 +77,7 @@ pub enum SubCommands {
         process_at_most: Option<usize>,
 
         /// The time between each reporting and processing run, specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
-        #[structopt(long, short = "r", default_value = "60s")]
+        #[structopt(long, short = "r", default_value = "5min")]
         report_every: humantime::Duration,
 
         /// If set, the amount of times the reporting stage will run. If set to 0, they will never run.
