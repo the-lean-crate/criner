@@ -55,6 +55,7 @@ pub fn select_callback(
         Ok(repo) => {
             let (tx, rx) = flume::bounded(processors as usize);
             let is_bare_repo = repo.is_bare();
+            let report_dir = report_dir.to_owned();
             let handle = std::thread::spawn(move || -> Result<()> {
                 let res = (|| {
                     progress.init(None, Some("files stored in index"));
@@ -88,27 +89,16 @@ pub fn select_callback(
                             TOTAL_LOOSE_OBJECTS_WRITTEN.load(Ordering::Relaxed)
                         ));
                         if TOTAL_LOOSE_OBJECTS_WRITTEN.load(Ordering::Relaxed) > PACK_THRESHOLD {
-                            progress.blocked("Gathering loose suitable for packing", None);
-                            let mut packer = repo.packbuilder()?;
-                            packer.set_threads(0);
-                            packer.insert_tree(tree_oid)?;
-                            if let Ok(commit_oid) =
-                                repo.head().and_then(|h| h.peel_to_commit().map(|c| c.id()))
-                            {
-                                packer.insert_recursive(commit_oid, None)?;
-                            }
+                            use std::process::Stdio;
                             progress.blocked("Packing loose objects - this can take a while", None);
-                            progress.init(None, Some("seconds"));
-                            let name = progress.name().unwrap_or_else(|| "git".into());
-                            progress.set_name("Waiting for pack write");
-                            let mut seconds_waited = 0;
-                            while packer.object_count() != packer.written() {
-                                seconds_waited += 1;
-                                progress.set(seconds_waited);
-                                std::thread::sleep(std::time::Duration::from_secs(1));
-                            }
-                            progress.set_name(name);
-                            TOTAL_LOOSE_OBJECTS_WRITTEN.store(0, Ordering::SeqCst);
+                            let res = std::process::Command::new("git")
+                                .current_dir(report_dir)
+                                .arg("gc")
+                                .stdin(Stdio::null())
+                                .stdout(Stdio::null())
+                                .stderr(Stdio::null())
+                                .status();
+                            progress.info(format!("'git gc' exited with {:?}", res));
                         }
                     }
 
