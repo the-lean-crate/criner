@@ -82,7 +82,7 @@ pub fn select_callback(
 
                     TOTAL_LOOSE_OBJECTS_WRITTEN.fetch_add(req_count, Ordering::SeqCst);
                     progress.info(format!(
-                        "Wrote {} loose objects since last packing",
+                        "Wrote {} loose objects since last run",
                         TOTAL_LOOSE_OBJECTS_WRITTEN.load(Ordering::Relaxed)
                     ));
 
@@ -92,8 +92,11 @@ pub fn select_callback(
                         repo.set_index(&mut index)?;
                     }
 
-                    if let Ok(current_tree) =
-                        repo.head().and_then(|h| h.peel_to_tree()).map(|t| t.id())
+                    if let Ok(current_tree) = repo
+                        .head()
+                        .and_then(|h| h.resolve())
+                        .and_then(|h| h.peel_to_tree())
+                        .map(|t| t.id())
                     {
                         if current_tree == tree_oid {
                             progress.info("Skipping git commit as there was no change");
