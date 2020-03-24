@@ -12,7 +12,6 @@ fn all_but_recently_yanked(
     crate_name: &str,
     versions: &[String],
     table: &CrateVersionTable,
-    progress: &mut prodash::tree::Item,
     key_buf: &mut String,
 ) -> Result<usize> {
     let mut num_yanked = 0;
@@ -189,7 +188,6 @@ pub trait Generator {
                         &name,
                         &c.versions,
                         &crate_versions,
-                        &mut progress,
                         &mut key_buf,
                     )?)
                     .enumerate()
