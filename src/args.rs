@@ -23,7 +23,7 @@ pub enum SubCommands {
         fps: f32,
 
         /// The amount of progress messages to keep in a ring buffer.
-        #[structopt(long, default_value = "100")]
+        #[structopt(short = "s", long, default_value = "1000")]
         progress_message_scrollback_buffer_size: usize,
 
         /// The amount of IO-bound processors to run concurrently.
@@ -32,7 +32,7 @@ pub enum SubCommands {
         /// Depending on that number, one should experiment with an amount of processors that saturate
         /// either input or output.
         /// Most commonly, these are bound to the input, as it is the network.
-        #[structopt(long, alias = "io", default_value = "10")]
+        #[structopt(long, alias = "io", value_name = "io", default_value = "10")]
         io_bound_processors: u32,
 
         /// The amount of CPU- and Output-bound processors to run concurrently.
@@ -42,14 +42,14 @@ pub enum SubCommands {
         /// It's recommended to adjust that number to whatever can saturate the speed of writing to disk,
         /// as these processors will yield when writing, allowing other processors to compute.
         /// Computes are relatively inexpensive compared to the writes.
-        #[structopt(long, alias = "cpu-o", default_value = "20")]
+        #[structopt(long, alias = "cpu-o", value_name = "cpu-o", default_value = "20")]
         cpu_o_bound_processors: u32,
 
         /// The amount of CPU-bound processors to run concurrently.
         ///
         /// One can assume that one of these can occupy one core of a CPU.
         /// However, they will not use a lot of IO, nor will they use much memory.
-        #[structopt(long, alias = "cpu", default_value = "4")]
+        #[structopt(long, alias = "cpu", value_name = "cpu", default_value = "4")]
         cpu_bound_processors: u32,
 
         /// Path to the possibly existing crates.io repository clone. If unset, it will be cloned to a temporary spot.
@@ -119,7 +119,7 @@ impl Default for SubCommands {
         SubCommands::Mine {
             no_gui: false,
             fps: 6.0,
-            progress_message_scrollback_buffer_size: 100,
+            progress_message_scrollback_buffer_size: 1000,
             io_bound_processors: 5,
             cpu_bound_processors: 2,
             cpu_o_bound_processors: 10,
