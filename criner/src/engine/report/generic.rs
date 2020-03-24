@@ -184,7 +184,6 @@ pub trait Generator {
             for (name, krate) in krates.into_iter() {
                 let c: model::Crate = krate.as_slice().into();
                 let crate_dir = crate_dir(&out_dir, &name);
-                async_std::fs::create_dir_all(&crate_dir).await?;
                 progress.init(Some(c.versions.len() as u32), Some("versions"));
                 progress.set_name(&name);
 
@@ -338,6 +337,8 @@ async fn complete_and_write_report(
         write_state,
     )? {
         WriteInstruction::DoWrite(WriteRequest { path, content }) => {
+            async_std::fs::create_dir_all(path.parent().expect("file path with parent directory"))
+                .await?;
             let p: &Path = path.as_ref();
             progress.blocked("writing report to disk", None);
             async_std::fs::write(p, &content).await?;
