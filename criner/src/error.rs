@@ -82,5 +82,9 @@ quick_error! {
             from()
             cause(err)
         }
+        StripPrefixError(err: std::path::StripPrefixError) {
+            from()
+            cause(err)
+        }
     }
 }

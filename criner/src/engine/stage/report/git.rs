@@ -54,14 +54,16 @@ pub fn select_callback(
         Ok(repo) => {
             let (tx, rx) = flume::bounded(processors as usize);
             let is_bare_repo = repo.is_bare();
+            let report_dir = report_dir.to_owned();
             let handle = std::thread::spawn(move || -> Result<()> {
                 let res = (|| {
                     progress.init(None, Some("files stored in index"));
                     let mut index = repo.index()?;
                     let mut req_count = 0u64;
                     for WriteRequest { path, content } in rx.iter() {
+                        let path = path.strip_prefix(&report_dir)?;
                         req_count += 1;
-                        let entry = file_index_entry(path, content.len());
+                        let entry = file_index_entry(path.to_owned(), content.len());
                         index.add_frombuffer(&entry, &content)?;
                         progress.set(req_count as u32);
                     }
