@@ -4,12 +4,12 @@
 
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data, like release date
   * [ ] Consider extracting the release date from git and upgrade `crates-index-diff` to support that.
+* [ ] Make things prettier and more visual - that way we can try again for a come-back :D
 * [ ] See why RipGrep doesn't get any suggestions
-* [ ] Suggest 'top-level' globs like `/README.md` if we know the matched file is on the top-level. Otherwise the pattern `README.md` will actually match `*/README.md`.
-* [ ] Only show potential savings if it is the most recent version
 * [ ] More reporting - right now the context gathering to see how much time is spent where is neglected.
 
 ## Possible Improvements
+* [ ] Suggest 'top-level' globs like `/README.md` if we know the matched file is on the top-level. Otherwise the pattern `README.md` will actually match `*/README.md`.
 * [ ] Count negation patterns in includes and excludes. The latter don't seem to be working, and if nobody is using them, Cargo can either make it work or
       reject them properly. Maybe. Maybe first create an issue for that and see what they think.
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down

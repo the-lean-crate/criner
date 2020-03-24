@@ -105,7 +105,7 @@ pub fn select_callback(
 
                     TOTAL_LOOSE_OBJECTS_WRITTEN.fetch_add(req_count, Ordering::SeqCst);
                     progress.info(format!(
-                        "Wrote {} loose objects since last run",
+                        "Wrote {} loose objects since program start",
                         TOTAL_LOOSE_OBJECTS_WRITTEN.load(Ordering::Relaxed)
                     ));
 
