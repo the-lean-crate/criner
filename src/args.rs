@@ -23,7 +23,7 @@ pub enum SubCommands {
         fps: f32,
 
         /// The amount of progress messages to keep in a ring buffer.
-        #[structopt(short = "s", long, default_value = "1000")]
+        #[structopt(short = "s", long, default_value = "100")]
         progress_message_scrollback_buffer_size: usize,
 
         /// The amount of IO-bound processors to run concurrently.
@@ -119,7 +119,7 @@ impl Default for SubCommands {
         SubCommands::Mine {
             no_gui: false,
             fps: 6.0,
-            progress_message_scrollback_buffer_size: 1000,
+            progress_message_scrollback_buffer_size: 100,
             io_bound_processors: 5,
             cpu_bound_processors: 2,
             cpu_o_bound_processors: 10,

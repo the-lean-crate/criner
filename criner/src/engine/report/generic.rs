@@ -30,12 +30,6 @@ fn all_but_recently_yanked(
             break;
         }
     }
-    if num_yanked > 0 {
-        progress.info(format!(
-            "Skipped {} latest yanked versions of crate {}",
-            num_yanked, crate_name
-        ));
-    }
     Ok(versions.len() - num_yanked)
 }
 
