@@ -12,6 +12,7 @@
 * [ ] Suggest 'top-level' globs like `/README.md` if we know the matched file is on the top-level. Otherwise the pattern `README.md` will actually match `*/README.md`.
 * [ ] Count negation patterns in includes and excludes. The latter don't seem to be working, and if nobody is using them, Cargo can either make it work or
       reject them properly. Maybe. Maybe first create an issue for that and see what they think.
+* [ ] On chunk download timeout, don't restart, but resume the download where it left off
 * [ ] resilience: protect against ThreadPanics - they prevent the program from shutting down
    * Futures has a wrapper to catch panics, even though we don't use it yet. A panic only brings down the future that panics, not the entire program.
 * [ ] Graceful shutdown on Ctrl+C

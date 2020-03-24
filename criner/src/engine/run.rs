@@ -76,7 +76,7 @@ pub async fn non_blocking(
         stage.every.as_secs() as u32,
         {
             let p = progress.clone();
-            move || p.add_child("Reporting Timer")
+            move || p.add_child("Processing Timer")
         },
         deadline,
         stage.at_most,
