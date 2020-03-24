@@ -58,7 +58,28 @@ pub fn select_callback(
             let handle = std::thread::spawn(move || -> Result<()> {
                 let res = (|| {
                     progress.init(None, Some("files stored in index"));
-                    let mut index = repo.index()?;
+                    let mut index = {
+                        let mut i = repo.index()?;
+                        if is_bare_repo {
+                            if let Ok(tree_oid) = repo
+                                .head()
+                                .and_then(|h| h.resolve())
+                                .and_then(|h| h.peel_to_tree())
+                                .map(|t| t.id())
+                            {
+                                progress.info(format!(
+                                    "reading latest tree into in-memory index: {}",
+                                    tree_oid
+                                ));
+                                progress.blocked("reading tree into in-memory index", None);
+                                i.read_tree(
+                                    &repo.find_tree(tree_oid).expect("a tree object to exist"),
+                                )?;
+                                progress.done("read tree into memory index");
+                            }
+                        }
+                        i
+                    };
                     let mut req_count = 0u64;
                     for WriteRequest { path, content } in rx.iter() {
                         let path = path.strip_prefix(&report_dir)?;
@@ -88,11 +109,12 @@ pub fn select_callback(
                         TOTAL_LOOSE_OBJECTS_WRITTEN.load(Ordering::Relaxed)
                     ));
 
-                    {
+                    if !is_bare_repo {
                         progress.set(2);
                         progress.blocked("writing new index", None);
                         repo.set_index(&mut index)?;
                     }
+                    drop(index);
 
                     if let Ok(current_tree) = repo
                         .head()
