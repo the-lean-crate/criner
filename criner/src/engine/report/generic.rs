@@ -332,7 +332,7 @@ async fn complete_and_write_report(
             async_std::fs::create_dir_all(path.parent().expect("file path with parent directory"))
                 .await?;
             let p: &Path = path.as_ref();
-            progress.blocked("writing report to disk", None);
+            progress.halted("writing report to disk", None);
             async_std::fs::write(p, &content).await?;
             Ok(content)
         }
