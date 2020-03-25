@@ -29,6 +29,9 @@ pub async fn generate(
     let glob_str = glob.as_ref().map(|s| s.as_str());
     let num_crates = krates.count_filtered(glob_str.clone()) as u32;
     let chunk_size = 500.min(num_crates);
+    if chunk_size == 0 {
+        return Ok(());
+    }
     progress.init(Some(num_crates), Some("crates"));
 
     let (rx_result, tx) = {
