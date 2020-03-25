@@ -21,7 +21,7 @@ quick-error = "1.2.3"
 futures = { version = "0.3.4", features = ["thread-pool"]}
 futures-timer = "3.0.1"
 crates-index-diff = "7.0.0"
-prodash = { version = "3.1.0", default-features = false, features = ["tui-renderer", "log-renderer", "localtime"] }
+prodash = { version = "3.1.1", default-features = false, features = ["tui-renderer", "log-renderer", "localtime"] }
 rmp-serde = "0.14.0"
 serde_derive = "1.0.104"
 serde = "1.0.104"
