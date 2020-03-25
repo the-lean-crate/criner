@@ -180,21 +180,28 @@ fn remove_implicit_entries(entries: &mut Vec<TarHeader>) {
     });
 }
 
+const TOP_LEVEL_REPORT_NAME: &str = "__top-level-report__";
+
+fn path_from_prefix(out_dir: &Path, prefix: &str) -> PathBuf {
+    use crate::engine::report::generic::Generator;
+    out_dir.join(format!(
+        "{}-{}-{}.rmp",
+        prefix,
+        super::Generator::name(),
+        super::Generator::version()
+    ))
+}
+
 impl Report {
-    fn path_to_storage_location(&self, out_dir: &Path) -> Option<PathBuf> {
-        use crate::engine::report::generic::Generator;
+    fn path_to_storage_location(&self, out_dir: &Path) -> PathBuf {
         use Report::*;
         let prefix = match self {
             Version { crate_name, .. } | Crate { crate_name, .. } => crate_name.as_str(),
-            CrateCollection { .. } => "__top-level-report__",
+            CrateCollection { .. } => TOP_LEVEL_REPORT_NAME,
         };
-        Some(out_dir.join(format!(
-            "{}-{}-{}.rmp",
-            prefix,
-            super::Generator::name(),
-            super::Generator::version()
-        )))
+        path_from_prefix(out_dir, prefix)
     }
+
     pub fn from_result(crate_name: &str, crate_version: &str, result: TaskResult) -> Report {
         match result {
             TaskResult::ExplodedCrate {

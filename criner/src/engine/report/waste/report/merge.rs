@@ -379,29 +379,36 @@ impl crate::engine::report::generic::Aggregate for Report {
         report.write_to_io(out)?;
         Ok(())
     }
+    async fn load_previous_top_level_state(
+        out_dir: &Path,
+        progress: &mut prodash::tree::Item,
+    ) -> Option<Self> {
+        let path = super::path_from_prefix(out_dir, super::TOP_LEVEL_REPORT_NAME);
+        progress.blocked("loading previous top-level waste report from disk", None);
+        async_std::fs::read(path)
+            .await
+            .ok()
+            .and_then(|v| rmp_serde::from_read(v.as_slice()).ok())
+    }
+
     async fn load_previous_state(
         &self,
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Option<Self> {
-        if let Some(path) = self.path_to_storage_location(out_dir) {
-            progress.blocked("loading previous waste report from disk", None);
-            async_std::fs::read(path)
-                .await
-                .ok()
-                .and_then(|v| rmp_serde::from_read(v.as_slice()).ok())
-        } else {
-            None
-        }
+        let path = self.path_to_storage_location(out_dir);
+        progress.blocked("loading previous waste report from disk", None);
+        async_std::fs::read(path)
+            .await
+            .ok()
+            .and_then(|v| rmp_serde::from_read(v.as_slice()).ok())
     }
     async fn store_current_state(
         &self,
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Result<()> {
-        let path = self
-            .path_to_storage_location(out_dir)
-            .expect("a path for every occasion");
+        let path = self.path_to_storage_location(out_dir);
         progress.blocked("storing current waste report to disk", None);
         let data = rmp_serde::to_vec(self)?;
         async_std::fs::write(path, data).await.map_err(Into::into)

@@ -63,6 +63,10 @@ where
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Option<Self>;
+    async fn load_previous_top_level_state(
+        out_dir: &Path,
+        progress: &mut prodash::tree::Item,
+    ) -> Option<Self>;
     async fn store_current_state(
         &self,
         out_dir: &Path,
@@ -124,7 +128,12 @@ pub trait Generator {
         }
         if let Some(mut report) = report {
             let previous_report = match cache_dir.as_ref() {
-                Some(cd) => report.load_previous_state(&cd, &mut progress).await,
+                Some(cd) => {
+                    match Self::Report::load_previous_top_level_state(&cd, &mut progress).await {
+                        Some(r) => Some(r),
+                        None => report.load_previous_state(&cd, &mut progress).await,
+                    }
+                }
                 None => None,
             };
             report = match previous_report {
