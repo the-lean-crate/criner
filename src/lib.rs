@@ -65,6 +65,7 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
                 Some(criner::prodash::tui::TuiOptions {
                     title: "Criner".into(),
                     frames_per_second: fps,
+                    recompute_column_width_every_nth_frame: Option::from(fps as usize),
                     ..criner::prodash::tui::TuiOptions::default()
                 })
             },
