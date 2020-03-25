@@ -50,6 +50,8 @@ mine-nonstop: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run all operations con
 		ulimit -n 512; $(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --io 10 --cpu 1 --cpu-o 10 $(DB)
 mine-nonstop-logonly: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run all operations continuously, fully automated, without gui
 		ulimit -n 512; $(RELEASE_EXECUTABLE) mine --no-gui -c $(bare_index_path) --io 10 --cpu 1 --cpu-o 10 $(DB)
+mine-2min-logonly: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run all operations continuously, painfully often, and for two minutes only
+		ulimit -n 512; $(RELEASE_EXECUTABLE) mine --time-limit 2min --no-gui -c $(bare_index_path) --io 10 --cpu 1 --cpu-o 10 -f 10s -p 10s -r 10s $(DB)
 
 ##@ Waste Report Maintenance
 
