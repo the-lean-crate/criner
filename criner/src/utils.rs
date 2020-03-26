@@ -6,7 +6,11 @@ use futures::{
     task::Spawn,
 };
 use futures_timer::Delay;
-use std::{future::Future, time::Duration, time::SystemTime};
+use std::{
+    convert::TryFrom,
+    future::Future,
+    time::{Duration, SystemTime},
+};
 
 pub fn parse_semver(version: &str) -> Semver {
     use std::str::FromStr;
@@ -26,14 +30,71 @@ pub async fn wait_with_progress(
     duration_s: u32,
     mut progress: prodash::tree::Item,
     deadline: Option<SystemTime>,
+    time: Option<time::Time>,
 ) -> Result<()> {
     progress.init(Some(duration_s), Some("s"));
+    if let Some(time) = time {
+        progress.set_name(format!(
+            "{} scheduled at {}",
+            progress.name().unwrap_or_else(|| "un-named".into()),
+            time.format("%R")
+        ));
+    }
     for s in 1..=duration_s {
         Delay::new(Duration::from_secs(1)).await;
         check(deadline)?;
         progress.set(s);
     }
     Ok(())
+}
+
+fn duration_until(time: Option<time::Time>) -> Duration {
+    time.map(|t| {
+        let now = time::OffsetDateTime::now_local();
+        let desired = now.date().with_time(t).assume_offset(now.offset());
+        if desired > now {
+            desired - now
+        } else {
+            desired
+                .date()
+                .next_day()
+                .with_time(t)
+                .assume_offset(now.offset())
+                - now
+        }
+    })
+    .and_then(|d| Duration::try_from(d).ok())
+    .unwrap_or_default()
+}
+
+pub async fn repeat_daily_at<MakeFut, MakeProgress, Fut, T>(
+    time: Option<time::Time>,
+    mut make_progress: MakeProgress,
+    deadline: Option<SystemTime>,
+    mut make_future: MakeFut,
+) -> Result<()>
+where
+    Fut: Future<Output = Result<T>>,
+    MakeFut: FnMut() -> Fut,
+    MakeProgress: FnMut() -> prodash::tree::Item,
+{
+    let mut iteration = 0;
+    loop {
+        iteration += 1;
+        wait_with_progress(
+            duration_until(time).as_secs() as u32,
+            make_progress(),
+            deadline,
+            time,
+        )
+        .await?;
+        if let Err(err) = make_future().await {
+            make_progress().fail(format!(
+                "{} : ignored by repeat_daily_at('{:?}',…) iteration {}",
+                err, time, iteration
+            ))
+        }
+    }
 }
 
 pub async fn repeat_every_s<MakeFut, MakeProgress, Fut, T>(
@@ -64,7 +125,7 @@ where
         if iteration == max_iterations {
             return Ok(());
         }
-        wait_with_progress(interval_s, make_progress(), deadline).await?;
+        wait_with_progress(interval_s, make_progress(), deadline, None).await?;
     }
 }
 

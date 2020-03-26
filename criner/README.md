@@ -2,6 +2,10 @@
 
 ## TODO
 
+* [ ] Make report generation resumable - currently if it's aborted without having committed, it's likely reports are list or incorrect, possibly because
+      versions are set to 'done' and because the cache wasn't written yet. Do it only once Downloads are integrated, as it will change the Report data structure
+      quite a lot. **Maybe just add a feature to prodash to queue quitting, instead of quitting right away**. Also dont' deadline it, it takes at most 10min on a decent
+      computer.
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data, like release date
   * [ ] Consider extracting the release date from git and upgrade `crates-index-diff` to support that.
 * [ ] Make things prettier and more visual - that way we can try again for a come-back :D

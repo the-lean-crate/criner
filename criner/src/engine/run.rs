@@ -8,7 +8,6 @@ use futures_timer::Delay;
 use log::{info, warn};
 use prodash::tui::{Event, Line};
 use std::{
-    convert::TryFrom,
     path::{Path, PathBuf},
     time::{Duration, SystemTime},
 };
@@ -49,17 +48,14 @@ pub async fn non_blocking(
     check(deadline)?;
     let startup_time = SystemTime::now();
 
-    let wait_for = wait_duration_until(download_crates_io_database_every_24_hours_starting_at);
-
-    let db_download_handle = pool.spawn_with_handle(repeat_every_s(
-        24 * 60 * 60,
+    let db_download_handle = pool.spawn_with_handle(repeat_daily_at(
+        download_crates_io_database_every_24_hours_starting_at,
         {
             let p = progress.clone();
-            move || p.add_child("Fetch Timer")
+            move || p.add_child("Crates.io DB Digest")
         },
         deadline,
-        None,
-        { move || Delay::new(wait_for).map(|_| Ok(())) },
+        { move || Delay::new(Duration::from_secs(1)).map(|_| Ok(())) },
     ))?;
 
     let run = fetch_settings;
@@ -151,25 +147,6 @@ pub async fn non_blocking(
     fetch_handle.await?;
     db_download_handle.await?;
     processing_handle.await
-}
-
-fn wait_duration_until(time: Option<time::Time>) -> Duration {
-    time.map(|t| {
-        let now = time::OffsetDateTime::now_local();
-        let desired = now.date().with_time(t).assume_offset(now.offset());
-        if desired > now {
-            desired - now
-        } else {
-            desired
-                .date()
-                .next_day()
-                .with_time(t)
-                .assume_offset(now.offset())
-                - now
-        }
-    })
-    .and_then(|d| Duration::try_from(d).ok())
-    .unwrap_or_default()
 }
 
 /// For convenience, run the engine and block until done.
