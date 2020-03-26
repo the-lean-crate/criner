@@ -1,6 +1,10 @@
 use std::path::PathBuf;
 use structopt::StructOpt;
 
+fn parse_local_time(src: &str) -> Result<time::Time, time::ParseError> {
+    time::parse(src, "%R")
+}
+
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Interact with crates.io from the command-line")]
 #[structopt(settings = &[clap::AppSettings::ColoredHelp, clap::AppSettings::ColorAuto])]
@@ -84,6 +88,14 @@ pub enum SubCommands {
         #[structopt(long, short = "R")]
         report_at_most: Option<usize>,
 
+        /// If set, declare at which local time to download the crates.io database and digest it.
+        ///
+        /// This job runs every 24h, as the database is updated that often.
+        /// If unset, the job starts right away.
+        /// Format is HH:MM, e.g. '14:30' for 2:30 pm or 03:15 for quarter past 3 in the morning.
+        #[structopt(long, short = "d", parse(try_from_str = parse_local_time))]
+        download_crates_io_database_every_24_hours_starting_at: Option<time::Time>,
+
         /// If set, the reporting stage will only iterate over crates that match the given standard unix glob.
         ///
         /// moz* would match only crates starting with 'moz' for example.
@@ -129,6 +141,9 @@ impl Default for SubCommands {
             fetch_at_most: None,
             process_every: std::time::Duration::from_secs(60).into(),
             process_at_most: None,
+            download_crates_io_database_every_24_hours_starting_at: Some(
+                parse_local_time("3:00").expect("valid statically known time"),
+            ),
             report_every: std::time::Duration::from_secs(60).into(),
             report_at_most: None,
             db_path: PathBuf::from("criner.db"),

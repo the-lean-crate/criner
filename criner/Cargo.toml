@@ -40,6 +40,8 @@ rusqlite = { version = "0.21.0", features = ["bundled", "unlock_notify"] }
 parking_lot = "0.10.0"
 async-trait = "0.1.24"
 dia-semver = "8.0.1"
+# For scheduling the cron-like download of the crates.io db using local time declarations
+time = "0.2.9"
 
 # For 'export' functionality only (embed json in SQL text for simplicity)
 serde_json = "1.0.48"

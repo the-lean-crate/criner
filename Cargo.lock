@@ -316,6 +316,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "tar",
+ "time 0.2.9",
  "tokio",
  "toml",
 ]
@@ -329,6 +330,7 @@ dependencies = [
  "env_logger",
  "humantime 2.0.0",
  "structopt",
+ "time 0.2.9",
 ]
 
 [[package]]

@@ -28,6 +28,7 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             fetch_at_most,
             process_at_most,
             process_every,
+            download_crates_io_database_every_24_hours_starting_at,
             report_every,
             report_at_most,
             glob,
@@ -54,6 +55,7 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
                 },
                 glob,
             },
+            download_crates_io_database_every_24_hours_starting_at,
             criner::prodash::TreeOptions {
                 message_buffer_capacity: progress_message_scrollback_buffer_size,
                 ..criner::prodash::TreeOptions::default()
