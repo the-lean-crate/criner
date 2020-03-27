@@ -7,7 +7,7 @@ use futures::{
 };
 use futures_timer::Delay;
 use std::{
-    convert::TryFrom,
+    convert::TryInto,
     future::Future,
     time::{Duration, SystemTime},
 };
@@ -37,7 +37,7 @@ pub async fn wait_with_progress(
         progress.set_name(format!(
             "{} scheduled at {}",
             progress.name().unwrap_or_else(|| "un-named".into()),
-            time.format("%R")
+            time.format("%R %p")
         ));
     }
     for s in 1..=duration_s {
@@ -49,22 +49,17 @@ pub async fn wait_with_progress(
 }
 
 fn duration_until(time: Option<time::Time>) -> Duration {
-    time.map(|t| {
-        let now = time::OffsetDateTime::now_local();
-        let desired = now.date().with_time(t).assume_offset(now.offset());
-        if desired > now {
-            desired - now
-        } else {
-            desired
-                .date()
-                .next_day()
-                .with_time(t)
-                .assume_offset(now.offset())
-                - now
-        }
-    })
-    .and_then(|d| Duration::try_from(d).ok())
-    .unwrap_or_default()
+    let time = time.unwrap_or_else(|| time::OffsetDateTime::now_local().time());
+    let now = time::OffsetDateTime::now_local();
+    let mut desired = now.date().with_time(time).assume_offset(now.offset());
+    if desired < now {
+        desired = desired
+            .date()
+            .next_day()
+            .with_time(time)
+            .assume_offset(now.offset());
+    }
+    (desired - now).try_into().unwrap_or(Duration::from_secs(1))
 }
 
 pub async fn repeat_daily_at<MakeFut, MakeProgress, Fut, T>(
