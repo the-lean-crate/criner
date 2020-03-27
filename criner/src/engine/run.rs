@@ -37,6 +37,7 @@ pub async fn non_blocking(
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
+    interrupt_control: InterruptControlEvents,
     fetch_settings: StageRunSettings,
     process_settings: StageRunSettings,
     report_settings: GlobStageRunSettings,
@@ -136,6 +137,7 @@ pub async fn non_blocking(
             let assets_dir = assets_dir.clone();
             let pool = pool.clone();
             let glob = stage.glob.clone();
+            let interrupt_control = interrupt_control.clone();
             move || {
                 stage::report::generate(
                     db.clone(),
@@ -145,6 +147,7 @@ pub async fn non_blocking(
                     deadline,
                     cpu_o_bound_processors,
                     pool.clone(),
+                    interrupt_control.clone(),
                 )
             }
         },
@@ -154,6 +157,22 @@ pub async fn non_blocking(
     fetch_handle.await?;
     db_download_handle.await?;
     processing_handle.await
+}
+
+pub enum Interruptible {
+    Instantly,
+    Deferred,
+}
+
+pub type InterruptControlEvents = futures::channel::mpsc::Sender<Interruptible>;
+
+impl From<Interruptible> for prodash::tui::Event {
+    fn from(v: Interruptible) -> Self {
+        match v {
+            Interruptible::Deferred => Event::Tick,
+            Interruptible::Instantly => Event::Tick,
+        }
+    }
 }
 
 /// For convenience, run the engine and block until done.
@@ -194,6 +213,8 @@ pub fn blocking(
     let assets_dir = db.as_ref().join("assets");
     let db = Db::open(db)?;
     std::fs::create_dir_all(&assets_dir)?;
+    let (interrupt_control_sink, interrupt_control_stream) =
+        futures::channel::mpsc::channel::<Interruptible>(1);
 
     // dropping the work handle will stop (non-blocking) futures
     let work_handle = non_blocking(
@@ -204,6 +225,7 @@ pub fn blocking(
         io_bound_processors,
         cpu_bound_processors,
         cpu_o_bound_processors,
+        interrupt_control_sink,
         fetch_settings,
         process_settings,
         report_settings,
@@ -218,7 +240,10 @@ pub fn blocking(
             let (gui, abort_handle) = futures::future::abortable(prodash::tui::render_with_input(
                 root,
                 gui_options,
-                context_stream(&db, start_of_computation),
+                futures::stream::select(
+                    context_stream(&db, start_of_computation),
+                    interrupt_control_stream.map(|v| Event::from(v)),
+                ),
             )?);
             let gui = task_pool.spawn_with_handle(gui)?;
 
@@ -238,6 +263,7 @@ pub fn blocking(
             }
         }
         None => {
+            drop(interrupt_control_stream);
             let work_result = futures::executor::block_on(work_handle);
             if let Err(e) = work_result {
                 warn!("work processor failed: {}", e);
