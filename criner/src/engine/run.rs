@@ -55,7 +55,14 @@ pub async fn non_blocking(
             move || p.add_child("Crates.io DB Digest")
         },
         deadline,
-        { move || Delay::new(Duration::from_secs(1)).map(|_| Ok(())) },
+        {
+            let progress = progress.clone();
+            move || {
+                let mut p = progress.add_child("fake: fetching crates-io db");
+                p.blocked("working", None);
+                Delay::new(Duration::from_secs(10)).map(|_| Ok(()))
+            }
+        },
     ))?;
 
     let run = fetch_settings;

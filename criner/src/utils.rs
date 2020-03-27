@@ -48,7 +48,7 @@ pub async fn wait_with_progress(
     Ok(())
 }
 
-fn duration_until(time: Option<time::Time>) -> Duration {
+fn desired_launch_at(time: Option<time::Time>) -> time::OffsetDateTime {
     let time = time.unwrap_or_else(|| time::OffsetDateTime::now_local().time());
     let now = time::OffsetDateTime::now_local();
     let mut desired = now.date().with_time(time).assume_offset(now.offset());
@@ -59,7 +59,14 @@ fn duration_until(time: Option<time::Time>) -> Duration {
             .with_time(time)
             .assume_offset(now.offset());
     }
-    (desired - now).try_into().unwrap_or(Duration::from_secs(1))
+    desired
+}
+
+fn duration_until(time: Option<time::Time>) -> Duration {
+    let desired = desired_launch_at(time);
+    (desired - time::OffsetDateTime::now_local())
+        .try_into()
+        .unwrap_or(Duration::from_secs(1))
 }
 
 pub async fn repeat_daily_at<MakeFut, MakeProgress, Fut, T>(
@@ -74,21 +81,22 @@ where
     MakeProgress: FnMut() -> prodash::tree::Item,
 {
     let mut iteration = 0;
+    let time = desired_launch_at(time).time();
     loop {
         iteration += 1;
-        wait_with_progress(
-            duration_until(time).as_secs() as u32,
-            make_progress(),
-            deadline,
-            time,
-        )
-        .await?;
         if let Err(err) = make_future().await {
             make_progress().fail(format!(
                 "{} : ignored by repeat_daily_at('{:?}',…) iteration {}",
                 err, time, iteration
             ))
         }
+        wait_with_progress(
+            duration_until(Some(time)).as_secs() as u32,
+            make_progress(),
+            deadline,
+            Some(time),
+        )
+        .await?;
     }
 }
 
