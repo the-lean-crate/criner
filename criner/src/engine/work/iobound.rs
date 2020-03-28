@@ -21,7 +21,7 @@ struct ProcessingState {
     url: String,
     kind: &'static str,
     output_file_path: PathBuf,
-    key: String,
+    result_key: Option<String>,
 }
 pub struct Agent {
     client: reqwest::Client,
@@ -64,8 +64,7 @@ impl crate::engine::work::generic::Processor for Agent {
                 output_file_path,
                 progress_name,
                 task_key,
-                crate_name,
-                crate_version,
+                crate_name_and_version,
                 kind,
                 url,
             } => {
@@ -78,19 +77,31 @@ impl crate::engine::work::generic::Processor for Agent {
                     content_length: 0,
                     content_type: None,
                 };
-                let mut key = String::with_capacity(task_key.len() * 2);
-                task_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut key);
                 self.state = Some(ProcessingState {
                     url,
                     kind,
                     output_file_path,
-                    key,
+                    result_key: crate_name_and_version.as_ref().map(
+                        |(crate_name, crate_version)| {
+                            let mut result_key = String::with_capacity(task_key.len() * 2);
+                            task_result.fq_key(
+                                &crate_name,
+                                &crate_version,
+                                &dummy_task,
+                                &mut result_key,
+                            );
+                            result_key
+                        },
+                    ),
                 });
-                self.extraction_request = Some(super::cpubound::ExtractRequest {
-                    download_task: dummy_task.clone(),
-                    crate_name,
-                    crate_version,
-                });
+                self.extraction_request =
+                    crate_name_and_version.map(|(crate_name, crate_version)| {
+                        super::cpubound::ExtractRequest {
+                            download_task: dummy_task.clone(),
+                            crate_name,
+                            crate_version,
+                        }
+                    });
                 Ok((dummy_task, task_key, progress_name))
             }
         }
@@ -107,17 +118,17 @@ impl crate::engine::work::generic::Processor for Agent {
         let ProcessingState {
             url,
             kind,
-            output_file_path: out_file,
-            key,
+            output_file_path,
+            result_key,
         } = self.state.take().expect("initialized state");
         download_file_and_store_result(
             progress,
-            &key,
+            result_key,
             &self.results,
             &self.client,
             kind,
             &url,
-            out_file,
+            output_file_path,
         )
         .await
         .map_err(|err| (err, format!("Failed to download '{}'", url)))
@@ -141,8 +152,7 @@ pub struct DownloadRequest {
     pub output_file_path: PathBuf,
     pub progress_name: String,
     pub task_key: String,
-    pub crate_name: String,
-    pub crate_version: String,
+    pub crate_name_and_version: Option<(String, String)>,
     pub kind: &'static str,
     pub url: String,
 }
@@ -160,7 +170,7 @@ pub fn default_persisted_download_task() -> model::Task {
 
 async fn download_file_and_store_result(
     progress: &mut prodash::tree::Item,
-    key: &str,
+    result_key: Option<String>,
     results: &persistence::TaskResultTable,
     client: &reqwest::Client,
     kind: &str,
@@ -191,11 +201,11 @@ async fn download_file_and_store_result(
         return Err(Error::HttpStatus(response.status()));
     }
 
-    let content_length: u32 = response
+    let remaining_content_length = response
         .content_length()
-        .ok_or(Error::InvalidHeader("expected content-length"))?
-        as u32;
+        .ok_or(Error::InvalidHeader("expected content-length"))?;
 
+    let content_length = (start_byte + remaining_content_length) as u32;
     progress.init(Some(content_length / 1024), Some("Kb"));
     progress.done(format!(
         "HEAD{}:{}: content-length = {}",
@@ -204,7 +214,7 @@ async fn download_file_and_store_result(
         ByteSize(content_length.into())
     ));
 
-    if start_byte != content_length as u64 {
+    if remaining_content_length != 0 {
         let mut out = tokio::fs::OpenOptions::new()
             .create(truncate)
             .truncate(truncate)
@@ -243,16 +253,18 @@ async fn download_file_and_store_result(
         progress.done(format!("{} already on disk - skipping", url))
     }
 
-    let task_result = model::TaskResult::Download {
-        kind: kind.to_owned(),
-        url: url.to_owned(),
-        content_length,
-        content_type: response
-            .headers()
-            .get(http::header::CONTENT_TYPE)
-            .and_then(|t| t.to_str().ok())
-            .map(Into::into),
-    };
-    results.insert(progress, &key, &task_result)?;
+    if let Some(result_key) = result_key {
+        let task_result = model::TaskResult::Download {
+            kind: kind.to_owned(),
+            url: url.to_owned(),
+            content_length,
+            content_type: response
+                .headers()
+                .get(http::header::CONTENT_TYPE)
+                .and_then(|t| t.to_str().ok())
+                .map(Into::into),
+        };
+        results.insert(progress, &result_key, &task_result)?;
+    }
     Ok(())
 }
