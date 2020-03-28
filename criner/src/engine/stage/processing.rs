@@ -33,7 +33,7 @@ pub async fn process(
                     processing_progress.add_child(format!("{}:CPU IDLE", idx + 1)),
                     rx.clone(),
                     work::cpubound::Agent::new(assets_dir.clone(), &db)?,
-                    max_retries_on_timeout
+                    max_retries_on_timeout,
                 )
                 .map(|r| {
                     if let Err(e) = r {
@@ -58,7 +58,7 @@ pub async fn process(
                     processing_progress.add_child(format!("{}: ↓ IDLE", idx + 1)),
                     rx.clone(),
                     work::iobound::Agent::new(&db, tx_cpu.clone())?,
-                    max_retries_on_timeout
+                    max_retries_on_timeout,
                 )
                 .map(|r| {
                     if let Err(e) = r {
