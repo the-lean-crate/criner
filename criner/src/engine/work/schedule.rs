@@ -1,11 +1,13 @@
-use super::iobound;
 use crate::{
-    engine::work::cpubound,
+    engine::{work::cpubound, work::iobound},
     error::Result,
     model, persistence,
     persistence::{TableAccess, TaskTable},
 };
-use std::time::SystemTime;
+use std::{
+    path::{Path, PathBuf},
+    time::SystemTime,
+};
 
 const MAX_ATTEMPTS_BEFORE_WE_GIVE_UP: usize = 7;
 
@@ -27,6 +29,7 @@ pub enum AsyncResult {
 }
 
 pub async fn tasks(
+    assets_dir: &Path,
     tasks: &persistence::TaskTable,
     krate: &model::CrateVersion,
     mut progress: prodash::tree::Item,
@@ -43,6 +46,8 @@ pub async fn tasks(
         krate,
         iobound::default_persisted_download_task,
     )?;
+    let dummy_task = iobound::default_persisted_download_task();
+    let kind = "crate";
     Ok(
         match submit_single(
             startup_time,
@@ -52,9 +57,17 @@ pub async fn tasks(
             1,
             1,
             || iobound::DownloadRequest {
+                output_file_path: download_file_path(
+                    &assets_dir,
+                    &krate.name,
+                    &krate.version,
+                    &dummy_task.process,
+                    &dummy_task.version,
+                    kind,
+                ),
                 crate_name: krate.name.clone(),
                 crate_version: krate.version.clone(),
-                kind: "crate",
+                kind,
                 url: format!(
                     "https://crates.io/api/v1/crates/{name}/{version}/download",
                     name = krate.name,
@@ -148,4 +161,35 @@ async fn submit_single<R>(
         AttemptsWithFailure(_) => PermanentFailure,
         Complete => Done(task),
     }
+}
+
+fn crate_dir(assets_dir: &Path, crate_name: &str) -> PathBuf {
+    // we can safely assume ascii here - otherwise we panic
+    let crate_path = match crate_name.len() {
+        1 => Path::new("1").join(crate_name),
+        2 => Path::new("2").join(crate_name),
+        3 => Path::new("3").join(&crate_name[..1]),
+        _ => Path::new(&crate_name[..2])
+            .join(&crate_name[2..4])
+            .join(crate_name),
+    };
+    assets_dir.join(crate_path)
+}
+
+pub fn download_file_path(
+    assets_dir: &Path,
+    crate_name: &str,
+    crate_version: &str,
+    process: &str,
+    version: &str,
+    kind: &str,
+) -> PathBuf {
+    crate_dir(assets_dir, crate_name).join(format!(
+        "{crate_version}-{process}{sep}{version}.{kind}",
+        process = process,
+        sep = crate::persistence::KEY_SEP_CHAR,
+        version = version,
+        kind = kind,
+        crate_version = crate_version
+    ))
 }

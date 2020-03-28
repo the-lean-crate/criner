@@ -10,7 +10,7 @@ use crate::utils::timeout_after;
 use async_trait::async_trait;
 use futures::FutureExt;
 use std::{
-    path::{Path, PathBuf},
+    path::PathBuf,
     time::{Duration, SystemTime},
 };
 
@@ -20,11 +20,10 @@ const FETCH_CHUNK_TIMEOUT_SECONDS: Duration = Duration::from_secs(20);
 struct ProcessingState {
     url: String,
     kind: &'static str,
-    out_file: PathBuf,
+    output_file_path: PathBuf,
     key: String,
 }
 pub struct Agent {
-    asset_dir: PathBuf,
     client: reqwest::Client,
     results: persistence::TaskResultTable,
     channel: async_std::sync::Sender<super::cpubound::ExtractRequest>,
@@ -34,7 +33,6 @@ pub struct Agent {
 
 impl Agent {
     pub fn new(
-        assets_dir: impl Into<PathBuf>,
         db: &persistence::Db,
         channel: async_std::sync::Sender<super::cpubound::ExtractRequest>,
     ) -> Result<Agent> {
@@ -42,7 +40,6 @@ impl Agent {
 
         let results = db.open_results()?;
         Ok(Agent {
-            asset_dir: assets_dir.into(),
             client,
             results,
             channel,
@@ -65,6 +62,7 @@ impl crate::engine::work::generic::Processor for Agent {
         progress.init(None, None);
         match request {
             DownloadRequest {
+                output_file_path,
                 crate_name,
                 crate_version,
                 kind,
@@ -82,18 +80,10 @@ impl crate::engine::work::generic::Processor for Agent {
                 };
                 let mut key = String::with_capacity(out_key.len() * 2);
                 task_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut key);
-                let base_dir = crate_dir(&self.asset_dir, &crate_name);
-                let out_file = download_file_path(
-                    &base_dir,
-                    &crate_version,
-                    &dummy_task.process,
-                    &dummy_task.version,
-                    kind,
-                );
                 self.state = Some(ProcessingState {
                     url,
                     kind,
-                    out_file,
+                    output_file_path,
                     key,
                 });
                 self.extraction_request = Some(super::cpubound::ExtractRequest {
@@ -117,7 +107,7 @@ impl crate::engine::work::generic::Processor for Agent {
         let ProcessingState {
             url,
             kind,
-            out_file,
+            output_file_path: out_file,
             key,
         } = self.state.take().expect("initialized state");
         download_file_and_store_result(
@@ -150,6 +140,7 @@ impl crate::engine::work::generic::Processor for Agent {
 
 #[derive(Clone)]
 pub struct DownloadRequest {
+    pub output_file_path: PathBuf,
     pub crate_name: String,
     pub crate_version: String,
     pub kind: &'static str,
@@ -259,34 +250,4 @@ async fn download_file_and_store_result(
     };
     results.insert(progress, &key, &task_result)?;
     Ok(())
-}
-
-pub fn download_file_path(
-    base_dir: &Path,
-    crate_version: &str,
-    process: &str,
-    version: &str,
-    kind: &str,
-) -> PathBuf {
-    base_dir.join(format!(
-        "{crate_version}-{process}{sep}{version}.{kind}",
-        process = process,
-        sep = crate::persistence::KEY_SEP_CHAR,
-        version = version,
-        kind = kind,
-        crate_version = crate_version
-    ))
-}
-
-pub fn crate_dir(assets_dir: &Path, crate_name: &str) -> PathBuf {
-    // we can safely assume ascii here - otherwise we panic
-    let crate_path = match crate_name.len() {
-        1 => Path::new("1").join(crate_name),
-        2 => Path::new("2").join(crate_name),
-        3 => Path::new("3").join(&crate_name[..1]),
-        _ => Path::new(&crate_name[..2])
-            .join(&crate_name[2..4])
-            .join(crate_name),
-    };
-    assets_dir.join(crate_path)
 }

@@ -50,16 +50,14 @@ impl crate::engine::work::generic::Processor for Agent {
                 let dummy_task = default_persisted_extraction_task();
                 dummy_task.fq_key(&crate_name, &crate_version, out_key);
 
-                let downloaded_crate = {
-                    let crate_dir = super::iobound::crate_dir(&self.asset_dir, &crate_name);
-                    super::iobound::download_file_path(
-                        &crate_dir,
-                        &crate_version,
-                        &download_task.process,
-                        &download_task.version,
-                        "crate",
-                    )
-                };
+                let downloaded_crate = super::schedule::download_file_path(
+                    &self.asset_dir,
+                    &crate_name,
+                    &crate_version,
+                    &download_task.process,
+                    &download_task.version,
+                    "crate",
+                );
                 let dummy_result = model::TaskResult::ExplodedCrate {
                     entries_meta_data: vec![],
                     selected_entries: vec![],

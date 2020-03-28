@@ -54,7 +54,7 @@ pub async fn process(
                     db.clone(),
                     processing_progress.add_child(format!("{}: ↓ IDLE", idx + 1)),
                     rx.clone(),
-                    work::iobound::Agent::new(assets_dir.clone(), &db, tx_cpu.clone())?,
+                    work::iobound::Agent::new(&db, tx_cpu.clone())?,
                 )
                 .map(|r| {
                     if let Err(e) = r {
@@ -101,6 +101,7 @@ pub async fn process(
             progress.set((vid + fetched_versions + 1) as u32);
             progress.halted("wait for task consumers", None);
             work::schedule::tasks(
+                &assets_dir,
                 &tasks,
                 &version,
                 progress.add_child(format!("schedule {}", version.key())),
