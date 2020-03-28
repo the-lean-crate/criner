@@ -207,7 +207,8 @@ async fn download_file_and_store_result(
 
     progress.init(Some(content_length / 1024), Some("Kb"));
     progress.done(format!(
-        "HEAD:{}: content-length = {}",
+        "HEAD{}:{}: content-length = {}",
+        if start_byte != 0 { "(resumable)" } else { "" },
         url,
         ByteSize(content_length.into())
     ));
@@ -238,7 +239,8 @@ async fn download_file_and_store_result(
             progress.set((bytes_received / 1024) as u32);
         }
         progress.done(format!(
-            "GET:{}: body-size = {}",
+            "GET{}:{}: body-size = {}",
+            if start_byte != 0 { "(resumed)" } else { "" },
             url,
             ByteSize(bytes_received as u64)
         ));
