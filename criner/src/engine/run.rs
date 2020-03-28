@@ -176,8 +176,8 @@ pub type InterruptControlEvents = futures::channel::mpsc::Sender<Interruptible>;
 impl From<Interruptible> for prodash::tui::Event {
     fn from(v: Interruptible) -> Self {
         match v {
-            Interruptible::Deferred => Event::Tick,
-            Interruptible::Instantly => Event::Tick,
+            Interruptible::Instantly => Event::SetInterruptMode(prodash::tui::Interrupt::Instantly),
+            Interruptible::Deferred => Event::SetInterruptMode(prodash::tui::Interrupt::Deferred),
         }
     }
 }

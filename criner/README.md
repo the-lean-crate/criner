@@ -2,10 +2,10 @@
 
 ## TODO
 
-* [ ] Make report generation resumable - currently if it's aborted without having committed, it's likely reports are list or incorrect, possibly because
+* [x] Make report generation resumable - currently if it's aborted without having committed, it's likely reports are list or incorrect, possibly because
       versions are set to 'done' and because the cache wasn't written yet. Do it only once Downloads are integrated, as it will change the Report data structure
       quite a lot. **Maybe just add a feature to prodash to queue quitting, instead of quitting right away**. Also dont' deadline it, it takes at most 10min on a decent
-      computer.
+      computer when done from scratch, and less than a second for typical updates.
 * [ ] When fetching git, it can hang forever while receiving bytes due to lack of a timeout. The only way to handle that is to run it on a separate thread which handles
       timeout correctly.
 * [ ] Resumable downloads as standard capability. Many crates are too big to download before it times out, causing permanent failures even though downloads could be resumed.
