@@ -168,7 +168,7 @@ fn crate_dir(assets_dir: &Path, crate_name: &str) -> PathBuf {
     let crate_path = match crate_name.len() {
         1 => Path::new("1").join(crate_name),
         2 => Path::new("2").join(crate_name),
-        3 => Path::new("3").join(&crate_name[..1]),
+        3 => Path::new("3").join(&crate_name[..1]).join(&crate_name[1..]),
         _ => Path::new(&crate_name[..2])
             .join(&crate_name[2..4])
             .join(crate_name),
