@@ -6,6 +6,9 @@
       versions are set to 'done' and because the cache wasn't written yet. Do it only once Downloads are integrated, as it will change the Report data structure
       quite a lot. **Maybe just add a feature to prodash to queue quitting, instead of quitting right away**. Also dont' deadline it, it takes at most 10min on a decent
       computer.
+* [ ] When fetching git, it can hang forever while receiving bytes due to lack of a timeout. The only way to handle that is to run it on a separate thread which handles
+      timeout correctly.
+* [ ] Resumable downloads as standard capability. Many crates are too big to download before it times out, causing permanent failures even though downloads could be resumed.
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data, like release date
   * [ ] Consider extracting the release date from git and upgrade `crates-index-diff` to support that.
 * [ ] Make things prettier and more visual - that way we can try again for a come-back :D
@@ -13,6 +16,8 @@
 * [ ] More reporting - right now the context gathering to see how much time is spent where is neglected.
 
 ## Possible Improvements
+* [ ] Even though it wasn't observed yet, I believe 'push' can hang forever while sending bytes, similar to how fetch can hang forever while receiving bytes.
+      This can be handled by implementing a timeout from within the git thread.
 * [ ] Suggest 'top-level' globs like `/README.md` if we know the matched file is on the top-level. Otherwise the pattern `README.md` will actually match `*/README.md`.
 * [ ] Count negation patterns in includes and excludes. The latter don't seem to be working, and if nobody is using them, Cargo can either make it work or
       reject them properly. Maybe. Maybe first create an issue for that and see what they think.
