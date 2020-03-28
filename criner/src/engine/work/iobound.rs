@@ -206,12 +206,15 @@ async fn download_file_and_store_result(
 
     {
         let mut out = tokio::fs::OpenOptions::new()
-            .create(true)
+            .create(truncate)
             .truncate(truncate)
-            .write(true)
-            .append(true)
+            .write(truncate)
+            .append(!truncate)
             .open(&out_file)
-            .await?;
+            .await
+            .map_err(|err| {
+                crate::Error::Message(format!("Failed to open '{}': {}", out_file.display(), err))
+            })?;
 
         let mut bytes_received = start_byte as usize;
         while let Some(chunk) = timeout_after(
