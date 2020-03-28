@@ -46,7 +46,7 @@ pub async fn tasks(
         krate,
         iobound::default_persisted_download_task,
     )?;
-    let dummy_task = iobound::default_persisted_download_task();
+
     let kind = "crate";
     Ok(
         match submit_single(
@@ -56,24 +56,31 @@ pub async fn tasks(
             perform_io,
             1,
             1,
-            || iobound::DownloadRequest {
-                output_file_path: download_file_path(
-                    &assets_dir,
-                    &krate.name,
-                    &krate.version,
-                    &dummy_task.process,
-                    &dummy_task.version,
+            || {
+                let dummy_task = iobound::default_persisted_download_task();
+                let mut task_key = String::new();
+                dummy_task.fq_key(&krate.name, &krate.version, &mut task_key);
+
+                iobound::DownloadRequest {
+                    output_file_path: download_file_path(
+                        &assets_dir,
+                        &krate.name,
+                        &krate.version,
+                        &dummy_task.process,
+                        &dummy_task.version,
+                        kind,
+                    ),
+                    progress_name: format!("{}:{}", krate.name, krate.version),
+                    task_key,
+                    crate_name: krate.name.clone(),
+                    crate_version: krate.version.clone(),
                     kind,
-                ),
-                progress_name: format!("{}:{}", krate.name, krate.version),
-                crate_name: krate.name.clone(),
-                crate_version: krate.version.clone(),
-                kind,
-                url: format!(
-                    "https://crates.io/api/v1/crates/{name}/{version}/download",
-                    name = krate.name,
-                    version = krate.version
-                ),
+                    url: format!(
+                        "https://crates.io/api/v1/crates/{name}/{version}/download",
+                        name = krate.name,
+                        version = krate.version
+                    ),
+                }
             },
         )
         .await

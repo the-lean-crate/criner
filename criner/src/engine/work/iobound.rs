@@ -63,6 +63,7 @@ impl crate::engine::work::generic::Processor for Agent {
             DownloadRequest {
                 output_file_path,
                 progress_name,
+                task_key,
                 crate_name,
                 crate_version,
                 kind,
@@ -71,8 +72,6 @@ impl crate::engine::work::generic::Processor for Agent {
                 let dummy_task = default_persisted_download_task();
                 let progress_name = format!("↓ {}", progress_name);
 
-                let mut task_key = String::new();
-                dummy_task.fq_key(&crate_name, &crate_version, &mut task_key);
                 let task_result = model::TaskResult::Download {
                     kind: kind.to_owned(),
                     url: String::new(),
@@ -125,16 +124,14 @@ impl crate::engine::work::generic::Processor for Agent {
     }
 
     async fn schedule_next(&mut self, progress: &mut prodash::tree::Item) -> Result<()> {
-        let extract_request = self
-            .extraction_request
-            .take()
-            .expect("this to be set when we are called");
-        progress.blocked("schedule crate extraction", None);
-        // Here we risk doing this work twice, but must of the time, we don't. And since it's fast,
-        // we take the risk of duplicate work for keeping more precessors busy.
-        // And yes, this send is blocking the source processor, but should not be an issue as CPU
-        // processors are so fast - slow producer, fast consumer.
-        self.channel.send(extract_request).await;
+        if let Some(extract_request) = self.extraction_request.take() {
+            progress.blocked("schedule crate extraction", None);
+            // Here we risk doing this work twice, but must of the time, we don't. And since it's fast,
+            // we take the risk of duplicate work for keeping more processors busy.
+            // And yes, this send is blocking the source processor, but should not be an issue as CPU
+            // processors are so fast - slow producer, fast consumer.
+            self.channel.send(extract_request).await;
+        }
         Ok(())
     }
 }
@@ -143,6 +140,7 @@ impl crate::engine::work::generic::Processor for Agent {
 pub struct DownloadRequest {
     pub output_file_path: PathBuf,
     pub progress_name: String,
+    pub task_key: String,
     pub crate_name: String,
     pub crate_version: String,
     pub kind: &'static str,
