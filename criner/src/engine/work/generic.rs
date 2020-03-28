@@ -35,9 +35,9 @@ pub async fn processor<T: Clone>(
         let mut try_count = 0;
         let task = loop {
             key.clear();
-            let (dummy_task, progress_info) =
+            let (dummy_task, progress_name) =
                 agent.set(request.clone(), &mut key, &mut progress)?;
-            progress.set_name(progress_info);
+            progress.set_name(progress_name);
 
             let mut task = tasks.update(Some(&mut progress), &key, |mut t| {
                 t.process = dummy_task.process.clone();

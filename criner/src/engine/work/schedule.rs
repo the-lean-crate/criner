@@ -65,6 +65,7 @@ pub async fn tasks(
                     &dummy_task.version,
                     kind,
                 ),
+                progress_name: format!("{}:{}", krate.name, krate.version),
                 crate_name: krate.name.clone(),
                 crate_version: krate.version.clone(),
                 kind,

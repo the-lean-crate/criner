@@ -63,22 +63,22 @@ impl crate::engine::work::generic::Processor for Agent {
         match request {
             DownloadRequest {
                 output_file_path,
+                progress_name,
                 crate_name,
                 crate_version,
                 kind,
                 url,
             } => {
-                let dummy_task = default_persisted_download_task();
-                let progress_message = format!("↓ {}:{}", crate_name, crate_version);
+                let progress_name = format!("↓ {}", progress_name);
 
-                dummy_task.fq_key(&crate_name, &crate_version, out_key);
                 let task_result = model::TaskResult::Download {
                     kind: kind.to_owned(),
                     url: String::new(),
                     content_length: 0,
                     content_type: None,
                 };
-                let mut key = String::with_capacity(out_key.len() * 2);
+                let mut key = String::with_capacity(out_key.capacity());
+                let dummy_task = default_persisted_download_task();
                 task_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut key);
                 self.state = Some(ProcessingState {
                     url,
@@ -91,7 +91,7 @@ impl crate::engine::work::generic::Processor for Agent {
                     crate_name,
                     crate_version,
                 });
-                Ok((dummy_task, progress_message))
+                Ok((dummy_task, progress_name))
             }
         }
     }
@@ -141,6 +141,7 @@ impl crate::engine::work::generic::Processor for Agent {
 #[derive(Clone)]
 pub struct DownloadRequest {
     pub output_file_path: PathBuf,
+    pub progress_name: String,
     pub crate_name: String,
     pub crate_version: String,
     pub kind: &'static str,
