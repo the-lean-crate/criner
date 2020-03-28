@@ -40,8 +40,6 @@ pub async fn generate(
     pool: impl Spawn + Clone + Send + 'static + Sync,
     interrupt_control: InterruptControlEvents,
 ) -> Result<()> {
-    let _uninterruptible: Uninterruptible = interrupt_control.into();
-
     use report::generic::Generator;
     let krates = db.open_crates()?;
     let output_dir = assets_dir
