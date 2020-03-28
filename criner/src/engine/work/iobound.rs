@@ -4,16 +4,16 @@ use crate::{
     Error, Result,
 };
 use bytesize::ByteSize;
-use std::{
-    path::{Path, PathBuf},
-    time::SystemTime,
-};
 use tokio::io::AsyncWriteExt;
 
 use crate::utils::timeout_after;
 use async_trait::async_trait;
 use futures::FutureExt;
-use std::time::Duration;
+use std::{
+    path::{Path, PathBuf},
+    str::FromStr,
+    time::{Duration, SystemTime},
+};
 
 const CONNECT_AND_FETCH_HEAD_TIMEOUT: Duration = Duration::from_secs(30);
 const FETCH_CHUNK_TIMEOUT_SECONDS: Duration = Duration::from_secs(20);
@@ -177,45 +177,73 @@ async fn download_file_and_store_result(
     url: &str,
     out_file: PathBuf,
 ) -> Result<()> {
+    tokio::fs::create_dir_all(&out_file.parent().expect("parent directory")).await?;
+
+    // NOTE: We assume that the files we download never change, and we assume the server supports resumption!
+    let content_length_file = {
+        let mut p = out_file.clone();
+        p.set_extension("content-length");
+        p
+    };
+    let (start_byte, truncate) = if let (Ok(existing_meta), Some(previous_content_length)) = (
+        tokio::fs::metadata(&out_file).await,
+        tokio::fs::read_to_string(&content_length_file)
+            .await
+            .ok()
+            .and_then(|string| u32::from_str(&string).ok()),
+    ) {
+        (existing_meta.len(), false)
+    } else {
+        (0, true)
+    };
+
     progress.blocked("fetch HEAD", None);
-    let mut res = timeout_after(
+    let mut response = timeout_after(
         CONNECT_AND_FETCH_HEAD_TIMEOUT,
         "fetching HEAD",
-        client.get(url).send(),
+        client
+            .get(url)
+            .header(http::header::RANGE, format!("bytes="))
+            .send(),
     )
     .await??;
-    let size: u32 = res
+
+    let content_length: u32 = response
         .content_length()
-        .ok_or(Error::InvalidHeader("expected content-length"))? as u32;
-    progress.init(Some(size / 1024), Some("Kb"));
+        .ok_or(Error::InvalidHeader("expected content-length"))?
+        as u32;
+
+    progress.init(Some(content_length / 1024), Some("Kb"));
     progress.done(format!(
         "HEAD:{}: content-length = {}",
         url,
-        ByteSize(size.into())
+        ByteSize(content_length.into())
     ));
+    tokio::fs::write(content_length_file, format!("{}", content_length))
+        .await
+        .ok();
 
-    let mut bytes_received = 0usize;
-    tokio::fs::create_dir_all(&out_file.parent().expect("parent directory")).await?;
     let mut out = tokio::fs::OpenOptions::new()
         .create(true)
-        .truncate(true)
+        .truncate(truncate)
         .write(true)
-        .open(out_file)
+        .append(true)
+        .open(&out_file)
         .await?;
 
+    let mut bytes_received = 0usize;
     while let Some(chunk) = timeout_after(
         FETCH_CHUNK_TIMEOUT_SECONDS,
         format!(
-            "fetching {} of {}",
+            "fetched {} of {}",
             ByteSize(bytes_received as u64),
-            ByteSize(size.into())
+            ByteSize(content_length.into())
         ),
-        res.chunk().boxed(),
+        response.chunk().boxed(),
     )
     .await??
     {
         out.write(&chunk).await?;
-        // body_buf.extend(chunk);
         bytes_received += chunk.len();
         progress.set((bytes_received / 1024) as u32);
     }
@@ -228,8 +256,8 @@ async fn download_file_and_store_result(
     let task_result = model::TaskResult::Download {
         kind: kind.to_owned(),
         url: url.to_owned(),
-        content_length: size,
-        content_type: res
+        content_length,
+        content_type: response
             .headers()
             .get(http::header::CONTENT_TYPE)
             .and_then(|t| t.to_str().ok())

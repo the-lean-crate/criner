@@ -2,13 +2,9 @@
 
 ## TODO
 
-* [x] Make report generation resumable - currently if it's aborted without having committed, it's likely reports are list or incorrect, possibly because
-      versions are set to 'done' and because the cache wasn't written yet. Do it only once Downloads are integrated, as it will change the Report data structure
-      quite a lot. **Maybe just add a feature to prodash to queue quitting, instead of quitting right away**. Also dont' deadline it, it takes at most 10min on a decent
-      computer when done from scratch, and less than a second for typical updates.
+* [ ] Resumable downloads as standard capability. Many crates are too big to download before it times out, causing permanent failures even though downloads could be resumed.
 * [ ] When fetching git, it can hang forever while receiving bytes due to lack of a timeout. The only way to handle that is to run it on a separate thread which handles
       timeout correctly.
-* [ ] Resumable downloads as standard capability. Many crates are too big to download before it times out, causing permanent failures even though downloads could be resumed.
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data, like release date
   * [ ] Consider extracting the release date from git and upgrade `crates-index-diff` to support that.
 * [ ] Make things prettier and more visual - that way we can try again for a come-back :D
