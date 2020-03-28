@@ -11,7 +11,6 @@ use async_trait::async_trait;
 use futures::FutureExt;
 use std::{
     path::{Path, PathBuf},
-    str::FromStr,
     time::{Duration, SystemTime},
 };
 
@@ -180,18 +179,7 @@ async fn download_file_and_store_result(
     tokio::fs::create_dir_all(&out_file.parent().expect("parent directory")).await?;
 
     // NOTE: We assume that the files we download never change, and we assume the server supports resumption!
-    let content_length_file = {
-        let mut p = out_file.clone();
-        p.set_extension("content-length");
-        p
-    };
-    let (start_byte, truncate) = if let (Ok(existing_meta), Some(previous_content_length)) = (
-        tokio::fs::metadata(&out_file).await,
-        tokio::fs::read_to_string(&content_length_file)
-            .await
-            .ok()
-            .and_then(|string| u32::from_str(&string).ok()),
-    ) {
+    let (start_byte, truncate) = if let Ok(existing_meta) = tokio::fs::metadata(&out_file).await {
         (existing_meta.len(), false)
     } else {
         (0, true)
@@ -203,7 +191,7 @@ async fn download_file_and_store_result(
         "fetching HEAD",
         client
             .get(url)
-            .header(http::header::RANGE, format!("bytes="))
+            .header(http::header::RANGE, format!("bytes={}-", start_byte))
             .send(),
     )
     .await??;
@@ -219,9 +207,6 @@ async fn download_file_and_store_result(
         url,
         ByteSize(content_length.into())
     ));
-    tokio::fs::write(content_length_file, format!("{}", content_length))
-        .await
-        .ok();
 
     let mut out = tokio::fs::OpenOptions::new()
         .create(true)
@@ -231,7 +216,7 @@ async fn download_file_and_store_result(
         .open(&out_file)
         .await?;
 
-    let mut bytes_received = 0usize;
+    let mut bytes_received = start_byte as usize;
     while let Some(chunk) = timeout_after(
         FETCH_CHUNK_TIMEOUT_SECONDS,
         format!(
