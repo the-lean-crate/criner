@@ -8,9 +8,8 @@ pub trait Processor {
     fn set(
         &mut self,
         request: Self::Item,
-        out_key: &mut String,
         progress: &mut prodash::tree::Item,
-    ) -> Result<(model::Task, String)>;
+    ) -> Result<(model::Task, String, String)>;
     fn idle_message(&self) -> String;
     async fn process(
         &mut self,
@@ -27,19 +26,17 @@ pub async fn processor<T: Clone>(
     r: async_std::sync::Receiver<T>,
     mut agent: impl Processor<Item = T> + Send,
 ) -> Result<()> {
-    let mut key = String::with_capacity(32);
     let tasks = db.open_tasks()?;
     let max_retries_on_timeout = 10;
 
     while let Some(request) = r.recv().await {
         let mut try_count = 0;
-        let task = loop {
-            key.clear();
-            let (dummy_task, progress_name) =
-                agent.set(request.clone(), &mut key, &mut progress)?;
+        let (task, task_key) = loop {
+            let (dummy_task, task_key, progress_name) =
+                agent.set(request.clone(), &mut progress)?;
             progress.set_name(progress_name);
 
-            let mut task = tasks.update(Some(&mut progress), &key, |mut t| {
+            let mut task = tasks.update(Some(&mut progress), &task_key, |mut t| {
                 t.process = dummy_task.process.clone();
                 t.version = dummy_task.version.clone();
                 t.state.merge_with(&model::TaskState::InProgress(None));
@@ -67,10 +64,10 @@ pub async fn processor<T: Clone>(
                     model::TaskState::Complete
                 }
             };
-            break task;
+            break (task, task_key);
         };
 
-        tasks.upsert(&mut progress, &key, &task)?;
+        tasks.upsert(&mut progress, &task_key, &task)?;
         progress.set_name(agent.idle_message());
         progress.init(None, None);
     }

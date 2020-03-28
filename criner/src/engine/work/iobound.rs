@@ -56,9 +56,8 @@ impl crate::engine::work::generic::Processor for Agent {
     fn set(
         &mut self,
         request: Self::Item,
-        out_key: &mut String,
         progress: &mut prodash::tree::Item,
-    ) -> Result<(model::Task, String)> {
+    ) -> Result<(model::Task, String, String)> {
         progress.init(None, None);
         match request {
             DownloadRequest {
@@ -69,16 +68,18 @@ impl crate::engine::work::generic::Processor for Agent {
                 kind,
                 url,
             } => {
+                let dummy_task = default_persisted_download_task();
                 let progress_name = format!("↓ {}", progress_name);
 
+                let mut task_key = String::new();
+                dummy_task.fq_key(&crate_name, &crate_version, &mut task_key);
                 let task_result = model::TaskResult::Download {
                     kind: kind.to_owned(),
                     url: String::new(),
                     content_length: 0,
                     content_type: None,
                 };
-                let mut key = String::with_capacity(out_key.capacity());
-                let dummy_task = default_persisted_download_task();
+                let mut key = String::with_capacity(task_key.len() * 2);
                 task_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut key);
                 self.state = Some(ProcessingState {
                     url,
@@ -91,7 +92,7 @@ impl crate::engine::work::generic::Processor for Agent {
                     crate_name,
                     crate_version,
                 });
-                Ok((dummy_task, progress_name))
+                Ok((dummy_task, task_key, progress_name))
             }
         }
     }

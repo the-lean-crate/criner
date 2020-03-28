@@ -36,9 +36,8 @@ impl crate::engine::work::generic::Processor for Agent {
     fn set(
         &mut self,
         request: Self::Item,
-        out_key: &mut String,
         progress: &mut prodash::tree::Item,
-    ) -> Result<(model::Task, String)> {
+    ) -> Result<(model::Task, String, String)> {
         progress.init(None, Some("files extracted"));
         match request {
             ExtractRequest {
@@ -48,7 +47,8 @@ impl crate::engine::work::generic::Processor for Agent {
             } => {
                 let progress_info = format!("CPU UNZIP+UNTAR {}:{}", crate_name, crate_version);
                 let dummy_task = default_persisted_extraction_task();
-                dummy_task.fq_key(&crate_name, &crate_version, out_key);
+                let mut task_key = String::new();
+                dummy_task.fq_key(&crate_name, &crate_version, &mut task_key);
 
                 let downloaded_crate = super::schedule::download_file_path(
                     &self.asset_dir,
@@ -63,14 +63,14 @@ impl crate::engine::work::generic::Processor for Agent {
                     selected_entries: vec![],
                 };
 
-                let mut key = String::with_capacity(out_key.len() * 2);
+                let mut key = String::with_capacity(task_key.len() * 2);
                 dummy_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut key);
 
                 self.state = Some(ProcessingState {
                     downloaded_crate,
                     key,
                 });
-                Ok((dummy_task, progress_info))
+                Ok((dummy_task, task_key, progress_info))
             }
         }
     }
