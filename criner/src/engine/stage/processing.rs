@@ -26,12 +26,14 @@ pub async fn process(
     let tx_cpu = {
         let (tx_cpu, rx) = async_std::sync::channel(1);
         for idx in 0..cpu_bound_processors {
+            let max_retries_on_timeout = 0;
             pool.spawn(
                 work::generic::processor(
                     db.clone(),
                     processing_progress.add_child(format!("{}:CPU IDLE", idx + 1)),
                     rx.clone(),
                     work::cpubound::Agent::new(assets_dir.clone(), &db)?,
+                    max_retries_on_timeout
                 )
                 .map(|r| {
                     if let Err(e) = r {
@@ -49,12 +51,14 @@ pub async fn process(
         for idx in 0..io_bound_processors {
             // Can only use the pool if the downloader uses a futures-compatible runtime
             // Tokio is its very own thing, and futures requiring it need to run there.
+            let max_retries_on_timeout = 40;
             tokio.spawn(
                 work::generic::processor(
                     db.clone(),
                     processing_progress.add_child(format!("{}: ↓ IDLE", idx + 1)),
                     rx.clone(),
                     work::iobound::Agent::new(&db, tx_cpu.clone())?,
+                    max_retries_on_timeout
                 )
                 .map(|r| {
                     if let Err(e) = r {

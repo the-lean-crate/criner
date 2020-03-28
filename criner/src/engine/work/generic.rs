@@ -25,9 +25,9 @@ pub async fn processor<T: Clone>(
     mut progress: prodash::tree::Item,
     r: async_std::sync::Receiver<T>,
     mut agent: impl Processor<Item = T> + Send,
+    max_retries_on_timeout: usize
 ) -> Result<()> {
     let tasks = db.open_tasks()?;
-    let max_retries_on_timeout = 10;
 
     while let Some(request) = r.recv().await {
         let mut try_count = 0;
