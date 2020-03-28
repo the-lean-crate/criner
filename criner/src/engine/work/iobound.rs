@@ -204,7 +204,7 @@ async fn download_file_and_store_result(
         ByteSize(content_length.into())
     ));
 
-    {
+    if start_byte != content_length as u64 {
         let mut out = tokio::fs::OpenOptions::new()
             .create(truncate)
             .truncate(truncate)
@@ -239,6 +239,8 @@ async fn download_file_and_store_result(
             ByteSize(bytes_received as u64)
         ));
         out.flush().await?;
+    } else {
+        progress.done(format!("{} already on disk - skipping", url))
     }
 
     let task_result = model::TaskResult::Download {
