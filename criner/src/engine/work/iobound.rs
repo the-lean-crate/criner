@@ -196,6 +196,10 @@ async fn download_file_and_store_result(
     )
     .await??;
 
+    if !response.status().is_success() {
+        return Err(Error::HttpStatus(response.status()));
+    }
+
     let content_length: u32 = response
         .content_length()
         .ok_or(Error::InvalidHeader("expected content-length"))?
@@ -208,35 +212,38 @@ async fn download_file_and_store_result(
         ByteSize(content_length.into())
     ));
 
-    let mut out = tokio::fs::OpenOptions::new()
-        .create(true)
-        .truncate(truncate)
-        .write(true)
-        .append(true)
-        .open(&out_file)
-        .await?;
-
-    let mut bytes_received = start_byte as usize;
-    while let Some(chunk) = timeout_after(
-        FETCH_CHUNK_TIMEOUT_SECONDS,
-        format!(
-            "fetched {} of {}",
-            ByteSize(bytes_received as u64),
-            ByteSize(content_length.into())
-        ),
-        response.chunk().boxed(),
-    )
-    .await??
     {
-        out.write(&chunk).await?;
-        bytes_received += chunk.len();
-        progress.set((bytes_received / 1024) as u32);
+        let mut out = tokio::fs::OpenOptions::new()
+            .create(true)
+            .truncate(truncate)
+            .write(true)
+            .append(true)
+            .open(&out_file)
+            .await?;
+
+        let mut bytes_received = start_byte as usize;
+        while let Some(chunk) = timeout_after(
+            FETCH_CHUNK_TIMEOUT_SECONDS,
+            format!(
+                "fetched {} of {}",
+                ByteSize(bytes_received as u64),
+                ByteSize(content_length.into())
+            ),
+            response.chunk().boxed(),
+        )
+        .await??
+        {
+            out.write(&chunk).await?;
+            bytes_received += chunk.len();
+            progress.set((bytes_received / 1024) as u32);
+        }
+        progress.done(format!(
+            "GET:{}: body-size = {}",
+            url,
+            ByteSize(bytes_received as u64)
+        ));
+        out.flush().await?;
     }
-    progress.done(format!(
-        "GET:{}: body-size = {}",
-        url,
-        ByteSize(bytes_received as u64)
-    ));
 
     let task_result = model::TaskResult::Download {
         kind: kind.to_owned(),

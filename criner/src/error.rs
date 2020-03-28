@@ -32,6 +32,9 @@ quick_error! {
         InvalidHeader(d: &'static str) {
             display("{}", d)
         }
+        HttpStatus(status: http::StatusCode) {
+            display("{}", status)
+        }
         DeadlineExceeded(d: FormatDeadline) {
             display("Stopped computation as deadline was reached {}.", d)
         }

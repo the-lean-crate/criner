@@ -7,7 +7,7 @@ use crate::{
 };
 use std::time::SystemTime;
 
-const MAX_ATTEMPTS_BEFORE_WE_GIVE_UP: usize = 5;
+const MAX_ATTEMPTS_BEFORE_WE_GIVE_UP: usize = 7;
 
 #[derive(Clone, Copy)]
 pub enum Scheduling {
