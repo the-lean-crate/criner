@@ -3,6 +3,7 @@ use futures::{
     future::{Either, FutureExt},
     stream::StreamExt,
     task::{Spawn, SpawnExt},
+    SinkExt,
 };
 use futures_timer::Delay;
 use log::{info, warn};
@@ -132,23 +133,29 @@ pub async fn non_blocking(
         deadline,
         stage.run.at_most,
         {
-            let progress = progress.clone();
-            let db = db.clone();
-            let assets_dir = assets_dir.clone();
-            let pool = pool.clone();
-            let glob = stage.glob.clone();
-            let interrupt_control = interrupt_control.clone();
             move || {
-                stage::report::generate(
-                    db.clone(),
-                    progress.add_child("Reports"),
-                    assets_dir.clone(),
-                    glob.clone(),
-                    deadline,
-                    cpu_o_bound_processors,
-                    pool.clone(),
-                    interrupt_control.clone(),
-                )
+                let progress = progress.clone();
+                let db = db.clone();
+                let assets_dir = assets_dir.clone();
+                let pool = pool.clone();
+                let glob = stage.glob.clone();
+                let interrupt_control = interrupt_control.clone();
+                async move {
+                    let mut ctrl = interrupt_control;
+                    ctrl.send(Interruptible::Deferred).await.ok();
+                    let res = stage::report::generate(
+                        db.clone(),
+                        progress.add_child("Reports"),
+                        assets_dir.clone(),
+                        glob.clone(),
+                        deadline,
+                        cpu_o_bound_processors,
+                        pool.clone(),
+                    )
+                    .await;
+                    ctrl.send(Interruptible::Instantly).await.ok();
+                    res
+                }
             }
         },
     )

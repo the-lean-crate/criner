@@ -1,34 +1,15 @@
 use crate::persistence::new_key_value_query_old_to_new_filtered;
 use crate::{
-    engine::{
-        report,
-        run::{InterruptControlEvents, Interruptible},
-        work,
-    },
+    engine::{report, work},
     error::Result,
     persistence::{self, TableAccess},
     utils::check,
 };
-use futures::{task::Spawn, task::SpawnExt, FutureExt, SinkExt};
+use futures::{task::Spawn, task::SpawnExt, FutureExt};
 use rusqlite::NO_PARAMS;
 use std::{path::PathBuf, time::SystemTime};
 
 mod git;
-
-struct Uninterruptible(InterruptControlEvents);
-
-impl From<InterruptControlEvents> for Uninterruptible {
-    fn from(mut v: InterruptControlEvents) -> Self {
-        futures::executor::block_on(v.send(Interruptible::Deferred)).ok();
-        Uninterruptible(v)
-    }
-}
-
-impl Drop for Uninterruptible {
-    fn drop(&mut self) {
-        futures::executor::block_on(self.0.send(Interruptible::Instantly)).ok();
-    }
-}
 
 pub async fn generate(
     db: persistence::Db,
@@ -38,7 +19,6 @@ pub async fn generate(
     deadline: Option<SystemTime>,
     cpu_o_bound_processors: u32,
     pool: impl Spawn + Clone + Send + 'static + Sync,
-    interrupt_control: InterruptControlEvents,
 ) -> Result<()> {
     use report::generic::Generator;
     let krates = db.open_crates()?;
