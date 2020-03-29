@@ -54,7 +54,7 @@ pub async fn generate(
             async_std::fs::create_dir_all(&cd).await?;
             (
                 Some(cd),
-                git::select_callback(
+                git::choose_callback(
                     cpu_o_bound_processors,
                     &waste_report_dir,
                     progress.add_child("git"),
@@ -133,9 +133,7 @@ pub async fn generate(
 
     if let Some(handle) = maybe_join_handle {
         progress.blocked("waiting for git to finish", None);
-        if handle.join().is_err() {
-            progress.fail("git failed with unknown error");
-        }
+        handle.await??;
     };
     Ok(())
 }

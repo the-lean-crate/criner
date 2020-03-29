@@ -1,12 +1,14 @@
 use crate::{
     engine::report::generic::{WriteCallback, WriteCallbackState, WriteInstruction, WriteRequest},
+    utils::enforce_threaded,
     Result,
 };
 use crates_index_diff::git2;
 use std::{
+    ops::Add,
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
-    time::{SystemTime, UNIX_EPOCH},
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
 static TOTAL_LOOSE_OBJECTS_WRITTEN: AtomicU64 = AtomicU64::new(0);
@@ -41,149 +43,153 @@ fn env_var(name: &str) -> Result<String> {
     })
 }
 
-pub fn select_callback(
+pub fn choose_callback(
     processors: u32,
     report_dir: &Path,
     mut progress: prodash::tree::Item,
 ) -> (
     WriteCallback,
     WriteCallbackState,
-    Option<std::thread::JoinHandle<Result<()>>>,
+    Option<impl std::future::Future<Output = Result<Result<()>>>>,
 ) {
     match git2::Repository::open(report_dir) {
         Ok(repo) => {
             let (tx, rx) = flume::bounded(processors as usize);
             let is_bare_repo = repo.is_bare();
             let report_dir = report_dir.to_owned();
-            let handle = std::thread::spawn(move || -> Result<()> {
-                let res = (|| {
-                    progress.init(None, Some("files stored in index"));
-                    let mut index = {
-                        let mut i = repo.index()?;
-                        if is_bare_repo {
-                            if let Ok(tree_oid) = repo
-                                .head()
-                                .and_then(|h| h.resolve())
-                                .and_then(|h| h.peel_to_tree())
-                                .map(|t| t.id())
-                            {
-                                progress.info(format!(
-                                    "reading latest tree into in-memory index: {}",
-                                    tree_oid
-                                ));
-                                progress.blocked("reading tree into in-memory index", None);
-                                i.read_tree(
-                                    &repo.find_tree(tree_oid).expect("a tree object to exist"),
-                                )?;
-                                progress.done("read tree into memory index");
+            let generous_timeout_as_initial_pushes_transfer_around_200mb =
+                SystemTime::now().add(Duration::from_secs(4 * 60 * 60));
+            let handle = enforce_threaded(
+                generous_timeout_as_initial_pushes_transfer_around_200mb,
+                move || -> Result<()> {
+                    let res = (|| {
+                        progress.init(None, Some("files stored in index"));
+                        let mut index = {
+                            let mut i = repo.index()?;
+                            if is_bare_repo {
+                                if let Ok(tree_oid) = repo
+                                    .head()
+                                    .and_then(|h| h.resolve())
+                                    .and_then(|h| h.peel_to_tree())
+                                    .map(|t| t.id())
+                                {
+                                    progress.info(format!(
+                                        "reading latest tree into in-memory index: {}",
+                                        tree_oid
+                                    ));
+                                    progress.blocked("reading tree into in-memory index", None);
+                                    i.read_tree(
+                                        &repo.find_tree(tree_oid).expect("a tree object to exist"),
+                                    )?;
+                                    progress.done("read tree into memory index");
+                                }
                             }
+                            i
+                        };
+                        let mut req_count = 0u64;
+                        for WriteRequest { path, content } in rx.iter() {
+                            let path = path.strip_prefix(&report_dir)?;
+                            req_count += 1;
+                            let entry = file_index_entry(path.to_owned(), content.len());
+                            index.add_frombuffer(&entry, &content)?;
+                            progress.set(req_count as u32);
                         }
-                        i
-                    };
-                    let mut req_count = 0u64;
-                    for WriteRequest { path, content } in rx.iter() {
-                        let path = path.strip_prefix(&report_dir)?;
-                        req_count += 1;
-                        let entry = file_index_entry(path.to_owned(), content.len());
-                        index.add_frombuffer(&entry, &content)?;
-                        progress.set(req_count as u32);
-                    }
 
-                    progress.init(Some(5), Some("steps"));
-                    let tree_oid = {
-                        progress.set(1);
-                        progress.blocked("writing tree", None);
+                        progress.init(Some(5), Some("steps"));
+                        let tree_oid = {
+                            progress.set(1);
+                            progress.blocked("writing tree", None);
+                            progress.info(format!(
+                                "writing tree with {} new entries and a total of {} entries",
+                                req_count,
+                                index.len()
+                            ));
+                            let oid = index.write_tree()?;
+                            progress.done("Tree written successfully");
+                            oid
+                        };
+
+                        TOTAL_LOOSE_OBJECTS_WRITTEN.fetch_add(req_count, Ordering::SeqCst);
                         progress.info(format!(
-                            "writing tree with {} new entries and a total of {} entries",
-                            req_count,
-                            index.len()
+                            "Wrote {} loose objects since program start",
+                            TOTAL_LOOSE_OBJECTS_WRITTEN.load(Ordering::Relaxed)
                         ));
-                        let oid = index.write_tree()?;
-                        progress.done("Tree written successfully");
-                        oid
-                    };
 
-                    TOTAL_LOOSE_OBJECTS_WRITTEN.fetch_add(req_count, Ordering::SeqCst);
-                    progress.info(format!(
-                        "Wrote {} loose objects since program start",
-                        TOTAL_LOOSE_OBJECTS_WRITTEN.load(Ordering::Relaxed)
-                    ));
-
-                    if !is_bare_repo {
-                        progress.set(2);
-                        progress.blocked("writing new index", None);
-                        repo.set_index(&mut index)?;
-                    }
-                    drop(index);
-
-                    if let Ok(current_tree) = repo
-                        .head()
-                        .and_then(|h| h.resolve())
-                        .and_then(|h| h.peel_to_tree())
-                        .map(|t| t.id())
-                    {
-                        if current_tree == tree_oid {
-                            progress.info("Skipping git commit as there was no change");
-                            return Ok(());
+                        if !is_bare_repo {
+                            progress.set(2);
+                            progress.blocked("writing new index", None);
+                            repo.set_index(&mut index)?;
                         }
-                    }
+                        drop(index);
 
-                    {
-                        progress.set(3);
-                        progress.blocked("writing commit", None);
-                        let current_time = git2::Time::new(
-                            SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() as i64,
-                            0,
-                        );
-                        let signature = git2::Signature::new(
-                            "Criner",
-                            "https://github.com/the-lean-crate/criner",
-                            &current_time,
-                        )?;
-                        let parent = repo
+                        if let Ok(current_tree) = repo
                             .head()
                             .and_then(|h| h.resolve())
-                            .and_then(|h| h.peel_to_commit())
-                            .ok();
-                        let mut parent_store = Vec::with_capacity(1);
+                            .and_then(|h| h.peel_to_tree())
+                            .map(|t| t.id())
+                        {
+                            if current_tree == tree_oid {
+                                progress.info("Skipping git commit as there was no change");
+                                return Ok(());
+                            }
+                        }
 
-                        repo.commit(
-                            Some("HEAD"),
-                            &signature,
-                            &signature,
-                            &format!("update {} reports", req_count),
-                            &repo
-                                .find_tree(tree_oid)
-                                .expect("tree just written to be found"),
-                            match parent.as_ref() {
-                                Some(parent) => {
-                                    parent_store.push(parent);
-                                    &parent_store
-                                }
-                                None => &[],
-                            },
-                        )?;
-                        progress.done("Commit created");
-                    }
-                    {
-                        progress.set(4);
-                        progress.blocked("pushing changes", None);
-                        let remote_name = repo
-                            .branch_upstream_remote(
-                                repo.head()
-                                    .and_then(|h| h.resolve())?
-                                    .name()
-                                    .expect("branch name is valid utf8"),
-                            )
-                            .map(|b| b.as_str().expect("valid utf8").to_string())
-                            .unwrap_or_else(|_| "origin".into());
-                        let mut remote = repo.find_remote(&remote_name)?;
-                        let mut callbacks = git2::RemoteCallbacks::new();
-                        let mut subprogress = progress.add_child("git credentials");
-                        let mut sideband = progress.add_child("git sideband");
-                        let username = env_var("CRINER_REPORT_PUSH_HTTP_USERNAME")?;
-                        let password = env_var("CRINER_REPORT_PUSH_HTTP_PASSWORD")?;
-                        callbacks
+                        {
+                            progress.set(3);
+                            progress.blocked("writing commit", None);
+                            let current_time = git2::Time::new(
+                                SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() as i64,
+                                0,
+                            );
+                            let signature = git2::Signature::new(
+                                "Criner",
+                                "https://github.com/the-lean-crate/criner",
+                                &current_time,
+                            )?;
+                            let parent = repo
+                                .head()
+                                .and_then(|h| h.resolve())
+                                .and_then(|h| h.peel_to_commit())
+                                .ok();
+                            let mut parent_store = Vec::with_capacity(1);
+
+                            repo.commit(
+                                Some("HEAD"),
+                                &signature,
+                                &signature,
+                                &format!("update {} reports", req_count),
+                                &repo
+                                    .find_tree(tree_oid)
+                                    .expect("tree just written to be found"),
+                                match parent.as_ref() {
+                                    Some(parent) => {
+                                        parent_store.push(parent);
+                                        &parent_store
+                                    }
+                                    None => &[],
+                                },
+                            )?;
+                            progress.done("Commit created");
+                        }
+                        {
+                            progress.set(4);
+                            progress.blocked("pushing changes", None);
+                            let remote_name = repo
+                                .branch_upstream_remote(
+                                    repo.head()
+                                        .and_then(|h| h.resolve())?
+                                        .name()
+                                        .expect("branch name is valid utf8"),
+                                )
+                                .map(|b| b.as_str().expect("valid utf8").to_string())
+                                .unwrap_or_else(|_| "origin".into());
+                            let mut remote = repo.find_remote(&remote_name)?;
+                            let mut callbacks = git2::RemoteCallbacks::new();
+                            let mut subprogress = progress.add_child("git credentials");
+                            let mut sideband = progress.add_child("git sideband");
+                            let username = env_var("CRINER_REPORT_PUSH_HTTP_USERNAME")?;
+                            let password = env_var("CRINER_REPORT_PUSH_HTTP_PASSWORD")?;
+                            callbacks
                             .transfer_progress(|p| {
                                 progress.set_name(format!(
                                     "Git pushing changes ({} received)",
@@ -205,23 +211,24 @@ pub fn select_callback(
                                 git2::Cred::userpass_plaintext(&username, &password)
                             });
 
-                        remote.push(
-                            &["HEAD:refs/heads/master"],
-                            Some(
-                                git2::PushOptions::new()
-                                    .packbuilder_parallelism(0)
-                                    .remote_callbacks(callbacks),
-                            ),
-                        )?;
-                        progress.done("Pushed changes");
-                    }
-                    Ok(())
-                })();
-                res.map_err(|err| {
-                    progress.fail(format!("{}", err));
-                    err
-                })
-            });
+                            remote.push(
+                                &["HEAD:refs/heads/master"],
+                                Some(
+                                    git2::PushOptions::new()
+                                        .packbuilder_parallelism(0)
+                                        .remote_callbacks(callbacks),
+                                ),
+                            )?;
+                            progress.done("Pushed changes");
+                        }
+                        Ok(())
+                    })();
+                    res.map_err(|err| {
+                        progress.fail(format!("{}", err));
+                        err
+                    })
+                },
+            );
             (
                 if is_bare_repo {
                     log::info!("Writing into bare git repo only, local writes disabled");

@@ -2,8 +2,6 @@
 
 ## TODO
 
-* [x] When fetching git, it can hang forever while receiving bytes due to lack of a timeout. The only way to handle that is to run it on a separate thread which handles
-      timeout correctly.
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data, like release date
   * [ ] Consider extracting the release date from git and upgrade `crates-index-diff` to support that.
 * [ ] Make things prettier and more visual - that way we can try again for a come-back :D
