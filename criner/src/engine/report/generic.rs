@@ -44,7 +44,7 @@ pub enum WriteInstruction {
     DoWrite(WriteRequest),
 }
 
-pub type WriteCallbackState = Option<crossbeam_channel::Sender<WriteRequest>>;
+pub type WriteCallbackState = Option<flume::Sender<WriteRequest>>;
 pub type WriteCallback = fn(WriteRequest, &WriteCallbackState) -> Result<WriteInstruction>;
 
 #[async_trait]
@@ -176,7 +176,7 @@ pub trait Generator {
     ) -> Result<Option<Self::Report>> {
         let mut chunk_report = None::<Self::Report>;
         let crate_versions = db.open_crate_versions()?;
-        let mut results_to_update = Vec::new();
+        let mut reports_to_mark_done = Vec::new();
         let mut out_buf = Vec::new();
         {
             let connection = db.open_connection()?;
@@ -236,7 +236,7 @@ pub trait Generator {
                                 None => version_report,
                             });
 
-                            results_to_update.push(reports_key);
+                            reports_to_mark_done.push(reports_key);
                         }
                     }
                 }
@@ -286,18 +286,18 @@ pub trait Generator {
             }
         }
 
-        if !results_to_update.is_empty() {
+        if !reports_to_mark_done.is_empty() {
             let mut connection = db.open_connection_no_async_with_busy_wait()?;
             progress.blocked("wait for write lock", None);
             let transaction =
                 connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
             progress.init(
-                Some(results_to_update.len() as u32),
+                Some(reports_to_mark_done.len() as u32),
                 Some("report done markers written"),
             );
             {
                 let mut statement = new_key_insertion(ReportsTree::table_name(), &transaction)?;
-                for (kid, key) in results_to_update.iter().enumerate() {
+                for (kid, key) in reports_to_mark_done.iter().enumerate() {
                     statement.execute(params![key])?;
                     progress.set((kid + 1) as u32);
                 }
