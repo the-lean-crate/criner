@@ -1,10 +1,6 @@
 use crate::error::{Error, FormatDeadline, Result};
 use dia_semver::Semver;
-use futures::task::SpawnExt;
-use futures::{
-    future::{self, Either},
-    task::Spawn,
-};
+use futures::future::{self, Either};
 use futures_timer::Delay;
 use std::{
     convert::TryInto,
@@ -155,25 +151,6 @@ where
     }
 }
 
-pub async fn enforce<F, T>(deadline: Option<SystemTime>, f: F) -> Result<T>
-where
-    F: Future<Output = T> + Unpin,
-{
-    match deadline {
-        Some(d) => {
-            let selector = future::select(
-                Delay::new(d.duration_since(SystemTime::now()).unwrap_or_default()),
-                f,
-            );
-            match selector.await {
-                Either::Left((_, _f)) => Err(Error::DeadlineExceeded(FormatDeadline(d))),
-                Either::Right((r, _delay)) => Ok(r),
-            }
-        }
-        None => Ok(f.await),
-    }
-}
-
 /// Use this if `f()` might block forever, due to code that doesn't implement timeouts like libgit2 fetch does as it has no timeout
 /// on 'recv' bytes.
 /// Even though the calling thread or future won't be blocked, the spawned thread calling the future will be blocked forever.
@@ -206,12 +183,4 @@ where
         Either::Right((Ok(res), _delay)) => Ok(res),
         Either::Right((Err(err), _delay)) => Err(Error::Message(format!("{}", err))),
     }
-}
-
-pub async fn enforce_blocking<F, T>(deadline: Option<SystemTime>, f: F, s: impl Spawn) -> Result<T>
-where
-    F: FnOnce() -> T + Send + 'static,
-    T: Send + 'static,
-{
-    enforce(deadline, s.spawn_with_handle(async { f() })?).await
 }

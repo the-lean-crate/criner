@@ -79,11 +79,9 @@ pub async fn non_blocking(
         {
             let db = db.clone();
             let progress = progress.clone();
-            let pool = pool.clone();
             move || {
                 stage::changes::fetch(
                     crates_io_path.clone(),
-                    pool.clone(),
                     db.clone(),
                     progress.add_child("crates.io refresh"),
                     deadline,
