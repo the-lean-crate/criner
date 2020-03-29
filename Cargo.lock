@@ -292,6 +292,7 @@ dependencies = [
  "bytesize",
  "common_macros",
  "crates-index-diff",
+ "crossbeam-channel",
  "dia-semver",
  "futures",
  "futures-timer 3.0.2",
