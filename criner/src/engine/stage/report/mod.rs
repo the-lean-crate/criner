@@ -46,18 +46,9 @@ pub async fn generate(
 
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
     async_std::fs::create_dir_all(&waste_report_dir).await?;
-    // DEBUG: allow using git while using globs
-    // use crate::engine::report::generic::WriteCallback;
+    use crate::engine::report::generic::WriteCallback;
     let (cache_dir, (git_handle, git_state, maybe_join_handle)) = match glob.as_ref() {
-        // Some(_) => (None, (git::not_available as WriteCallback, None, None)),
-        Some(_) => (
-            None,
-            git::select_callback(
-                cpu_o_bound_processors,
-                &waste_report_dir,
-                progress.add_child("git"),
-            ),
-        ),
+        Some(_) => (None, (git::not_available as WriteCallback, None, None)),
         None => {
             let cd = waste_report_dir.join("__incremental_cache__");
             async_std::fs::create_dir_all(&cd).await?;
