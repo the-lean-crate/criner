@@ -3,13 +3,14 @@ use crate::{
     error::{Error, Result},
     model,
     persistence::{self, new_key_value_insertion, CrateVersionTable, Keyed, TableAccess},
-    utils::*,
+    utils::{enforce_blocking, enforce_threaded},
 };
 use crates_index_diff::Index;
 use futures::task::Spawn;
 use rusqlite::params;
-use std::collections::BTreeMap;
 use std::{
+    collections::BTreeMap,
+    ops::Add,
     path::Path,
     time::{Duration, SystemTime},
 };
@@ -24,17 +25,16 @@ pub async fn fetch(
     let start = SystemTime::now();
     let mut subprogress = progress.add_child("Fetching changes from crates.io index");
     subprogress.blocked("potentially cloning", None);
-    let index = enforce_blocking(
-        deadline,
+    let index = enforce_threaded(
+        deadline.unwrap_or(SystemTime::now().add(Duration::from_secs(60 * 60))),
         {
             let path = crates_io_path.as_ref().to_path_buf();
             || Index::from_path_or_cloned(path)
         },
-        &pool,
     )
     .await??;
-    let (crate_versions, last_seen_git_object) = enforce_blocking(
-        deadline,
+    let (crate_versions, last_seen_git_object) = enforce_threaded(
+        deadline.unwrap_or(SystemTime::now().add(Duration::from_secs(10 * 60))),
         move || {
             let mut cbs = crates_index_diff::git2::RemoteCallbacks::new();
             let mut opts = {
@@ -57,7 +57,6 @@ pub async fn fetch(
 
             index.peek_changes_with_options(Some(&mut opts))
         },
-        &pool,
     )
     .await??;
 

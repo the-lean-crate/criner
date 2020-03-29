@@ -174,6 +174,40 @@ where
     }
 }
 
+/// Use this if `f()` might block forever, due to code that doesn't implement timeouts like libgit2 fetch does as it has no timeout
+/// on 'recv' bytes.
+/// Even though the calling thread or future won't be blocked, the spawned thread calling the future will be blocked forever.
+/// However, this is better than blocking a futures-threadpool thread, which quickly freezes the whole program as there are
+/// not too many of these.
+///
+/// This approach eventually fails as we would accumulate more and more threads, but this will also give use additional
+/// days of runtime for little effort. On a Chinese network, outside of data centers, one can probably restart criner on
+/// a weekly basis or so, which is can easily be automated.
+pub async fn enforce_threaded<F, T>(deadline: SystemTime, f: F) -> Result<T>
+where
+    T: Send + 'static,
+    F: FnOnce() -> T + Send + 'static,
+{
+    let (tx, rx) = futures::channel::oneshot::channel();
+    std::thread::spawn(move || {
+        let res = f();
+        tx.send(res).ok() // if this fails, we will timeout. Can't enforce Debug to be implemented
+    });
+    let selector = future::select(
+        Delay::new(
+            deadline
+                .duration_since(SystemTime::now())
+                .unwrap_or_default(),
+        ),
+        rx,
+    );
+    match selector.await {
+        Either::Left((_, _rx)) => Err(Error::DeadlineExceeded(FormatDeadline(deadline))),
+        Either::Right((Ok(res), _delay)) => Ok(res),
+        Either::Right((Err(err), _delay)) => Err(Error::Message(format!("{}", err))),
+    }
+}
+
 pub async fn enforce_blocking<F, T>(deadline: Option<SystemTime>, f: F, s: impl Spawn) -> Result<T>
 where
     F: FnOnce() -> T + Send + 'static,
