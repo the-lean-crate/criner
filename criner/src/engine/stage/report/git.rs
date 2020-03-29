@@ -180,7 +180,7 @@ pub fn select_callback(
                         .unwrap_or_else(|_| "origin".into());
 
                     futures::executor::block_on(enforce_threaded(
-                        SystemTime::now() + std::time::Duration::from_secs(4 * 60 * 60),
+                        SystemTime::now() + std::time::Duration::from_secs(60 * 60),
                         {
                             let mut progress = progress.add_child("git push");
                             move || -> crate::Result<_> {
