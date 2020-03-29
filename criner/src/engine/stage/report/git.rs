@@ -1,3 +1,4 @@
+use crate::utils::enforce_threaded;
 use crate::{
     engine::report::generic::{WriteCallback, WriteCallbackState, WriteInstruction, WriteRequest},
     Result,
@@ -165,56 +166,64 @@ pub fn select_callback(
                         )?;
                         progress.done("Commit created");
                     }
-                    {
-                        progress.set(4);
-                        progress.blocked("pushing changes", None);
-                        let remote_name = repo
-                            .branch_upstream_remote(
-                                repo.head()
-                                    .and_then(|h| h.resolve())?
-                                    .name()
-                                    .expect("branch name is valid utf8"),
-                            )
-                            .map(|b| b.as_str().expect("valid utf8").to_string())
-                            .unwrap_or_else(|_| "origin".into());
-                        let mut remote = repo.find_remote(&remote_name)?;
-                        let mut callbacks = git2::RemoteCallbacks::new();
-                        let mut subprogress = progress.add_child("git credentials");
-                        let mut sideband = progress.add_child("git sideband");
-                        let username = env_var("CRINER_REPORT_PUSH_HTTP_USERNAME")?;
-                        let password = env_var("CRINER_REPORT_PUSH_HTTP_PASSWORD")?;
-                        callbacks
-                            .transfer_progress(|p| {
-                                progress.set_name(format!(
-                                    "Git pushing changes ({} received)",
-                                    bytesize::ByteSize(p.received_bytes() as u64)
-                                ));
-                                progress.init(
-                                    Some((p.total_deltas() + p.total_objects()) as u32),
-                                    Some("objects"),
-                                );
-                                progress
-                                    .set((p.indexed_deltas() + p.received_objects()) as u32);
-                                true
-                            })
-                            .sideband_progress(move |line| {
-                                sideband.set_name(std::str::from_utf8(line).unwrap_or(""));
-                                true
-                            }).credentials(move |url, username_from_url, allowed_types| {
-                                subprogress.info(format!("Setting userpass plaintext credentials, allowed are {:?} for {:?} (username = {:?}", allowed_types, url, username_from_url));
-                                git2::Cred::userpass_plaintext(&username, &password)
-                            });
 
-                        remote.push(
-                            &["HEAD:refs/heads/master"],
-                            Some(
-                                git2::PushOptions::new()
-                                    .packbuilder_parallelism(0)
-                                    .remote_callbacks(callbacks),
-                            ),
-                        )?;
-                        progress.done("Pushed changes");
-                    }
+                    progress.set(4);
+                    progress.blocked("pushing changes", None);
+                    let remote_name = repo
+                        .branch_upstream_remote(
+                            repo.head()
+                                .and_then(|h| h.resolve())?
+                                .name()
+                                .expect("branch name is valid utf8"),
+                        )
+                        .map(|b| b.as_str().expect("valid utf8").to_string())
+                        .unwrap_or_else(|_| "origin".into());
+
+                    futures::executor::block_on(enforce_threaded(
+                        SystemTime::now() + std::time::Duration::from_secs(4 * 60 * 60),
+                        {
+                            let mut progress = progress.add_child("git push");
+                            move || -> crate::Result<_> {
+                                let mut remote = repo.find_remote(&remote_name)?;
+                                let mut callbacks = git2::RemoteCallbacks::new();
+                                let mut subprogress = progress.add_child("git credentials");
+                                let mut sideband = progress.add_child("git sideband");
+                                let username = env_var("CRINER_REPORT_PUSH_HTTP_USERNAME")?;
+                                let password = env_var("CRINER_REPORT_PUSH_HTTP_PASSWORD")?;
+                                callbacks
+                                        .transfer_progress(|p| {
+                                            progress.set_name(format!(
+                                                "Git pushing changes ({} received)",
+                                                bytesize::ByteSize(p.received_bytes() as u64)
+                                            ));
+                                            progress.init(
+                                                Some((p.total_deltas() + p.total_objects()) as u32),
+                                                Some("objects"),
+                                            );
+                                            progress
+                                                .set((p.indexed_deltas() + p.received_objects()) as u32);
+                                            true
+                                        })
+                                        .sideband_progress(move |line| {
+                                            sideband.set_name(std::str::from_utf8(line).unwrap_or(""));
+                                            true
+                                        }).credentials(move |url, username_from_url, allowed_types| {
+                                        subprogress.info(format!("Setting userpass plaintext credentials, allowed are {:?} for {:?} (username = {:?}", allowed_types, url, username_from_url));
+                                        git2::Cred::userpass_plaintext(&username, &password)
+                                    });
+                                remote.push(
+                                    &["HEAD:refs/heads/master"],
+                                    Some(
+                                        git2::PushOptions::new()
+                                            .packbuilder_parallelism(0)
+                                            .remote_callbacks(callbacks),
+                                    ),
+                                )?;
+                                Ok(())
+                            }
+                        },
+                    ))??;
+                    progress.done("Pushed changes");
                     Ok(())
                 })();
                 res.map_err(|err| {
