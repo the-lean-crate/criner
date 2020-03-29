@@ -3,7 +3,6 @@
 ## TODO
 
 * [ ] Make use of crates-io database easy and integrate with criner to allow using download counts and other meta-data, like release date
-  * [ ] Consider extracting the release date from git and upgrade `crates-index-diff` to support that.
 * [ ] Make things prettier and more visual - that way we can try again for a come-back :D
 * [ ] See why RipGrep doesn't get any suggestions
 * [ ] More reporting - right now the context gathering to see how much time is spent where is neglected.

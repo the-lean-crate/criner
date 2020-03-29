@@ -54,7 +54,7 @@ pub fn choose_callback(
 ) {
     match git2::Repository::open(report_dir) {
         Ok(repo) => {
-            let (tx, rx) = flume::bounded(processors as usize);
+            let (tx, rx) = std::sync::mpsc::sync_channel(processors as usize);
             let is_bare_repo = repo.is_bare();
             let report_dir = report_dir.to_owned();
             let generous_timeout_as_initial_pushes_transfer_around_200mb =

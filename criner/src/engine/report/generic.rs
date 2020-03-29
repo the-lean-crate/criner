@@ -44,7 +44,7 @@ pub enum WriteInstruction {
     DoWrite(WriteRequest),
 }
 
-pub type WriteCallbackState = Option<flume::Sender<WriteRequest>>;
+pub type WriteCallbackState = Option<std::sync::mpsc::SyncSender<WriteRequest>>;
 pub type WriteCallback = fn(WriteRequest, &WriteCallbackState) -> Result<WriteInstruction>;
 
 #[async_trait]
