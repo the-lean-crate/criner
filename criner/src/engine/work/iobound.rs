@@ -10,7 +10,7 @@ use crate::utils::timeout_after;
 use async_trait::async_trait;
 use futures::FutureExt;
 use std::{
-    path::PathBuf,
+    path::{Path, PathBuf},
     time::{Duration, SystemTime},
 };
 
@@ -23,19 +23,28 @@ struct ProcessingState {
     output_file_path: PathBuf,
     result_key: Option<String>,
 }
-pub struct Agent {
+pub struct Agent<Fn> {
     client: reqwest::Client,
     results: persistence::TaskResultTable,
     channel: async_std::sync::Sender<super::cpubound::ExtractRequest>,
     state: Option<ProcessingState>,
+    make_state: Fn,
     extraction_request: Option<super::cpubound::ExtractRequest>,
 }
 
-impl Agent {
+impl<Fn> Agent<Fn>
+where
+    Fn: FnMut(
+        Option<(String, String)>,
+        &model::Task,
+        &Path,
+    ) -> Option<super::cpubound::ExtractRequest>,
+{
     pub fn new(
         db: &persistence::Db,
         channel: async_std::sync::Sender<super::cpubound::ExtractRequest>,
-    ) -> Result<Agent> {
+        make_state: Fn,
+    ) -> Result<Agent<Fn>> {
         let client = reqwest::ClientBuilder::new().gzip(true).build()?;
 
         let results = db.open_results()?;
@@ -45,12 +54,21 @@ impl Agent {
             channel,
             state: None,
             extraction_request: None,
+            make_state,
         })
     }
 }
 
 #[async_trait]
-impl crate::engine::work::generic::Processor for Agent {
+impl<Fn> crate::engine::work::generic::Processor for Agent<Fn>
+where
+    Fn: FnMut(
+            Option<(String, String)>,
+            &model::Task,
+            &Path,
+        ) -> Option<super::cpubound::ExtractRequest>
+        + Send,
+{
     type Item = DownloadRequest;
 
     fn set(
@@ -77,6 +95,12 @@ impl crate::engine::work::generic::Processor for Agent {
                     content_length: 0,
                     content_type: None,
                 };
+
+                self.extraction_request = (self.make_state)(
+                    crate_name_and_version.clone(),
+                    &dummy_task,
+                    &output_file_path,
+                );
                 self.state = Some(ProcessingState {
                     url,
                     kind,
@@ -94,14 +118,6 @@ impl crate::engine::work::generic::Processor for Agent {
                         },
                     ),
                 });
-                self.extraction_request =
-                    crate_name_and_version.map(|(crate_name, crate_version)| {
-                        super::cpubound::ExtractRequest {
-                            download_task: dummy_task.clone(),
-                            crate_name,
-                            crate_version,
-                        }
-                    });
                 Ok((dummy_task, task_key, progress_name))
             }
         }
