@@ -23,28 +23,24 @@ struct ProcessingState {
     output_file_path: PathBuf,
     result_key: Option<String>,
 }
-pub struct Agent<Fn> {
+pub struct Agent<Fn, FnResult> {
     client: reqwest::Client,
     results: persistence::TaskResultTable,
-    channel: async_std::sync::Sender<super::cpubound::ExtractRequest>,
+    channel: async_std::sync::Sender<FnResult>,
     state: Option<ProcessingState>,
     make_state: Fn,
-    extraction_request: Option<super::cpubound::ExtractRequest>,
+    extraction_request: Option<FnResult>,
 }
 
-impl<Fn> Agent<Fn>
+impl<Fn, FnResult> Agent<Fn, FnResult>
 where
-    Fn: FnMut(
-        Option<(String, String)>,
-        &model::Task,
-        &Path,
-    ) -> Option<super::cpubound::ExtractRequest>,
+    Fn: FnMut(Option<(String, String)>, &model::Task, &Path) -> Option<FnResult>,
 {
     pub fn new(
         db: &persistence::Db,
-        channel: async_std::sync::Sender<super::cpubound::ExtractRequest>,
+        channel: async_std::sync::Sender<FnResult>,
         make_state: Fn,
-    ) -> Result<Agent<Fn>> {
+    ) -> Result<Agent<Fn, FnResult>> {
         let client = reqwest::ClientBuilder::new().gzip(true).build()?;
 
         let results = db.open_results()?;
@@ -60,14 +56,10 @@ where
 }
 
 #[async_trait]
-impl<Fn> crate::engine::work::generic::Processor for Agent<Fn>
+impl<Fn, FnResult> crate::engine::work::generic::Processor for Agent<Fn, FnResult>
 where
-    Fn: FnMut(
-            Option<(String, String)>,
-            &model::Task,
-            &Path,
-        ) -> Option<super::cpubound::ExtractRequest>
-        + Send,
+    Fn: FnMut(Option<(String, String)>, &model::Task, &Path) -> Option<FnResult> + Send,
+    FnResult: Send,
 {
     type Item = DownloadRequest;
 
