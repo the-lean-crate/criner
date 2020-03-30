@@ -231,11 +231,11 @@ impl RenderOnce for Report {
                                 : title_section(title);
                                 : total_section(total_size_in_bytes, total_files);
                                 : savings_section(fix_to_wasted_files_aggregate(suggested_fix.clone()));
-                                @ if suggested_fix.is_some() {
+                                @ if let Some(suggested_fix) = suggested_fix {
                                     section {
                                         h3: "Fix";
                                         section {
-                                            |t| write!(t, "{:#?}", suggested_fix.unwrap())
+                                            |t| write!(t, "{:#?}", suggested_fix)
                                         }
                                     }
                                 } else {

@@ -100,7 +100,7 @@ pub async fn tasks(
                     2,
                     2,
                     || cpubound::ExtractRequest {
-                        download_task: download_crate_task.into(),
+                        download_task: download_crate_task,
                         crate_name: krate.name.clone(),
                         crate_version: krate.version.clone(),
                     },

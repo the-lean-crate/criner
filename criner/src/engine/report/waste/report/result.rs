@@ -52,7 +52,7 @@ fn entry_is_file(entry_type: u8) -> bool {
     tar::EntryType::new(entry_type).is_file()
 }
 
-fn split_to_matched_and_unmatched<'entries>(
+fn split_to_matched_and_unmatched(
     entries: Vec<TarHeader>,
     globset: &globset::GlobSet,
 ) -> (Vec<TarHeader>, Vec<TarHeader>) {
@@ -302,10 +302,10 @@ fn simplify_includes<'a>(
                 out_patterns.push(matched[0].clone());
             }
             _ => {
-                out_patterns.push(pattern.to_string());
+                out_patterns.push((*pattern).to_string());
             }
         }
-        entries.retain(|e| !matched.iter().any(|p| p == &tar_path_to_utf8_str(&e.path)));
+        entries.retain(|e| !matched.iter().any(|p| p == tar_path_to_utf8_str(&e.path)));
     }
     remove_implicit_includes(&mut out_patterns, Vec::new());
     out_patterns
@@ -354,7 +354,7 @@ fn matches_in_set_a_but_not_in_set_b(
                 break;
             }
             if set_b.is_empty() {
-                patterns_to_amend.push(pattern_a.to_string());
+                patterns_to_amend.push((*pattern_a).to_string());
                 continue;
             }
 
@@ -362,7 +362,7 @@ fn matches_in_set_a_but_not_in_set_b(
                 .iter()
                 .any(|e| set_b.is_match(tar_path_to_utf8_str(&e.path)))
             {
-                patterns_to_amend.push(pattern_a.to_string());
+                patterns_to_amend.push((*pattern_a).to_string());
             }
         }
     }
@@ -492,7 +492,7 @@ fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)
                         || p.contains('@')
                         || (!p.as_bytes().iter().any(|b| b.is_ascii_digit()) && &p.to_uppercase() == p) // probably environment variable
                         || p.starts_with("cargo:")
-                        || p.starts_with("-"))
+                        || p.starts_with('-'))
                 })
                 .collect();
             let dirs = BTreeSet::from_iter(v.iter().filter_map(|p| {
@@ -507,7 +507,7 @@ fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)
             } else {
                 let mut dirs =
                     optimize_directories(dirs.into_iter().map(|d| format!("{}/*", d)).collect());
-                dirs.extend(v.clone().into_iter().map(|p| format!("{}/*", p)));
+                dirs.extend(v.into_iter().map(|p| format!("{}/*", p)));
                 dirs
             };
             possible_patterns
@@ -568,7 +568,7 @@ fn non_greedy_patterns<S: AsRef<str>>(
 impl Report {
     pub(crate) fn cargo_config_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> CargoConfig {
         find_in_entries(entries, &[], "Cargo.toml")
-            .and_then(|(_e, v)| v.map(|v| CargoConfig::from(v)))
+            .and_then(|(_e, v)| v.map(CargoConfig::from))
             .unwrap_or_default()
     }
 
@@ -756,11 +756,8 @@ impl Report {
 
             let build_script_name = config.actual_or_expected_build_script_path();
             let maybe_data = find_in_entries(&entries_with_buffer, &entries, build_script_name);
-            maybe_build_script_path = maybe_build_script_path.or_else(|| {
-                maybe_data
-                    .as_ref()
-                    .and_then(|_| Some(build_script_name.to_owned()))
-            });
+            maybe_build_script_path = maybe_build_script_path
+                .or_else(|| maybe_data.as_ref().map(|_| build_script_name.to_owned()));
             includes_parsed_from_files.extend(find_paths_mentioned_in_build_script(maybe_data));
 
             if includes_parsed_from_files.is_empty() {

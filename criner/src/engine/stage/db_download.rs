@@ -41,6 +41,7 @@ pub async fn trigger(
         );
         tx_io
     };
+
     let today_yyyy_mm_dd = time::OffsetDateTime::now_local().format("%F");
     let task_key = format!(
         "{}{}{}",
@@ -48,7 +49,10 @@ pub async fn trigger(
         crate::persistence::KEY_SEP_CHAR,
         today_yyyy_mm_dd
     );
-    let db_file_path = assets_dir.join("crates-io-db").join(format!("{}-crates-io-db-dump.tar.gz", today_yyyy_mm_dd));
+    // TODO: avoid double-scheduling in case DL takes more than 24h…
+    let db_file_path = assets_dir
+        .join("crates-io-db")
+        .join(format!("{}-crates-io-db-dump.tar.gz", today_yyyy_mm_dd));
     tx_io
         .send(work::iobound::DownloadRequest {
             output_file_path: db_file_path,

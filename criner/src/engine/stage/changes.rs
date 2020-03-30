@@ -24,7 +24,7 @@ pub async fn fetch(
     let mut subprogress = progress.add_child("Fetching changes from crates.io index");
     subprogress.blocked("potentially cloning", None);
     let index = enforce_threaded(
-        deadline.unwrap_or(SystemTime::now().add(Duration::from_secs(60 * 60))),
+        deadline.unwrap_or_else(|| SystemTime::now().add(Duration::from_secs(60 * 60))),
         {
             let path = crates_io_path.as_ref().to_path_buf();
             || Index::from_path_or_cloned(path)
@@ -32,7 +32,7 @@ pub async fn fetch(
     )
     .await??;
     let (crate_versions, last_seen_git_object) = enforce_threaded(
-        deadline.unwrap_or(SystemTime::now().add(Duration::from_secs(10 * 60))),
+        deadline.unwrap_or_else(|| SystemTime::now().add(Duration::from_secs(10 * 60))),
         move || {
             let mut cbs = crates_index_diff::git2::RemoteCallbacks::new();
             let mut opts = {
@@ -64,7 +64,7 @@ pub async fn fetch(
     store_progress.init(Some(crate_versions.len() as u32), Some("crate versions"));
 
     let without_time_limit_unless_one_is_set =
-        deadline.unwrap_or(SystemTime::now().add(Duration::from_secs(24 * 60 * 60)));
+        deadline.unwrap_or_else(|| SystemTime::now().add(Duration::from_secs(24 * 60 * 60)));
     enforce_threaded(without_time_limit_unless_one_is_set, {
         let db = db.clone();
         let index_path = crates_io_path.as_ref().to_path_buf();

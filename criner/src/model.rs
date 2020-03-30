@@ -151,7 +151,7 @@ pub enum TaskState {
 impl TaskState {
     pub fn merge_with(&mut self, other: &TaskState) {
         fn merge_vec(mut existing: Vec<String>, new: &Vec<String>) -> Vec<String> {
-            existing.extend(new.iter().map(|e| e.clone()));
+            existing.extend(new.iter().cloned());
             existing
         }
         use TaskState::*;

@@ -26,7 +26,7 @@ pub async fn generate(
         .parent()
         .expect("assets directory to be in criner.db")
         .join("reports");
-    let glob_str = glob.as_ref().map(|s| s.as_str());
+    let glob_str = glob.as_deref();
     let num_crates = krates.count_filtered(glob_str.clone()) as u32;
     let chunk_size = 500.min(num_crates);
     if chunk_size == 0 {
@@ -83,11 +83,11 @@ pub async fn generate(
     loop {
         let abort_loop = {
             progress.blocked("fetching chunk of crates to schedule", None);
-            let mut connection = db.open_connection_no_async_with_busy_wait()?;
+            let connection = db.open_connection_no_async_with_busy_wait()?;
             let mut statement = new_key_value_query_old_to_new_filtered(
                 persistence::CrateTable::table_name(),
                 glob_str,
-                &mut connection,
+                &connection,
                 Some((fetched_crates, chunk_size as usize)),
             )?;
 
@@ -103,7 +103,7 @@ pub async fn generate(
         };
 
         cid += 1;
-        check(deadline.clone())?;
+        check(deadline)?;
 
         progress.set((cid * chunk_size) as u32);
         progress.halted("write crate report", None);

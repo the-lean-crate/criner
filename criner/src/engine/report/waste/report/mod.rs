@@ -89,17 +89,13 @@ impl CargoConfig {
     pub fn lib_path(&self) -> &str {
         self.lib
             .as_ref()
-            .and_then(|l| l.path.as_ref().map(|s| s.as_str()))
+            .and_then(|l| l.path.as_deref())
             .unwrap_or("src/lib.rs")
     }
     pub fn bin_paths(&self) -> Vec<&str> {
         self.bin
             .as_ref()
-            .map(|l| {
-                l.iter()
-                    .filter_map(|s| s.path.as_ref().map(|s| s.as_str()))
-                    .collect()
-            })
+            .map(|l| l.iter().filter_map(|s| s.path.as_deref()).collect())
             .unwrap_or_else(|| vec!["src/main.rs"])
     }
 }

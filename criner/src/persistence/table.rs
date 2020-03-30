@@ -272,7 +272,7 @@ fn retry_on_db_busy<T>(
                 Error::Rusqlite(SqliteError::SqliteFailure(
                     SqliteFFIError {
                         code: SqliteFFIErrorCode::DatabaseBusy,
-                        extended_code: _,
+                        ..
                     },
                     _,
                 )),
@@ -291,9 +291,9 @@ fn retry_on_db_busy<T>(
                     err,
                     total_wait_time
                 );
-                progress.as_mut().map(|p| {
-                    p.blocked("wait for write lock", Some(SystemTime::now().add(wait_for)))
-                });
+                if let Some(p) = progress.as_mut() {
+                    p.blocked("wait for write lock", Some(SystemTime::now().add(wait_for)));
+                };
                 std::thread::sleep(wait_for);
                 total_wait_time += wait_for;
                 wait_for *= 2;

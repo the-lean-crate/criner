@@ -39,7 +39,6 @@ pub async fn process(
                     if let Err(e) = r {
                         log::warn!("CPU bound processor failed: {}", e);
                     }
-                    ()
                 }),
             )?;
         }
@@ -95,10 +94,10 @@ pub async fn process(
     loop {
         let abort_loop = {
             progress.blocked("fetching chunk of version to schedule", None);
-            let mut connection = db.open_connection_no_async_with_busy_wait()?;
+            let connection = db.open_connection_no_async_with_busy_wait()?;
             let mut statement = new_value_query_recent_first(
                 CrateVersionTable::table_name(),
-                &mut connection,
+                &connection,
                 fetched_versions,
                 auto_checkpoint_every,
             )?;
