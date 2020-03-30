@@ -29,7 +29,7 @@ pub struct Agent<Fn, FnResult> {
     channel: async_std::sync::Sender<FnResult>,
     state: Option<ProcessingState>,
     make_state: Fn,
-    extraction_request: Option<FnResult>,
+    next_action_state: Option<FnResult>,
 }
 
 impl<Fn, FnResult> Agent<Fn, FnResult>
@@ -49,7 +49,7 @@ where
             results,
             channel,
             state: None,
-            extraction_request: None,
+            next_action_state: None,
             make_state,
         })
     }
@@ -88,7 +88,7 @@ where
                     content_type: None,
                 };
 
-                self.extraction_request = (self.make_state)(
+                self.next_action_state = (self.make_state)(
                     crate_name_and_version.clone(),
                     &dummy_task,
                     &output_file_path,
@@ -143,13 +143,13 @@ where
     }
 
     async fn schedule_next(&mut self, progress: &mut prodash::tree::Item) -> Result<()> {
-        if let Some(extract_request) = self.extraction_request.take() {
+        if let Some(request) = self.next_action_state.take() {
             progress.blocked("schedule crate extraction", None);
-            // Here we risk doing this work twice, but must of the time, we don't. And since it's fast,
+            // Here we risk doing this work twice, but most of the time, we don't. And since it's fast,
             // we take the risk of duplicate work for keeping more processors busy.
-            // And yes, this send is blocking the source processor, but should not be an issue as CPU
-            // processors are so fast - slow producer, fast consumer.
-            self.channel.send(extract_request).await;
+            // NOTE: We assume there is no risk of double-scheduling, also we assume the consumer is faster
+            // then the producer (us), so we are ok with blocking until the task is scheduled.
+            self.channel.send(request).await;
         }
         Ok(())
     }
