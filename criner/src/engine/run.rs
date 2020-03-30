@@ -5,7 +5,6 @@ use futures::{
     task::{Spawn, SpawnExt},
     SinkExt,
 };
-use futures_timer::Delay;
 use log::{info, warn};
 use prodash::tui::{Event, Line};
 use std::{
@@ -58,11 +57,19 @@ pub async fn non_blocking(
         },
         deadline,
         {
+            let db = db.clone();
+            let assets_dir = assets_dir.clone();
             let progress = progress.clone();
+            let tokio = tokio.clone();
+            let pool = pool.clone();
             move || {
-                let mut p = progress.add_child("fake: fetching crates-io db");
-                p.blocked("working", None);
-                Delay::new(Duration::from_secs(10)).map(|_| Ok(()))
+                stage::db_download::trigger(
+                    db.clone(),
+                    assets_dir.clone(),
+                    progress.add_child("fetching crates-io db"),
+                    tokio.clone(),
+                    pool.clone(),
+                )
             }
         },
     ))?;
