@@ -205,9 +205,25 @@ async fn download_file_and_store_result(
     )
     .await??;
 
-    if !response.status().is_success() {
-        return Err(Error::HttpStatus(response.status()));
-    }
+    match response.status().as_u16() {
+        200..=299 => {}
+        416 => {
+            // we assume that this means we have fully downloaded the item previously, and that the DB result was written already
+            // but not checked
+            progress.done(format!(
+                "GET{}:{}: body-size = {}",
+                if start_byte != 0 {
+                    "(resumed, already completed)"
+                } else {
+                    ""
+                },
+                url,
+                ByteSize(start_byte as u64)
+            ));
+            return Ok(());
+        }
+        _ => return Err(Error::HttpStatus(response.status())),
+    };
 
     let remaining_content_length = response
         .content_length()
