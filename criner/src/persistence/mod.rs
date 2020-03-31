@@ -99,7 +99,7 @@ impl Db {
 }
 
 fn sleeper(attempts: i32) -> bool {
-    log::warn!("SQLITE_BUSY, retrying after 250ms (attempt {})", attempts);
-    std::thread::sleep(std::time::Duration::from_millis(250));
+    log::warn!("SQLITE_BUSY, retrying after 50ms (attempt {})", attempts);
+    std::thread::sleep(std::time::Duration::from_millis(50));
     true
 }
