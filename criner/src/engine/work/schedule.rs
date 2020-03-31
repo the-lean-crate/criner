@@ -48,68 +48,67 @@ pub async fn tasks(
     )?;
 
     let kind = "crate";
-    Ok(
-        match submit_single(
-            startup_time,
-            io_task,
-            &mut progress,
-            perform_io,
-            1,
-            1,
-            || {
-                let dummy_task = iobound::default_persisted_download_task();
-                let mut task_key = String::new();
-                dummy_task.fq_key(&krate.name, &krate.version, &mut task_key);
+    let submit_result = submit_single(
+        startup_time,
+        io_task,
+        &mut progress,
+        perform_io,
+        1,
+        1,
+        || {
+            let dummy_task = iobound::default_persisted_download_task();
+            let mut task_key = String::new();
+            dummy_task.fq_key(&krate.name, &krate.version, &mut task_key);
 
-                iobound::DownloadRequest {
-                    output_file_path: download_file_path(
-                        &assets_dir,
-                        &krate.name,
-                        &krate.version,
-                        &dummy_task.process,
-                        &dummy_task.version,
-                        kind,
-                    ),
-                    progress_name: format!("{}:{}", krate.name, krate.version),
-                    task_key,
-                    crate_name_and_version: Some((krate.name.clone(), krate.version.clone())),
+            iobound::DownloadRequest {
+                output_file_path: download_file_path(
+                    &assets_dir,
+                    &krate.name,
+                    &krate.version,
+                    &dummy_task.process,
+                    &dummy_task.version,
                     kind,
-                    url: format!(
-                        "https://crates.io/api/v1/crates/{name}/{version}/download",
-                        name = krate.name,
-                        version = krate.version
-                    ),
-                }
-            },
-        )
-        .await
-        {
-            PermanentFailure | Submitted => AsyncResult::Done,
-            Done(download_crate_task) => {
-                let cpu_task = task_or_default(
-                    tasks,
-                    &mut key_buf,
-                    krate,
-                    cpubound::default_persisted_extraction_task,
-                )?;
-                submit_single(
-                    startup_time,
-                    cpu_task,
-                    &mut progress,
-                    perform_cpu,
-                    2,
-                    2,
-                    || cpubound::ExtractRequest {
-                        download_task: download_crate_task,
-                        crate_name: krate.name.clone(),
-                        crate_version: krate.version.clone(),
-                    },
-                )
-                .await;
-                AsyncResult::Done
+                ),
+                progress_name: format!("{}:{}", krate.name, krate.version),
+                task_key,
+                crate_name_and_version: Some((krate.name.clone(), krate.version.clone())),
+                kind,
+                url: format!(
+                    "https://crates.io/api/v1/crates/{name}/{version}/download",
+                    name = krate.name,
+                    version = krate.version
+                ),
             }
         },
     )
+    .await;
+
+    Ok(match submit_result {
+        PermanentFailure | Submitted => AsyncResult::Done,
+        Done(download_crate_task) => {
+            let cpu_task = task_or_default(
+                tasks,
+                &mut key_buf,
+                krate,
+                cpubound::default_persisted_extraction_task,
+            )?;
+            submit_single(
+                startup_time,
+                cpu_task,
+                &mut progress,
+                perform_cpu,
+                2,
+                2,
+                || cpubound::ExtractRequest {
+                    download_task: download_crate_task,
+                    crate_name: krate.name.clone(),
+                    crate_version: krate.version.clone(),
+                },
+            )
+            .await;
+            AsyncResult::Done
+        }
+    })
 }
 
 fn task_or_default(
