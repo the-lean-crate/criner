@@ -84,9 +84,9 @@ dependencies = [
 
 [[package]]
 name = "async-trait"
-version = "0.1.27"
+version = "0.1.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "991d0a1a3e790c835fd54ab41742a59251338d8c7577fe7d7f0170c7072be708"
+checksum = "bab5c215748dc1ad11a145359b1067107ae0f8ca5e99844fa64067ed5bf198e3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -406,9 +406,9 @@ dependencies = [
 
 [[package]]
 name = "dashmap"
-version = "3.9.0"
+version = "3.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b58d1fe94e8ca0be6d9d1fd0e1cc55ee5c037e4b9bf6a50768ef3f056e28c4c"
+checksum = "beb09e993960365a51676afc743a5c928806386358f36bcb34c5f301b03da348"
 dependencies = [
  "ahash",
  "cfg-if",
@@ -474,9 +474,9 @@ checksum = "7360491ce676a36bf9bb3c56c1aa791658183a54d2744120f27285738d90465a"
 
 [[package]]
 name = "filetime"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ff6d4dab0aa0c8e6346d46052e93b13a16cf847b54ed357087c35011048cc7d"
+checksum = "f59efc38004c988e4201d11d263b8171f49a2e7ec0bdbb71773433f271504a5e"
 dependencies = [
  "cfg-if",
  "libc",
@@ -660,9 +660,9 @@ dependencies = [
 
 [[package]]
 name = "git2"
-version = "0.13.0"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7da16ceafe24cedd9ba02c4463a2b506b6493baf4317c79c5acb553134a3c15"
+checksum = "ef222034f2069cfc5af01ce423574d3d9a3925bd4052912a14e5bcfd7ca9e47a"
 dependencies = [
  "bitflags",
  "libc",
@@ -925,9 +925,9 @@ dependencies = [
 
 [[package]]
 name = "libgit2-sys"
-version = "0.12.0+0.99.0"
+version = "0.12.2+1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05dff41ac39e7b653f5f1550886cf00ba52f8e7f57210b633cdeedb3de5b236c"
+checksum = "a12c878ccc1a49ff71e264233a66d2114cdcc7fdc44c0ebe2b54075240831238"
 dependencies = [
  "cc",
  "libc",
@@ -1281,9 +1281,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro-hack"
-version = "0.5.14"
+version = "0.5.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fcfdefadc3d57ca21cf17990a28ef4c0f7c61383a28cb7604cf4a18e6ede1420"
+checksum = "0d659fe7c6d27f25e9d80a1a094c223f5246f6a6596453e09d7229bf42750b63"
 
 [[package]]
 name = "proc-macro-nested"
@@ -1302,9 +1302,9 @@ dependencies = [
 
 [[package]]
 name = "prodash"
-version = "3.3.0"
+version = "3.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae7ad0e814b0b310031b3de0eac2daa5b6ff40f5a6d7011683265b1033f4cda5"
+checksum = "ecdd0e8460b6d423d195044df6e0253b515bbec47e5b2973535d93df67023892"
 dependencies = [
  "dashmap",
  "futures",
@@ -1902,9 +1902,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "0.2.13"
+version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0fa5e81d6bc4e67fe889d5783bd2a128ab2e0cfa487e0be16b6a8d177b101616"
+checksum = "2751672f9da075d045c67fdb0068be9850ab7b231fa77bb51d6fd35da9c0bb0d"
 dependencies = [
  "bytes",
  "fnv",
