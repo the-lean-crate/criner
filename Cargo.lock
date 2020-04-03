@@ -1302,9 +1302,9 @@ dependencies = [
 
 [[package]]
 name = "prodash"
-version = "3.4.0"
+version = "3.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ecdd0e8460b6d423d195044df6e0253b515bbec47e5b2973535d93df67023892"
+checksum = "2042f328cc465cc3c9bb1bbd07dae77b49bbb37035724d850bdad7f4f0721d0f"
 dependencies = [
  "dashmap",
  "futures",
