@@ -1,4 +1,9 @@
-use crate::{engine::work, persistence::Db, Result};
+use crate::{
+    persistence::TableAccess,
+    engine::work,
+    persistence::Db,
+    Result
+};
 use futures::{task::Spawn, FutureExt};
 use std::path::PathBuf;
 
@@ -49,20 +54,27 @@ pub async fn trigger(
         crate::persistence::KEY_SEP_CHAR,
         today_yyyy_mm_dd
     );
-    // TODO: avoid double-scheduling in case DL takes more than 24h…
-    let db_file_path = assets_dir
-        .join("crates-io-db")
-        .join(format!("{}-crates-io-db-dump.tar.gz", today_yyyy_mm_dd));
-    tx_io
-        .send(work::iobound::DownloadRequest {
-            output_file_path: db_file_path,
-            progress_name: "db dump".to_string(),
-            task_key,
-            crate_name_and_version: None,
-            kind: "tar.gz",
-            url: "https://static.crates.io/db-dump.tar.gz".to_string(),
-        })
-        .await;
+
+    let tasks = db.open_tasks()?;
+    if tasks
+        .get(&task_key)?
+        .map(|t| t.state.can_be_started())
+        .unwrap_or(true)
+    {
+        let db_file_path = assets_dir
+            .join("crates-io-db")
+            .join(format!("{}-crates-io-db-dump.tar.gz", today_yyyy_mm_dd));
+        tx_io
+            .send(work::iobound::DownloadRequest {
+                output_file_path: db_file_path,
+                progress_name: "db dump".to_string(),
+                task_key,
+                crate_name_and_version: None,
+                kind: "tar.gz",
+                url: "https://static.crates.io/db-dump.tar.gz".to_string(),
+            })
+            .await;
+    }
 
     Ok(())
 }

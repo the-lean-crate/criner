@@ -149,6 +149,20 @@ pub enum TaskState {
 }
 
 impl TaskState {
+    pub fn is_complete(&self) -> bool {
+        if let TaskState::Complete = self {
+            true
+        } else {
+            false
+        }
+    }
+    // NOTE: Racy if task should be spawned based on the outcome, only for tasks with no contention!
+    pub fn can_be_started(&self) -> bool {
+        match self {
+            TaskState::NotStarted | TaskState::AttemptsWithFailure(_) => true,
+            _ => false,
+        }
+    }
     pub fn merge_with(&mut self, other: &TaskState) {
         fn merge_vec(mut existing: Vec<String>, new: &Vec<String>) -> Vec<String> {
             existing.extend(new.iter().cloned());
