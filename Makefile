@@ -6,7 +6,7 @@ help:  ## Display this help
 
 EXECUTABLE = target/debug/criner
 RELEASE_EXECUTABLE = target/release/criner
-RUST_SRC_FILES = $(shell find src criner/src -name "*.rs")
+RUST_SRC_FILES = $(shell find src criner/src -name "*.rs") Cargo.lock
 bare_index_path = index-bare
 
 DB = criner.db
