@@ -69,6 +69,7 @@ pub async fn non_blocking(
                     progress.add_child("fetching crates-io db"),
                     tokio.clone(),
                     pool.clone(),
+                    startup_time,
                 )
             }
         },

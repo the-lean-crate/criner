@@ -1,9 +1,4 @@
-use crate::{
-    persistence::TableAccess,
-    engine::work,
-    persistence::Db,
-    Result
-};
+use crate::{engine::work, persistence::Db, persistence::TableAccess, Result};
 use futures::{task::Spawn, FutureExt};
 use std::path::PathBuf;
 
@@ -13,6 +8,7 @@ pub async fn trigger(
     mut progress: prodash::tree::Item,
     tokio: tokio::runtime::Handle,
     _pool: impl Spawn + Clone + Send + 'static + Sync,
+    startup_time: std::time::SystemTime,
 ) -> Result<()> {
     let (tx_cpu, _rx_cpu) = async_std::sync::channel(1);
     let tx_io = {
@@ -58,7 +54,7 @@ pub async fn trigger(
     let tasks = db.open_tasks()?;
     if tasks
         .get(&task_key)?
-        .map(|t| t.state.can_be_started())
+        .map(|t| t.can_be_started(startup_time))
         .unwrap_or(true)
     {
         let db_file_path = assets_dir

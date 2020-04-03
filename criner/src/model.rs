@@ -156,13 +156,6 @@ impl TaskState {
             false
         }
     }
-    // NOTE: Racy if task should be spawned based on the outcome, only for tasks with no contention!
-    pub fn can_be_started(&self) -> bool {
-        match self {
-            TaskState::NotStarted | TaskState::AttemptsWithFailure(_) => true,
-            _ => false,
-        }
-    }
     pub fn merge_with(&mut self, other: &TaskState) {
         fn merge_vec(mut existing: Vec<String>, new: &Vec<String>) -> Vec<String> {
             existing.extend(new.iter().cloned());
@@ -211,6 +204,17 @@ impl Default for Task {
             process: Default::default(),
             version: Default::default(),
             state: Default::default(),
+        }
+    }
+}
+
+impl Task {
+    // NOTE: Racy if task should be spawned based on the outcome, only for tasks with no contention!
+    pub fn can_be_started(&self, startup_time: std::time::SystemTime) -> bool {
+        match self.state {
+            TaskState::NotStarted | TaskState::AttemptsWithFailure(_) => true,
+            TaskState::InProgress(_) => startup_time > self.stored_at,
+            _ => false,
         }
     }
 }
