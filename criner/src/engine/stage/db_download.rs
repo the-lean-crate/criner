@@ -1,12 +1,57 @@
 use crate::{engine::work, persistence::Db, persistence::TableAccess, Result};
+use bytesize::ByteSize;
 use futures::FutureExt;
+use std::collections::BTreeMap;
+use std::fs::File;
+use std::io::{BufReader, Read};
 use std::path::PathBuf;
 
 async fn extract_and_ingest(
     _db: Db,
-    _progress: prodash::tree::Item,
-    _db_file_path: PathBuf,
+    mut progress: prodash::tree::Item,
+    db_file_path: PathBuf,
 ) -> crate::Result<()> {
+    progress.init(None, Some("csv files"));
+    let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new(File::open(
+        db_file_path,
+    )?))?);
+    let whitelist_names = [
+        "crate_owners",
+        "versions",
+        "version_authors",
+        "users",
+        "crates",
+    ];
+
+    let mut csv_map = BTreeMap::new();
+    let mut num_files_seen = 0;
+    let mut num_bytes_seen = 0;
+    for (eid, entry) in archive.entries()?.enumerate() {
+        num_files_seen = eid + 1;
+        progress.set(eid as u32);
+        let mut entry = entry?;
+        let entry_size = entry.header().size()?;
+        num_bytes_seen += entry_size;
+        if let Some(name) = entry.path().ok().and_then(|p| {
+            whitelist_names
+                .iter()
+                .find(|n| p.ends_with(format!("{}.csv", n)))
+        }) {
+            let mut buf = Vec::with_capacity(entry_size as usize);
+            entry.read_to_end(&mut buf)?;
+            csv_map.insert(name, buf);
+            progress.done(format!(
+                "extracted '{}' with size {} into memory",
+                entry.path()?.display(),
+                ByteSize(entry_size)
+            ))
+        }
+    }
+    progress.done(format!(
+        "Saw {} files and a total of {}",
+        num_files_seen,
+        ByteSize(num_bytes_seen)
+    ));
     Ok(())
 }
 
@@ -69,9 +114,16 @@ pub async fn trigger(
             .await;
 
         if let Some(db_file_path) = rx_result.recv().await {
-            extract_and_ingest(db, progress.add_child("ingest"), db_file_path).await?;
+            extract_and_ingest(db, progress.add_child("ingest"), db_file_path)
+                .await
+                .map_err(|err| {
+                    progress.fail(format!("ingestion failed: {}", err));
+                    err
+                })?;
         }
     }
+
+    // TODO: cleanup old db dumps
 
     Ok(())
 }
