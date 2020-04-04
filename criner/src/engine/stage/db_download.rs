@@ -1,12 +1,82 @@
 use crate::{engine::work, persistence::Db, persistence::TableAccess, Result};
 use bytesize::ByteSize;
 use futures::FutureExt;
-use std::collections::BTreeMap;
-use std::fs::File;
-use std::io::{BufReader, Read};
-use std::path::PathBuf;
+use std::{
+    collections::BTreeMap,
+    fs::File,
+    io::{BufReader, Read},
+    path::PathBuf,
+};
 
-async fn extract_and_ingest(
+mod model {
+    use std::time::SystemTime;
+
+    type UserId = u32;
+
+    pub struct Keyword<'a> {
+        name: &'a str,
+        // amount of crates using the keyword
+        crates_count: u32,
+    }
+
+    pub struct Category<'a> {
+        name: &'a str,
+        crates_count: u32,
+        description: &'a str,
+        path: &'a str,
+        slug: &'a str,
+    }
+
+    pub struct Crate<'a> {
+        name: &'a str,
+        created_at: SystemTime,
+        updated_at: SystemTime,
+        description: Option<&'a str>,
+        documentation: Option<&'a str>,
+        downloads: u64,
+        homepage: Option<&'a str>,
+        readme: Option<&'a str>,
+        repository: Option<&'a str>,
+        created_by: UserId,
+        keywords: Vec<Keyword<'a>>,
+        categories: Vec<Category<'a>>,
+        owner: UserId,
+    }
+
+    pub enum UserKind {
+        Individual,
+        Team,
+    }
+
+    pub struct User<'a> {
+        github_avatar_url: &'a str,
+        github_id: u32,
+        github_login: &'a str,
+        crates_io_id: UserId,
+        name: Option<&'a str>,
+        kind: UserKind,
+    }
+
+    pub struct Feature {
+        name: String,
+        dependencies: Vec<String>,
+    }
+
+    pub struct Version<'a> {
+        crate_size: Option<u32>,
+        created_at: SystemTime,
+        updated_at: SystemTime,
+        downloads: u32,
+        features: Vec<Feature>,
+        license: &'a str,
+        // corresponds to 'num' in original data set
+        semver: &'a str,
+        published_by: Option<UserId>,
+        is_yanked: bool,
+    }
+}
+
+fn extract_and_ingest(
     _db: Db,
     mut progress: prodash::tree::Item,
     db_file_path: PathBuf,
@@ -16,11 +86,16 @@ async fn extract_and_ingest(
         db_file_path,
     )?))?);
     let whitelist_names = [
+        "crates",
         "crate_owners",
         "versions",
         "version_authors",
+        "crates_categories",
+        "categories",
+        "crates_keywords",
+        "keywords",
         "users",
-        "crates",
+        "teams",
     ];
 
     let mut csv_map = BTreeMap::new();
@@ -114,12 +189,10 @@ pub async fn trigger(
             .await;
 
         if let Some(db_file_path) = rx_result.recv().await {
-            extract_and_ingest(db, progress.add_child("ingest"), db_file_path)
-                .await
-                .map_err(|err| {
-                    progress.fail(format!("ingestion failed: {}", err));
-                    err
-                })?;
+            extract_and_ingest(db, progress.add_child("ingest"), db_file_path).map_err(|err| {
+                progress.fail(format!("ingestion failed: {}", err));
+                err
+            })?;
         }
     }
 
