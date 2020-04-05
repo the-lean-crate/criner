@@ -9,9 +9,11 @@ use std::{
 };
 
 mod model {
+    use serde_derive::Deserialize;
     use std::time::SystemTime;
 
     type UserId = u32;
+    type Id = u32;
 
     pub struct Keyword<'a> {
         name: &'a str,
@@ -19,13 +21,16 @@ mod model {
         crates_count: u32,
     }
 
-    pub struct Category<'a> {
-        id: u32,
-        name: &'a str,
-        crates_count: u32,
-        description: &'a str,
-        path: &'a str,
-        slug: &'a str,
+    #[derive(Deserialize)]
+    pub struct Category {
+        pub id: Id,
+        #[serde(rename = "category")]
+        pub name: String,
+        #[serde(rename = "crates_cnt")]
+        pub crates_count: u32,
+        pub description: String,
+        pub path: String,
+        pub slug: String,
     }
 
     pub struct Crate<'a> {
@@ -40,7 +45,7 @@ mod model {
         repository: Option<&'a str>,
         created_by: UserId,
         keywords: Vec<Keyword<'a>>,
-        categories: Vec<Category<'a>>,
+        categories: Vec<Category>,
         owner: UserId,
     }
 
@@ -79,17 +84,22 @@ mod model {
 }
 
 mod from_csv {
-    pub fn records<'csv, T>(csv: &'csv [u8], cb: impl FnMut(T)) -> crate::Result<()>
+    pub fn records<T>(
+        csv: &[u8],
+        progress: &mut prodash::tree::Item,
+        mut cb: impl FnMut(T),
+    ) -> crate::Result<()>
     where
-        T: serde::Deserialize<'csv>,
+        T: serde::de::DeserializeOwned,
     {
         let mut rd = csv::ReaderBuilder::new()
             .delimiter(b',')
             .has_headers(true)
             .flexible(true)
             .from_reader(csv);
-        for item in rd.deserialize() {
+        for (idx, item) in rd.deserialize().enumerate() {
             cb(item?);
+            progress.set((idx + 1) as u32);
         }
         Ok(())
     }
@@ -146,6 +156,17 @@ fn extract_and_ingest(
         num_files_seen,
         ByteSize(num_bytes_seen)
     ));
+
+    let mut decode = progress.add_child("decoding");
+    decode.init(None, Some("category"));
+    let mut categories = BTreeMap::new();
+    from_csv::records(
+        &csv_map[&"categories"],
+        &mut decode,
+        |v: model::Category| {
+            categories.insert(v.id, v);
+        },
+    )?;
     Ok(())
 }
 
