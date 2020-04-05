@@ -1,12 +1,7 @@
 use crate::{engine::work, persistence::Db, persistence::TableAccess, Result};
 use bytesize::ByteSize;
 use futures::FutureExt;
-use std::{
-    collections::BTreeMap,
-    fs::File,
-    io::{BufReader, Read},
-    path::PathBuf,
-};
+use std::{collections::BTreeMap, fs::File, io::BufReader, path::PathBuf};
 
 mod model {
     use serde_derive::Deserialize;
@@ -172,7 +167,7 @@ mod from_csv {
     impl_as_id!(Crate);
 
     pub fn records<T>(
-        csv: &[u8],
+        csv: impl std::io::Read,
         progress: &mut prodash::tree::Item,
         mut cb: impl FnMut(T),
     ) -> crate::Result<()>
@@ -192,7 +187,7 @@ mod from_csv {
     }
 
     pub fn mapping<T>(
-        csv_map: &mut BTreeMap<&&str, Vec<u8>>,
+        rd: impl std::io::Read,
         name: &'static str,
         progress: &mut prodash::tree::Item,
     ) -> crate::Result<BTreeMap<model::Id, T>>
@@ -202,10 +197,9 @@ mod from_csv {
         let mut decode = progress.add_child("decoding");
         decode.init(None, Some(name));
         let mut map = BTreeMap::new();
-        records(&csv_map[&name], &mut decode, |v: T| {
+        records(rd, &mut decode, |v: T| {
             map.insert(v.as_id(), v);
         })?;
-        csv_map.remove(&name);
         Ok(map)
     }
 }
@@ -232,14 +226,21 @@ fn extract_and_ingest(
         "teams",
     ];
 
-    let mut csv_map = BTreeMap::new();
     let mut num_files_seen = 0;
     let mut num_bytes_seen = 0;
+    let (mut teams, mut categories, mut versions, mut keywords, mut users, mut crates) = (
+        None::<BTreeMap<model::Id, model::Team>>,
+        None::<BTreeMap<model::Id, model::Category>>,
+        None::<BTreeMap<model::Id, model::Version>>,
+        None::<BTreeMap<model::Id, model::Keyword>>,
+        None::<BTreeMap<model::Id, model::User>>,
+        None::<BTreeMap<model::Id, model::Crate>>,
+    );
     for (eid, entry) in archive.entries()?.enumerate() {
         num_files_seen = eid + 1;
         progress.set(eid as u32);
 
-        let mut entry = entry?;
+        let entry = entry?;
         let entry_size = entry.header().size()?;
         num_bytes_seen += entry_size;
 
@@ -248,15 +249,34 @@ fn extract_and_ingest(
                 .iter()
                 .find(|n| p.ends_with(format!("{}.csv", n)))
         }) {
-            let mut buf = Vec::with_capacity(entry_size as usize);
-            entry.read_to_end(&mut buf)?;
-            csv_map.insert(name, buf);
-
-            progress.done(format!(
+            let done_msg = format!(
                 "extracted '{}' with size {} into memory",
                 entry.path()?.display(),
                 ByteSize(entry_size)
-            ))
+            );
+            match *name {
+                "teams" => teams = Some(from_csv::mapping(entry, name, &mut progress)?),
+                "categories" => {
+                    categories = Some(from_csv::mapping(entry, "categories", &mut progress)?);
+                }
+                "versions" => {
+                    versions = Some(from_csv::mapping(entry, "versions", &mut progress)?);
+                }
+                "keywords" => {
+                    keywords = Some(from_csv::mapping(entry, "keywords", &mut progress)?);
+                }
+                "users" => {
+                    users = Some(from_csv::mapping(entry, "users", &mut progress)?);
+                }
+                "crates" => {
+                    crates = Some(from_csv::mapping(entry, "crates", &mut progress)?);
+                }
+                _ => progress.fail(format!(
+                    "bug or oversight: Could not parse table of type {:?}",
+                    name
+                )),
+            }
+            progress.done(done_msg);
         }
     }
     progress.done(format!(
@@ -265,13 +285,6 @@ fn extract_and_ingest(
         ByteSize(num_bytes_seen)
     ));
 
-    let categories =
-        from_csv::mapping::<model::Category>(&mut csv_map, "categories", &mut progress)?;
-    let versions = from_csv::mapping::<model::Version>(&mut csv_map, "versions", &mut progress)?;
-    let keywords = from_csv::mapping::<model::Keyword>(&mut csv_map, "keywords", &mut progress)?;
-    let users = from_csv::mapping::<model::User>(&mut csv_map, "users", &mut progress)?;
-    let teams = from_csv::mapping::<model::Team>(&mut csv_map, "teams", &mut progress)?;
-    let crates = from_csv::mapping::<model::Crate>(&mut csv_map, "crates", &mut progress)?;
     Ok(())
 }
 
