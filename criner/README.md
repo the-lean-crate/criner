@@ -19,6 +19,8 @@
 * [ ] Graceful shutdown on Ctrl+C
   * The current implementation relies on the database to handle aborted writes, and is no problem for that reason. However, it would be nice to have
     A well-behaving program.
+* [ ] Parse CSV files separately and index rows and fields - from there build everything on the fly without having to allocate and copy strings.
+   * probably warrants a different crate, and will really only be done if the 500MB budget isn't sufficient, that is things don't run on the Pie III
     
 
 ## Lessons learned

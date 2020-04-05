@@ -15,10 +15,14 @@ mod model {
     type UserId = u32;
     pub type Id = u32;
 
-    pub struct Keyword<'a> {
-        name: &'a str,
+    #[derive(Deserialize)]
+    pub struct Keyword {
+        pub id: Id,
+        #[serde(rename = "keyword")]
+        pub name: String,
         // amount of crates using the keyword
-        crates_count: u32,
+        #[serde(rename = "crates_cnt")]
+        pub crates_count: u32,
     }
 
     #[derive(Deserialize)]
@@ -44,7 +48,7 @@ mod model {
         readme: Option<&'a str>,
         repository: Option<&'a str>,
         created_by: UserId,
-        keywords: Vec<Keyword<'a>>,
+        keywords: Vec<Keyword>,
         categories: Vec<Category>,
         owner: UserId,
     }
@@ -127,16 +131,19 @@ mod from_csv {
         fn as_id(&self) -> model::Id;
     }
 
-    impl AsId for model::Category {
-        fn as_id(&self) -> model::Id {
-            self.id
-        }
+    macro_rules! impl_as_id {
+        ($name:ident) => {
+            impl AsId for model::$name {
+                fn as_id(&self) -> model::Id {
+                    self.id
+                }
+            }
+        };
     }
-    impl AsId for model::Version {
-        fn as_id(&self) -> model::Id {
-            self.id
-        }
-    }
+
+    impl_as_id!(Keyword);
+    impl_as_id!(Version);
+    impl_as_id!(Category);
 
     pub fn records<T>(
         csv: &[u8],
@@ -235,6 +242,7 @@ fn extract_and_ingest(
     let categories =
         from_csv::mapping::<model::Category>(&mut csv_map, "categories", &mut progress)?;
     let versions = from_csv::mapping::<model::Version>(&mut csv_map, "versions", &mut progress)?;
+    let keywords = from_csv::mapping::<model::Keyword>(&mut csv_map, "keywords", &mut progress)?;
     Ok(())
 }
 
