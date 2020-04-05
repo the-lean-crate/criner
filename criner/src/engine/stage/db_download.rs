@@ -39,20 +39,20 @@ mod model {
         pub slug: String,
     }
 
-    pub struct Crate<'a> {
-        name: &'a str,
-        created_at: SystemTime,
-        updated_at: SystemTime,
-        description: Option<&'a str>,
-        documentation: Option<&'a str>,
-        downloads: u64,
-        homepage: Option<&'a str>,
-        readme: Option<&'a str>,
-        repository: Option<&'a str>,
-        created_by: UserId,
-        keywords: Vec<Keyword>,
-        categories: Vec<Category>,
-        owner: UserId,
+    #[derive(Deserialize)]
+    pub struct Crate {
+        pub id: Id,
+        pub name: String,
+        #[serde(deserialize_with = "deserialize_timestamp")]
+        pub created_at: SystemTime,
+        #[serde(deserialize_with = "deserialize_timestamp")]
+        pub updated_at: SystemTime,
+        pub description: Option<String>,
+        pub documentation: Option<String>,
+        pub downloads: u64,
+        pub homepage: Option<String>,
+        pub readme: Option<String>,
+        pub repository: Option<String>,
     }
 
     pub enum UserKind {
@@ -169,6 +169,7 @@ mod from_csv {
     impl_as_id!(Category);
     impl_as_id!(User);
     impl_as_id!(Team);
+    impl_as_id!(Crate);
 
     pub fn records<T>(
         csv: &[u8],
@@ -270,6 +271,7 @@ fn extract_and_ingest(
     let keywords = from_csv::mapping::<model::Keyword>(&mut csv_map, "keywords", &mut progress)?;
     let users = from_csv::mapping::<model::User>(&mut csv_map, "users", &mut progress)?;
     let teams = from_csv::mapping::<model::Team>(&mut csv_map, "teams", &mut progress)?;
+    let crates = from_csv::mapping::<model::Crate>(&mut csv_map, "crates", &mut progress)?;
     Ok(())
 }
 
@@ -330,7 +332,7 @@ pub async fn trigger(
                 url: "https://static.crates.io/db-dump.tar.gz".to_string(),
             })
             .await;
-
+        drop(tx_io);
         if let Some(db_file_path) = rx_result.recv().await {
             extract_and_ingest(db, progress.add_child("ingest"), db_file_path).map_err(|err| {
                 progress.fail(format!("ingestion failed: {}", err));
