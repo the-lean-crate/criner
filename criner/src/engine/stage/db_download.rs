@@ -156,7 +156,7 @@ mod model {
     #[derive(Deserialize)]
     pub struct CrateOwner {
         pub crate_id: Id,
-        pub created_by: UserId,
+        pub created_by: Option<UserId>,
         pub owner_id: UserId,
         #[serde(deserialize_with = "deserialize_owner_kind")]
         pub owner_kind: UserKind,
