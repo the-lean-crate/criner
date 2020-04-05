@@ -200,6 +200,7 @@ mod from_csv {
         records(rd, &mut decode, |v: T| {
             map.insert(v.as_id(), v);
         })?;
+        decode.info(format!("Decoded {} {} into memory", map.len(), name));
         Ok(map)
     }
 }
@@ -250,7 +251,7 @@ fn extract_and_ingest(
                 .find(|n| p.ends_with(format!("{}.csv", n)))
         }) {
             let done_msg = format!(
-                "extracted '{}' with size {} into memory",
+                "extracted '{}' with size {}",
                 entry.path()?.display(),
                 ByteSize(entry_size)
             );
