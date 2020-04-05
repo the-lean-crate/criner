@@ -63,23 +63,59 @@ mod model {
         kind: UserKind,
     }
 
+    #[derive(Deserialize)]
     pub struct Feature {
         name: String,
         dependencies: Vec<String>,
     }
 
-    pub struct Version<'a> {
-        crate_size: Option<u32>,
-        created_at: SystemTime,
-        updated_at: SystemTime,
-        downloads: u32,
-        features: Vec<Feature>,
-        license: &'a str,
-        crate_name: &'a str,
-        // corresponds to 'num' in original data set
-        semver: &'a str,
-        published_by: Option<UserId>,
-        is_yanked: bool,
+    fn deserialize_json<'de, D>(deserializer: D) -> Result<Vec<Feature>, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        use serde::Deserialize;
+        Vec::deserialize(deserializer)
+    }
+
+    fn deserialize_yanked<'de, D>(deserializer: D) -> Result<bool, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        use serde::Deserialize;
+        let val = std::borrow::Cow::<'de, str>::deserialize(deserializer)?;
+        Ok(val == "t")
+    }
+
+    fn deserialize_timestamp<'de, D>(deserializer: D) -> Result<SystemTime, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        use serde::Deserialize;
+        let val = std::borrow::Cow::<'de, str>::deserialize(deserializer)?;
+        // 2017-11-30 04:00:19.334919
+        let t: time::PrimitiveDateTime =
+            time::parse(val, "%F %T").map_err(serde::de::Error::custom)?;
+        Ok(t.into())
+    }
+
+    #[derive(Deserialize)]
+    pub struct Version {
+        pub id: Id,
+        pub crate_id: Id,
+        pub crate_size: Option<u32>,
+        #[serde(deserialize_with = "deserialize_timestamp")]
+        pub created_at: SystemTime,
+        #[serde(deserialize_with = "deserialize_timestamp")]
+        pub updated_at: SystemTime,
+        pub downloads: u32,
+        #[serde(deserialize_with = "deserialize_json")]
+        pub features: Vec<Feature>,
+        pub license: String,
+        #[serde(rename = "num")]
+        pub semver: String,
+        pub published_by: Option<UserId>,
+        #[serde(deserialize_with = "deserialize_yanked")]
+        pub is_yanked: bool,
     }
 }
 
@@ -92,6 +128,11 @@ mod from_csv {
     }
 
     impl AsId for model::Category {
+        fn as_id(&self) -> model::Id {
+            self.id
+        }
+    }
+    impl AsId for model::Version {
         fn as_id(&self) -> model::Id {
             self.id
         }
@@ -193,6 +234,7 @@ fn extract_and_ingest(
 
     let categories =
         from_csv::mapping::<model::Category>(&mut csv_map, "categories", &mut progress)?;
+    let versions = from_csv::mapping::<model::Version>(&mut csv_map, "versions", &mut progress)?;
     Ok(())
 }
 
