@@ -116,7 +116,7 @@ mod model {
         #[serde(rename = "num")]
         pub semver: String,
         pub published_by: Option<UserId>,
-        #[serde(deserialize_with = "deserialize_yanked")]
+        #[serde(deserialize_with = "deserialize_yanked", rename = "yanked")]
         pub is_yanked: bool,
     }
 }
