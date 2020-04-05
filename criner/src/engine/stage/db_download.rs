@@ -15,6 +15,7 @@ mod model {
 
     type UserId = u32;
     pub type Id = u32;
+    pub type GitHubId = i32;
 
     #[derive(Deserialize)]
     pub struct Keyword {
@@ -65,7 +66,7 @@ mod model {
         #[serde(rename = "gh_avatar")]
         pub github_avatar_url: String,
         #[serde(rename = "gh_id")]
-        pub github_id: u32,
+        pub github_id: GitHubId,
         #[serde(rename = "gh_login")]
         pub github_login: String,
         pub name: Option<String>,
@@ -77,7 +78,7 @@ mod model {
         #[serde(rename = "avatar")]
         pub github_avatar_url: String,
         #[serde(rename = "github_id")]
-        pub github_id: u32,
+        pub github_id: GitHubId,
         #[serde(rename = "login")]
         pub github_login: String,
         pub name: Option<String>,
