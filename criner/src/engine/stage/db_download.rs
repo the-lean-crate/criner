@@ -20,6 +20,7 @@ mod model {
     }
 
     pub struct Category<'a> {
+        id: u32,
         name: &'a str,
         crates_count: u32,
         description: &'a str,
@@ -69,10 +70,28 @@ mod model {
         downloads: u32,
         features: Vec<Feature>,
         license: &'a str,
+        crate_name: &'a str,
         // corresponds to 'num' in original data set
         semver: &'a str,
         published_by: Option<UserId>,
         is_yanked: bool,
+    }
+}
+
+mod from_csv {
+    pub fn records<'csv, T>(csv: &'csv [u8], cb: impl FnMut(T)) -> crate::Result<()>
+    where
+        T: serde::Deserialize<'csv>,
+    {
+        let mut rd = csv::ReaderBuilder::new()
+            .delimiter(b',')
+            .has_headers(true)
+            .flexible(true)
+            .from_reader(csv);
+        for item in rd.deserialize() {
+            cb(item?);
+        }
+        Ok(())
     }
 }
 

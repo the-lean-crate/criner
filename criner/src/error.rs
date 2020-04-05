@@ -89,5 +89,9 @@ quick_error! {
             from()
             cause(err)
         }
+        Csv(err: csv::Error) {
+            from()
+            cause(err)
+        }
     }
 }
