@@ -79,6 +79,19 @@ mod model {
         pub name: Option<String>,
     }
 
+    fn deserialize_owner_kind<'de, D>(deserializer: D) -> Result<UserKind, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        use serde::Deserialize;
+        let val = u8::deserialize(deserializer)?;
+        Ok(if val == 0 {
+            UserKind::Individual
+        } else {
+            UserKind::Team
+        })
+    }
+
     fn deserialize_json_map<'de, D>(deserializer: D) -> Result<Vec<Feature>, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -138,6 +151,33 @@ mod model {
         pub published_by: Option<UserId>,
         #[serde(deserialize_with = "deserialize_yanked", rename = "yanked")]
         pub is_yanked: bool,
+    }
+
+    #[derive(Deserialize)]
+    pub struct CrateOwner {
+        pub crate_id: Id,
+        pub created_by: UserId,
+        pub owner_id: UserId,
+        #[serde(deserialize_with = "deserialize_owner_kind")]
+        pub owner_kind: UserKind,
+    }
+
+    #[derive(Deserialize)]
+    pub struct VersionAuthor {
+        pub name: String,
+        pub version_id: Id,
+    }
+
+    #[derive(Deserialize)]
+    pub struct CratesCategory {
+        pub category_id: Id,
+        pub crate_id: Id,
+    }
+
+    #[derive(Deserialize)]
+    pub struct CratesKeyword {
+        pub keyword_id: Id,
+        pub crate_id: Id,
     }
 }
 
@@ -203,6 +243,25 @@ mod from_csv {
         decode.info(format!("Decoded {} {} into memory", map.len(), name));
         Ok(map)
     }
+
+    pub fn vec<T>(
+        rd: impl std::io::Read,
+        name: &'static str,
+        progress: &mut prodash::tree::Item,
+    ) -> crate::Result<Vec<T>>
+    where
+        T: serde::de::DeserializeOwned,
+    {
+        let mut decode = progress.add_child("decoding");
+        decode.init(None, Some(name));
+        let mut vec = Vec::new();
+        records(rd, &mut decode, |v: T| {
+            vec.push(v);
+        })?;
+        vec.shrink_to_fit();
+        decode.info(format!("Decoded {} {} into memory", vec.len(), name));
+        Ok(vec)
+    }
 }
 
 fn extract_and_ingest(
@@ -229,13 +288,28 @@ fn extract_and_ingest(
 
     let mut num_files_seen = 0;
     let mut num_bytes_seen = 0;
-    let (mut teams, mut categories, mut versions, mut keywords, mut users, mut crates) = (
+    let (
+        mut teams,
+        mut categories,
+        mut versions,
+        mut keywords,
+        mut users,
+        mut crates,
+        mut crate_owners,
+        mut version_authors,
+        mut crates_categories,
+        mut crates_keywords,
+    ) = (
         None::<BTreeMap<model::Id, model::Team>>,
         None::<BTreeMap<model::Id, model::Category>>,
         None::<BTreeMap<model::Id, model::Version>>,
         None::<BTreeMap<model::Id, model::Keyword>>,
         None::<BTreeMap<model::Id, model::User>>,
         None::<BTreeMap<model::Id, model::Crate>>,
+        None::<Vec<model::CrateOwner>>,
+        None::<Vec<model::VersionAuthor>>,
+        None::<Vec<model::CratesCategory>>,
+        None::<Vec<model::CratesKeyword>>,
     );
     for (eid, entry) in archive.entries()?.enumerate() {
         num_files_seen = eid + 1;
@@ -271,6 +345,19 @@ fn extract_and_ingest(
                 }
                 "crates" => {
                     crates = Some(from_csv::mapping(entry, "crates", &mut progress)?);
+                }
+                "crate_owners" => {
+                    crate_owners = Some(from_csv::vec(entry, "crate_owners", &mut progress)?);
+                }
+                "version_authors" => {
+                    version_authors = Some(from_csv::vec(entry, "version_authors", &mut progress)?);
+                }
+                "crates_categories" => {
+                    crates_categories =
+                        Some(from_csv::vec(entry, "crates_categories", &mut progress)?);
+                }
+                "crates_keywords" => {
+                    crates_keywords = Some(from_csv::vec(entry, "crates_keywords", &mut progress)?);
                 }
                 _ => progress.fail(format!(
                     "bug or oversight: Could not parse table of type {:?}",
