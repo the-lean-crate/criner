@@ -118,7 +118,7 @@ mod from_csv {
     }
 
     pub fn mapping<T>(
-        csv_map: &BTreeMap<&&str, Vec<u8>>,
+        csv_map: &mut BTreeMap<&&str, Vec<u8>>,
         name: &'static str,
         progress: &mut prodash::tree::Item,
     ) -> crate::Result<BTreeMap<model::Id, T>>
@@ -131,6 +131,7 @@ mod from_csv {
         records(&csv_map[&name], &mut decode, |v: T| {
             map.insert(v.as_id(), v);
         })?;
+        csv_map.remove(&name);
         Ok(map)
     }
 }
@@ -163,9 +164,11 @@ fn extract_and_ingest(
     for (eid, entry) in archive.entries()?.enumerate() {
         num_files_seen = eid + 1;
         progress.set(eid as u32);
+
         let mut entry = entry?;
         let entry_size = entry.header().size()?;
         num_bytes_seen += entry_size;
+
         if let Some(name) = entry.path().ok().and_then(|p| {
             whitelist_names
                 .iter()
@@ -174,6 +177,7 @@ fn extract_and_ingest(
             let mut buf = Vec::with_capacity(entry_size as usize);
             entry.read_to_end(&mut buf)?;
             csv_map.insert(name, buf);
+
             progress.done(format!(
                 "extracted '{}' with size {} into memory",
                 entry.path()?.display(),
@@ -187,7 +191,8 @@ fn extract_and_ingest(
         ByteSize(num_bytes_seen)
     ));
 
-    let categories = from_csv::mapping::<model::Category>(&csv_map, "categories", &mut progress)?;
+    let categories =
+        from_csv::mapping::<model::Category>(&mut csv_map, "categories", &mut progress)?;
     Ok(())
 }
 
