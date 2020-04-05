@@ -10,6 +10,7 @@ use std::{
 
 mod model {
     use serde_derive::Deserialize;
+    use std::collections::BTreeMap;
     use std::time::SystemTime;
 
     type UserId = u32;
@@ -67,18 +68,15 @@ mod model {
         kind: UserKind,
     }
 
-    #[derive(Deserialize)]
-    pub struct Feature {
-        name: String,
-        dependencies: Vec<String>,
-    }
-
-    fn deserialize_json<'de, D>(deserializer: D) -> Result<Vec<Feature>, D::Error>
+    fn deserialize_json_map<'de, D>(
+        deserializer: D,
+    ) -> Result<BTreeMap<String, Vec<String>>, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
         use serde::Deserialize;
-        Vec::deserialize(deserializer)
+        let val = std::borrow::Cow::<'de, str>::deserialize(deserializer)?;
+        serde_json::from_str(&val).map_err(serde::de::Error::custom)
     }
 
     fn deserialize_yanked<'de, D>(deserializer: D) -> Result<bool, D::Error>
@@ -112,8 +110,8 @@ mod model {
         #[serde(deserialize_with = "deserialize_timestamp")]
         pub updated_at: SystemTime,
         pub downloads: u32,
-        #[serde(deserialize_with = "deserialize_json")]
-        pub features: Vec<Feature>,
+        #[serde(deserialize_with = "deserialize_json_map")]
+        pub features: BTreeMap<String, Vec<String>>,
         pub license: String,
         #[serde(rename = "num")]
         pub semver: String,
