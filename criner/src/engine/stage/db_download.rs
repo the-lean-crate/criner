@@ -68,15 +68,18 @@ mod model {
         kind: UserKind,
     }
 
-    fn deserialize_json_map<'de, D>(
-        deserializer: D,
-    ) -> Result<BTreeMap<String, Vec<String>>, D::Error>
+    fn deserialize_json_map<'de, D>(deserializer: D) -> Result<Vec<Feature>, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
         use serde::Deserialize;
         let val = std::borrow::Cow::<'de, str>::deserialize(deserializer)?;
-        serde_json::from_str(&val).map_err(serde::de::Error::custom)
+        let val: BTreeMap<String, Vec<String>> =
+            serde_json::from_str(&val).map_err(serde::de::Error::custom)?;
+        Ok(val
+            .into_iter()
+            .map(|(name, crates)| Feature { name, crates })
+            .collect())
     }
 
     fn deserialize_yanked<'de, D>(deserializer: D) -> Result<bool, D::Error>
@@ -100,6 +103,12 @@ mod model {
         Ok(t.into())
     }
 
+    pub struct Feature {
+        pub name: String,
+        /// The crates the feature depends on
+        pub crates: Vec<String>,
+    }
+
     #[derive(Deserialize)]
     pub struct Version {
         pub id: Id,
@@ -111,7 +120,7 @@ mod model {
         pub updated_at: SystemTime,
         pub downloads: u32,
         #[serde(deserialize_with = "deserialize_json_map")]
-        pub features: BTreeMap<String, Vec<String>>,
+        pub features: Vec<Feature>,
         pub license: String,
         #[serde(rename = "num")]
         pub semver: String,
