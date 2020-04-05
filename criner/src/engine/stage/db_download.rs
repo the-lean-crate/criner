@@ -13,7 +13,7 @@ mod model {
     use std::time::SystemTime;
 
     type UserId = u32;
-    type Id = u32;
+    pub type Id = u32;
 
     pub struct Keyword<'a> {
         name: &'a str,
@@ -84,6 +84,19 @@ mod model {
 }
 
 mod from_csv {
+    use super::model;
+    use std::collections::BTreeMap;
+
+    pub trait AsId {
+        fn as_id(&self) -> model::Id;
+    }
+
+    impl AsId for model::Category {
+        fn as_id(&self) -> model::Id {
+            self.id
+        }
+    }
+
     pub fn records<T>(
         csv: &[u8],
         progress: &mut prodash::tree::Item,
@@ -102,6 +115,23 @@ mod from_csv {
             progress.set((idx + 1) as u32);
         }
         Ok(())
+    }
+
+    pub fn mapping<T>(
+        csv_map: &BTreeMap<&&str, Vec<u8>>,
+        name: &'static str,
+        progress: &mut prodash::tree::Item,
+    ) -> crate::Result<BTreeMap<model::Id, T>>
+    where
+        T: serde::de::DeserializeOwned + AsId,
+    {
+        let mut decode = progress.add_child("decoding");
+        decode.init(None, Some(name));
+        let mut map = BTreeMap::new();
+        records(&csv_map[&name], &mut decode, |v: T| {
+            map.insert(v.as_id(), v);
+        })?;
+        Ok(map)
     }
 }
 
@@ -157,16 +187,7 @@ fn extract_and_ingest(
         ByteSize(num_bytes_seen)
     ));
 
-    let mut decode = progress.add_child("decoding");
-    decode.init(None, Some("category"));
-    let mut categories = BTreeMap::new();
-    from_csv::records(
-        &csv_map[&"categories"],
-        &mut decode,
-        |v: model::Category| {
-            categories.insert(v.id, v);
-        },
-    )?;
+    let categories = from_csv::mapping::<model::Category>(&csv_map, "categories", &mut progress)?;
     Ok(())
 }
 
