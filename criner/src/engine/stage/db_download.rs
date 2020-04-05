@@ -59,13 +59,28 @@ mod model {
         Team,
     }
 
-    pub struct User<'a> {
-        github_avatar_url: &'a str,
-        github_id: u32,
-        github_login: &'a str,
-        crates_io_id: UserId,
-        name: Option<&'a str>,
-        kind: UserKind,
+    #[derive(Deserialize)]
+    pub struct User {
+        pub id: Id,
+        #[serde(rename = "gh_avatar")]
+        pub github_avatar_url: String,
+        #[serde(rename = "gh_id")]
+        pub github_id: u32,
+        #[serde(rename = "gh_login")]
+        pub github_login: String,
+        pub name: Option<String>,
+    }
+
+    #[derive(Deserialize)]
+    pub struct Team {
+        pub id: Id,
+        #[serde(rename = "avatar")]
+        pub github_avatar_url: String,
+        #[serde(rename = "github_id")]
+        pub github_id: u32,
+        #[serde(rename = "login")]
+        pub github_login: String,
+        pub name: Option<String>,
     }
 
     fn deserialize_json_map<'de, D>(deserializer: D) -> Result<Vec<Feature>, D::Error>
@@ -151,6 +166,8 @@ mod from_csv {
     impl_as_id!(Keyword);
     impl_as_id!(Version);
     impl_as_id!(Category);
+    impl_as_id!(User);
+    impl_as_id!(Team);
 
     pub fn records<T>(
         csv: &[u8],
@@ -250,6 +267,8 @@ fn extract_and_ingest(
         from_csv::mapping::<model::Category>(&mut csv_map, "categories", &mut progress)?;
     let versions = from_csv::mapping::<model::Version>(&mut csv_map, "versions", &mut progress)?;
     let keywords = from_csv::mapping::<model::Keyword>(&mut csv_map, "keywords", &mut progress)?;
+    let users = from_csv::mapping::<model::User>(&mut csv_map, "users", &mut progress)?;
+    let teams = from_csv::mapping::<model::Team>(&mut csv_map, "teams", &mut progress)?;
     Ok(())
 }
 
