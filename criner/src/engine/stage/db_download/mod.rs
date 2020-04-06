@@ -148,42 +148,56 @@ mod convert {
     ) -> BTreeMap<db_dump::Id, Vec<db_dump::CrateVersion>> {
         progress.init(Some(versions.len() as u32), Some("versions converted"));
         versions.sort_by_key(|v| v.id);
-        let version_offset = 6usize;
-        assert_eq!(
-            versions[0].id, version_offset as u32,
-            "We expect a constant offset of 6 to speed up assigning authors to versions"
-        );
+        let versions_len = versions.len();
 
-        let mut vec = Vec::with_capacity(versions.len());
+        let mut version_by_id = BTreeMap::new();
         for (vid, version) in versions.into_iter().enumerate() {
             progress.set((vid + 1) as u32);
             let crate_id = version.crate_id;
             let published_by = version.published_by;
+            let version_id = version.id;
             let mut version: db_dump::CrateVersion = version.into();
             version.published_by = published_by
                 .and_then(|user_id| actors.get(&(user_id, db_dump::ActorKind::User)).cloned());
-            vec.push((crate_id, version));
+            version_by_id.insert(version_id, (crate_id, version));
         }
+        progress.done(format!(
+            "transformed {} crate versions and assigned publishing actor",
+            version_by_id.len()
+        ));
 
+        let version_authors_len = version_authors.len();
         progress.init(
-            Some(version_authors.len() as u32),
+            Some(version_authors_len as u32),
             Some("version authors assigned"),
         );
-        for csv_model::VersionAuthor { name, version_id } in version_authors.into_iter() {
-            let idx = version_id as usize - version_offset;
-            progress.set((idx + 1) as u32);
-            vec[idx].1.authors.push(name.into());
+        for (vid, csv_model::VersionAuthor { name, version_id }) in
+            version_authors.into_iter().enumerate()
+        {
+            progress.set((vid + 1) as u32);
+            version_by_id
+                .get_mut(&version_id)
+                .expect("to have a version for a given id")
+                .1
+                .authors
+                .push(name.into());
         }
+        progress.done(format!("Assigned {} version authors", version_authors_len));
 
         let mut map = BTreeMap::new();
         progress.init(
-            Some(vec.len() as u32),
+            Some(version_by_id.len() as u32),
             Some("version-crate associations made"),
         );
-        for (vid, (crate_id, version)) in vec.into_iter().enumerate() {
+        for (vid, (_, (crate_id, version))) in version_by_id.into_iter().enumerate() {
             progress.set((vid + 1) as u32);
             map.entry(crate_id).or_insert_with(Vec::new).push(version);
         }
+        progress.done(format!(
+            "Associated {} crate versions to {} crates",
+            versions_len,
+            map.len()
+        ));
 
         map
     }
