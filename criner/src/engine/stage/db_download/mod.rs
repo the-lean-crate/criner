@@ -9,6 +9,7 @@ mod from_csv;
 mod convert {
     use super::csv_model;
     use crate::model::db_dump;
+    use crate::utils::parse_semver;
     use std::collections::BTreeMap;
 
     lazy_static! {
@@ -111,6 +112,7 @@ mod convert {
             }: csv_model::Crate,
         ) -> Self {
             db_dump::Crate {
+                versions: Vec::new(),
                 name,
                 created_at,
                 updated_at,
@@ -231,16 +233,32 @@ mod convert {
         map
     }
 
-    pub fn into_crates(crates: Vec<csv_model::Crate>, mut progress: prodash::tree::Item) -> Vec<db_dump::Crate> {
+    pub fn into_crates(
+        crates: Vec<csv_model::Crate>,
+        mut versions_by_crate_id: BTreeMap<db_dump::Id, Vec<db_dump::CrateVersion>>,
+        mut progress: prodash::tree::Item,
+    ) -> Vec<db_dump::Crate> {
         let mut crate_by_id = BTreeMap::new();
         progress.init(Some(crates.len() as u32), Some("crates converted"));
         for (kid, krate) in crates.into_iter().enumerate() {
             progress.set((kid + 1) as u32);
             let crate_id = krate.id;
-            let krate: db_dump::Crate = krate.into();
+            let mut krate: db_dump::Crate = krate.into();
+            let mut versions: Vec<_> = std::mem::replace(
+                &mut versions_by_crate_id
+                    .get_mut(&crate_id)
+                    .expect("at least one version per crate"),
+                Vec::new(),
+            );
+            versions.sort_by_key(|v| parse_semver(&v.semver));
+            krate.versions = versions;
             crate_by_id.insert(crate_id, krate);
         }
-        progress.done(format!("converted {} krates", crate_by_id.len()));
+        drop(versions_by_crate_id);
+        progress.done(format!(
+            "converted {} crates and assigned crate versions",
+            crate_by_id.len()
+        ));
 
         crate_by_id.into_iter().map(|(_, v)| v).collect()
     }
@@ -382,7 +400,7 @@ fn extract_and_ingest(
 
     progress.set_name("transform crates");
     progress.set(3);
-    let crates = convert::into_crates(crates, progress.add_child("crates"));
+    let crates = convert::into_crates(crates, versions_by_crate_id, progress.add_child("crates"));
 
     Ok(())
 }

@@ -363,5 +363,7 @@ pub mod db_dump {
         pub homepage: Option<String>,
         pub readme: Option<String>,
         pub repository: Option<String>,
+        /// Versions, sorted by semantic version
+        pub versions: Vec<CrateVersion>,
     }
 }
