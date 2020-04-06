@@ -350,4 +350,18 @@ pub mod db_dump {
         /// If true, the version was yanked
         pub is_yanked: bool,
     }
+
+    /// Everything crates.io knows about a crate in one neat package
+    #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
+    pub struct Crate {
+        pub name: String,
+        pub created_at: SystemTime,
+        pub updated_at: SystemTime,
+        pub description: Option<String>,
+        pub documentation: Option<String>,
+        pub downloads: u64,
+        pub homepage: Option<String>,
+        pub readme: Option<String>,
+        pub repository: Option<String>,
+    }
 }

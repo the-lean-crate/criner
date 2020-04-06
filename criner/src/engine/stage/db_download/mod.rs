@@ -95,6 +95,35 @@ mod convert {
         }
     }
 
+    impl From<csv_model::Crate> for db_dump::Crate {
+        fn from(
+            csv_model::Crate {
+                id: _,
+                name,
+                created_at,
+                updated_at,
+                description,
+                documentation,
+                downloads,
+                homepage,
+                readme,
+                repository,
+            }: csv_model::Crate,
+        ) -> Self {
+            db_dump::Crate {
+                name,
+                created_at,
+                updated_at,
+                description,
+                documentation,
+                downloads,
+                homepage,
+                readme,
+                repository,
+            }
+        }
+    }
+
     impl From<String> for db_dump::Person {
         fn from(v: String) -> Self {
             PERSON
@@ -201,6 +230,20 @@ mod convert {
 
         map
     }
+
+    pub fn into_crates(crates: Vec<csv_model::Crate>, mut progress: prodash::tree::Item) -> Vec<db_dump::Crate> {
+        let mut crate_by_id = BTreeMap::new();
+        progress.init(Some(crates.len() as u32), Some("crates converted"));
+        for (kid, krate) in crates.into_iter().enumerate() {
+            progress.set((kid + 1) as u32);
+            let crate_id = krate.id;
+            let krate: db_dump::Crate = krate.into();
+            crate_by_id.insert(crate_id, krate);
+        }
+        progress.done(format!("converted {} krates", crate_by_id.len()));
+
+        crate_by_id.into_iter().map(|(_, v)| v).collect()
+    }
 }
 
 fn extract_and_ingest(
@@ -244,7 +287,7 @@ fn extract_and_ingest(
         None::<Vec<csv_model::Version>>,
         None::<BTreeMap<csv_model::Id, csv_model::Keyword>>,
         None::<BTreeMap<csv_model::Id, csv_model::User>>,
-        None::<BTreeMap<csv_model::Id, csv_model::Crate>>,
+        None::<Vec<csv_model::Crate>>,
         None::<Vec<csv_model::CrateOwner>>,
         None::<Vec<csv_model::VersionAuthor>>,
         None::<Vec<csv_model::CratesCategory>>,
@@ -283,7 +326,7 @@ fn extract_and_ingest(
                     users = Some(from_csv::mapping(entry, "users", &mut progress)?);
                 }
                 "crates" => {
-                    crates = Some(from_csv::mapping(entry, "crates", &mut progress)?);
+                    crates = Some(from_csv::vec(entry, "crates", &mut progress)?);
                 }
                 "crate_owners" => {
                     crate_owners = Some(from_csv::vec(entry, "crate_owners", &mut progress)?);
@@ -320,6 +363,8 @@ fn extract_and_ingest(
         versions.ok_or_else(|| crate::Error::Bug("expected versions.csv in crates-io db dump"))?;
     let version_authors = version_authors
         .ok_or_else(|| crate::Error::Bug("expected version_authors.csv in crates-io db dump"))?;
+    let crates =
+        crates.ok_or_else(|| crate::Error::Bug("expected crates.csv in crates-io db dump"))?;
 
     progress.init(Some(5), Some("conversion steps"));
     progress.set_name("transform actors");
@@ -334,6 +379,10 @@ fn extract_and_ingest(
         &actors_by_id,
         progress.add_child("versions"),
     );
+
+    progress.set_name("transform crates");
+    progress.set(3);
+    let crates = convert::into_crates(crates, progress.add_child("crates"));
 
     Ok(())
 }
