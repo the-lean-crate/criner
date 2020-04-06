@@ -113,6 +113,7 @@ mod convert {
         ) -> Self {
             db_dump::Crate {
                 versions: Vec::new(),
+                keywords: Vec::new(),
                 name,
                 created_at,
                 updated_at,
@@ -123,6 +124,18 @@ mod convert {
                 readme,
                 repository,
             }
+        }
+    }
+
+    impl From<csv_model::Keyword> for db_dump::Keyword {
+        fn from(
+            csv_model::Keyword {
+                id: _,
+                name,
+                crates_count,
+            }: csv_model::Keyword,
+        ) -> Self {
+            db_dump::Keyword { name, crates_count }
         }
     }
 
@@ -235,6 +248,8 @@ mod convert {
 
     pub fn into_crates(
         crates: Vec<csv_model::Crate>,
+        mut keywords_by_id: BTreeMap<csv_model::Id, csv_model::Keyword>,
+        crates_keywords: Vec<csv_model::CratesKeyword>,
         mut versions_by_crate_id: BTreeMap<db_dump::Id, Vec<db_dump::CrateVersion>>,
         mut progress: prodash::tree::Item,
     ) -> Vec<db_dump::Crate> {
@@ -259,6 +274,31 @@ mod convert {
             "converted {} crates and assigned crate versions",
             crate_by_id.len()
         ));
+
+        progress.init(Some(crates_keywords.len() as u32), Some("crates keywords"));
+        let crates_keywords_len = crates_keywords.len();
+        for (
+            idx,
+            csv_model::CratesKeyword {
+                keyword_id,
+                crate_id,
+            },
+        ) in crates_keywords.into_iter().enumerate()
+        {
+            progress.set((idx + 1) as u32);
+            crate_by_id
+                .get_mut(&crate_id)
+                .expect("matching crate for keyword")
+                .keywords
+                .push(
+                    std::mem::replace(
+                        keywords_by_id.get_mut(&keyword_id).expect("keyword for id"),
+                        csv_model::Keyword::default(),
+                    )
+                    .into(),
+                )
+        }
+        progress.done(format!("assigned {} keywords", crates_keywords_len));
 
         crate_by_id.into_iter().map(|(_, v)| v).collect()
     }
@@ -383,6 +423,10 @@ fn extract_and_ingest(
         .ok_or_else(|| crate::Error::Bug("expected version_authors.csv in crates-io db dump"))?;
     let crates =
         crates.ok_or_else(|| crate::Error::Bug("expected crates.csv in crates-io db dump"))?;
+    let keywords =
+        keywords.ok_or_else(|| crate::Error::Bug("expected keywords.csv in crates-io db dump"))?;
+    let crates_keywords = crates_keywords
+        .ok_or_else(|| crate::Error::Bug("expected crates_keywords.csv in crates-io db dump"))?;
 
     progress.init(Some(5), Some("conversion steps"));
     progress.set_name("transform actors");
@@ -400,7 +444,13 @@ fn extract_and_ingest(
 
     progress.set_name("transform crates");
     progress.set(3);
-    let crates = convert::into_crates(crates, versions_by_crate_id, progress.add_child("crates"));
+    let crates = convert::into_crates(
+        crates,
+        keywords,
+        crates_keywords,
+        versions_by_crate_id,
+        progress.add_child("crates"),
+    );
 
     Ok(())
 }

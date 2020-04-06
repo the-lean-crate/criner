@@ -351,6 +351,13 @@ pub mod db_dump {
         pub is_yanked: bool,
     }
 
+    #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
+    pub struct Keyword {
+        pub name: String,
+        /// The amount of crates using this keyword
+        pub crates_count: u32,
+    }
+
     /// Everything crates.io knows about a crate in one neat package
     #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
     pub struct Crate {
@@ -365,5 +372,6 @@ pub mod db_dump {
         pub repository: Option<String>,
         /// Versions, sorted by semantic version
         pub versions: Vec<CrateVersion>,
+        pub keywords: Vec<Keyword>,
     }
 }
