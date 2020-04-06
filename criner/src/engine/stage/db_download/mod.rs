@@ -12,7 +12,7 @@ mod convert {
     use std::collections::BTreeMap;
 
     lazy_static! {
-        static ref PERSON: regex::Regex = regex::Regex::new("(?P<name>.+?)(<(?P<email>.*)>)?")
+        static ref PERSON: regex::Regex = regex::Regex::new("(?P<name>[\\w ]+)(<(?P<email>.*)>)?")
             .expect("valid statically known regex");
     }
 
@@ -97,15 +97,17 @@ mod convert {
 
     impl From<String> for db_dump::Person {
         fn from(v: String) -> Self {
-            let cap = PERSON.captures(&v).expect("at least some match in 'name'");
-            db_dump::Person {
-                name: cap
-                    .name("name")
-                    .expect("name should always exist")
-                    .as_str()
-                    .to_owned(),
-                email: cap.name("email").map(|e| e.as_str().to_owned()),
-            }
+            PERSON
+                .captures(&v)
+                .map(|cap| db_dump::Person {
+                    name: cap
+                        .name("name")
+                        .expect("name should always exist")
+                        .as_str()
+                        .to_owned(),
+                    email: cap.name("email").map(|e| e.as_str().to_owned()),
+                })
+                .unwrap_or_default()
         }
     }
 

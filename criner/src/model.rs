@@ -320,7 +320,7 @@ pub mod db_dump {
         pub crates: Vec<String>,
     }
 
-    #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
+    #[derive(Clone, Default, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
     pub struct Person {
         pub name: String,
         pub email: Option<String>,
