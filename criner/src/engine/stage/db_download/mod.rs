@@ -115,6 +115,8 @@ mod convert {
                 versions: Vec::new(),
                 keywords: Vec::new(),
                 categories: Vec::new(),
+                owners: Vec::new(),
+                created_by: None,
                 name,
                 created_at,
                 updated_at,
@@ -174,6 +176,15 @@ mod convert {
                     email: cap.name("email").map(|e| e.as_str().to_owned()),
                 })
                 .unwrap_or_default()
+        }
+    }
+
+    impl From<csv_model::UserKind> for db_dump::ActorKind {
+        fn from(v: csv_model::UserKind) -> Self {
+            match v {
+                csv_model::UserKind::User => db_dump::ActorKind::User,
+                csv_model::UserKind::Team => db_dump::ActorKind::Team,
+            }
         }
     }
 
@@ -274,6 +285,8 @@ mod convert {
         crates_keywords: Vec<csv_model::CratesKeyword>,
         mut categories_by_id: BTreeMap<csv_model::Id, csv_model::Category>,
         crates_categories: Vec<csv_model::CratesCategory>,
+        actors_by_id: BTreeMap<(db_dump::Id, db_dump::ActorKind), db_dump::Actor>,
+        crate_owners: Vec<csv_model::CrateOwner>,
         mut versions_by_crate_id: BTreeMap<db_dump::Id, Vec<db_dump::CrateVersion>>,
         mut progress: prodash::tree::Item,
     ) -> Vec<db_dump::Crate> {
@@ -353,6 +366,36 @@ mod convert {
                 )
         }
         progress.done(format!("assigned {} categories", crates_categories_len));
+
+        let crate_owners_len = crate_owners.len();
+        progress.init(Some(crate_owners_len as u32), Some("crates owners"));
+        for (
+            idx,
+            csv_model::CrateOwner {
+                crate_id,
+                created_by,
+                owner_id,
+                owner_kind,
+            },
+        ) in crate_owners.into_iter().enumerate()
+        {
+            progress.set((idx + 1) as u32);
+            let owner = actors_by_id
+                .get(&(owner_id, owner_kind.into()))
+                .expect("owner to exist for owner-id & kind combination")
+                .to_owned();
+            let created_by = created_by
+                .and_then(|id| actors_by_id.get(&(id, db_dump::ActorKind::User)).cloned());
+            let krate = crate_by_id
+                .get_mut(&crate_id)
+                .expect("crate id to match crate for owner assignment");
+            if krate.created_by.is_none() {
+                krate.created_by = created_by;
+            }
+            krate.owners.push(owner);
+        }
+
+        progress.done(format!("assigned {} owners", crate_owners_len));
 
         crate_by_id.into_iter().map(|(_, v)| v).collect()
     }
@@ -485,6 +528,8 @@ fn extract_and_ingest(
         .ok_or_else(|| crate::Error::Bug("expected categories.csv in crates-io db dump"))?;
     let crates_categories = crates_categories
         .ok_or_else(|| crate::Error::Bug("expected crates_categories.csv in crates-io db dump"))?;
+    let crate_owners = crate_owners
+        .ok_or_else(|| crate::Error::Bug("expected crate_owners.csv in crates-io db dump"))?;
 
     progress.init(Some(5), Some("conversion steps"));
     progress.set_name("transform actors");
@@ -508,6 +553,8 @@ fn extract_and_ingest(
         crates_keywords,
         categories,
         crates_categories,
+        actors_by_id,
+        crate_owners,
         versions_by_crate_id,
         progress.add_child("crates"),
     );

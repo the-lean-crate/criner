@@ -384,5 +384,7 @@ pub mod db_dump {
         pub versions: Vec<CrateVersion>,
         pub keywords: Vec<Keyword>,
         pub categories: Vec<Category>,
+        pub created_by: Option<Actor>,
+        pub owners: Vec<Actor>,
     }
 }
