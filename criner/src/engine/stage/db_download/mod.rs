@@ -8,9 +8,10 @@ mod from_csv;
 
 mod convert {
     use super::csv_model;
+    use crate::model::db_dump;
     use std::collections::BTreeMap;
 
-    impl From<csv_model::User> for crate::model::Actor {
+    impl From<csv_model::User> for db_dump::Actor {
         fn from(
             csv_model::User {
                 id,
@@ -20,9 +21,9 @@ mod convert {
                 name,
             }: csv_model::User,
         ) -> Self {
-            crate::model::Actor {
+            db_dump::Actor {
                 crates_io_id: id,
-                kind: crate::model::ActorKind::User,
+                kind: db_dump::ActorKind::User,
                 github_avatar_url,
                 github_id,
                 github_login,
@@ -31,7 +32,7 @@ mod convert {
         }
     }
 
-    impl From<csv_model::Team> for crate::model::Actor {
+    impl From<csv_model::Team> for db_dump::Actor {
         fn from(
             csv_model::Team {
                 id,
@@ -41,9 +42,9 @@ mod convert {
                 name,
             }: csv_model::Team,
         ) -> Self {
-            crate::model::Actor {
+            db_dump::Actor {
                 crates_io_id: id,
-                kind: crate::model::ActorKind::Team,
+                kind: db_dump::ActorKind::Team,
                 github_avatar_url,
                 github_id,
                 github_login,
@@ -56,7 +57,7 @@ mod convert {
         users: BTreeMap<csv_model::Id, csv_model::User>,
         teams: BTreeMap<csv_model::Id, csv_model::Team>,
         mut progress: prodash::tree::Item,
-    ) -> BTreeMap<(crate::model::Id, crate::model::ActorKind), crate::model::Actor> {
+    ) -> BTreeMap<(db_dump::Id, db_dump::ActorKind), db_dump::Actor> {
         progress.init(
             Some((users.len() + teams.len()) as u32),
             Some("users and teams"),
@@ -67,18 +68,25 @@ mod convert {
         for (id, actor) in users.into_iter() {
             count += 1;
             progress.set(count);
-            let actor: crate::model::Actor = actor.into();
+            let actor: db_dump::Actor = actor.into();
             actors.insert((id, actor.kind), actor);
         }
 
         for (id, actor) in teams.into_iter() {
             count += 1;
             progress.set(count);
-            let actor: crate::model::Actor = actor.into();
+            let actor: db_dump::Actor = actor.into();
             actors.insert((id, actor.kind), actor);
         }
 
         actors
+    }
+
+    pub fn into_versions_by_crate_id(
+        versions: BTreeMap<csv_model::Id, csv_model::Version>,
+        progress: prodash::tree::Item,
+    ) -> BTreeMap<db_dump::Id, db_dump::CrateVersion> {
+        unimplemented!()
     }
 }
 
@@ -195,11 +203,18 @@ fn extract_and_ingest(
         users.ok_or_else(|| crate::Error::Bug("expected users.csv in crates-io db dump"))?;
     let teams =
         teams.ok_or_else(|| crate::Error::Bug("expected teams.csv in crates-io db dump"))?;
+    let versions =
+        versions.ok_or_else(|| crate::Error::Bug("expected versions.csv in crates-io db dump"))?;
 
     progress.init(Some(5), Some("conversion steps"));
     progress.set_name("transform actors");
     progress.set(1);
     let actors_by_id = convert::into_actors_by_id(users, teams, progress.add_child("actors"));
+
+    progress.set_name("transform versions");
+    progress.set(2);
+    let versions_by_crate_id =
+        convert::into_versions_by_crate_id(versions, progress.add_child("versions"));
 
     Ok(())
 }

@@ -282,28 +282,65 @@ impl From<crates_index_diff::CrateVersion> for CrateVersion {
     }
 }
 
-pub type Id = u32;
-pub type GitHubId = i32;
+pub mod db_dump {
+    use serde_derive::{Deserialize, Serialize};
+    use std::time::SystemTime;
 
-/// Identifies a kind of actor
-#[derive(Clone, Copy, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
-pub enum ActorKind {
-    User,
-    Team,
-}
+    pub type Id = u32;
+    pub type UserId = Id;
+    pub type GitHubId = i32;
 
-#[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
-pub struct Actor {
-    /// The id used by crates.io
-    pub crates_io_id: Id,
-    /// Whether actor is a user or a team
-    pub kind: ActorKind,
-    /// The URL to the GitHub avatar
-    pub github_avatar_url: String,
-    /// The ID identifying a user on GitHub
-    pub github_id: GitHubId,
-    /// The GitHUb login name
-    pub github_login: String,
-    /// The users given name
-    pub name: Option<String>,
+    /// Identifies a kind of actor
+    #[derive(Clone, Copy, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
+    pub enum ActorKind {
+        User,
+        Team,
+    }
+
+    #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
+    pub struct Actor {
+        /// The id used by crates.io
+        pub crates_io_id: Id,
+        /// Whether actor is a user or a team
+        pub kind: ActorKind,
+        /// The URL to the GitHub avatar
+        pub github_avatar_url: String,
+        /// The ID identifying a user on GitHub
+        pub github_id: GitHubId,
+        /// The GitHUb login name
+        pub github_login: String,
+        /// The users given name
+        pub name: Option<String>,
+    }
+
+    #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
+    pub struct Feature {
+        /// The name of the feature
+        pub name: String,
+        /// The crates the feature depends on
+        pub crates: Vec<String>,
+    }
+
+    /// A crate version from the crates-io db dump, containing additional meta data
+    #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
+    pub struct CrateVersion {
+        /// The size of the crate in bytes, compressed
+        pub crate_size: Option<u32>,
+        /// The time when the first crate version was published
+        pub created_at: SystemTime,
+        /// The time at which the most recent create version was published
+        pub updated_at: SystemTime,
+        /// The amount of downloads of all create version in all time
+        pub downloads: u32,
+        /// Features specified in Cargo.toml
+        pub features: Vec<Feature>,
+        /// The license type
+        pub license: String,
+        /// The semantic version associated with this version
+        pub semver: String,
+        /// The actor that published the version
+        pub published_by: Option<Actor>,
+        /// If true, the version was yanked
+        pub is_yanked: bool,
+    }
 }
