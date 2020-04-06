@@ -57,7 +57,7 @@ pub fn new_key_value_insertion<'conn>(
     connection: &'conn rusqlite::Connection,
 ) -> Result<rusqlite::Statement<'conn>> {
     Ok(connection.prepare(&format!(
-        "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
+        "REPLACE INTO '{}' (key, data) VALUES (?1, ?2)",
         table_name
     ))?)
 }

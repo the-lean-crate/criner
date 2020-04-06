@@ -1,14 +1,35 @@
 use crate::model::db_dump;
-use crate::{engine::work, persistence::Db, persistence::TableAccess, Error, Result};
+use crate::{
+    engine::work, persistence::new_key_value_insertion, persistence::Db, persistence::TableAccess,
+    Error, Result,
+};
 use bytesize::ByteSize;
 use futures::FutureExt;
+use rusqlite::params;
+use rusqlite::TransactionBehavior;
 use std::{collections::BTreeMap, fs::File, io::BufReader, path::PathBuf};
 
 mod convert;
 mod csv_model;
 mod from_csv;
 
-fn store(db: Db, crates: Vec<db_dump::Crate>) -> Result<()> {
+fn store(db: Db, crates: Vec<db_dump::Crate>, mut progress: prodash::tree::Item) -> Result<()> {
+    let now = std::time::SystemTime::now();
+    let crates_len = crates.len();
+    progress.init(Some(crates_len as u32), Some("crates stored"));
+    let mut connection = db.open_connection_no_async_with_busy_wait()?;
+    let transaction = connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    {
+        let mut insert = new_key_value_insertion("crates.io-crate", &transaction)?;
+        for (idx, mut krate) in crates.into_iter().enumerate() {
+            progress.set((idx + 1) as u32);
+            krate.stored_at = now;
+            let data = rmp_serde::to_vec(&krate)?;
+            insert.execute(params![krate.name, data])?;
+        }
+    }
+    transaction.commit()?;
+    progress.done(format!("Stored {} crates in database", crates_len));
     Ok(())
 }
 
@@ -167,7 +188,7 @@ fn extract_and_ingest(
         progress.add_child("crates"),
     );
 
-    store(db, crates)
+    store(db, crates, progress.add_child("persist"))
 }
 
 pub async fn trigger(

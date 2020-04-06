@@ -372,6 +372,8 @@ pub mod db_dump {
     #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
     pub struct Crate {
         pub name: String,
+        /// The time at which this record was updated, i.e. how recent it is.
+        pub stored_at: SystemTime,
         pub created_at: SystemTime,
         pub updated_at: SystemTime,
         pub description: Option<String>,

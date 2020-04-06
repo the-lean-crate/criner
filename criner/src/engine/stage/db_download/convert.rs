@@ -2,6 +2,7 @@ use super::csv_model;
 use crate::model::db_dump;
 use crate::utils::parse_semver;
 use std::collections::BTreeMap;
+use std::time::SystemTime;
 
 lazy_static! {
     static ref PERSON: regex::Regex = regex::Regex::new("(?P<name>[\\w ]+)(<(?P<email>.*)>)?")
@@ -107,6 +108,7 @@ impl From<csv_model::Crate> for db_dump::Crate {
             keywords: Vec::new(),
             categories: Vec::new(),
             owners: Vec::new(),
+            stored_at: SystemTime::UNIX_EPOCH,
             created_by: None,
             name,
             created_at,

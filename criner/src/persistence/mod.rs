@@ -28,9 +28,9 @@ impl Db {
             ")?;
 
             let transaction = connection.transaction()?;
-            for name in &["meta", "crate_version", "crate", "task", "result"] {
+            for name in &["meta", "crate_version", "crate", "task", "result", "crates.io-crate"] {
                 transaction.execute_batch(&format!(
-                    "CREATE TABLE IF NOT EXISTS {} (
+                    "CREATE TABLE IF NOT EXISTS '{}' (
                           key             TEXT PRIMARY KEY NOT NULL,
                           data            BLOB NOT NULL
                     )",
