@@ -53,6 +53,42 @@ mod convert {
         }
     }
 
+    impl From<csv_model::Version> for db_dump::CrateVersion {
+        fn from(
+            csv_model::Version {
+                id: _,
+                crate_id: _,
+                crate_size,
+                created_at,
+                updated_at,
+                downloads,
+                features,
+                license,
+                semver,
+                published_by: _,
+                is_yanked,
+            }: csv_model::Version,
+        ) -> Self {
+            db_dump::CrateVersion {
+                crate_size,
+                created_at,
+                updated_at,
+                downloads,
+                features: features
+                    .into_iter()
+                    .map(|f| db_dump::Feature {
+                        name: f.name,
+                        crates: f.crates,
+                    })
+                    .collect(),
+                license,
+                semver,
+                published_by: None,
+                is_yanked,
+            }
+        }
+    }
+
     pub fn into_actors_by_id(
         users: BTreeMap<csv_model::Id, csv_model::User>,
         teams: BTreeMap<csv_model::Id, csv_model::Team>,
@@ -62,31 +98,44 @@ mod convert {
             Some((users.len() + teams.len()) as u32),
             Some("users and teams"),
         );
-        let mut actors = BTreeMap::new();
+        let mut map = BTreeMap::new();
 
         let mut count = 0;
         for (id, actor) in users.into_iter() {
             count += 1;
             progress.set(count);
             let actor: db_dump::Actor = actor.into();
-            actors.insert((id, actor.kind), actor);
+            map.insert((id, actor.kind), actor);
         }
 
         for (id, actor) in teams.into_iter() {
             count += 1;
             progress.set(count);
             let actor: db_dump::Actor = actor.into();
-            actors.insert((id, actor.kind), actor);
+            map.insert((id, actor.kind), actor);
         }
 
-        actors
+        map
     }
 
     pub fn into_versions_by_crate_id(
-        versions: BTreeMap<csv_model::Id, csv_model::Version>,
-        progress: prodash::tree::Item,
+        versions: Vec<csv_model::Version>,
+        actors: &BTreeMap<(db_dump::Id, db_dump::ActorKind), db_dump::Actor>,
+        mut progress: prodash::tree::Item,
     ) -> BTreeMap<db_dump::Id, db_dump::CrateVersion> {
-        unimplemented!()
+        let mut map = BTreeMap::new();
+        progress.init(Some(versions.len() as u32), Some("versions"));
+        for (vid, version) in versions.into_iter().enumerate() {
+            progress.set((vid + 1) as u32);
+            let crate_id = version.crate_id;
+            let published_by = version.published_by;
+            let mut version: db_dump::CrateVersion = version.into();
+            version.published_by = published_by
+                .and_then(|user_id| actors.get(&(user_id, db_dump::ActorKind::User)).cloned());
+            map.insert(crate_id, version);
+        }
+
+        map
     }
 }
 
@@ -128,7 +177,7 @@ fn extract_and_ingest(
     ) = (
         None::<BTreeMap<csv_model::Id, csv_model::Team>>,
         None::<BTreeMap<csv_model::Id, csv_model::Category>>,
-        None::<BTreeMap<csv_model::Id, csv_model::Version>>,
+        None::<Vec<csv_model::Version>>,
         None::<BTreeMap<csv_model::Id, csv_model::Keyword>>,
         None::<BTreeMap<csv_model::Id, csv_model::User>>,
         None::<BTreeMap<csv_model::Id, csv_model::Crate>>,
@@ -161,7 +210,7 @@ fn extract_and_ingest(
                     categories = Some(from_csv::mapping(entry, "categories", &mut progress)?);
                 }
                 "versions" => {
-                    versions = Some(from_csv::mapping(entry, "versions", &mut progress)?);
+                    versions = Some(from_csv::vec(entry, "versions", &mut progress)?);
                 }
                 "keywords" => {
                     keywords = Some(from_csv::mapping(entry, "keywords", &mut progress)?);
@@ -214,7 +263,7 @@ fn extract_and_ingest(
     progress.set_name("transform versions");
     progress.set(2);
     let versions_by_crate_id =
-        convert::into_versions_by_crate_id(versions, progress.add_child("versions"));
+        convert::into_versions_by_crate_id(versions, &actors_by_id, progress.add_child("versions"));
 
     Ok(())
 }

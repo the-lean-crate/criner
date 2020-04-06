@@ -287,7 +287,6 @@ pub mod db_dump {
     use std::time::SystemTime;
 
     pub type Id = u32;
-    pub type UserId = Id;
     pub type GitHubId = i32;
 
     /// Identifies a kind of actor
