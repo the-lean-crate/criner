@@ -432,9 +432,9 @@ dependencies = [
 
 [[package]]
 name = "dashmap"
-version = "3.9.1"
+version = "3.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "beb09e993960365a51676afc743a5c928806386358f36bcb34c5f301b03da348"
+checksum = "0899c830f359a74834c84ed43b4c0cb6fd714a6fa64e20ab78c78f8cf86d8fc0"
 dependencies = [
  "ahash",
  "cfg-if",
@@ -1664,9 +1664,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.50"
+version = "1.0.51"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78a7a12c167809363ec3bd7329fc0a3369056996de43c4b37ef3cd54a6ce4867"
+checksum = "da07b57ee2623368351e9a0488bb0b261322a15a6e0ae53e243cbdc0f4208da9"
 dependencies = [
  "itoa",
  "ryu",

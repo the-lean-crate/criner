@@ -320,6 +320,12 @@ pub mod db_dump {
         pub crates: Vec<String>,
     }
 
+    #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
+    pub struct Person {
+        pub name: String,
+        pub email: Option<String>,
+    }
+
     /// A crate version from the crates-io db dump, containing additional meta data
     #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
     pub struct CrateVersion {
@@ -339,6 +345,8 @@ pub mod db_dump {
         pub semver: String,
         /// The actor that published the version
         pub published_by: Option<Actor>,
+        /// The authors of a particular versions
+        pub authors: Vec<Person>,
         /// If true, the version was yanked
         pub is_yanked: bool,
     }

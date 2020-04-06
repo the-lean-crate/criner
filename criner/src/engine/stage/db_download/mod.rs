@@ -11,6 +11,11 @@ mod convert {
     use crate::model::db_dump;
     use std::collections::BTreeMap;
 
+    lazy_static! {
+        static ref PERSON: regex::Regex = regex::Regex::new("(?P<name>.+?)(<(?P<email>.*)>)?")
+            .expect("valid statically known regex");
+    }
+
     impl From<csv_model::User> for db_dump::Actor {
         fn from(
             csv_model::User {
@@ -84,7 +89,22 @@ mod convert {
                 license,
                 semver,
                 published_by: None,
+                authors: Vec::new(),
                 is_yanked,
+            }
+        }
+    }
+
+    impl From<String> for db_dump::Person {
+        fn from(v: String) -> Self {
+            let cap = PERSON.captures(&v).expect("at least some match in 'name'");
+            db_dump::Person {
+                name: cap
+                    .name("name")
+                    .expect("name should always exist")
+                    .as_str()
+                    .to_owned(),
+                email: cap.name("email").map(|e| e.as_str().to_owned()),
             }
         }
     }
@@ -119,12 +139,20 @@ mod convert {
     }
 
     pub fn into_versions_by_crate_id(
-        versions: Vec<csv_model::Version>,
+        mut versions: Vec<csv_model::Version>,
+        version_authors: Vec<csv_model::VersionAuthor>,
         actors: &BTreeMap<(db_dump::Id, db_dump::ActorKind), db_dump::Actor>,
         mut progress: prodash::tree::Item,
-    ) -> BTreeMap<db_dump::Id, db_dump::CrateVersion> {
-        let mut map = BTreeMap::new();
-        progress.init(Some(versions.len() as u32), Some("versions"));
+    ) -> BTreeMap<db_dump::Id, Vec<db_dump::CrateVersion>> {
+        progress.init(Some(versions.len() as u32), Some("versions converted"));
+        versions.sort_by_key(|v| v.id);
+        let version_offset = 6usize;
+        assert_eq!(
+            versions[0].id, version_offset as u32,
+            "We expect a constant offset of 6 to speed up assigning authors to versions"
+        );
+
+        let mut vec = Vec::with_capacity(versions.len());
         for (vid, version) in versions.into_iter().enumerate() {
             progress.set((vid + 1) as u32);
             let crate_id = version.crate_id;
@@ -132,7 +160,27 @@ mod convert {
             let mut version: db_dump::CrateVersion = version.into();
             version.published_by = published_by
                 .and_then(|user_id| actors.get(&(user_id, db_dump::ActorKind::User)).cloned());
-            map.insert(crate_id, version);
+            vec.push((crate_id, version));
+        }
+
+        progress.init(
+            Some(version_authors.len() as u32),
+            Some("version authors assigned"),
+        );
+        for csv_model::VersionAuthor { name, version_id } in version_authors.into_iter() {
+            let idx = version_id as usize - version_offset;
+            progress.set((idx + 1) as u32);
+            vec[idx].1.authors.push(name.into());
+        }
+
+        let mut map = BTreeMap::new();
+        progress.init(
+            Some(vec.len() as u32),
+            Some("version-crate associations made"),
+        );
+        for (vid, (crate_id, version)) in vec.into_iter().enumerate() {
+            progress.set((vid + 1) as u32);
+            map.entry(crate_id).or_insert_with(Vec::new).push(version);
         }
 
         map
@@ -254,6 +302,8 @@ fn extract_and_ingest(
         teams.ok_or_else(|| crate::Error::Bug("expected teams.csv in crates-io db dump"))?;
     let versions =
         versions.ok_or_else(|| crate::Error::Bug("expected versions.csv in crates-io db dump"))?;
+    let version_authors = version_authors
+        .ok_or_else(|| crate::Error::Bug("expected version_authors.csv in crates-io db dump"))?;
 
     progress.init(Some(5), Some("conversion steps"));
     progress.set_name("transform actors");
@@ -262,8 +312,12 @@ fn extract_and_ingest(
 
     progress.set_name("transform versions");
     progress.set(2);
-    let versions_by_crate_id =
-        convert::into_versions_by_crate_id(versions, &actors_by_id, progress.add_child("versions"));
+    let versions_by_crate_id = convert::into_versions_by_crate_id(
+        versions,
+        version_authors,
+        &actors_by_id,
+        progress.add_child("versions"),
+    );
 
     Ok(())
 }
