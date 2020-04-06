@@ -3,13 +3,83 @@ use bytesize::ByteSize;
 use futures::FutureExt;
 use std::{collections::BTreeMap, fs::File, io::BufReader, path::PathBuf};
 
+mod csv_model;
 mod from_csv;
-mod model;
 
-mod to_db {
-    use super::model;
+mod convert {
+    use super::csv_model;
+    use std::collections::BTreeMap;
 
-    // pub fn users(users: model::User)
+    impl From<csv_model::User> for crate::model::Actor {
+        fn from(
+            csv_model::User {
+                id,
+                github_avatar_url,
+                github_id,
+                github_login,
+                name,
+            }: csv_model::User,
+        ) -> Self {
+            crate::model::Actor {
+                crates_io_id: id,
+                kind: crate::model::ActorKind::User,
+                github_avatar_url,
+                github_id,
+                github_login,
+                name,
+            }
+        }
+    }
+
+    impl From<csv_model::Team> for crate::model::Actor {
+        fn from(
+            csv_model::Team {
+                id,
+                github_avatar_url,
+                github_id,
+                github_login,
+                name,
+            }: csv_model::Team,
+        ) -> Self {
+            crate::model::Actor {
+                crates_io_id: id,
+                kind: crate::model::ActorKind::Team,
+                github_avatar_url,
+                github_id,
+                github_login,
+                name,
+            }
+        }
+    }
+
+    pub fn into_actors_by_id(
+        users: BTreeMap<csv_model::Id, csv_model::User>,
+        teams: BTreeMap<csv_model::Id, csv_model::Team>,
+        mut progress: prodash::tree::Item,
+    ) -> BTreeMap<(crate::model::Id, crate::model::ActorKind), crate::model::Actor> {
+        progress.init(
+            Some((users.len() + teams.len()) as u32),
+            Some("users and teams"),
+        );
+        let mut actors = BTreeMap::new();
+
+        let mut count = 0;
+        for (id, actor) in users.into_iter() {
+            count += 1;
+            progress.set(count);
+            let actor: crate::model::Actor = actor.into();
+            actors.insert((id, actor.kind), actor);
+        }
+
+        for (id, actor) in teams.into_iter() {
+            count += 1;
+            progress.set(count);
+            let actor: crate::model::Actor = actor.into();
+            actors.insert((id, actor.kind), actor);
+        }
+
+        actors
+    }
 }
 
 fn extract_and_ingest(
@@ -48,16 +118,16 @@ fn extract_and_ingest(
         mut crates_categories,
         mut crates_keywords,
     ) = (
-        None::<BTreeMap<model::Id, model::Team>>,
-        None::<BTreeMap<model::Id, model::Category>>,
-        None::<BTreeMap<model::Id, model::Version>>,
-        None::<BTreeMap<model::Id, model::Keyword>>,
-        None::<BTreeMap<model::Id, model::User>>,
-        None::<BTreeMap<model::Id, model::Crate>>,
-        None::<Vec<model::CrateOwner>>,
-        None::<Vec<model::VersionAuthor>>,
-        None::<Vec<model::CratesCategory>>,
-        None::<Vec<model::CratesKeyword>>,
+        None::<BTreeMap<csv_model::Id, csv_model::Team>>,
+        None::<BTreeMap<csv_model::Id, csv_model::Category>>,
+        None::<BTreeMap<csv_model::Id, csv_model::Version>>,
+        None::<BTreeMap<csv_model::Id, csv_model::Keyword>>,
+        None::<BTreeMap<csv_model::Id, csv_model::User>>,
+        None::<BTreeMap<csv_model::Id, csv_model::Crate>>,
+        None::<Vec<csv_model::CrateOwner>>,
+        None::<Vec<csv_model::VersionAuthor>>,
+        None::<Vec<csv_model::CratesCategory>>,
+        None::<Vec<csv_model::CratesKeyword>>,
     );
     for (eid, entry) in archive.entries()?.enumerate() {
         num_files_seen = eid + 1;
@@ -120,6 +190,16 @@ fn extract_and_ingest(
         num_files_seen,
         ByteSize(num_bytes_seen)
     ));
+
+    let users =
+        users.ok_or_else(|| crate::Error::Bug("expected users.csv in crates-io db dump"))?;
+    let teams =
+        teams.ok_or_else(|| crate::Error::Bug("expected teams.csv in crates-io db dump"))?;
+
+    progress.init(Some(5), Some("conversion steps"));
+    progress.set_name("transform actors");
+    progress.set(1);
+    let actors_by_id = convert::into_actors_by_id(users, teams, progress.add_child("actors"));
 
     Ok(())
 }

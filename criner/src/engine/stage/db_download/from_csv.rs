@@ -1,14 +1,14 @@
-use super::model;
+use super::csv_model;
 use std::collections::BTreeMap;
 
 pub trait AsId {
-    fn as_id(&self) -> model::Id;
+    fn as_id(&self) -> csv_model::Id;
 }
 
 macro_rules! impl_as_id {
     ($name:ident) => {
-        impl AsId for model::$name {
-            fn as_id(&self) -> model::Id {
+        impl AsId for csv_model::$name {
+            fn as_id(&self) -> csv_model::Id {
                 self.id
             }
         }
@@ -46,7 +46,7 @@ pub fn mapping<T>(
     rd: impl std::io::Read,
     name: &'static str,
     progress: &mut prodash::tree::Item,
-) -> crate::Result<BTreeMap<model::Id, T>>
+) -> crate::Result<BTreeMap<csv_model::Id, T>>
 where
     T: serde::de::DeserializeOwned + AsId,
 {

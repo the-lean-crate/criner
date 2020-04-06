@@ -45,7 +45,7 @@ pub struct Crate {
 }
 
 pub enum UserKind {
-    Individual,
+    User,
     Team,
 }
 
@@ -80,7 +80,7 @@ where
     use serde::Deserialize;
     let val = u8::deserialize(deserializer)?;
     Ok(if val == 0 {
-        UserKind::Individual
+        UserKind::User
     } else {
         UserKind::Team
     })

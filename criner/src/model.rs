@@ -281,3 +281,29 @@ impl From<crates_index_diff::CrateVersion> for CrateVersion {
         }
     }
 }
+
+pub type Id = u32;
+pub type GitHubId = i32;
+
+/// Identifies a kind of actor
+#[derive(Clone, Copy, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
+pub enum ActorKind {
+    User,
+    Team,
+}
+
+#[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
+pub struct Actor {
+    /// The id used by crates.io
+    pub crates_io_id: Id,
+    /// Whether actor is a user or a team
+    pub kind: ActorKind,
+    /// The URL to the GitHub avatar
+    pub github_avatar_url: String,
+    /// The ID identifying a user on GitHub
+    pub github_id: GitHubId,
+    /// The GitHUb login name
+    pub github_login: String,
+    /// The users given name
+    pub name: Option<String>,
+}

@@ -8,8 +8,6 @@
 * [ ] More reporting - right now the context gathering to see how much time is spent where is neglected.
 
 ## Possible Improvements
-* [ ] Even though it wasn't observed yet, I believe 'push' can hang forever while sending bytes, similar to how fetch can hang forever while receiving bytes.
-      This can be handled by implementing a timeout from within the git thread.
 * [ ] Suggest 'top-level' globs like `/README.md` if we know the matched file is on the top-level. Otherwise the pattern `README.md` will actually match `*/README.md`.
 * [ ] Count negation patterns in includes and excludes. The latter don't seem to be working, and if nobody is using them, Cargo can either make it work or
       reject them properly. Maybe. Maybe first create an issue for that and see what they think.
@@ -19,6 +17,9 @@
 * [ ] Graceful shutdown on Ctrl+C
   * The current implementation relies on the database to handle aborted writes, and is no problem for that reason. However, it would be nice to have
     A well-behaving program.
+* [ ] Git is slowing down report generation, as sending them to git and creating objects is slow. We could possibly multi-thread this by creating lose objects
+      ourselves and sending these into an aggregator which puts them into the index. This is only interesting during the very first report generation though, so
+      probably not worth it.
 * [ ] Parse CSV files separately and index rows and fields - from there build everything on the fly without having to allocate and copy strings.
    * probably warrants a different crate, and will really only be done if the 500MB budget isn't sufficient, that is things don't run on the Pie III
     
