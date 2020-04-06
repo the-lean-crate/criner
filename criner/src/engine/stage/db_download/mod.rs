@@ -160,7 +160,7 @@ fn extract_and_ingest(
     let crate_owners =
         crate_owners.ok_or_else(|| Error::Bug("expected crate_owners.csv in crates-io db dump"))?;
 
-    progress.init(Some(5), Some("conversion steps"));
+    progress.init(Some(4), Some("conversion steps"));
     progress.set_name("transform actors");
     progress.set(1);
     let actors_by_id = convert::into_actors_by_id(users, teams, progress.add_child("actors"));
@@ -188,6 +188,8 @@ fn extract_and_ingest(
         progress.add_child("crates"),
     );
 
+    progress.set_name("storing crates");
+    progress.set(4);
     store(db, crates, progress.add_child("persist"))
 }
 
