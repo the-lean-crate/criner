@@ -16,7 +16,7 @@ pub struct Keyword {
     pub crates_count: u32,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 pub struct Category {
     pub id: Id,
     #[serde(rename = "category")]

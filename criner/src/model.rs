@@ -358,6 +358,16 @@ pub mod db_dump {
         pub crates_count: u32,
     }
 
+    #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
+    pub struct Category {
+        pub name: String,
+        /// The amount of crates using this keyword
+        pub crates_count: u32,
+        pub description: String,
+        pub path: String,
+        pub slug: String,
+    }
+
     /// Everything crates.io knows about a crate in one neat package
     #[derive(Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
     pub struct Crate {
@@ -373,5 +383,6 @@ pub mod db_dump {
         /// Versions, sorted by semantic version
         pub versions: Vec<CrateVersion>,
         pub keywords: Vec<Keyword>,
+        pub categories: Vec<Category>,
     }
 }
