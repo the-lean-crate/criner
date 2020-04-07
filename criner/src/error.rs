@@ -93,5 +93,13 @@ quick_error! {
             from()
             cause(err)
         }
+        GlobPattern(err: glob::PatternError) {
+            from()
+            cause(err)
+        }
+        Glob(err: glob::GlobError) {
+            from()
+            cause(err)
+        }
     }
 }

@@ -193,7 +193,36 @@ fn extract_and_ingest(
     store(db, crates, progress.add_child("persist"))
 }
 
-pub async fn trigger(
+fn cleanup(db_file_path: PathBuf, mut progress: prodash::tree::Item) -> Result<()> {
+    let glob_pattern = db_file_path
+        .parent()
+        .expect("parent directory for db dump")
+        .join(format!("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*"))
+        .with_extension(db_file_path.extension().expect("file extension"));
+    let pattern = glob::Pattern::new(
+        &glob_pattern
+            .to_str()
+            .expect("db dump path is valid utf8 string"),
+    )?;
+    if !pattern.matches_path(&db_file_path) {
+        return Err(crate::Error::Message(format!(
+            "BUG: Pattern {} did not match the original database path '{}'",
+            pattern,
+            db_file_path.display()
+        )));
+    }
+
+    for file in glob::glob(pattern.as_str())? {
+        let file = file?;
+        if file != db_file_path {
+            std::fs::remove_file(&file)?;
+            progress.done(format!("Deleted old db-dump at '{}'", file.display()));
+        }
+    }
+    Ok(())
+}
+
+pub async fn schedule(
     db: Db,
     assets_dir: PathBuf,
     mut progress: prodash::tree::Item,
@@ -224,6 +253,7 @@ pub async fn trigger(
     };
 
     let today_yyyy_mm_dd = time::OffsetDateTime::now_local().format("%F");
+    let file_suffix = "db-dump.tar.gz";
     let task_key = format!(
         "{}{}{}",
         "crates-io-db-dump",
@@ -231,18 +261,18 @@ pub async fn trigger(
         today_yyyy_mm_dd
     );
 
+    let db_file_path = assets_dir
+        .join("crates-io-db")
+        .join(format!("{}-{}", today_yyyy_mm_dd, file_suffix));
     let tasks = db.open_tasks()?;
     if tasks
         .get(&task_key)?
         .map(|t| t.can_be_started(startup_time) || t.state.is_complete()) // always allow the extractor to run - must be idempotent
         .unwrap_or(true)
     {
-        let db_file_path = assets_dir
-            .join("crates-io-db")
-            .join(format!("{}-crates-io-db-dump.tar.gz", today_yyyy_mm_dd));
         tx_io
             .send(work::iobound::DownloadRequest {
-                output_file_path: db_file_path,
+                output_file_path: db_file_path.clone(),
                 progress_name: "db dump".to_string(),
                 task_key,
                 crate_name_and_version: None,
@@ -259,7 +289,6 @@ pub async fn trigger(
         }
     }
 
-    // TODO: cleanup old db dumps
-
+    cleanup(db_file_path, progress.add_child("removing old db-dumps"))?;
     Ok(())
 }

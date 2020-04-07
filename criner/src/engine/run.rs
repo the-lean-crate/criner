@@ -62,7 +62,7 @@ pub async fn non_blocking(
             let progress = progress.clone();
             let tokio = tokio.clone();
             move || {
-                stage::db_download::trigger(
+                stage::db_download::schedule(
                     db.clone(),
                     assets_dir.clone(),
                     progress.add_child("fetching crates-io db"),
