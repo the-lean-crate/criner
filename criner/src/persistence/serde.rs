@@ -1,4 +1,4 @@
-use crate::model::{Context, Crate, CrateVersion, ReportResult, Task, TaskResult};
+use crate::model::{db_dump, Context, Crate, CrateVersion, ReportResult, Task, TaskResult};
 
 fn expect<T, E: std::fmt::Display>(
     r: std::result::Result<T, E>,
@@ -36,3 +36,4 @@ impl_deserialize!(TaskResult);
 impl_deserialize!(CrateVersion);
 impl_deserialize!(Context);
 impl_deserialize!(ReportResult);
+impl_deserialize!(db_dump::Crate);

@@ -1,3 +1,4 @@
+mod dbdump_crate;
 mod krate;
 mod krate_version;
 mod meta;
