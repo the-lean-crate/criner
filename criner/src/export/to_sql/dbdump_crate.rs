@@ -6,14 +6,38 @@ impl<'a> SqlConvert for model::db_dump::Crate {
         "will not be called"
     }
     fn source_table_name() -> &'static str {
-        "crate"
+        "crates.io-crate"
     }
     fn init_table_statement() -> &'static str {
-        "CREATE TABLE crate (
-             name           TEXT NOT NULL,
-             version        TEXT NOT NULL,
-             PRIMARY KEY (name, version)
-        )"
+        "
+        BEGIN;
+        CREATE TABLE crates.io-actor (
+             id                                INTEGER NOT NULL,
+             crates_io_id                      INTEGER NOT NULL,
+             kind                              TEXT NOT NULL,
+             github_id                         INTEGER NOT NULL,
+             github_avatar_url                 TEXT NOT NULL,
+             github_login                      TEXT NOT NULL,
+             name                              TEXT,
+             PRIMARY KEY (id),
+        );
+        CREATE TABLE crates.io-crate (
+             name                TEXT NOT NULL,
+             stored_at           TIMESTAMP NOT NULL,
+             created_at          TIMESTAMP NOT NULL,
+             updated_at          TIMESTAMP NOT NULL,
+             description         TEXT,
+             documentation       TEXT,
+             downloads           INTEGER NOT NULL,
+             homepage            TEXT,
+             readme              TEXT,
+             repository          TEXT,
+             created_by          INTEGER,
+             PRIMARY KEY (name),
+             FOREIGN KEY (created_by) REFERENCES actor(id)
+        );
+        COMMIT;
+        "
     }
 
     fn convert_to_sql(
