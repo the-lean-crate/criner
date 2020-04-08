@@ -3,7 +3,6 @@ use crate::{
     model,
 };
 use rusqlite::{params, Statement, NO_PARAMS};
-use std::collections::BTreeMap;
 
 impl<'a> SqlConvert for model::db_dump::Crate {
     fn replace_statement() -> &'static str {
@@ -16,14 +15,13 @@ impl<'a> SqlConvert for model::db_dump::Crate {
         "
         BEGIN;
         CREATE TABLE 'crates.io-actor' (
-             id                                INTEGER NOT NULL,
-             crates_io_id                      INTEGER NOT NULL,
+             crates_io_id                      INTEGER NOT NULL, -- these IDs are not unique, so we can't use it as unique id
              kind                              TEXT NOT NULL,
-             github_id                         INTEGER NOT NULL,
+             github_id                         INTEGER NOT NULL, -- This is a unique id across teams and users
              github_avatar_url                 TEXT NOT NULL,
              github_login                      TEXT NOT NULL,
              name                              TEXT,
-             PRIMARY KEY (id)
+             PRIMARY KEY (github_id)
         );
         CREATE TABLE 'crates.io-crate' (
              name                TEXT NOT NULL,
@@ -67,46 +65,28 @@ fn do_it(
     transaction: &rusqlite::Transaction,
 ) -> crate::Result<usize> {
     let mut insert_crate = transaction
-        .prepare(&format!(
-            "
-            REPLACE INTO '{}'
+        .prepare("
+            REPLACE INTO 'crates.io-crate'
                      (name, stored_at, created_at, updated_at, description, documentation, downloads, homepage, readme, repository, created_by)
               VALUES (?1  , ?2       , ?3        , ?4        , ?5         , ?6           , ?7       , ?8      , ?9    , ?10       , ?11);
+        ",)
+        .unwrap();
+    let mut insert_actor = transaction
+        .prepare(
+            "
+            INSERT OR IGNORE INTO 'crates.io-actor'
+                     (crates_io_id, kind, github_id, github_avatar_url, github_login, name)
+              VALUES (?1          , ?2  , ?3       , ?4               , ?5          , ?6  );
         ",
-            model::db_dump::Crate::source_table_name()
-        ))
+        )
         .unwrap();
 
-    let mut actors = BTreeMap::new();
-    {
-        let mut actor_id = 0;
-        for res in input_statement.query_map(NO_PARAMS, |r| {
-            let key: String = r.get(0)?;
-            let value: Vec<u8> = r.get(1)?;
-            Ok((key, value))
-        })? {
-            let (_crate_name, bytes) = res?;
-            let krate: model::db_dump::Crate = bytes.as_slice().into();
-            let mut incremented_id = || {
-                let id = actor_id;
-                actor_id += 1;
-                id
-            };
-            if let Some(actor) = krate.created_by {
-                actors.entry(actor).or_insert_with(&mut incremented_id);
-            }
-            for actor in krate.owners.into_iter() {
-                actors.entry(actor).or_insert_with(&mut incremented_id);
-            }
-        }
-    }
     let mut count = 0;
     for res in input_statement.query_map(NO_PARAMS, |r| {
         let key: String = r.get(0)?;
         let value: Vec<u8> = r.get(1)?;
         Ok((key, value))
     })? {
-        count += 1;
         let (_crate_name, bytes) = res?;
         let model::db_dump::Crate {
             name,
@@ -123,10 +103,18 @@ fn do_it(
             keywords: _,
             categories: _,
             created_by,
-            owners: _,
+            owners,
         } = bytes.as_slice().into();
 
-        insert_crate.execute(params![
+        if let Some(actor) = created_by.as_ref() {
+            insert_actor_to_db(&mut insert_actor, actor)?;
+        }
+
+        for owner in owners.iter() {
+            insert_actor_to_db(&mut insert_actor, owner)?;
+        }
+
+        count += insert_crate.execute(params![
             name,
             to_seconds_since_epoch(stored_at),
             to_seconds_since_epoch(created_at),
@@ -137,8 +125,25 @@ fn do_it(
             homepage,
             readme,
             repository,
-            created_by.map(|actor| actors.get(&actor))
+            created_by.map(|actor| actor.github_id)
         ])?;
     }
     Ok(count)
+}
+
+fn insert_actor_to_db(
+    insert_actor: &mut Statement,
+    actor: &model::db_dump::Actor,
+) -> rusqlite::Result<usize> {
+    insert_actor.execute(params![
+        actor.crates_io_id,
+        match actor.kind {
+            model::db_dump::ActorKind::User => "user",
+            model::db_dump::ActorKind::Team => "team",
+        },
+        actor.github_id,
+        actor.github_avatar_url,
+        actor.github_login,
+        actor.name
+    ])
 }
