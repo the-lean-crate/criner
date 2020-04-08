@@ -14,6 +14,21 @@ impl<'a> SqlConvert for model::db_dump::Crate {
     fn init_table_statement() -> &'static str {
         "
         BEGIN;
+        CREATE TABLE 'crates.io-crate_version' (
+             parent_id              INTEGER NOT NULL,
+             crate_name             TEXT NOT NULL,
+             crate_size             INTEGER,
+             created_at             TIMESTAMP NOT NULL,
+             updated_at             TIMESTAMP NOT NULL,
+             downloads              INTEGER NOT NULL,
+             features               JSON NOT NULL, -- Array of Feature objects
+             license                TEXT NOT NULL,
+             semver                 TEXT NOT NULL,
+             published_by           INTEGER,  -- Github user id as index into crates.io-actor table
+             authors                JSON NOT NULL, -- Array of Persons, each with name and email
+             is_yanked              INTEGER NOT NULL,  -- is 1 if this version is yanked
+             FOREIGN KEY (parent_id) REFERENCES 'crates.io-crate'(_row_id_)
+        );
         CREATE TABLE 'crates.io-actor' (
              crates_io_id                      INTEGER NOT NULL, -- these IDs are not unique, so we can't use it as unique id
              kind                              TEXT NOT NULL,
@@ -34,7 +49,7 @@ impl<'a> SqlConvert for model::db_dump::Crate {
              homepage            TEXT,
              readme              TEXT,
              repository          TEXT,
-             created_by          INTEGER,
+             created_by          INTEGER,  -- Github user id as index into crates.io-actor table
              owners              JSON NOT NULL, -- Array of github user ids for indexing into the crates.io-actor table
              keywords            JSON NOT NULL, -- Array of strings, each string being a keyword
              categories          JSON NOT NULL, -- Array of category objects, providing a wealth of information for each
@@ -84,6 +99,16 @@ fn do_it(
         )
         .unwrap();
 
+    let mut insert_crate_version = transaction
+        .prepare(
+            "
+            INSERT OR IGNORE INTO 'crates.io-crate_version'
+                     (parent_id, crate_name, crate_size, created_at, updated_at, downloads, features, license, semver, published_by, authors, is_yanked)
+              VALUES (?1       , ?2        , ?3        , ?4        , ?5        , ?6       , ?7      , ?8     , ?9    , ?10         , ?11    , ?12);
+        ",
+        )
+        .unwrap();
+
     let mut count = 0;
     for res in input_statement.query_map(NO_PARAMS, |r| {
         let key: String = r.get(0)?;
@@ -102,7 +127,7 @@ fn do_it(
             homepage,
             readme,
             repository,
-            versions: _,
+            versions,
             keywords,
             categories,
             created_by,
@@ -139,6 +164,35 @@ fn do_it(
             serde_json::to_string_pretty(&keywords).unwrap(),
             serde_json::to_string_pretty(&categories).unwrap(),
         ])?;
+
+        for version in versions {
+            let model::db_dump::CrateVersion {
+                crate_size,
+                created_at,
+                updated_at,
+                downloads,
+                features,
+                license,
+                semver,
+                published_by,
+                authors,
+                is_yanked,
+            } = version;
+            insert_crate_version.execute(params![
+                count as i32,
+                name,
+                crate_size,
+                to_seconds_since_epoch(created_at),
+                to_seconds_since_epoch(updated_at),
+                downloads as i64,
+                serde_json::to_string_pretty(&features).unwrap(),
+                license,
+                semver,
+                published_by.map(|a| a.github_id),
+                serde_json::to_string_pretty(&authors).unwrap(),
+                is_yanked
+            ])?;
+        }
     }
     Ok(count)
 }
