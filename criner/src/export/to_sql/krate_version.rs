@@ -28,14 +28,14 @@ impl SqlConvert for model::CrateVersion {
             version             TEXT NOT NULL,
             kind                TEXT NOT NULL,
             checksum            TEXT NOT NULL,
-            features            TEXT NOT NULL, -- JSON
+            features            JSON NOT NULL,
             PRIMARY KEY (name, version)
         );
         CREATE TABLE crate_version_dependency (
              parent_id              INTEGER NOT NULL,
              name                   TEXT NOT NULL,
              required_version       TEXT NOT NULL,
-             features               TEXT NOT NULL,    -- JSON
+             features               JSON NOT NULL,
              optional               INTEGER NOT NULL, -- BOOL
              default_features       INTEGER NOT NULL, -- BOOL
              target                 TEXT,
