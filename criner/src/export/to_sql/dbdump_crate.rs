@@ -17,13 +17,13 @@ impl<'a> SqlConvert for model::db_dump::Crate {
         CREATE TABLE 'crates.io-crate_version' (
              parent_id              INTEGER NOT NULL,
              crate_name             TEXT NOT NULL,
-             crate_size             INTEGER,
+             semver                 TEXT NOT NULL,
              created_at             TIMESTAMP NOT NULL,
              updated_at             TIMESTAMP NOT NULL,
              downloads              INTEGER NOT NULL,
              features               JSON NOT NULL, -- Array of Feature objects
              license                TEXT NOT NULL,
-             semver                 TEXT NOT NULL,
+             crate_size             INTEGER,
              published_by           INTEGER,  -- Github user id as index into crates.io-actor table
              authors                JSON NOT NULL, -- Array of Persons, each with name and email
              is_yanked              INTEGER NOT NULL,  -- is 1 if this version is yanked
@@ -103,8 +103,8 @@ fn do_it(
         .prepare(
             "
             INSERT OR IGNORE INTO 'crates.io-crate_version'
-                     (parent_id, crate_name, crate_size, created_at, updated_at, downloads, features, license, semver, published_by, authors, is_yanked)
-              VALUES (?1       , ?2        , ?3        , ?4        , ?5        , ?6       , ?7      , ?8     , ?9    , ?10         , ?11    , ?12);
+                     (parent_id, crate_name, semver, created_at, updated_at, downloads, features, license, crate_size, published_by, authors, is_yanked)
+              VALUES (?1       , ?2        , ?3        , ?4        , ?5        , ?6       , ?7      , ?8 , ?9        , ?10         , ?11    , ?12);
         ",
         )
         .unwrap();
@@ -181,13 +181,13 @@ fn do_it(
             insert_crate_version.execute(params![
                 count as i32,
                 name,
-                crate_size,
+                semver,
                 to_seconds_since_epoch(created_at),
                 to_seconds_since_epoch(updated_at),
                 downloads as i64,
                 serde_json::to_string_pretty(&features).unwrap(),
                 license,
-                semver,
+                crate_size,
                 published_by.map(|a| a.github_id),
                 serde_json::to_string_pretty(&authors).unwrap(),
                 is_yanked

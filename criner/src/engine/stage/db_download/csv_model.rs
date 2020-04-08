@@ -6,7 +6,7 @@ type UserId = u32;
 pub type Id = u32;
 pub type GitHubId = i32;
 
-#[derive(Deserialize, Default)]
+#[derive(Deserialize, Default, Clone)]
 pub struct Keyword {
     pub id: Id,
     #[serde(rename = "keyword")]
@@ -16,7 +16,7 @@ pub struct Keyword {
     pub crates_count: u32,
 }
 
-#[derive(Deserialize, Default)]
+#[derive(Deserialize, Default, Clone)]
 pub struct Category {
     pub id: Id,
     #[serde(rename = "category")]

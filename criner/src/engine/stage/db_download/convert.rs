@@ -321,11 +321,11 @@ pub fn into_crates(
             .expect("matching crate for keyword")
             .keywords
             .push(
-                std::mem::replace(
-                    keywords_by_id.get_mut(&keyword_id).expect("keyword for id"),
-                    csv_model::Keyword::default(),
-                )
-                .into(),
+                keywords_by_id
+                    .get_mut(&keyword_id)
+                    .expect("keyword for id")
+                    .to_owned()
+                    .into(),
             )
     }
     progress.done(format!("assigned {} keywords", crates_keywords_len));
@@ -349,13 +349,11 @@ pub fn into_crates(
             .expect("matching crate for category")
             .categories
             .push(
-                std::mem::replace(
-                    categories_by_id
-                        .get_mut(&category_id)
-                        .expect("category for id"),
-                    csv_model::Category::default(),
-                )
-                .into(),
+                categories_by_id
+                    .get_mut(&category_id)
+                    .expect("category for id")
+                    .to_owned()
+                    .into(),
             )
     }
     progress.done(format!("assigned {} categories", crates_categories_len));

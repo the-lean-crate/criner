@@ -1,8 +1,7 @@
 [![Build Status](https://travis-ci.org/the-lean-crate/criner.svg?branch=master)](https://travis-ci.org/the-lean-crate/criner)
 
 ## TODO
-
-* [ ] Fix categories and keywords (seem empty, though present)
+* [ ] Incorporate download counts into report
 * [ ] Make things prettier and more visual - that way we can try again for a come-back :D
 * [ ] See why RipGrep doesn't get any suggestions
 * [ ] More reporting - right now the context gathering to see how much time is spent where is neglected.
