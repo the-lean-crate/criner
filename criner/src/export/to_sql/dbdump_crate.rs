@@ -35,6 +35,7 @@ impl<'a> SqlConvert for model::db_dump::Crate {
              readme              TEXT,
              repository          TEXT,
              created_by          INTEGER,
+             owners              JSON NOT NULL,
              PRIMARY KEY (name),
              FOREIGN KEY (created_by) REFERENCES actor(id)
         );
@@ -67,8 +68,8 @@ fn do_it(
     let mut insert_crate = transaction
         .prepare("
             REPLACE INTO 'crates.io-crate'
-                     (name, stored_at, created_at, updated_at, description, documentation, downloads, homepage, readme, repository, created_by)
-              VALUES (?1  , ?2       , ?3        , ?4        , ?5         , ?6           , ?7       , ?8      , ?9    , ?10       , ?11);
+                     (name, stored_at, created_at, updated_at, description, documentation, downloads, homepage, readme, repository, created_by, owners)
+              VALUES (?1  , ?2       , ?3        , ?4        , ?5         , ?6           , ?7       , ?8      , ?9    , ?10       , ?11       , ?12);
         ",)
         .unwrap();
     let mut insert_actor = transaction
@@ -125,7 +126,14 @@ fn do_it(
             homepage,
             readme,
             repository,
-            created_by.map(|actor| actor.github_id)
+            created_by.map(|actor| actor.github_id),
+            serde_json::to_string_pretty(
+                &owners
+                    .iter()
+                    .map(|actor| actor.github_id)
+                    .collect::<Vec<_>>()
+            )
+            .unwrap(),
         ])?;
     }
     Ok(count)
