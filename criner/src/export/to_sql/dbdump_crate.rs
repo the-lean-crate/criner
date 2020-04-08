@@ -35,9 +35,11 @@ impl<'a> SqlConvert for model::db_dump::Crate {
              readme              TEXT,
              repository          TEXT,
              created_by          INTEGER,
-             owners              JSON NOT NULL,
+             owners              JSON NOT NULL, -- Array of github user ids for indexing into the crates.io-actor table
+             keywords            JSON NOT NULL, -- Array of strings, each string being a keyword
+             categories          JSON NOT NULL, -- Array of category objects, providing a wealth of information for each
              PRIMARY KEY (name),
-             FOREIGN KEY (created_by) REFERENCES actor(id)
+             FOREIGN KEY (created_by) REFERENCES actor(github_id)
         );
         COMMIT;
         "
@@ -68,8 +70,8 @@ fn do_it(
     let mut insert_crate = transaction
         .prepare("
             REPLACE INTO 'crates.io-crate'
-                     (name, stored_at, created_at, updated_at, description, documentation, downloads, homepage, readme, repository, created_by, owners)
-              VALUES (?1  , ?2       , ?3        , ?4        , ?5         , ?6           , ?7       , ?8      , ?9    , ?10       , ?11       , ?12);
+                     (name, stored_at, created_at, updated_at, description, documentation, downloads, homepage, readme, repository, created_by, owners, keywords, categories)
+              VALUES (?1  , ?2       , ?3        , ?4        , ?5         , ?6           , ?7       , ?8      , ?9    , ?10       , ?11       , ?12   , ?13     , ?14);
         ",)
         .unwrap();
     let mut insert_actor = transaction
@@ -101,8 +103,8 @@ fn do_it(
             readme,
             repository,
             versions: _,
-            keywords: _,
-            categories: _,
+            keywords,
+            categories,
             created_by,
             owners,
         } = bytes.as_slice().into();
@@ -134,6 +136,8 @@ fn do_it(
                     .collect::<Vec<_>>()
             )
             .unwrap(),
+            serde_json::to_string_pretty(&keywords).unwrap(),
+            serde_json::to_string_pretty(&categories).unwrap(),
         ])?;
     }
     Ok(count)
