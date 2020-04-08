@@ -199,6 +199,8 @@ Clone this repository and run `cargo run --release -- mine` to get started. Prov
 Provided there is a database generated already with `criner mine`, run `criner export` to get another SQlite database with all data exploded into tables and fields, which
 can be operated using SQL. This process is non-incremental and takes about 5 minutes to complete on a single core. Threading is not implemented.
 
+Some of the columns are of type `JSON`, whose properties can be used in queries using the `json_*(…)` set of SQLITE functions.
+
 Possible improvements are along export performance - it could probably be parallel and incremental - and along not having to mine yourself for an initial database state.
 Criner could upload its database once a day to an S3 bucket for instance - it's about 800MB gzipped.
 

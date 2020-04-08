@@ -57,29 +57,17 @@ fn extract_and_ingest(
 
     let mut num_files_seen = 0;
     let mut num_bytes_seen = 0;
-    let (
-        mut teams,
-        mut categories,
-        mut versions,
-        mut keywords,
-        mut users,
-        mut crates,
-        mut crate_owners,
-        mut version_authors,
-        mut crates_categories,
-        mut crates_keywords,
-    ) = (
-        None::<BTreeMap<csv_model::Id, csv_model::Team>>,
-        None::<BTreeMap<csv_model::Id, csv_model::Category>>,
-        None::<Vec<csv_model::Version>>,
-        None::<BTreeMap<csv_model::Id, csv_model::Keyword>>,
-        None::<BTreeMap<csv_model::Id, csv_model::User>>,
-        None::<Vec<csv_model::Crate>>,
-        None::<Vec<csv_model::CrateOwner>>,
-        None::<Vec<csv_model::VersionAuthor>>,
-        None::<Vec<csv_model::CratesCategory>>,
-        None::<Vec<csv_model::CratesKeyword>>,
-    );
+    let mut teams = None::<BTreeMap<csv_model::Id, csv_model::Team>>;
+    let mut categories = None::<BTreeMap<csv_model::Id, csv_model::Category>>;
+    let mut versions = None::<Vec<csv_model::Version>>;
+    let mut keywords = None::<BTreeMap<csv_model::Id, csv_model::Keyword>>;
+    let mut users = None::<BTreeMap<csv_model::Id, csv_model::User>>;
+    let mut crates = None::<Vec<csv_model::Crate>>;
+    let mut crate_owners = None::<Vec<csv_model::CrateOwner>>;
+    let mut version_authors = None::<Vec<csv_model::VersionAuthor>>;
+    let mut crates_categories = None::<Vec<csv_model::CratesCategory>>;
+    let mut crates_keywords = None::<Vec<csv_model::CratesKeyword>>;
+
     for (eid, entry) in archive.entries()?.enumerate() {
         num_files_seen = eid + 1;
         progress.set(eid as u32);
