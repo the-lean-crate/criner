@@ -51,9 +51,6 @@ impl SqlConvert for model::Task {
         let mut tokens = key.split(crate::persistence::KEY_SEP_CHAR);
         let crate_name = tokens.next().unwrap();
         let crate_version = tokens.next().unwrap();
-        let _process_name = tokens.next().unwrap();
-        let _process_version = tokens.next().unwrap();
-        assert!(tokens.next().is_none());
 
         let Self {
             stored_at,
