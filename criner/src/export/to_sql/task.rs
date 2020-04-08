@@ -7,8 +7,8 @@ use rusqlite::{params, Statement};
 impl SqlConvert for model::Task {
     fn replace_statement() -> &'static str {
         "REPLACE INTO task
-                   (id, crate_name, crate_version, process, version, stored_at, state)
-            VALUES (?1, ?2,         ?3,            ?4,      ?5,      ?6,        ?7); "
+                   (id, key, process, version, stored_at, state)
+            VALUES (?1, ?2,  ?3,      ?4,      ?5,        ?6); "
     }
     fn secondary_replace_statement() -> Option<&'static str> {
         Some(
@@ -24,13 +24,12 @@ impl SqlConvert for model::Task {
         "BEGIN;
             CREATE TABLE task (
                  id               INTEGER UNIQUE NOT NULL,
-                 crate_name       TEXT NOT NULL,
-                 crate_version    TEXT NOT NULL,
+                 key              TEXT NOT NULL,
                  process          TEXT NOT NULL,
                  version          TEXT NOT NULL,
                  stored_at        TIMESTAMP NOT NULL,
                  state            TEXT NOT NULL,
-                 PRIMARY KEY      (crate_name, crate_version, process, version)
+                 PRIMARY KEY      (key)
             );
             CREATE TABLE task_error (
                  parent_id        INTEGER NOT NULL,
@@ -48,9 +47,6 @@ impl SqlConvert for model::Task {
         sstm: Option<&mut rusqlite::Statement<'_>>,
     ) -> crate::Result<usize> {
         use model::TaskState::*;
-        let mut tokens = key.split(crate::persistence::KEY_SEP_CHAR);
-        let crate_name = tokens.next().unwrap();
-        let crate_version = tokens.next().unwrap();
 
         let Self {
             stored_at,
@@ -60,8 +56,7 @@ impl SqlConvert for model::Task {
         } = self;
         stm.execute(params![
             uid,
-            crate_name,
-            crate_version,
+            key,
             process,
             version,
             to_seconds_since_epoch(*stored_at),
