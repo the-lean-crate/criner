@@ -1,4 +1,7 @@
-use crate::{export::to_sql::SqlConvert, model};
+use crate::{
+    export::to_sql::{to_seconds_since_epoch, SqlConvert},
+    model,
+};
 use rusqlite::{params, Statement};
 
 impl SqlConvert for model::Task {
@@ -64,10 +67,7 @@ impl SqlConvert for model::Task {
             crate_version,
             process,
             version,
-            stored_at
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs() as i64,
+            to_seconds_since_epoch(*stored_at),
             match state {
                 NotStarted => "NotStarted",
                 Complete => "Complete",

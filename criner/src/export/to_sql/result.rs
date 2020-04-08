@@ -40,14 +40,11 @@ impl<'a> SqlConvert for model::TaskResult {
                 )
                 .unwrap();
 
-            for (_uid, res) in istm
-                .query_map(NO_PARAMS, |r| {
-                    let key: String = r.get(0)?;
-                    let value: Vec<u8> = r.get(1)?;
-                    Ok((key, value))
-                })?
-                .enumerate()
-            {
+            for res in istm.query_map(NO_PARAMS, |r| {
+                let key: String = r.get(0)?;
+                let value: Vec<u8> = r.get(1)?;
+                Ok((key, value))
+            })? {
                 let (key, value) = res?;
                 let mut tokens = key.split(crate::persistence::KEY_SEP_CHAR);
                 let crate_name = tokens.next().unwrap();

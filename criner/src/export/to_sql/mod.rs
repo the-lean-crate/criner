@@ -5,6 +5,12 @@ mod meta;
 mod result;
 mod task;
 
+pub fn to_seconds_since_epoch(time: std::time::SystemTime) -> i64 {
+    time.duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs() as i64
+}
+
 pub trait SqlConvert {
     fn convert_to_sql(
         _input_statement: &mut rusqlite::Statement,

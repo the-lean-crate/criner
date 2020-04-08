@@ -20,6 +20,7 @@
 * [ ] Git is slowing down report generation, as sending them to git and creating objects is slow. We could possibly multi-thread this by creating lose objects
       ourselves and sending these into an aggregator which puts them into the index. This is only interesting during the very first report generation though, so
       probably not worth it.
+* [ ] Have each sub-section of criner use their own error type, which are aggregated in the crate level error. That way, individual errors will be smaller.
 * [ ] Parse CSV files separately and index rows and fields - from there build everything on the fly without having to allocate and copy strings.
    * probably warrants a different crate, and will really only be done if the 500MB budget isn't sufficient, that is things don't run on the Pie III
     

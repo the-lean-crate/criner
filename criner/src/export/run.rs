@@ -26,11 +26,11 @@ pub fn run_blocking(
     )?;
 
     transfer::<model::db_dump::Crate>(&mut input, &mut output)?;
-    transfer::<model::Crate>(&mut input, &mut output)?;
-    transfer::<model::Task>(&mut input, &mut output)?;
-    transfer::<model::Context>(&mut input, &mut output)?;
-    transfer::<model::CrateVersion>(&mut input, &mut output)?;
-    transfer::<model::TaskResult>(&mut input, &mut output)?;
+    // transfer::<model::Crate>(&mut input, &mut output)?;
+    // transfer::<model::Task>(&mut input, &mut output)?;
+    // transfer::<model::Context>(&mut input, &mut output)?;
+    // transfer::<model::CrateVersion>(&mut input, &mut output)?;
+    // transfer::<model::TaskResult>(&mut input, &mut output)?;
 
     Ok(())
 }
@@ -40,7 +40,10 @@ where
     for<'a> T: SqlConvert + From<&'a [u8]>,
 {
     output.execute_batch(T::init_table_statement())?;
-    let mut istm = input.prepare(&format!("SELECT key, data FROM {}", T::source_table_name()))?;
+    let mut istm = input.prepare(&format!(
+        "SELECT key, data FROM '{}'",
+        T::source_table_name()
+    ))?;
     let transaction = output.transaction()?;
     let mut count = 0;
     let start = std::time::SystemTime::now();
