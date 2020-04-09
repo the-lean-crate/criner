@@ -1335,9 +1335,9 @@ dependencies = [
 
 [[package]]
 name = "prodash"
-version = "3.5.1"
+version = "3.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd30f073b79e4b514f962e4b02077fd5df363fe62b7bf690331f84a2dcd6959b"
+checksum = "573b133d014bf05ddfa014b6c1937ee112c451558ff4d2a3d1885ae0f6df286c"
 dependencies = [
  "dashmap",
  "futures",
@@ -2023,9 +2023,9 @@ dependencies = [
 
 [[package]]
 name = "tui-react"
-version = "0.2.2"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "819a391ed10c1b9ec323e5eeb079f74f8ddb76331dd5a1d41311e00ff2fbc785"
+checksum = "16c456e28ca46d1de06e73d562de375464028d377bbfb6dcd5134f18bc175478"
 dependencies = [
  "log",
  "tui",
