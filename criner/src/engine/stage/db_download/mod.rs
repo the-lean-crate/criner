@@ -185,7 +185,7 @@ fn cleanup(db_file_path: PathBuf, mut progress: prodash::tree::Item) -> Result<(
     let glob_pattern = db_file_path
         .parent()
         .expect("parent directory for db dump")
-        .join(format!("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*"))
+        .join("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*")
         .with_extension(db_file_path.extension().expect("file extension"));
     let pattern = glob::Pattern::new(
         &glob_pattern

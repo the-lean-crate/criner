@@ -1,3 +1,4 @@
+#![allow(clippy::unneeded_field_pattern)]
 #![deny(unsafe_code)]
 
 #[macro_use]
