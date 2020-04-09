@@ -14,8 +14,8 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-const CONNECT_AND_FETCH_HEAD_TIMEOUT: Duration = Duration::from_secs(30);
-const FETCH_CHUNK_TIMEOUT_SECONDS: Duration = Duration::from_secs(20);
+const CONNECT_AND_FETCH_HEAD_TIMEOUT: Duration = Duration::from_secs(15);
+const FETCH_CHUNK_TIMEOUT_SECONDS: Duration = Duration::from_secs(10);
 
 struct ProcessingState {
     url: String,
