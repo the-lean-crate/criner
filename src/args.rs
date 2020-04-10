@@ -103,6 +103,7 @@ pub enum SubCommands {
         glob: Option<String>,
 
         /// Path to the possibly existing database. It's used to persist all mining results.
+        #[structopt(default_value = "criner.db")]
         db_path: PathBuf,
     },
     /// Export all Criner data into a format friendly for exploration via SQL, best viewed with https://sqlitebrowser.org
