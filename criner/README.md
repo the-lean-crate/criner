@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/the-lean-crate/criner.svg?branch=master)](https://travis-ci.org/the-lean-crate/criner)
+![Rust](https://github.com/the-lean-crate/criner/workflows/Rust/badge.svg)
 
 ## TODO
 * [ ] Incorporate download counts into report
