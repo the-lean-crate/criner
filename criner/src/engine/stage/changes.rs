@@ -27,6 +27,9 @@ pub async fn fetch(
         deadline.unwrap_or_else(|| SystemTime::now().add(Duration::from_secs(60 * 60))),
         {
             let path = crates_io_path.as_ref().to_path_buf();
+            if !path.is_dir() {
+                std::fs::create_dir(&path)?;
+            }
             || Index::from_path_or_cloned(path)
         },
     )

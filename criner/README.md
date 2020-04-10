@@ -2,6 +2,7 @@
 
 ## TODO
 * [ ] Incorporate download counts into report
+* [ ] Teach crates-index-diff how to deal with squashed crates index repositories. The previous history is kept in a separate branch to allow to connect both.
 * [ ] Make things prettier and more visual - that way we can try again for a come-back :D
 * [ ] See why RipGrep doesn't get any suggestions
 * [ ] More reporting - right now the context gathering to see how much time is spent where is neglected.
