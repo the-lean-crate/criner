@@ -14,5 +14,5 @@ jobs:
     - name: tests
       run: make tests
     - name: stress
-      run: make mine-2min-logonly
+      run: make mine-2min-logonly && du -sch criner.db/*
 
