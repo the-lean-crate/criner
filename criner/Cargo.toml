@@ -1,6 +1,6 @@
 [package]
 name = "criner"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 edition = "2018"
 description = "a platform for resumable mining of crates.io for knowledge and information"
