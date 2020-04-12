@@ -1,4 +1,5 @@
 ![Rust](https://github.com/the-lean-crate/criner/workflows/Rust/badge.svg)
+[![crates.io version](https://img.shields.io/crates/v/criner-cli.svg)](https://crates.io/crates/criner-cli)
 
 # The Lean Crate Initiative
 
