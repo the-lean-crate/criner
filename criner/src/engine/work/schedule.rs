@@ -9,7 +9,7 @@ use std::{
     time::SystemTime,
 };
 
-const MAX_ATTEMPTS_BEFORE_WE_GIVE_UP: usize = 7;
+const MAX_ATTEMPTS_BEFORE_WE_GIVE_UP: usize = 8;
 
 #[derive(Clone, Copy)]
 pub enum Scheduling {
