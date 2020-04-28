@@ -1,7 +1,8 @@
-use super::super::{AggregateFileInfo, Fix, Report, VersionInfo};
-use crate::engine::report::generic::Aggregate;
-use crate::engine::report::waste::PotentialWaste;
-use crate::model::TarHeader;
+use crate::{
+    engine::report::generic::Aggregate,
+    engine::report::waste::{AggregateFileInfo, Fix, PotentialWaste, Report, VersionInfo},
+    model::TarHeader,
+};
 use common_macros::b_tree_map;
 use std::collections::BTreeMap;
 

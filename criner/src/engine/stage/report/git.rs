@@ -205,7 +205,7 @@ pub fn select_callback(
                                             true
                                         })
                                         .sideband_progress(move |line| {
-                                            sideband.set_name(std::str::from_utf8(line).unwrap_or(""));
+                                            sideband.set_name(std::str::from_utf8(line).map(|s| s.trim()).unwrap_or(""));
                                             true
                                         }).credentials(move |url, username_from_url, allowed_types| {
                                         subprogress.info(format!("Setting userpass plaintext credentials, allowed are {:?} for {:?} (username = {:?}", allowed_types, url, username_from_url));
