@@ -321,7 +321,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "tar",
- "time 0.2.14",
+ "time 0.2.15",
  "tokio",
  "toml",
 ]
@@ -335,7 +335,7 @@ dependencies = [
  "env_logger",
  "humantime 2.0.0",
  "structopt",
- "time 0.2.14",
+ "time 0.2.15",
 ]
 
 [[package]]
@@ -1244,18 +1244,18 @@ checksum = "d4fd5641d01c8f18a23da7b6fe29298ff4b55afcccdf78973b24cf3175fee32e"
 
 [[package]]
 name = "pin-project"
-version = "0.4.9"
+version = "0.4.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f6a7f5eee6292c559c793430c55c00aea9d3b3d1905e855806ca4d7253426a2"
+checksum = "36e3dcd42688c05a66f841d22c5d8390d9a5d4c9aaf57b9285eae4900a080063"
 dependencies = [
  "pin-project-internal",
 ]
 
 [[package]]
 name = "pin-project-internal"
-version = "0.4.9"
+version = "0.4.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8988430ce790d8682672117bc06dda364c0be32d3abd738234f19f3240bad99a"
+checksum = "f4d7346ac577ff1296e06a418e7618e22655bae834d4970cb6e39d6da8119969"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1335,9 +1335,9 @@ dependencies = [
 
 [[package]]
 name = "prodash"
-version = "3.6.2"
+version = "3.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f259ffe9b19f17d2724bca15730a12f4afd69793232a0f4323a17c02286445ed"
+checksum = "d3351d07ecf9d00dc0a8af88bb305dac95684e48be3e12d969a623a1010ed371"
 dependencies = [
  "dashmap",
  "futures",
@@ -1346,7 +1346,7 @@ dependencies = [
  "log",
  "parking_lot",
  "termion",
- "time 0.2.14",
+ "time 0.2.15",
  "tui",
  "tui-react",
  "unicode-segmentation",
@@ -1895,9 +1895,9 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.2.14"
+version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c19b581e837b3f1a6a211e1d30f11a2da711cc8f6d38c16972eecc0398114446"
+checksum = "e1330829d2e6c06771eeae476be12ff1aa9eb5e29ca718a431ab27168efde6c1"
 dependencies = [
  "cfg-if",
  "libc",
