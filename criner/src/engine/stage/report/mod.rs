@@ -5,7 +5,7 @@ use crate::{
     persistence::{self, TableAccess},
     utils::check,
 };
-use futures_util::future::FutureExt;
+use futures_util::FutureExt;
 use rusqlite::NO_PARAMS;
 use std::{path::PathBuf, time::SystemTime};
 

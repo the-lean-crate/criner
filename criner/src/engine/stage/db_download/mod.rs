@@ -4,7 +4,7 @@ use crate::{
     Error, Result,
 };
 use bytesize::ByteSize;
-use futures_util::future::FutureExt;
+use futures_util::FutureExt;
 use rusqlite::params;
 use rusqlite::TransactionBehavior;
 use std::{collections::BTreeMap, fs::File, io::BufReader, path::PathBuf};

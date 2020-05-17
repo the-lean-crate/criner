@@ -44,8 +44,11 @@ pub enum WriteInstruction {
     DoWrite(WriteRequest),
 }
 
-pub type WriteCallbackState = Option<flume::Sender<WriteRequest>>;
-pub type WriteCallback = fn(WriteRequest, &WriteCallbackState) -> Result<WriteInstruction>;
+pub type WriteCallbackState = Option<piper::Sender<WriteRequest>>;
+pub type WriteCallback = fn(
+    WriteRequest,
+    &WriteCallbackState,
+) -> futures_util::future::BoxFuture<Result<WriteInstruction>>;
 
 #[async_trait]
 pub trait Aggregate
@@ -336,7 +339,9 @@ async fn complete_and_write_report(
             content: out,
         },
         write_state,
-    )? {
+    )
+    .await?
+    {
         WriteInstruction::DoWrite(WriteRequest { path, content }) => {
             {
                 let path = path.clone();

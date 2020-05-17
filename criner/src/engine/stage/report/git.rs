@@ -4,6 +4,7 @@ use crate::{
     Result,
 };
 use crates_index_diff::git2;
+use futures_util::{future::BoxFuture, FutureExt};
 use std::{
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
@@ -53,7 +54,7 @@ pub fn select_callback(
 ) {
     match git2::Repository::open(report_dir) {
         Ok(repo) => {
-            let (tx, rx) = flume::bounded(processors as usize);
+            let (tx, rx) = piper::chan(processors as usize);
             let is_bare_repo = repo.is_bare();
             let report_dir = report_dir.to_owned();
             let handle = std::thread::spawn(move || -> Result<()> {
@@ -82,7 +83,7 @@ pub fn select_callback(
                         i
                     };
                     let mut req_count = 0u64;
-                    for WriteRequest { path, content } in rx.iter() {
+                    while let Some(WriteRequest { path, content }) = smol::block_on(rx.recv()) {
                         let path = path.strip_prefix(&report_dir)?;
                         req_count += 1;
                         let entry = file_index_entry(path.to_owned(), content.len());
@@ -257,22 +258,34 @@ pub fn select_callback(
 pub fn repo_with_working_dir(
     req: WriteRequest,
     send: &WriteCallbackState,
-) -> Result<WriteInstruction> {
-    send.as_ref()
-        .expect("send to be available if a repo is available")
-        .send(req.clone())
-        .map_err(|_| crate::Error::Message("Could not send git request".into()))?;
-    Ok(WriteInstruction::DoWrite(req))
+) -> BoxFuture<Result<WriteInstruction>> {
+    async move {
+        send.as_ref()
+            .expect("send to be available if a repo is available")
+            .send(req.clone())
+            .await;
+        Ok(WriteInstruction::DoWrite(req))
+    }
+    .boxed()
 }
 
-pub fn repo_bare(req: WriteRequest, send: &WriteCallbackState) -> Result<WriteInstruction> {
-    send.as_ref()
-        .expect("send to be available if a repo is available")
-        .send(req)
-        .map_err(|_| crate::Error::Message("Could not send git request".into()))?;
-    Ok(WriteInstruction::Skip)
+pub fn repo_bare(
+    req: WriteRequest,
+    send: &WriteCallbackState,
+) -> BoxFuture<Result<WriteInstruction>> {
+    async move {
+        send.as_ref()
+            .expect("send to be available if a repo is available")
+            .send(req)
+            .await;
+        Ok(WriteInstruction::Skip)
+    }
+    .boxed()
 }
 
-pub fn not_available(req: WriteRequest, _state: &WriteCallbackState) -> Result<WriteInstruction> {
-    Ok(WriteInstruction::DoWrite(req))
+pub fn not_available(
+    req: WriteRequest,
+    _state: &WriteCallbackState,
+) -> BoxFuture<Result<WriteInstruction>> {
+    async move { Ok(WriteInstruction::DoWrite(req)) }.boxed()
 }

@@ -5,7 +5,7 @@ use crate::{
     model::CrateVersion,
     persistence::{Db, Keyed, TableAccess},
 };
-use futures_util::future::FutureExt;
+use futures_util::FutureExt;
 use std::{path::PathBuf, time::SystemTime};
 
 pub async fn process(
