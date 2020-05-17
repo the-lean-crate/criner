@@ -1,6 +1,6 @@
 use crate::persistence::new_key_value_query_old_to_new_filtered;
 use crate::{
-    engine::{report, work},
+    engine::report,
     error::Result,
     persistence::{self, TableAccess},
     utils::check,
@@ -33,16 +33,7 @@ pub async fn generate(
     }
     progress.init(Some(num_crates), Some("crates"));
 
-    let (rx_result, tx) = {
-        let (tx, rx) = piper::chan(1);
-        let (tx_result, rx_result) = piper::chan((cpu_o_bound_processors * 2) as usize);
-        // TODO: use task span with a bounded channel instead - no need for this kind of 'simple' agent
-        for _ in 0..cpu_o_bound_processors {
-            smol::Task::spawn(work::simple::processor(rx.clone(), tx_result.clone()).map(|_| ()))
-                .detach();
-        }
-        (rx_result, tx)
-    };
+    let (tx_result, rx_result) = piper::chan(cpu_o_bound_processors as usize);
 
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
     {
@@ -113,18 +104,30 @@ pub async fn generate(
 
         progress.set((cid * chunk_size) as u32);
         progress.halted("write crate report", None);
-        tx.send(
-            report::waste::Generator::write_files(
-                db.clone(),
-                waste_report_dir.clone(),
-                cache_dir.clone(),
-                chunk,
-                progress.add_child(""),
-                git_handle,
-                git_state.clone(),
-            )
-            .boxed(),
-        )
+        smol::Task::blocking({
+            let tx_result = tx_result.clone();
+            let db = db.clone();
+            let waste_report_dir = waste_report_dir.clone();
+            let cache_dir = cache_dir.clone();
+            let progress = progress.add_child("");
+            let git_state = git_state.clone();
+            async move {
+                tx_result
+                    .send(
+                        report::waste::Generator::write_files(
+                            db,
+                            waste_report_dir,
+                            cache_dir,
+                            chunk,
+                            progress,
+                            git_handle,
+                            git_state,
+                        )
+                        .await,
+                    )
+                    .await
+            }
+        })
         .await;
         chunk = Vec::with_capacity(chunk_size as usize);
         if abort_loop {
@@ -132,7 +135,7 @@ pub async fn generate(
         }
     }
     drop(git_state);
-    drop(tx);
+    drop(tx_result);
     progress.set(num_crates);
     merge_reports.await;
     progress.done("Generating and merging waste report done");
