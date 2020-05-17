@@ -327,6 +327,7 @@ dependencies = [
  "log",
  "num_cpus",
  "parking_lot",
+ "piper",
  "prodash",
  "quick-error",
  "regex",

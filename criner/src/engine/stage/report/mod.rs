@@ -35,9 +35,8 @@ pub async fn generate(
     progress.init(Some(num_crates), Some("crates"));
 
     let (rx_result, tx) = {
-        let (tx, rx) = async_std::sync::channel(1);
-        let (tx_result, rx_result) =
-            async_std::sync::channel((cpu_o_bound_processors * 2) as usize);
+        let (tx, rx) = piper::chan(1);
+        let (tx_result, rx_result) = piper::chan((cpu_o_bound_processors * 2) as usize);
         for _ in 0..cpu_o_bound_processors {
             pool.spawn(work::simple::processor(rx.clone(), tx_result.clone()).map(|_| ()))?;
         }

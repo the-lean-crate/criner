@@ -104,7 +104,7 @@ pub trait Generator {
         out_dir: PathBuf,
         cache_dir: Option<PathBuf>,
         mut progress: prodash::tree::Item,
-        reports: async_std::sync::Receiver<Result<Option<Self::Report>>>,
+        reports: piper::Receiver<Result<Option<Self::Report>>>,
         write: WriteCallback,
         write_state: WriteCallbackState,
     ) -> Result<()> {
