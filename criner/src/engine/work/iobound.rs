@@ -4,7 +4,7 @@ use crate::{
     Error, Result,
 };
 use bytesize::ByteSize;
-use tokio::io::AsyncWriteExt;
+use futures::io::AsyncWriteExt;
 
 use crate::utils::timeout_after;
 use async_trait::async_trait;
@@ -185,10 +185,11 @@ async fn download_file_and_store_result(
     url: &str,
     out_file: PathBuf,
 ) -> Result<()> {
-    tokio::fs::create_dir_all(&out_file.parent().expect("parent directory")).await?;
+    async_std::fs::create_dir_all(&out_file.parent().expect("parent directory")).await?;
 
     // NOTE: We assume that the files we download never change, and we assume the server supports resumption!
-    let (start_byte, truncate) = if let Ok(existing_meta) = tokio::fs::metadata(&out_file).await {
+    let (start_byte, truncate) = if let Ok(existing_meta) = async_std::fs::metadata(&out_file).await
+    {
         (existing_meta.len(), false)
     } else {
         (0, true)
@@ -239,7 +240,7 @@ async fn download_file_and_store_result(
     ));
 
     if remaining_content_length != 0 {
-        let mut out = tokio::fs::OpenOptions::new()
+        let mut out = async_std::fs::OpenOptions::new()
             .create(truncate)
             .truncate(truncate)
             .write(truncate)
