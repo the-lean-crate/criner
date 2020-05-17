@@ -26,7 +26,7 @@ struct ProcessingState {
 pub struct Agent<Fn, FnResult> {
     client: reqwest::Client,
     results: persistence::TaskResultTable,
-    channel: async_std::sync::Sender<FnResult>,
+    channel: piper::Sender<FnResult>,
     state: Option<ProcessingState>,
     make_state: Fn,
     next_action_state: Option<FnResult>,
@@ -38,7 +38,7 @@ where
 {
     pub fn new(
         db: &persistence::Db,
-        channel: async_std::sync::Sender<FnResult>,
+        channel: piper::Sender<FnResult>,
         make_state: Fn,
     ) -> Result<Agent<Fn, FnResult>> {
         let client = reqwest::ClientBuilder::new().gzip(true).build()?;

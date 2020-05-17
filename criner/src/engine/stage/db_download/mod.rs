@@ -216,9 +216,9 @@ pub async fn schedule(
     mut progress: prodash::tree::Item,
     startup_time: std::time::SystemTime,
 ) -> Result<()> {
-    let (tx_result, rx_result) = async_std::sync::channel(1);
+    let (tx_result, rx_result) = piper::chan(1);
     let tx_io = {
-        let (tx_io, rx) = async_std::sync::channel(1);
+        let (tx_io, rx) = piper::chan(1);
         let max_retries_on_timeout = 80;
         smol::Task::spawn(
             work::generic::processor(

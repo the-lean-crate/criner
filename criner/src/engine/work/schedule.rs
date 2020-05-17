@@ -34,8 +34,8 @@ pub async fn tasks(
     krate: &model::CrateVersion,
     mut progress: prodash::tree::Item,
     _mode: Scheduling,
-    perform_io: &async_std::sync::Sender<iobound::DownloadRequest>,
-    perform_cpu: &async_std::sync::Sender<cpubound::ExtractRequest>,
+    perform_io: &piper::Sender<iobound::DownloadRequest>,
+    perform_cpu: &piper::Sender<cpubound::ExtractRequest>,
     startup_time: SystemTime,
 ) -> Result<AsyncResult> {
     use SubmitResult::*;
@@ -133,7 +133,7 @@ async fn submit_single<R>(
     startup_time: SystemTime,
     task: model::Task,
     progress: &mut prodash::tree::Item,
-    channel: &async_std::sync::Sender<R>,
+    channel: &piper::Sender<R>,
     step: u32,
     max_step: u32,
     f: impl FnOnce() -> R,

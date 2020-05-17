@@ -23,7 +23,7 @@ pub async fn process(
 ) -> Result<()> {
     processing_progress.set_name("Downloads and Extractors");
     let tx_cpu = {
-        let (tx_cpu, rx) = async_std::sync::channel(1);
+        let (tx_cpu, rx) = piper::chan(1);
         for idx in 0..cpu_bound_processors {
             let max_retries_on_timeout = 0;
             pool.spawn(
@@ -45,7 +45,7 @@ pub async fn process(
     };
 
     let tx_io = {
-        let (tx_io, rx) = async_std::sync::channel(1);
+        let (tx_io, rx) = piper::chan(1);
         for idx in 0..io_bound_processors {
             // Can only use the pool if the downloader uses a futures-compatible runtime
             let max_retries_on_timeout = 40;

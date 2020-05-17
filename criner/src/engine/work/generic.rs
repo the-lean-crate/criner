@@ -23,7 +23,7 @@ pub trait Processor {
 pub async fn processor<T: Clone>(
     db: persistence::Db,
     mut progress: prodash::tree::Item,
-    r: async_std::sync::Receiver<T>,
+    r: piper::Receiver<T>,
     mut agent: impl Processor<Item = T> + Send,
     max_retries_on_timeout: usize,
 ) -> Result<()> {
