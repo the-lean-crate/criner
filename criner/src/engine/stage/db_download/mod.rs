@@ -270,13 +270,20 @@ pub async fn schedule(
             .await;
         drop(tx_io);
         if let Some(db_file_path) = rx_result.recv().await {
-            extract_and_ingest(db, progress.add_child("ingest"), db_file_path).map_err(|err| {
+            {
+                let progress = progress.add_child("ingest");
+                smol::blocking!(extract_and_ingest(db, progress, db_file_path))
+            }
+            .map_err(|err| {
                 progress.fail(format!("ingestion failed: {}", err));
                 err
             })?;
         }
     }
 
-    cleanup(db_file_path, progress.add_child("removing old db-dumps"))?;
+    smol::blocking!(cleanup(
+        db_file_path,
+        progress.add_child("removing old db-dumps")
+    ))?;
     Ok(())
 }

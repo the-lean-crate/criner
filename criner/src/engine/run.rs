@@ -45,6 +45,11 @@ pub async fn non_blocking(
     check(deadline)?;
     let startup_time = SystemTime::now();
 
+    for _ in 0..1 {
+        // A pending future is one that simply yields forever - our workstealing static threadpool
+        std::thread::spawn(|| smol::run(futures_util::future::pending::<()>()));
+    }
+
     let db_download_handle = smol::Task::spawn(repeat_daily_at(
         download_crates_io_database_every_24_hours_starting_at,
         {
@@ -189,12 +194,6 @@ pub fn blocking(
     root: prodash::Tree,
     gui: Option<prodash::tui::TuiOptions>,
 ) -> Result<()> {
-    // Run the thread-local and work-stealing executor on a thread pool.
-    // We don't need much OOMP for this
-    for _ in 0..2 {
-        // A pending future is one that simply yields forever.
-        std::thread::spawn(|| smol::run(futures_util::future::pending::<()>()));
-    }
     let start_of_computation = SystemTime::now();
     let assets_dir = db.as_ref().join("assets");
     let db = Db::open(db)?;
