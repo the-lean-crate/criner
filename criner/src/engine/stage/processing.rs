@@ -5,10 +5,7 @@ use crate::{
     model::CrateVersion,
     persistence::{Db, Keyed, TableAccess},
 };
-use futures::{
-    task::{Spawn, SpawnExt},
-    FutureExt,
-};
+use futures::FutureExt;
 use std::{path::PathBuf, time::SystemTime};
 
 pub async fn process(
@@ -17,7 +14,6 @@ pub async fn process(
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     mut processing_progress: prodash::tree::Item,
-    pool: impl Spawn + Clone + Send + 'static + Sync,
     assets_dir: PathBuf,
     startup_time: SystemTime,
 ) -> Result<()> {
@@ -26,7 +22,7 @@ pub async fn process(
         let (tx_cpu, rx) = piper::chan(1);
         for idx in 0..cpu_bound_processors {
             let max_retries_on_timeout = 0;
-            pool.spawn(
+            smol::Task::blocking(
                 work::generic::processor(
                     db.clone(),
                     processing_progress.add_child(format!("{}:CPU IDLE", idx + 1)),
@@ -39,7 +35,8 @@ pub async fn process(
                         log::warn!("CPU bound processor failed: {}", e);
                     }
                 }),
-            )?;
+            )
+            .detach();
         }
         tx_cpu
     };
@@ -47,7 +44,6 @@ pub async fn process(
     let tx_io = {
         let (tx_io, rx) = piper::chan(1);
         for idx in 0..io_bound_processors {
-            // Can only use the pool if the downloader uses a futures-compatible runtime
             let max_retries_on_timeout = 40;
             smol::Task::spawn(
                 work::generic::processor(

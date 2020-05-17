@@ -5,7 +5,7 @@ use crate::{
     persistence::{self, TableAccess},
     utils::check,
 };
-use futures::{task::Spawn, task::SpawnExt, FutureExt};
+use futures::FutureExt;
 use rusqlite::NO_PARAMS;
 use std::{path::PathBuf, time::SystemTime};
 
@@ -18,7 +18,6 @@ pub async fn generate(
     glob: Option<String>,
     deadline: Option<SystemTime>,
     cpu_o_bound_processors: u32,
-    pool: impl Spawn + Clone + Send + 'static + Sync,
 ) -> Result<()> {
     use report::generic::Generator;
     let krates = db.open_crates()?;
@@ -37,8 +36,10 @@ pub async fn generate(
     let (rx_result, tx) = {
         let (tx, rx) = piper::chan(1);
         let (tx_result, rx_result) = piper::chan((cpu_o_bound_processors * 2) as usize);
+        // TODO: use task span with a bounded channel instead - no need for this kind of 'simple' agent
         for _ in 0..cpu_o_bound_processors {
-            pool.spawn(work::simple::processor(rx.clone(), tx_result.clone()).map(|_| ()))?;
+            smol::Task::spawn(work::simple::processor(rx.clone(), tx_result.clone()).map(|_| ()))
+                .detach();
         }
         (rx_result, tx)
     };
@@ -67,7 +68,7 @@ pub async fn generate(
             )
         }
     };
-    let merge_reports = pool.spawn_with_handle({
+    let merge_reports = smol::Task::spawn({
         let mut merge_progress = progress.add_child("report aggregator");
         merge_progress.init(Some(num_crates / chunk_size), Some("Reports"));
         report::waste::Generator::merge_reports(
@@ -80,7 +81,7 @@ pub async fn generate(
         )
         .map(|_| ())
         .boxed()
-    })?;
+    });
 
     let mut fetched_crates = 0;
     let mut chunk = Vec::<(String, Vec<u8>)>::with_capacity(chunk_size as usize);

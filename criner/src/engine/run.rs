@@ -2,7 +2,6 @@ use crate::{engine::stage, error::Result, model, persistence::Db, utils::*};
 use futures::{
     future::{Either, FutureExt},
     stream::StreamExt,
-    task::{Spawn, SpawnExt},
     SinkExt,
 };
 use log::{info, warn};
@@ -43,12 +42,11 @@ pub async fn non_blocking(
     report_settings: GlobStageRunSettings,
     download_crates_io_database_every_24_hours_starting_at: Option<time::Time>,
     assets_dir: PathBuf,
-    pool: impl Spawn + Clone + Send + 'static + Sync,
 ) -> Result<()> {
     check(deadline)?;
     let startup_time = SystemTime::now();
 
-    let db_download_handle = pool.spawn_with_handle(repeat_daily_at(
+    let db_download_handle = smol::Task::spawn(repeat_daily_at(
         download_crates_io_database_every_24_hours_starting_at,
         {
             let p = progress.clone();
@@ -68,10 +66,10 @@ pub async fn non_blocking(
                 )
             }
         },
-    ))?;
+    ));
 
     let run = fetch_settings;
-    let fetch_handle = pool.spawn_with_handle(repeat_every_s(
+    let fetch_handle = smol::Task::spawn(repeat_every_s(
         run.every.as_secs() as u32,
         {
             let p = progress.clone();
@@ -91,10 +89,10 @@ pub async fn non_blocking(
                 )
             }
         },
-    ))?;
+    ));
 
     let stage = process_settings;
-    let processing_handle = pool.spawn_with_handle(repeat_every_s(
+    let processing_handle = smol::Task::spawn(repeat_every_s(
         stage.every.as_secs() as u32,
         {
             let p = progress.clone();
@@ -106,7 +104,6 @@ pub async fn non_blocking(
             let progress = progress.clone();
             let db = db.clone();
             let assets_dir = assets_dir.clone();
-            let pool = pool.clone();
             move || {
                 stage::processing::process(
                     db.clone(),
@@ -114,13 +111,12 @@ pub async fn non_blocking(
                     io_bound_processors,
                     cpu_bound_processors,
                     progress.add_child("Downloads"),
-                    pool.clone(),
                     assets_dir.clone(),
                     startup_time,
                 )
             }
         },
-    ))?;
+    ));
 
     let stage = report_settings;
     repeat_every_s(
@@ -136,7 +132,6 @@ pub async fn non_blocking(
                 let progress = progress.clone();
                 let db = db.clone();
                 let assets_dir = assets_dir.clone();
-                let pool = pool.clone();
                 let glob = stage.glob.clone();
                 let interrupt_control = interrupt_control.clone();
                 async move {
@@ -149,7 +144,6 @@ pub async fn non_blocking(
                         glob.clone(),
                         deadline,
                         cpu_o_bound_processors,
-                        pool.clone(),
                     )
                     .await;
                     ctrl.send(Interruptible::Instantly).await.ok();
@@ -203,18 +197,6 @@ pub fn blocking(
         std::thread::spawn(|| smol::run(futures::future::pending::<()>()));
     }
     let start_of_computation = SystemTime::now();
-    // NOTE: pool should be big enough to hold all possible blocking tasks running in parallel, +1 for
-    // additional non-blocking tasks.
-    // The main thread is expected to pool non-blocking tasks.
-    // I admit I don't fully understand why multi-pool setups aren't making progress… . So just one pool for now.
-    let how_much_slower_writes_are_compared_to_computation = 4;
-    let pool_size = 1usize
-        + cpu_bound_processors
-            .max(cpu_o_bound_processors / how_much_slower_writes_are_compared_to_computation)
-            as usize;
-    let task_pool = futures::executor::ThreadPool::builder()
-        .pool_size(pool_size)
-        .create()?;
     let assets_dir = db.as_ref().join("assets");
     let db = Db::open(db)?;
     std::fs::create_dir_all(&assets_dir)?;
@@ -236,7 +218,6 @@ pub fn blocking(
         report_settings,
         download_crates_io_database_every_24_hours_starting_at,
         assets_dir,
-        task_pool.clone(),
     );
 
     match gui {
@@ -249,7 +230,7 @@ pub fn blocking(
                     interrupt_control_stream.map(|v| Event::from(v)),
                 ),
             )?);
-            let gui = task_pool.spawn_with_handle(gui)?;
+            let gui = smol::Task::spawn(gui);
 
             let either = futures::executor::block_on(futures::future::select(
                 work_handle.boxed_local(),
