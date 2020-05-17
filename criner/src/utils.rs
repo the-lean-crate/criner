@@ -1,7 +1,7 @@
 use crate::error::{Error, FormatDeadline, Result};
 use dia_semver::Semver;
 use futures::future::{self, Either};
-use futures_timer::Delay;
+use smol::Timer;
 use std::{
     convert::TryInto,
     future::Future,
@@ -37,7 +37,7 @@ pub async fn wait_with_progress(
         ));
     }
     for s in 1..=duration_s {
-        Delay::new(Duration::from_secs(1)).await;
+        Timer::after(Duration::from_secs(1)).await;
         check(deadline)?;
         progress.set(s);
     }
@@ -144,7 +144,7 @@ pub async fn timeout_after<F, T>(duration: Duration, msg: impl Into<String>, f: 
 where
     F: Future<Output = T> + Unpin,
 {
-    let selector = future::select(Delay::new(duration), f);
+    let selector = future::select(Timer::after(duration), f);
     match selector.await {
         Either::Left((_, _f)) => Err(Error::Timeout(duration, msg.into())),
         Either::Right((r, _delay)) => Ok(r),
@@ -160,6 +160,7 @@ where
 /// This approach eventually fails as we would accumulate more and more threads, but this will also give use additional
 /// days of runtime for little effort. On a Chinese network, outside of data centers, one can probably restart criner on
 /// a weekly basis or so, which is can easily be automated.
+/// TODO: Make use of smol::blocking! here
 pub async fn enforce_threaded<F, T>(deadline: SystemTime, f: F) -> Result<T>
 where
     T: Send + 'static,
@@ -171,7 +172,7 @@ where
         tx.send(res).ok() // if this fails, we will timeout. Can't enforce Debug to be implemented
     });
     let selector = future::select(
-        Delay::new(
+        Timer::after(
             deadline
                 .duration_since(SystemTime::now())
                 .unwrap_or_default(),

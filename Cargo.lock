@@ -264,7 +264,6 @@ dependencies = [
  "dia-semver",
  "flume",
  "futures",
- "futures-timer",
  "glob",
  "globset",
  "horrorshow",

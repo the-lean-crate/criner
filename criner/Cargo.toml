@@ -19,7 +19,6 @@ doctest = false
 [dependencies]
 quick-error = "1.2.3"
 futures = { version = "0.3.4", default-features = false }
-futures-timer = "3.0.1"
 crates-index-diff = "7.0.0"
 prodash = { version = "3.6.0", default-features = false, features = ["tui-renderer", "log-renderer", "localtime"] }
 rmp-serde = "0.14.0"
