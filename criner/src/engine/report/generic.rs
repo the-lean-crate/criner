@@ -338,11 +338,20 @@ async fn complete_and_write_report(
         write_state,
     )? {
         WriteInstruction::DoWrite(WriteRequest { path, content }) => {
-            async_std::fs::create_dir_all(path.parent().expect("file path with parent directory"))
-                .await?;
-            let p: &Path = path.as_ref();
+            {
+                let path = path.clone();
+                smol::blocking!(std::fs::create_dir_all(
+                    path.parent().expect("file path with parent directory")
+                ))?;
+            }
             progress.halted("writing report to disk", None);
-            async_std::fs::write(p, &content).await?;
+
+            let content =
+                smol::Task::<std::result::Result<_, std::io::Error>>::blocking(async move {
+                    std::fs::write(path, &content)?;
+                    Ok(content)
+                })
+                .await?;
             Ok(content)
         }
         WriteInstruction::Skip => Ok(Vec::new()),
