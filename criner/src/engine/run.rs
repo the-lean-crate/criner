@@ -1,8 +1,7 @@
 use crate::{engine::stage, error::Result, model, persistence::Db, utils::*};
-use futures::{
+use futures_util::{
     future::{Either, FutureExt},
     stream::StreamExt,
-    SinkExt,
 };
 use log::{info, warn};
 use prodash::tui::{Event, Line};
@@ -135,8 +134,8 @@ pub async fn non_blocking(
                 let glob = stage.glob.clone();
                 let interrupt_control = interrupt_control.clone();
                 async move {
-                    let mut ctrl = interrupt_control;
-                    ctrl.send(Interruptible::Deferred).await.ok();
+                    let ctrl = interrupt_control;
+                    ctrl.send(Interruptible::Deferred).await;
                     let res = stage::report::generate(
                         db.clone(),
                         progress.add_child("Reports"),
@@ -146,7 +145,7 @@ pub async fn non_blocking(
                         cpu_o_bound_processors,
                     )
                     .await;
-                    ctrl.send(Interruptible::Instantly).await.ok();
+                    ctrl.send(Interruptible::Instantly).await;
                     res
                 }
             }
@@ -164,7 +163,7 @@ pub enum Interruptible {
     Deferred,
 }
 
-pub type InterruptControlEvents = futures::channel::mpsc::Sender<Interruptible>;
+pub type InterruptControlEvents = piper::Sender<Interruptible>;
 
 impl From<Interruptible> for prodash::tui::Event {
     fn from(v: Interruptible) -> Self {
@@ -194,14 +193,13 @@ pub fn blocking(
     // We don't need much OOMP for this
     for _ in 0..2 {
         // A pending future is one that simply yields forever.
-        std::thread::spawn(|| smol::run(futures::future::pending::<()>()));
+        std::thread::spawn(|| smol::run(futures_util::future::pending::<()>()));
     }
     let start_of_computation = SystemTime::now();
     let assets_dir = db.as_ref().join("assets");
     let db = Db::open(db)?;
     std::fs::create_dir_all(&assets_dir)?;
-    let (interrupt_control_sink, interrupt_control_stream) =
-        futures::channel::mpsc::channel::<Interruptible>(1);
+    let (interrupt_control_sink, interrupt_control_stream) = piper::chan::<Interruptible>(1);
 
     // dropping the work handle will stop (non-blocking) futures
     let work_handle = non_blocking(
@@ -222,24 +220,19 @@ pub fn blocking(
 
     match gui {
         Some(gui_options) => {
-            let (gui, abort_handle) = futures::future::abortable(prodash::tui::render_with_input(
+            let gui = smol::Task::spawn(prodash::tui::render_with_input(
                 root,
                 gui_options,
-                futures::stream::select(
+                futures_util::stream::select(
                     context_stream(&db, start_of_computation),
                     interrupt_control_stream.map(|v| Event::from(v)),
                 ),
             )?);
-            let gui = smol::Task::spawn(gui);
 
-            let either = futures::executor::block_on(futures::future::select(
-                work_handle.boxed_local(),
-                gui.boxed_local(),
-            ));
+            let either = smol::run(futures_util::future::select(work_handle.boxed_local(), gui));
             match either {
                 Either::Left((work_result, gui)) => {
-                    abort_handle.abort();
-                    futures::executor::block_on(gui).ok();
+                    smol::run(gui.cancel());
                     if let Err(e) = work_result {
                         warn!("work processor failed: {}", e);
                     }
@@ -249,7 +242,7 @@ pub fn blocking(
         }
         None => {
             drop(interrupt_control_stream);
-            let work_result = futures::executor::block_on(work_handle);
+            let work_result = smol::run(work_handle);
             if let Err(e) = work_result {
                 warn!("work processor failed: {}", e);
             }
@@ -269,7 +262,10 @@ fn wallclock(since: SystemTime) -> String {
     )
 }
 
-fn context_stream(db: &Db, start_of_computation: SystemTime) -> impl futures::Stream<Item = Event> {
+fn context_stream(
+    db: &Db,
+    start_of_computation: SystemTime,
+) -> impl futures_util::stream::Stream<Item = Event> {
     prodash::tui::ticker(Duration::from_secs(1)).map({
         let db = db.clone();
         move |_| {

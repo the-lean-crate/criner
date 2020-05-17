@@ -4,11 +4,10 @@ use crate::{
     Error, Result,
 };
 use bytesize::ByteSize;
-use futures::io::AsyncWriteExt;
+use futures_util::{future::FutureExt, io::AsyncWriteExt};
 
 use crate::utils::timeout_after;
 use async_trait::async_trait;
-use futures::FutureExt;
 use std::{
     path::{Path, PathBuf},
     time::{Duration, SystemTime},

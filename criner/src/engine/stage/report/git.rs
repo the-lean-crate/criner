@@ -179,7 +179,7 @@ pub fn select_callback(
                         .map(|b| b.as_str().expect("valid utf8").to_string())
                         .unwrap_or_else(|_| "origin".into());
 
-                    futures::executor::block_on(enforce_threaded(
+                    smol::block_on(enforce_threaded(
                         SystemTime::now() + std::time::Duration::from_secs(60 * 60),
                         {
                             let mut progress = progress.add_child("git push");

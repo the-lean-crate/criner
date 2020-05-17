@@ -41,10 +41,6 @@ quick_error! {
         Timeout(d: std::time::Duration, msg: String) {
             display("{} - timeout after {:?}.", msg, d)
         }
-        Spawn(err: futures::task::SpawnError) {
-            from()
-            cause(err)
-        }
         RmpSerdeEncode(err: rmp_serde::encode::Error) {
             from()
             cause(err)

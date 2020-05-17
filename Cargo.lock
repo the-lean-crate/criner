@@ -263,7 +263,7 @@ dependencies = [
  "csv",
  "dia-semver",
  "flume",
- "futures",
+ "futures-util",
  "glob",
  "globset",
  "horrorshow",
