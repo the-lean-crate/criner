@@ -44,13 +44,19 @@ pub async fn generate(
     };
 
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
-    async_std::fs::create_dir_all(&waste_report_dir).await?;
+    {
+        let dir = waste_report_dir.clone();
+        smol::blocking!(std::fs::create_dir_all(dir))?;
+    }
     use crate::engine::report::generic::WriteCallback;
     let (cache_dir, (git_handle, git_state, maybe_join_handle)) = match glob.as_ref() {
         Some(_) => (None, (git::not_available as WriteCallback, None, None)),
         None => {
             let cd = waste_report_dir.join("__incremental_cache__");
-            async_std::fs::create_dir_all(&cd).await?;
+            {
+                let cd = cd.clone();
+                smol::blocking!(std::fs::create_dir_all(cd))?;
+            }
             (
                 Some(cd),
                 git::select_callback(

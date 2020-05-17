@@ -185,14 +185,19 @@ async fn download_file_and_store_result(
     url: &str,
     out_file: PathBuf,
 ) -> Result<()> {
-    async_std::fs::create_dir_all(&out_file.parent().expect("parent directory")).await?;
+    {
+        let out_file = out_file.clone();
+        smol::blocking!(std::fs::create_dir_all(
+            &out_file.parent().expect("parent directory")
+        ))?;
+    }
 
     // NOTE: We assume that the files we download never change, and we assume the server supports resumption!
-    let (start_byte, truncate) = if let Ok(existing_meta) = async_std::fs::metadata(&out_file).await
-    {
-        (existing_meta.len(), false)
-    } else {
-        (0, true)
+    let (start_byte, truncate) = {
+        let out_file = out_file.clone();
+        smol::blocking!(std::fs::metadata(&out_file))
+            .map(|meta| (meta.len(), false))
+            .unwrap_or((0, true))
     };
 
     progress.blocked("fetch HEAD", None);
@@ -240,16 +245,20 @@ async fn download_file_and_store_result(
     ));
 
     if remaining_content_length != 0 {
-        let mut out = async_std::fs::OpenOptions::new()
-            .create(truncate)
-            .truncate(truncate)
-            .write(truncate)
-            .append(!truncate)
-            .open(&out_file)
-            .await
+        let mut out = smol::writer(
+            {
+                let out_file = out_file.clone();
+                smol::blocking!(std::fs::OpenOptions::new()
+                    .create(truncate)
+                    .truncate(truncate)
+                    .write(truncate)
+                    .append(!truncate)
+                    .open(out_file))
+            }
             .map_err(|err| {
                 crate::Error::Message(format!("Failed to open '{}': {}", out_file.display(), err))
-            })?;
+            })?,
+        );
 
         let mut bytes_received = start_byte as usize;
         while let Some(chunk) = timeout_after(
