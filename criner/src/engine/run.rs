@@ -123,7 +123,7 @@ pub async fn non_blocking(
     ));
 
     let stage = report_settings;
-    repeat_every_s(
+    let report_handle = smol::Task::spawn(repeat_every_s(
         stage.run.every.as_secs() as u32,
         {
             let p = progress.clone();
@@ -155,11 +155,11 @@ pub async fn non_blocking(
                 }
             }
         },
-    )
-    .await?;
+    ));
 
     fetch_handle.await?;
     db_download_handle.await?;
+    report_handle.await?;
     processing_handle.await
 }
 
