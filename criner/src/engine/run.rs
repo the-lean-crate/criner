@@ -44,7 +44,6 @@ pub async fn non_blocking(
     download_crates_io_database_every_24_hours_starting_at: Option<time::Time>,
     assets_dir: PathBuf,
     pool: impl Spawn + Clone + Send + 'static + Sync,
-    tokio: tokio::runtime::Handle,
 ) -> Result<()> {
     check(deadline)?;
     let startup_time = SystemTime::now();
@@ -108,7 +107,6 @@ pub async fn non_blocking(
             let db = db.clone();
             let assets_dir = assets_dir.clone();
             let pool = pool.clone();
-            let tokio = tokio.clone();
             move || {
                 stage::processing::process(
                     db.clone(),
@@ -116,7 +114,6 @@ pub async fn non_blocking(
                     io_bound_processors,
                     cpu_bound_processors,
                     progress.add_child("Downloads"),
-                    tokio.clone(),
                     pool.clone(),
                     assets_dir.clone(),
                     startup_time,
@@ -205,13 +202,6 @@ pub fn blocking(
         // A pending future is one that simply yields forever.
         std::thread::spawn(|| smol::run(futures::future::pending::<()>()));
     }
-    // required for request
-    let tokio_rt = tokio::runtime::Builder::new()
-        .enable_all()
-        .core_threads(1)
-        .max_threads(2) // needs to be two or nothing happens
-        .threaded_scheduler()
-        .build()?;
     let start_of_computation = SystemTime::now();
     // NOTE: pool should be big enough to hold all possible blocking tasks running in parallel, +1 for
     // additional non-blocking tasks.
@@ -247,7 +237,6 @@ pub fn blocking(
         download_crates_io_database_every_24_hours_starting_at,
         assets_dir,
         task_pool.clone(),
-        tokio_rt.handle().clone(),
     );
 
     match gui {

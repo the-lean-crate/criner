@@ -17,7 +17,6 @@ pub async fn process(
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     mut processing_progress: prodash::tree::Item,
-    tokio: tokio::runtime::Handle,
     pool: impl Spawn + Clone + Send + 'static + Sync,
     assets_dir: PathBuf,
     startup_time: SystemTime,
@@ -49,9 +48,8 @@ pub async fn process(
         let (tx_io, rx) = async_std::sync::channel(1);
         for idx in 0..io_bound_processors {
             // Can only use the pool if the downloader uses a futures-compatible runtime
-            // Tokio is its very own thing, and futures requiring it need to run there.
             let max_retries_on_timeout = 40;
-            tokio.spawn(
+            smol::Task::spawn(
                 work::generic::processor(
                     db.clone(),
                     processing_progress.add_child(format!("{}: ↓ IDLE", idx + 1)),
@@ -76,7 +74,8 @@ pub async fn process(
                         log::warn!("iobound processor failed: {}", e);
                     }
                 }),
-            );
+            )
+            .detach();
         }
         tx_io
     };

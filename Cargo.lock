@@ -340,7 +340,6 @@ dependencies = [
  "smol",
  "tar",
  "time 0.2.16",
- "tokio",
  "toml",
 ]
 
