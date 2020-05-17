@@ -60,13 +60,11 @@ pub async fn non_blocking(
             let db = db.clone();
             let assets_dir = assets_dir.clone();
             let progress = progress.clone();
-            let tokio = tokio.clone();
             move || {
                 stage::db_download::schedule(
                     db.clone(),
                     assets_dir.clone(),
                     progress.add_child("fetching crates-io db"),
-                    tokio.clone(),
                     startup_time,
                 )
             }
@@ -201,6 +199,12 @@ pub fn blocking(
     root: prodash::Tree,
     gui: Option<prodash::tui::TuiOptions>,
 ) -> Result<()> {
+    // Run the thread-local and work-stealing executor on a thread pool.
+    // We don't need much OOMP for this
+    for _ in 0..2 {
+        // A pending future is one that simply yields forever.
+        std::thread::spawn(|| smol::run(futures::future::pending::<()>()));
+    }
     // required for request
     let tokio_rt = tokio::runtime::Builder::new()
         .enable_all()

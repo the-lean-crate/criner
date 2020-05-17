@@ -214,14 +214,13 @@ pub async fn schedule(
     db: Db,
     assets_dir: PathBuf,
     mut progress: prodash::tree::Item,
-    tokio: tokio::runtime::Handle,
     startup_time: std::time::SystemTime,
 ) -> Result<()> {
     let (tx_result, rx_result) = async_std::sync::channel(1);
     let tx_io = {
         let (tx_io, rx) = async_std::sync::channel(1);
         let max_retries_on_timeout = 80;
-        tokio.spawn(
+        smol::Task::spawn(
             work::generic::processor(
                 db.clone(),
                 progress.add_child("↓ IDLE"),
@@ -236,7 +235,8 @@ pub async fn schedule(
                     log::warn!("db download: iobound processor failed: {}", e);
                 }
             }),
-        );
+        )
+        .detach();
         tx_io
     };
 
