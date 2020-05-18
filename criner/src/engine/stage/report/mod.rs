@@ -33,7 +33,25 @@ pub async fn generate(
     }
     progress.init(Some(num_crates), Some("crates"));
 
-    let (tx_result, rx_result) = piper::chan(cpu_o_bound_processors as usize);
+    let (processors, tx_result, rx_result) = {
+        let (tx_task, rx_task) = piper::chan(1);
+        let (tx_result, rx_result) = piper::chan(cpu_o_bound_processors as usize * 2);
+
+        for _ in 0..cpu_o_bound_processors {
+            // TODO Just use Task::blocking once fix has landed
+            smol::Task::spawn(smol::Task::blocking({
+                let task = rx_task.clone();
+                let result = tx_result.clone();
+                async move {
+                    while let Some(f) = task.recv().await {
+                        result.send(f.await).await;
+                    }
+                }
+            }))
+            .detach();
+        }
+        (tx_task, tx_result, rx_result)
+    };
 
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
     {
@@ -104,31 +122,17 @@ pub async fn generate(
 
         progress.set((cid * chunk_size) as u32);
         progress.halted("write crate report", None);
-        smol::Task::blocking({
-            let tx_result = tx_result.clone();
-            let db = db.clone();
-            let waste_report_dir = waste_report_dir.clone();
-            let cache_dir = cache_dir.clone();
-            let progress = progress.add_child("");
-            let git_state = git_state.clone();
-            async move {
-                tx_result
-                    .send(
-                        report::waste::Generator::write_files(
-                            db,
-                            waste_report_dir,
-                            cache_dir,
-                            chunk,
-                            progress,
-                            git_handle,
-                            git_state,
-                        )
-                        .await,
-                    )
-                    .await
-            }
-        })
-        .await;
+        processors
+            .send(report::waste::Generator::write_files(
+                db.clone(),
+                waste_report_dir.clone(),
+                cache_dir.clone(),
+                chunk,
+                progress.add_child(""),
+                git_handle,
+                git_state.clone(),
+            ))
+            .await;
         chunk = Vec::with_capacity(chunk_size as usize);
         if abort_loop {
             break;
