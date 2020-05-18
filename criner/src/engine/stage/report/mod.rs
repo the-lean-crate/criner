@@ -33,13 +33,12 @@ pub async fn generate(
     }
     progress.init(Some(num_crates), Some("crates"));
 
-    let (processors, tx_result, rx_result) = {
+    let (processors, rx_result) = {
         let (tx_task, rx_task) = piper::chan(1);
         let (tx_result, rx_result) = piper::chan(cpu_o_bound_processors as usize * 2);
 
         for _ in 0..cpu_o_bound_processors {
-            // TODO Just use Task::blocking once fix has landed
-            smol::Task::spawn(smol::Task::blocking({
+            smol::Task::blocking({
                 let task = rx_task.clone();
                 let result = tx_result.clone();
                 async move {
@@ -47,10 +46,10 @@ pub async fn generate(
                         result.send(f.await).await;
                     }
                 }
-            }))
+            })
             .detach();
         }
-        (tx_task, tx_result, rx_result)
+        (tx_task, rx_result)
     };
 
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
@@ -140,7 +139,6 @@ pub async fn generate(
     }
     drop(git_state);
     drop(processors);
-    drop(tx_result);
     progress.set(num_crates);
     merge_reports.await;
     progress.done("Generating and merging waste report done");

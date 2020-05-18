@@ -22,9 +22,7 @@ pub async fn process(
         let (tx_cpu, rx) = piper::chan(1);
         for idx in 0..cpu_bound_processors {
             let max_retries_on_timeout = 0;
-            // TODO: Only use Task::blocking(…).detach() once that works - currently it's probably more of a bug that it doesn't
-            // because the detached future for the blocking task needs to be evaluated to work.
-            smol::Task::spawn(smol::Task::blocking(
+            smol::Task::blocking(
                 work::generic::processor(
                     db.clone(),
                     processing_progress.add_child(format!("{}:CPU IDLE", idx + 1)),
@@ -37,7 +35,7 @@ pub async fn process(
                         log::warn!("CPU bound processor failed: {}", e);
                     }
                 }),
-            ))
+            )
             .detach();
         }
         tx_cpu
