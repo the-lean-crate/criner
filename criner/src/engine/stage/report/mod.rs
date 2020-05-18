@@ -139,6 +139,7 @@ pub async fn generate(
         }
     }
     drop(git_state);
+    drop(processors);
     drop(tx_result);
     progress.set(num_crates);
     merge_reports.await;
