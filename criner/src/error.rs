@@ -38,6 +38,9 @@ quick_error! {
         DeadlineExceeded(d: FormatDeadline) {
             display("Stopped computation as deadline was reached {}.", d)
         }
+        Interrupted {
+            display("Interrupt or termination signal received")
+        }
         Timeout(d: std::time::Duration, msg: String) {
             display("{} - timeout after {:?}.", msg, d)
         }

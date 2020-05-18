@@ -1,6 +1,7 @@
 use crate::error::{Error, FormatDeadline, Result};
 use dia_semver::Semver;
 use futures_util::future::{self, Either};
+use futures_util::FutureExt;
 use smol::Timer;
 use std::{
     convert::TryInto,
@@ -138,6 +139,22 @@ pub fn check(deadline: Option<SystemTime>) -> Result<()> {
             }
         })
         .unwrap_or(Ok(()))
+}
+
+pub async fn handle_ctrl_c_and_sigterm<F, T>(f: F) -> Result<T>
+where
+    F: Future<Output = T> + Unpin,
+{
+    let (s, r) = piper::chan(100);
+    ctrlc::set_handler(move || {
+        s.send(()).now_or_never();
+    })
+    .ok();
+    let selector = future::select(async move { r.recv().await }.boxed_local(), f);
+    match selector.await {
+        Either::Left((_, _f)) => Err(Error::Interrupted),
+        Either::Right((r, _interrupt)) => Ok(r),
+    }
 }
 
 pub async fn timeout_after<F, T>(duration: Duration, msg: impl Into<String>, f: F) -> Result<T>

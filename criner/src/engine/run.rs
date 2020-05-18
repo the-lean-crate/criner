@@ -228,11 +228,14 @@ pub fn blocking(
                 ),
             )?);
 
-            let either = smol::run(futures_util::future::select(work_handle.boxed_local(), gui));
+            let either = smol::run(futures_util::future::select(
+                handle_ctrl_c_and_sigterm(work_handle.boxed_local()).boxed_local(),
+                gui,
+            ));
             match either {
                 Either::Left((work_result, gui)) => {
                     smol::run(gui.cancel());
-                    if let Err(e) = work_result {
+                    if let Err(e) = work_result? {
                         warn!("work processor failed: {}", e);
                     }
                 }
@@ -241,7 +244,7 @@ pub fn blocking(
         }
         None => {
             drop(interrupt_control_stream);
-            let work_result = smol::run(work_handle);
+            let work_result = smol::run(handle_ctrl_c_and_sigterm(work_handle.boxed_local()));
             if let Err(e) = work_result {
                 warn!("work processor failed: {}", e);
             }
