@@ -4,7 +4,7 @@ use crate::{
     Error, Result,
 };
 use bytesize::ByteSize;
-use futures_util::future::FutureExt;
+use futures_util::{future::FutureExt, io::AsyncWriteExt};
 
 use crate::utils::timeout_after;
 use async_trait::async_trait;
@@ -243,17 +243,21 @@ async fn download_file_and_store_result(
         ByteSize(content_length.into())
     ));
 
-    use std::io::Write;
     if remaining_content_length != 0 {
-        let mut out = std::fs::OpenOptions::new()
-            .create(truncate)
-            .truncate(truncate)
-            .write(truncate)
-            .append(!truncate)
-            .open(out_file.clone())
+        let mut out = smol::writer(
+            {
+                let out_file = out_file.clone();
+                smol::blocking!(std::fs::OpenOptions::new()
+                    .create(truncate)
+                    .truncate(truncate)
+                    .write(truncate)
+                    .append(!truncate)
+                    .open(out_file))
+            }
             .map_err(|err| {
                 crate::Error::Message(format!("Failed to open '{}': {}", out_file.display(), err))
-            })?;
+            })?,
+        );
 
         let mut bytes_received = start_byte as usize;
         while let Some(chunk) = timeout_after(
@@ -267,7 +271,7 @@ async fn download_file_and_store_result(
         )
         .await??
         {
-            out.write(&chunk)?;
+            out.write_all(&chunk).await?;
             bytes_received += chunk.len();
             progress.set((bytes_received / 1024) as u32);
         }
@@ -277,7 +281,7 @@ async fn download_file_and_store_result(
             url,
             ByteSize(bytes_received as u64)
         ));
-        out.flush()?;
+        out.flush().await?;
     } else {
         progress.done(format!("{} already on disk - skipping", url))
     }
