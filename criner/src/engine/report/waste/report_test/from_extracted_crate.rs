@@ -1,23 +1,63 @@
-use super::super::{Fix, Report};
+use super::super::{Fix, Report, TarPackage};
 use crate::model::TaskResult;
 use std::path::Path;
 
+#[allow(dead_code)]
+fn save_as_package(input: TaskResult, file_name: &str) -> TaskResult {
+    let output = input.clone();
+    match input {
+        TaskResult::ExplodedCrate {
+            entries_meta_data,
+            selected_entries,
+        } => std::fs::write(
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("tests/fixtures")
+                .join(format!("{}.package.rmp", file_name)),
+            rmp_serde::to_vec(&TarPackage {
+                entries_meta_data,
+                entries: selected_entries,
+            })
+            .unwrap(),
+        )
+        .unwrap(),
+        _ => unreachable!(),
+    };
+    output
+}
+
+#[allow(dead_code)]
 fn task_result(file_name: &str) -> TaskResult {
-    TaskResult::from(
+    save_as_package(
+        TaskResult::from(
+            std::fs::read(
+                Path::new(env!("CARGO_MANIFEST_DIR"))
+                    .join("tests/fixtures")
+                    .join(format!("{}.rmp", file_name)),
+            )
+            .unwrap()
+            .as_slice(),
+        ),
+        file_name,
+    )
+}
+
+fn tar_package(file_name: &str) -> TarPackage {
+    rmp_serde::from_slice(
         std::fs::read(
             Path::new(env!("CARGO_MANIFEST_DIR"))
                 .join("tests/fixtures")
-                .join(format!("{}.rmp", file_name)),
+                .join(format!("{}.package.rmp", file_name)),
         )
         .unwrap()
         .as_slice(),
     )
+    .unwrap()
 }
 
 #[test]
 fn ripgrep_perfectly_lean_which_is_unexpected_actually() {
     assert_eq!(
-        Report::from_result("a", "1", task_result("ripgrep-12.0.0-extract_crate-1.0.0")),
+        Report::from_package("a", "1", tar_package("ripgrep-12.0.0-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -32,7 +72,7 @@ fn ripgrep_perfectly_lean_which_is_unexpected_actually() {
 #[test]
 fn avr_libc_missing_build_script_even_though_it_is_there() {
     assert_eq!(
-        Report::from_result("a", "1", task_result("avr_libc-0.1.3extract_crate-1.0.0")),
+        Report::from_package("a", "1", tar_package("avr_libc-0.1.3extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -531,10 +571,10 @@ fn avr_libc_missing_build_script_even_though_it_is_there() {
 #[test]
 fn fermium_build_script() {
     assert_eq!(
-        Report::from_result(
+        Report::from_package(
             "a",
             "1",
-            task_result("fermium-20.12.0-alpha2-extract_crate-1.0.0")
+            tar_package("fermium-20.12.0-alpha2-extract_crate-1.0.0")
         ),
         Report::Version {
             crate_name: "a".into(),
@@ -966,10 +1006,10 @@ fn fermium_build_script() {
 #[test]
 fn grpcio_sys_lean_with_potential() {
     assert_eq!(
-        Report::from_result(
+        Report::from_package(
             "a",
             "1",
-            task_result("grpcio-sys-0.5.0_extract_crate-1.0.0")
+            tar_package("grpcio-sys-0.5.0_extract_crate-1.0.0")
         ),
         Report::Version {
             crate_name: "a".into(),
@@ -991,10 +1031,10 @@ fn grpcio_sys_lean_with_potential() {
 #[test]
 fn openblas_provider_even_more_info_from_build_script_and_something_to_optimize_for() {
     assert_eq!(
-        Report::from_result(
+        Report::from_package(
             "a",
             "1",
-            task_result("openblas_provider-0.4.0-extract_crate-1.0.0")
+            tar_package("openblas_provider-0.4.0-extract_crate-1.0.0")
         ),
         Report::Version {
             crate_name: "a".into(),
@@ -1205,7 +1245,7 @@ fn openblas_provider_even_more_info_from_build_script_and_something_to_optimize_
 #[test]
 fn curl_sys_get_more_info_from_build_script() {
     assert_eq!(
-        Report::from_result("a", "1", task_result("curl_sys-0.4.27-extract_crate-1.0.0")),
+        Report::from_package("a", "1", tar_package("curl_sys-0.4.27-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -3867,10 +3907,10 @@ fn curl_sys_get_more_info_from_build_script() {
 #[test]
 fn threed_ice_sys_build_script_includes() {
     assert_eq!(
-        Report::from_result(
+        Report::from_package(
             "a",
             "1",
-            task_result("threed-ice-sys-0.3.0-extract_crate-1.0.0")
+            tar_package("threed-ice-sys-0.3.0-extract_crate-1.0.0")
         ),
         Report::Version {
             crate_name: "a".into(),
@@ -4046,10 +4086,10 @@ fn threed_ice_sys_build_script_includes() {
 #[test]
 fn lw_webdriver_with_big_binaries() {
     assert_eq!(
-        Report::from_result(
+        Report::from_package(
             "a",
             "1",
-            task_result("lw_webdriver-0.4.1-extract_crate-1.0.0")
+            tar_package("lw_webdriver-0.4.1-extract_crate-1.0.0")
         ),
         Report::Version {
             crate_name: "a".into(),
@@ -4076,10 +4116,10 @@ fn lw_webdriver_with_big_binaries() {
 #[test]
 fn falcon_raptor_typescript_with_false_positive_potential_waste() {
     assert_eq!(
-        Report::from_result(
+        Report::from_package(
             "a",
             "1",
-            task_result("falcon_raptor-0.4.9-extract_crate-1.0.0")
+            tar_package("falcon_raptor-0.4.9-extract_crate-1.0.0")
         ),
         Report::Version {
             crate_name: "a".into(),
@@ -4099,10 +4139,10 @@ fn falcon_raptor_typescript_with_false_positive_potential_waste() {
 #[test]
 fn deno_typescript() {
     assert_eq!(
-        Report::from_result(
+        Report::from_package(
             "a",
             "1",
-            task_result("deno_typescript-0.36.0-extract_crate-1.0.0")
+            tar_package("deno_typescript-0.36.0-extract_crate-1.0.0")
         ),
         Report::Version {
             crate_name: "a".into(),
@@ -4118,10 +4158,10 @@ fn deno_typescript() {
 #[test]
 fn cookie_factory() {
     assert_eq!(
-        Report::from_result(
+        Report::from_package(
             "a",
             "1",
-            task_result("cookie_factory-0.3.1-extract_crate-0.3.1")
+            tar_package("cookie_factory-0.3.1-extract_crate-0.3.1")
         ),
         Report::Version {
             crate_name: "a".into(),
@@ -4152,7 +4192,7 @@ fn cookie_factory() {
 #[test]
 fn gnir() {
     assert_eq!(
-        Report::from_result("a", "1", task_result("gnir-0.14.0-alpha3-extract_crate-1.0.0")),
+        Report::from_package("a", "1", tar_package("gnir-0.14.0-alpha3-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -4172,7 +4212,7 @@ fn gnir() {
 #[test]
 fn sovrin_client() {
     assert_eq!(
-        Report::from_result("a", "1", task_result("sovrin-client.0.1.0-179-extract_crate-1.0.0")),
+        Report::from_package("a", "1", tar_package("sovrin-client.0.1.0-179-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -4191,7 +4231,7 @@ fn sovrin_client() {
 #[test]
 fn mozjs() {
     assert_eq!(
-        Report::from_result("a", "1", task_result("mozjs_sys-0.67.1-extract_crate-1.0.0")),
+        Report::from_package("a", "1", tar_package("mozjs_sys-0.67.1-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),

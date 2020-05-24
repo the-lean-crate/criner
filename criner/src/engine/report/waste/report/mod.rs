@@ -10,6 +10,7 @@ pub use result::{globset_from_patterns, tar_path_to_utf8_str};
 
 pub type Patterns = Vec<String>;
 
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct TarPackage {
     /// Meta data of all entries in the crate
     pub entries_meta_data: Vec<TarHeader>,
