@@ -49,7 +49,7 @@ fn tar_path_to_path_no_strip(bytes: &[u8]) -> &Path {
 // NOTE: Actually there only seem to be files in these archives, but let's be safe
 // There are definitely no directories
 fn entry_is_file(entry_type: u8) -> bool {
-    tar::EntryType::new(entry_type).is_file()
+    entry_type == b'\x00' || entry_type == b'0'
 }
 
 fn split_to_matched_and_unmatched(
@@ -80,12 +80,13 @@ fn directories_of(entries: &[TarHeader]) -> Vec<TarHeader> {
             }
         }
     }
+    let tar_directory_entry = b'5';
     directories
         .into_iter()
         .map(|k| TarHeader {
             path: k.to_str().expect("utf8 paths").as_bytes().to_owned(),
             size: 0,
-            entry_type: tar::EntryType::Directory.as_byte(),
+            entry_type: tar_directory_entry,
         })
         .collect()
 }
