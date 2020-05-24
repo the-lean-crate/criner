@@ -295,6 +295,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "criner-waste-report"
+version = "0.1.2"
+dependencies = [
+ "bytesize",
+ "dia-semver",
+ "globset",
+ "horrorshow",
+ "humantime 2.0.0",
+ "lazy_static",
+ "regex",
+ "rmp-serde",
+ "serde",
+ "serde_derive",
+ "tar",
+ "toml",
+]
+
+[[package]]
 name = "crossbeam"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

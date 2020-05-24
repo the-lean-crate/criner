@@ -30,7 +30,7 @@ criner = { version = "0.1.0", path = "./criner" }
 env_logger = { version = "0.7.1", default-features = false, features = ["termcolor", "atty", "humantime"] }
 
 [workspace]
-members = ["criner"]
+members = ["criner", "criner-waste-report"]
 
 # Turn on when needed to have faster debug builds
 [profile.dev.package."*"]

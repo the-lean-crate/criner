@@ -34,7 +34,7 @@ impl std::ops::AddAssign for VersionInfo {
     }
 }
 
-pub fn add_named_optional_aggregate(
+fn add_named_optional_aggregate(
     lhs: Option<(String, AggregateFileInfo)>,
     rhs: Option<(String, AggregateFileInfo)>,
 ) -> Option<(String, AggregateFileInfo)> {
@@ -379,11 +379,12 @@ impl crate::engine::report::generic::Aggregate for Report {
         report.write_to_io(out)?;
         Ok(())
     }
+
     async fn load_previous_top_level_state(
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Option<Self> {
-        let path = super::path_from_prefix(out_dir, super::TOP_LEVEL_REPORT_NAME);
+        let path = super::criner::path_from_prefix(out_dir, super::criner::TOP_LEVEL_REPORT_NAME);
         progress.blocked("loading previous top-level waste report from disk", None);
         smol::blocking!(std::fs::read(path))
             .ok()

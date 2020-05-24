@@ -3,7 +3,7 @@ mod merge;
 mod result;
 
 use serde_derive::{Deserialize, Serialize};
-use std::{collections::BTreeMap, path::Path, path::PathBuf};
+use std::collections::BTreeMap;
 
 pub use result::{globset_from_patterns, tar_path_to_utf8_str};
 
@@ -197,28 +197,7 @@ fn remove_implicit_entries(entries: &mut Vec<TarHeader>) {
     });
 }
 
-const TOP_LEVEL_REPORT_NAME: &str = "__top-level-report__";
-
-fn path_from_prefix(out_dir: &Path, prefix: &str) -> PathBuf {
-    use crate::engine::report::generic::Generator;
-    out_dir.join(format!(
-        "{}-{}-{}.rmp",
-        prefix,
-        super::Generator::name(),
-        super::Generator::version()
-    ))
-}
-
 impl Report {
-    fn path_to_storage_location(&self, out_dir: &Path) -> PathBuf {
-        use Report::*;
-        let prefix = match self {
-            Version { crate_name, .. } | Crate { crate_name, .. } => crate_name.as_str(),
-            CrateCollection { .. } => TOP_LEVEL_REPORT_NAME,
-        };
-        path_from_prefix(out_dir, prefix)
-    }
-
     pub fn from_package(
         crate_name: &str,
         crate_version: &str,
