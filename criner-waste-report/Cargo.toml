@@ -1,10 +1,10 @@
 [package]
 name = "criner-waste-report"
-version = "0.1.2"
+version = "0.1.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 edition = "2018"
 description = "Determine include directives for Cargo.toml files to slim down a crate"
-include = ["src/**/*", "!**/*_test/*", "Cargo.*", "README.md", "LICENSE.md"]
+include = ["src/**/*", "!**/test/*", "Cargo.*", "README.md", "LICENSE.md"]
 license = "MIT"
 repository = "https://github.com/the-lean-crate/criner"
 readme = "README.md"
