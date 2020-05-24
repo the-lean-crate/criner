@@ -1,45 +1,5 @@
 use super::super::{Fix, Report, TarPackage};
-use crate::model::TaskResult;
 use std::path::Path;
-
-#[allow(dead_code)]
-fn save_as_package(input: TaskResult, file_name: &str) -> TaskResult {
-    let output = input.clone();
-    match input {
-        TaskResult::ExplodedCrate {
-            entries_meta_data,
-            selected_entries,
-        } => std::fs::write(
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("tests/fixtures")
-                .join(format!("{}.package.rmp", file_name)),
-            rmp_serde::to_vec(&TarPackage {
-                entries_meta_data,
-                entries: selected_entries,
-            })
-            .unwrap(),
-        )
-        .unwrap(),
-        _ => unreachable!(),
-    };
-    output
-}
-
-#[allow(dead_code)]
-fn task_result(file_name: &str) -> TaskResult {
-    save_as_package(
-        TaskResult::from(
-            std::fs::read(
-                Path::new(env!("CARGO_MANIFEST_DIR"))
-                    .join("tests/fixtures")
-                    .join(format!("{}.rmp", file_name)),
-            )
-            .unwrap()
-            .as_slice(),
-        ),
-        file_name,
-    )
-}
 
 fn tar_package(file_name: &str) -> TarPackage {
     rmp_serde::from_slice(

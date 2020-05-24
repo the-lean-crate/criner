@@ -2,13 +2,23 @@ mod html;
 mod merge;
 mod result;
 
-use crate::model::TarHeader;
 use serde_derive::{Deserialize, Serialize};
 use std::{collections::BTreeMap, path::Path, path::PathBuf};
 
 pub use result::{globset_from_patterns, tar_path_to_utf8_str};
 
 pub type Patterns = Vec<String>;
+
+/// An entry in a tar archive, including the most important meta-data
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct TarHeader {
+    /// The normalized path of the entry. May not be unicode encoded.
+    pub path: Vec<u8>,
+    /// The size of the file in bytes
+    pub size: u64,
+    /// The type of entry, to be analyzed with tar::EntryType
+    pub entry_type: u8,
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct TarPackage {

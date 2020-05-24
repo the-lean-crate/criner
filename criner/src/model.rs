@@ -1,3 +1,4 @@
+pub use crate::engine::report::waste::TarHeader;
 use serde_derive::{Deserialize, Serialize};
 use std::{collections::HashMap, ops::Add, time::Duration, time::SystemTime};
 
@@ -217,17 +218,6 @@ impl Task {
             _ => false,
         }
     }
-}
-
-/// An entry in a tar archive, including the most important meta-data
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
-pub struct TarHeader {
-    /// The normalized path of the entry. May not be unicode encoded.
-    pub path: Vec<u8>,
-    /// The size of the file in bytes
-    pub size: u64,
-    /// The type of entry, to be analyzed with tar::EntryType
-    pub entry_type: u8,
 }
 
 /// Append-variant-only data structure, otherwise migrations are needed
