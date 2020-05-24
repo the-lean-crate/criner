@@ -3,6 +3,7 @@
 #[macro_use]
 extern crate lazy_static;
 
+#[cfg(feature="html")]
 pub mod html;
 pub mod result;
 

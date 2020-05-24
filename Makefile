@@ -70,6 +70,7 @@ waste-report-clear-state: $(SQLITE_DB) $(WASTE_REPORT) ## clear database state a
 
 tests: ## Run all tests we have
 	cargo check --all --tests
+	cd criner-waste-report && cargo check --tests && cargo check --tests --no-default-features
 	cargo test --all
 
 ##@ Dataset
