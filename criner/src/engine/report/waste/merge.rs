@@ -1,18 +1,33 @@
-use super::{
-    path_to_storage_location, AggregateFileInfo, AggregateVersionInfo, Dict, Fix, Report,
-    VersionInfo, WastedFile,
-};
+use super::{AggregateFileInfo, AggregateVersionInfo, Dict, Fix, Report, VersionInfo, WastedFile};
 use crate::Result;
 use async_trait::async_trait;
-use criner_waste_report::{
-    add_optional_aggregate,
-    html::NO_EXT_MARKER
-};
+use criner_waste_report::{add_optional_aggregate, html::NO_EXT_MARKER};
 use std::{
     collections::BTreeMap,
     ops::AddAssign,
     path::{Path, PathBuf},
 };
+
+const TOP_LEVEL_REPORT_NAME: &str = "__top-level-report__";
+
+fn path_from_prefix(out_dir: &Path, prefix: &str) -> PathBuf {
+    use crate::engine::report::generic::Generator;
+    out_dir.join(format!(
+        "{}-{}-{}.rmp",
+        prefix,
+        super::Generator::name(),
+        super::Generator::version()
+    ))
+}
+
+fn path_to_storage_location(report: &Report, out_dir: &Path) -> PathBuf {
+    use Report::*;
+    let prefix = match report {
+        Version { crate_name, .. } | Crate { crate_name, .. } => crate_name.as_str(),
+        CrateCollection { .. } => TOP_LEVEL_REPORT_NAME,
+    };
+    path_from_prefix(out_dir, prefix)
+}
 
 pub fn vec_into_map_by_extension(
     initial: Dict<AggregateFileInfo>,
@@ -334,7 +349,7 @@ impl crate::engine::report::generic::Aggregate for Report {
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Option<Self> {
-        let path = super::path_from_prefix(out_dir, super::TOP_LEVEL_REPORT_NAME);
+        let path = path_from_prefix(out_dir, TOP_LEVEL_REPORT_NAME);
         progress.blocked("loading previous top-level waste report from disk", None);
         smol::blocking!(std::fs::read(path))
             .ok()

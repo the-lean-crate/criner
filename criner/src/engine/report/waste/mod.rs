@@ -2,8 +2,9 @@ use crate::persistence::TableAccess;
 use crate::{error::Result, model::TaskResult, persistence};
 use async_trait::async_trait;
 
-mod report;
-pub use report::*;
+pub use criner_waste_report::*;
+
+mod merge;
 
 pub struct Generator;
 
@@ -48,7 +49,20 @@ impl super::generic::Generator for Generator {
         result: TaskResult,
         _progress: &mut prodash::tree::Item,
     ) -> Result<Self::Report> {
-        Ok(from_result(crate_name, crate_version, result))
+        Ok(match result {
+            TaskResult::ExplodedCrate {
+                entries_meta_data,
+                selected_entries,
+            } => Report::from_package(
+                crate_name,
+                crate_version,
+                TarPackage {
+                    entries_meta_data,
+                    entries: selected_entries,
+                },
+            ),
+            _ => unreachable!("caller must assure we are always an exploded entry"),
+        })
     }
 }
 
