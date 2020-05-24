@@ -1,68 +1,18 @@
-use super::{AggregateFileInfo, Dict, Report, VersionInfo, WastedFile};
-use crate::{
-    engine::report::waste::{AggregateVersionInfo, Fix},
-    Result,
+use super::{
+    path_to_storage_location, AggregateFileInfo, AggregateVersionInfo, Dict, Fix, Report,
+    VersionInfo, WastedFile,
 };
+use crate::Result;
 use async_trait::async_trait;
-use std::{collections::BTreeMap, ops::AddAssign, path::Path, path::PathBuf};
-
-impl std::ops::AddAssign for AggregateFileInfo {
-    fn add_assign(&mut self, rhs: Self) {
-        let Self {
-            total_bytes,
-            total_files,
-        } = rhs;
-        self.total_bytes += total_bytes;
-        self.total_files += total_files;
-    }
-}
-
-impl std::ops::AddAssign for VersionInfo {
-    fn add_assign(&mut self, rhs: Self) {
-        let Self {
-            all,
-            waste,
-            potential_gains,
-            waste_latest_version,
-        } = rhs;
-        self.all += all;
-        self.waste += waste;
-        self.potential_gains =
-            add_optional_aggregate(self.potential_gains.clone(), potential_gains);
-        self.waste_latest_version =
-            add_named_optional_aggregate(self.waste_latest_version.clone(), waste_latest_version);
-    }
-}
-
-fn add_named_optional_aggregate(
-    lhs: Option<(String, AggregateFileInfo)>,
-    rhs: Option<(String, AggregateFileInfo)>,
-) -> Option<(String, AggregateFileInfo)> {
-    Some(match (lhs, rhs) {
-        (Some((lhs_name, lhs)), Some((rhs_name, _))) if lhs_name > rhs_name => (lhs_name, lhs),
-        (Some(_), Some((rhs_name, rhs))) => (rhs_name, rhs),
-        (Some(v), None) => v,
-        (None, Some(v)) => v,
-        (None, None) => return None,
-    })
-}
-
-pub fn add_optional_aggregate(
-    lhs: Option<AggregateFileInfo>,
-    rhs: Option<AggregateFileInfo>,
-) -> Option<AggregateFileInfo> {
-    Some(match (lhs, rhs) {
-        (Some(mut lhs), Some(rhs)) => {
-            lhs += rhs;
-            lhs
-        }
-        (Some(v), None) => v,
-        (None, Some(v)) => v,
-        (None, None) => return None,
-    })
-}
-
-pub const NO_EXT_MARKER: &str = "<NO_EXT>";
+use criner_waste_report::{
+    add_optional_aggregate,
+    html::NO_EXT_MARKER
+};
+use std::{
+    collections::BTreeMap,
+    ops::AddAssign,
+    path::{Path, PathBuf},
+};
 
 pub fn vec_into_map_by_extension(
     initial: Dict<AggregateFileInfo>,
@@ -384,7 +334,7 @@ impl crate::engine::report::generic::Aggregate for Report {
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Option<Self> {
-        let path = super::criner::path_from_prefix(out_dir, super::criner::TOP_LEVEL_REPORT_NAME);
+        let path = super::path_from_prefix(out_dir, super::TOP_LEVEL_REPORT_NAME);
         progress.blocked("loading previous top-level waste report from disk", None);
         smol::blocking!(std::fs::read(path))
             .ok()
@@ -396,7 +346,7 @@ impl crate::engine::report::generic::Aggregate for Report {
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Option<Self> {
-        let path = self.path_to_storage_location(out_dir);
+        let path = path_to_storage_location(self, out_dir);
         progress.blocked("loading previous waste report from disk", None);
         smol::blocking!(std::fs::read(path))
             .ok()
@@ -407,7 +357,7 @@ impl crate::engine::report::generic::Aggregate for Report {
         out_dir: &Path,
         progress: &mut prodash::tree::Item,
     ) -> Result<()> {
-        let path = self.path_to_storage_location(out_dir);
+        let path = path_to_storage_location(self, out_dir);
         progress.blocked("storing current waste report to disk", None);
         let data = rmp_serde::to_vec(self)?;
         smol::blocking!(std::fs::write(path, data)).map_err(Into::into)

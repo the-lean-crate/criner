@@ -1,11 +1,28 @@
-use super::{
-    merge::{fix_to_wasted_files_aggregate, NO_EXT_MARKER},
-    AggregateFileInfo, Dict, Report, VersionInfo,
-};
+use super::{AggregateFileInfo, Dict, Fix, Report, VersionInfo};
 use bytesize::ByteSize;
 use dia_semver::Semver;
 use horrorshow::{box_html, helper::doctype, html, Render, RenderBox, RenderOnce, TemplateBuffer};
 use std::{iter::FromIterator, time::SystemTime};
+
+pub fn fix_to_wasted_files_aggregate(fix: Option<Fix>) -> Option<AggregateFileInfo> {
+    match fix.unwrap_or(Fix::RemoveExclude) {
+        Fix::ImprovedInclude {
+            potential: Some(potential),
+            ..
+        } => Some(potential.potential_waste),
+        _ => None,
+    }
+    .map(|v| {
+        v.into_iter()
+            .fold(AggregateFileInfo::default(), |mut a, e| {
+                a.total_files += 1;
+                a.total_bytes += e.size;
+                a
+            })
+    })
+}
+
+pub const NO_EXT_MARKER: &str = "<NO_EXT>";
 
 fn parse_semver(version: &str) -> Semver {
     use std::str::FromStr;
@@ -22,7 +39,6 @@ fn parse_semver(version: &str) -> Semver {
 }
 
 // TODO: fix these unnecessary clones while maintaining composability
-
 fn potential_savings(info_by_crate: &Dict<VersionInfo>) -> Option<AggregateFileInfo> {
     let gains = info_by_crate
         .iter()

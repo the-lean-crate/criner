@@ -48,7 +48,7 @@ impl super::generic::Generator for Generator {
         result: TaskResult,
         _progress: &mut prodash::tree::Item,
     ) -> Result<Self::Report> {
-        Ok(Report::from_result(crate_name, crate_version, result))
+        Ok(from_result(crate_name, crate_version, result))
     }
 }
 
