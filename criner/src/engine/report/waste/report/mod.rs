@@ -2,13 +2,23 @@ mod html;
 mod merge;
 mod result;
 
-use crate::model::{TarHeader, TaskResult};
+use crate::model::TarHeader;
 use serde_derive::{Deserialize, Serialize};
 use std::{collections::BTreeMap, path::Path, path::PathBuf};
 
 pub use result::{globset_from_patterns, tar_path_to_utf8_str};
 
 pub type Patterns = Vec<String>;
+
+pub struct TarPackage {
+    /// Meta data of all entries in the crate
+    pub entries_meta_data: Vec<TarHeader>,
+    /// The actual content of selected files, Cargo.*, build.rs and lib/main
+    /// IMPORTANT: This file may be partial and limited in size unless it is Cargo.toml, which
+    /// is always complete.
+    /// Note that these are also present in entries_meta_data.
+    pub entries: Vec<(TarHeader, Vec<u8>)>,
+}
 
 #[derive(PartialEq, Eq, Debug, Clone, Deserialize, Serialize)]
 pub struct PotentialWaste {
@@ -198,66 +208,56 @@ impl Report {
         path_from_prefix(out_dir, prefix)
     }
 
-    pub fn from_result(crate_name: &str, crate_version: &str, result: TaskResult) -> Report {
-        match result {
-            TaskResult::ExplodedCrate {
-                mut entries_meta_data,
-                selected_entries,
-            } => {
-                remove_implicit_entries(&mut entries_meta_data);
-                let total_size_in_bytes = entries_meta_data.iter().map(|e| e.size).sum();
-                let total_files = entries_meta_data.len() as u64;
-                let cargo_config = Self::cargo_config_from_entries(&selected_entries);
-                let (includes, excludes, compile_time_includes, build_script_name) =
-                    Self::cargo_config_into_includes_excludes(
-                        cargo_config,
-                        &selected_entries,
-                        &entries_meta_data,
-                    );
-                let (suggested_fix, wasted_files) =
-                    match (includes, excludes, build_script_name, compile_time_includes) {
-                        (
-                            Some(includes),
-                            Some(excludes),
-                            _presence_of_build_script_not_relevant,
-                            _,
-                        ) => Self::compute_includes_from_includes_and_excludes(
-                            entries_meta_data,
-                            includes,
-                            excludes,
-                        ),
-                        (Some(includes), None, build_script_name, _) => Self::enrich_includes(
-                            entries_meta_data,
-                            includes,
-                            build_script_name.is_some(),
-                        ),
-                        (None, Some(excludes), build_script_name, compile_time_includes) => {
-                            Self::enrich_excludes(
-                                entries_meta_data,
-                                excludes,
-                                compile_time_includes,
-                                build_script_name.is_some(),
-                            )
-                        }
-                        (None, None, build_script_name, compile_time_includes) => {
-                            Self::standard_includes(
-                                entries_meta_data,
-                                build_script_name,
-                                compile_time_includes,
-                            )
-                        }
-                    };
-                let wasted_files = Self::convert_to_wasted_files(wasted_files);
-                Report::Version {
-                    crate_name: crate_name.into(),
-                    crate_version: crate_version.into(),
-                    total_size_in_bytes,
-                    total_files,
-                    wasted_files,
-                    suggested_fix,
+    pub fn from_package(
+        crate_name: &str,
+        crate_version: &str,
+        TarPackage {
+            mut entries_meta_data,
+            entries,
+        }: TarPackage,
+    ) -> Report {
+        remove_implicit_entries(&mut entries_meta_data);
+        let total_size_in_bytes = entries_meta_data.iter().map(|e| e.size).sum();
+        let total_files = entries_meta_data.len() as u64;
+        let cargo_config = Self::cargo_config_from_entries(&entries);
+        let (includes, excludes, compile_time_includes, build_script_name) =
+            Self::cargo_config_into_includes_excludes(cargo_config, &entries, &entries_meta_data);
+        let (suggested_fix, wasted_files) =
+            match (includes, excludes, build_script_name, compile_time_includes) {
+                (Some(includes), Some(excludes), _presence_of_build_script_not_relevant, _) => {
+                    Self::compute_includes_from_includes_and_excludes(
+                        entries_meta_data,
+                        includes,
+                        excludes,
+                    )
                 }
-            }
-            _ => unreachable!("need caller to assure we get exploded crates only"),
+                (Some(includes), None, build_script_name, _) => {
+                    Self::enrich_includes(entries_meta_data, includes, build_script_name.is_some())
+                }
+                (None, Some(excludes), build_script_name, compile_time_includes) => {
+                    Self::enrich_excludes(
+                        entries_meta_data,
+                        excludes,
+                        compile_time_includes,
+                        build_script_name.is_some(),
+                    )
+                }
+                (None, None, build_script_name, compile_time_includes) => Self::standard_includes(
+                    entries_meta_data,
+                    build_script_name,
+                    compile_time_includes,
+                ),
+            };
+        let wasted_files = Self::convert_to_wasted_files(wasted_files);
+        Report::Version {
+            crate_name: crate_name.into(),
+            crate_version: crate_version.into(),
+            total_size_in_bytes,
+            total_files,
+            wasted_files,
+            suggested_fix,
         }
     }
 }
+
+pub mod criner;

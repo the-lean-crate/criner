@@ -2,10 +2,24 @@ use super::{
     merge::{fix_to_wasted_files_aggregate, NO_EXT_MARKER},
     AggregateFileInfo, Dict, Report, VersionInfo,
 };
-use crate::utils::parse_semver;
 use bytesize::ByteSize;
+use dia_semver::Semver;
 use horrorshow::{box_html, helper::doctype, html, Render, RenderBox, RenderOnce, TemplateBuffer};
 use std::{iter::FromIterator, time::SystemTime};
+
+fn parse_semver(version: &str) -> Semver {
+    use std::str::FromStr;
+    Semver::from_str(&version)
+        .or_else(|_| {
+            Semver::from_str(
+                &version[..version
+                    .find('-')
+                    .or_else(|| version.find('+'))
+                    .expect("some prerelease version")],
+            )
+        })
+        .expect("semver parsing to work if violating prerelease versions are stripped")
+}
 
 // TODO: fix these unnecessary clones while maintaining composability
 
