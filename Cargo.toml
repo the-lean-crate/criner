@@ -4,10 +4,10 @@ version = "0.1.2"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 edition = "2018"
 description = "A command-line interface for the 'Criner' crates mining platform"
-include = ["/src/**/*", "/Cargo.*", "/README.md", "/LICENSE.md"]
 license = "MIT"
 repository = "https://github.com/the-lean-crate/criner"
 readme = "README.md"
+include = ["src/**/*", "LICENSE.md", "README.md", "CHANGELOG.md"]
 
 [[bin]]
 name = "criner"

@@ -4,10 +4,10 @@ version = "0.1.2"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 edition = "2018"
 description = "a platform for resumable mining of crates.io for knowledge and information"
-include = ["src/**/*", "!**/*_test/*", "Cargo.*", "README.md", "LICENSE.md"]
 license = "MIT"
 repository = "https://github.com/the-lean-crate/criner"
 readme = "README.md"
+include = ["src/**/*", "LICENSE.md", "README.md", "!**/*_test/*"]
 
 [features]
 default = []
