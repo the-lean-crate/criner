@@ -9,7 +9,7 @@ is very relevant for inclusiveness and for extending Rusts reach.
 This is facilitated by three means:
 
 * **[The Criner Waste Report][waste-io]** - Analyse the current state of waste within all crate versions of crates.io and offer a **fix**.
-* **[The 'cargo-diet' companion program][cargo-diet]** - Start lean by default and compute optimal includes and excludes before publishing to crates.io.
+* **[The 'cargo diet' Companion Program][cargo-diet]** - Start lean by default and compute optimal includes and excludes before publishing to crates.io.
 * _[PLANNED]_ **The 'lean crate' badge** - Show off that you care and present the badge on crates.io and in README files.
 
 ## Motivation
@@ -86,6 +86,13 @@ to make _The Criner Waste Report_ better in a [collaborative][code-of-conduct], 
 [waste-io]: https://the-lean-crate.github.io/waste/
 [negative-include]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-exclude-and-include-fields
 [code-of-conduct]: https://github.com/the-lean-crate/criner/blob/master/CODE_OF_CONDUCT.md
+
+# [The `cargo diet` Companion Program][cargo-diet]
+
+The logic employed in 'The Criner Waste Report' is available at your finger tips using [`cargo diet`][cargo-diet], making it easy to start out with a perfectly lean crate
+even when publishing a crate for the first time.
+
+[![asciicast](https://asciinema.org/a/UKhYox6XXwWgnVSVWm5PIdUf5.svg)](https://asciinema.org/a/UKhYox6XXwWgnVSVWm5PIdUf5)
 
 ## FAQ
 
