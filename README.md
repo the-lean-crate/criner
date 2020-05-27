@@ -9,7 +9,7 @@ is very relevant for inclusiveness and for extending Rusts reach.
 This is facilitated by three means:
 
 * **[The Criner Waste Report][waste-io]** - Analyse the current state of waste within all crate versions of crates.io and offer a **fix**.
-* _[PLANNED]_ **The 'cargo-diet' companion program** - Start lean by default and compute optimial includes and exludes before publishing to crates.io.
+* **[The 'cargo-diet' companion program][cargo-diet]** - Start lean by default and compute optimal includes and excludes before publishing to crates.io.
 * _[PLANNED]_ **The 'lean crate' badge** - Show off that you care and present the badge on crates.io and in README files.
 
 ## Motivation
@@ -25,6 +25,7 @@ Nowadays, `nushell` is [perfectly lean][nu-lean], and I hope we will have more o
 [nu]: https://github.com/nushell/nushell
 [nu-fix]: https://github.com/nushell/nushell/pull/1316
 [nu-lean]: https://the-lean-crate.github.io/waste/nu/0.11.0.html
+[cargo-diet]: https://github.com/the-lean-crate/cargo-diet
 
 ## How you can help right now
 
