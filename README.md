@@ -24,25 +24,25 @@ Nowadays, `nushell` is [perfectly lean][nu-lean], and I hope we will have more o
 
 [nu]: https://github.com/nushell/nushell
 [nu-fix]: https://github.com/nushell/nushell/pull/1316
-[nu-lean]: https://crates-io.github.io/waste/nu/0.11.0.html
+[nu-lean]: https://the-lean-crate.github.io/waste/nu/0.11.0.html
 
 ## How you can help right now
 
 First of all, thanks so much for your willingness to help! Let's get started.
 
-Head over to The [Criner Waste Report][waste-io] and find your crate or jump to your crate directly using `https://crates-io.github.io/waste/<your-crate>`. 
+Head over to The [Criner Waste Report][waste-io] and find your crate or jump to your crate directly using `https://the-lean-crate.github.io/waste/<your-crate>`. 
 See if a lot of 'waste' is detected, and validate and try the suggested fix. If something is wrong or not working, click the **Provide Feedback** link 
 at the bottom of your crates page.
 
 ### Example: There is some 'Waste' to be removed
 
-* Head over to [your most recent published crate version](https://crates-io.github.io/waste/rusty-leveldb/0.3.3.html)
+* Head over to [your most recent published crate version](https://the-lean-crate.github.io/waste/rusty-leveldb/0.3.3.html)
 * Create a new `include` directive, with values suggested by the page above, i.e. `include = ["src/**/*", "LICENSE", "README.md", "!**/benches/*"]`.
 * See if it works for you. And if it does, publish a new version. This will adjust the crate ranking next time the Criner authors update the website, currently once a day.
 
 ### Example: The crate is lean - there is nothing to do, or is there?
 
-* Head over to [your most recent published crate version](https://crates-io.github.io/waste/ripgrep/12.0.0.html) just to see the crate is perfectly lean!
+* Head over to [your most recent published crate version](https://the-lean-crate.github.io/waste/ripgrep/12.0.0.html) just to see the crate is perfectly lean!
 * Maybe check if Criner might have missed something - a way to do this is to check the package it would upload
    * `cargo package --offline --allow-dirty --no-verify`
    * Find the package in `target/package` and untar+gz it using `tar -xzf target/package/<crate-version>.crate`.
@@ -82,7 +82,7 @@ Please do note that _your feedback_ on whether or not these assumptions and conc
 to make _The Criner Waste Report_ better in a [collaborative][code-of-conduct], community driven effort.
 
 [criner-todo]: https://github.com/the-lean-crate/criner/tree/master/criner#todo
-[waste-io]: https://crates-io.github.io/waste/
+[waste-io]: https://the-lean-crate.github.io/waste/
 [negative-include]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-exclude-and-include-fields
 [code-of-conduct]: https://github.com/the-lean-crate/criner/blob/master/CODE_OF_CONDUCT.md
 
@@ -131,7 +131,7 @@ had in mind when designing it.
 However, right now we believe that certain kinds of files are not needed to build a crate and thus may have additional negation patterns that would
 exclude these files. Common examples are tests, which are easily included by the typical `src/**/*.rs` include directive.
 
-Potential savings do not count as 'Waste', but currently prevent the [crate version](https://crates-io.github.io/waste/zfs-core/0.2.0.html) 
+Potential savings do not count as 'Waste', but currently prevent the [crate version](https://the-lean-crate.github.io/waste/zfs-core/0.2.0.html) 
 from achieving the `perfectly lean` status.
     
 ## Limitations of Waste Reporting
@@ -140,7 +140,7 @@ from achieving the `perfectly lean` status.
   very well. Additionally it does have filter logic to reduce the input set of extracted strings which might yield false positives.
 * It does not handle negated include patterns, but it also is not disturbed by them.
 * When replacing an exclude which is not specific enough with an include that is, it always resolves to all desirable files and is unable 
-  to generate a glob pattern from that. This can result in [many files suggested as include](https://crates-io.github.io/waste/gnir/0.9.7.html).
+  to generate a glob pattern from that. This can result in [many files suggested as include](https://the-lean-crate.github.io/waste/gnir/0.9.7.html).
 * Cargo traverses the entire manifest directory and applies its globsset. The globs in that globsset are very greedy, so that what looks like a file
   `README.md` will actually match everything that matches `*/README.md`  or `**/README.md`. This may include unwanted files and we will not detect these.
   Circumvent this yourself by using a prefix slash, such as in `/README.md` indicating the file must be in the top level.
