@@ -15,4 +15,11 @@ jobs:
       run: make tests
     - name: stress
       run: make mine-2min-logonly && du -sch criner.db/*
+    - name: Check crate package size
+      run: |
+        curl -LSfs https://raw.githubusercontent.com/the-lean-crate/cargo-diet/master/ci/install.sh | \
+         sh -s -- --git the-lean-crate/cargo-diet --target x86_64-unknown-linux-musl
 
+        cargo diet -n --package-size-limit 15KB
+        (cd criner && cargo diet -n --package-size-limit 50KB)
+        (cd criner-waste-report && cargo diet -n --package-size-limit 15KB)
