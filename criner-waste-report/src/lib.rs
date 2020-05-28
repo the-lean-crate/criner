@@ -10,6 +10,7 @@ pub mod result;
 #[cfg(test)]
 mod test;
 
+#[cfg(feature = "with-serde")]
 use serde_derive::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
@@ -18,7 +19,8 @@ pub use result::{globset_from_patterns, tar_path_to_utf8_str};
 pub type Patterns = Vec<String>;
 
 /// An entry in a tar archive, including the most important meta-data
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "with-serde", derive(Serialize, Deserialize))]
 pub struct TarHeader {
     /// The normalized path of the entry. May not be unicode encoded.
     pub path: Vec<u8>,
@@ -28,7 +30,8 @@ pub struct TarHeader {
     pub entry_type: u8,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "with-serde", derive(Serialize, Deserialize))]
 pub struct TarPackage {
     /// Meta data of all entries in the crate
     pub entries_meta_data: Vec<TarHeader>,
@@ -39,13 +42,15 @@ pub struct TarPackage {
     pub entries: Vec<(TarHeader, Vec<u8>)>,
 }
 
-#[derive(PartialEq, Eq, Debug, Clone, Deserialize, Serialize)]
+#[derive(PartialEq, Eq, Debug, Clone)]
+#[cfg_attr(feature = "with-serde", derive(Serialize, Deserialize))]
 pub struct PotentialWaste {
     pub patterns_to_fix: Patterns,
     pub potential_waste: Vec<TarHeader>,
 }
 
-#[derive(PartialEq, Eq, Debug, Clone, Deserialize, Serialize)]
+#[derive(PartialEq, Eq, Debug, Clone)]
+#[cfg_attr(feature = "with-serde", derive(Serialize, Deserialize))]
 pub enum Fix {
     ImprovedInclude {
         include: Patterns,
@@ -155,7 +160,8 @@ impl PackageSection {
 
 pub type WastedFile = (String, u64);
 
-#[derive(Default, Debug, PartialEq, Clone, Deserialize, Serialize)]
+#[derive(Default, Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "with-serde", derive(Serialize, Deserialize))]
 pub struct AggregateFileInfo {
     pub total_bytes: u64,
     pub total_files: u64,
@@ -217,7 +223,8 @@ pub fn add_optional_aggregate(
     })
 }
 
-#[derive(Default, Debug, PartialEq, Clone, Deserialize, Serialize)]
+#[derive(Default, Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "with-serde", derive(Serialize, Deserialize))]
 pub struct VersionInfo {
     pub all: AggregateFileInfo,
     pub waste: AggregateFileInfo,
@@ -229,7 +236,8 @@ pub type AggregateVersionInfo = VersionInfo;
 
 pub type Dict<T> = BTreeMap<String, T>;
 
-#[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "with-serde", derive(Serialize, Deserialize))]
 pub enum Report {
     Version {
         crate_name: String,
