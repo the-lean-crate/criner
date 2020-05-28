@@ -297,7 +297,7 @@ dependencies = [
 
 [[package]]
 name = "criner-waste-report"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "bytesize",
  "dia-semver",
