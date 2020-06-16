@@ -1,6 +1,6 @@
 [package]
 name = "criner-cli"
-version = "0.1.2"
+version = "0.2.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 edition = "2018"
 description = "A command-line interface for the 'Criner' crates mining platform"
@@ -26,7 +26,7 @@ clap = {version = "2", features = ["color"]}
 structopt = "0.3.9"
 humantime = "2.0.0"
 time = "0.2.9"
-criner = { version = "0.1.0", path = "./criner" }
+criner = { version = "0.2.0", path = "./criner" }
 env_logger = { version = "0.7.1", default-features = false, features = ["termcolor", "atty", "humantime"] }
 
 [workspace]
