@@ -200,15 +200,6 @@ dependencies = [
 
 [[package]]
 name = "cloudabi"
-version = "0.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ddfc5b9aa5d4507acaf872de71051dfd0e309860e88966e1051e462a077aac4f"
-dependencies = [
- "bitflags",
-]
-
-[[package]]
-name = "cloudabi"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4344512281c643ae7638bbabc3af17a11307803ec8f0fcad9fae512a8bf36467"
@@ -311,7 +302,7 @@ dependencies = [
  "libflate",
  "log",
  "num_cpus",
- "parking_lot 0.10.2",
+ "parking_lot",
  "piper",
  "prodash",
  "quick-error",
@@ -932,15 +923,21 @@ checksum = "9457b06509d27052635f90d6466700c65095fdf75409b3fbdd903e988b886f49"
 
 [[package]]
 name = "libflate"
-version = "0.1.27"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9135df43b1f5d0e333385cb6e7897ecd1a43d7d11b91ac003f4d2c2d2401fdd"
+checksum = "e9bac9023e1db29c084f9f8cd9d3852e5e8fddf98fb47c4964a0ea4663d95949"
 dependencies = [
  "adler32",
  "crc32fast",
+ "libflate_lz77",
  "rle-decode-fast",
- "take_mut",
 ]
+
+[[package]]
+name = "libflate_lz77"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3286f09f7d4926fc486334f28d8d2e6ebe4f7f9994494b6dab27ddfad2c9b11b"
 
 [[package]]
 name = "libgit2-sys"
@@ -957,9 +954,9 @@ dependencies = [
 
 [[package]]
 name = "libsqlite3-sys"
-version = "0.17.3"
+version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56d90181c2904c287e5390186be820e5ef311a3c62edebb7d6ca3d6a48ce041d"
+checksum = "1e704a02bcaecd4a08b93a23f6be59d0bd79cd161e0963e9499165a0a35df7bd"
 dependencies = [
  "cc",
  "pkg-config",
@@ -983,15 +980,6 @@ name = "linked-hash-map"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8dd5a6d5999d9907cda8ed67bbd137d3af8085216c2ac62de5be860bd41f304a"
-
-[[package]]
-name = "lock_api"
-version = "0.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4da24a77a3d8a6d4862d95f72e6fdb9c09a643ecdb402d754004a557f2bec75"
-dependencies = [
- "scopeguard",
-]
 
 [[package]]
 name = "lock_api"
@@ -1228,37 +1216,13 @@ checksum = "c4029bc3504a62d92e42f30b9095fdef73b8a0b2a06aa41ce2935143b05a1a06"
 
 [[package]]
 name = "parking_lot"
-version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3a704eb390aafdc107b0e392f56a82b668e3a71366993b5340f5833fd62505e"
-dependencies = [
- "lock_api 0.3.4",
- "parking_lot_core 0.7.2",
-]
-
-[[package]]
-name = "parking_lot"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4893845fa2ca272e647da5d0e46660a314ead9c2fdd9a883aabc32e481a8733"
 dependencies = [
  "instant",
- "lock_api 0.4.0",
- "parking_lot_core 0.8.0",
-]
-
-[[package]]
-name = "parking_lot_core"
-version = "0.7.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d58c7c768d4ba344e3e8d72518ac13e259d7c7ade24167003b8488e10b6740a3"
-dependencies = [
- "cfg-if",
- "cloudabi 0.0.3",
- "libc",
- "redox_syscall",
- "smallvec",
- "winapi 0.3.9",
+ "lock_api",
+ "parking_lot_core",
 ]
 
 [[package]]
@@ -1268,7 +1232,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c361aa727dd08437f2f1447be8b59a33b0edd15e0fcee698f935613d9efbca9b"
 dependencies = [
  "cfg-if",
- "cloudabi 0.1.0",
+ "cloudabi",
  "instant",
  "libc",
  "redox_syscall",
@@ -1381,9 +1345,9 @@ dependencies = [
 
 [[package]]
 name = "prodash"
-version = "4.1.0"
+version = "5.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0585a1015faf9313605930f527648c9fbeb3341340755e5f86393c4ba564570"
+checksum = "8cd4862ad4123ca4c6ce6dac3f5dd535c3fc0728e2ce8370a37ea9652834c1a3"
 dependencies = [
  "dashmap",
  "futures-channel",
@@ -1391,7 +1355,7 @@ dependencies = [
  "futures-util",
  "humantime 2.0.1",
  "log",
- "parking_lot 0.11.0",
+ "parking_lot",
  "smol",
  "termion",
  "time 0.2.16",
@@ -1607,9 +1571,9 @@ dependencies = [
 
 [[package]]
 name = "rusqlite"
-version = "0.21.0"
+version = "0.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64a656821bb6317a84b257737b7934f79c0dbb7eb694710475908280ebad3e64"
+checksum = "45d0fd62e1df63d254714e6cb40d0a0e82e7a1623e7a27f679d851af092ae58b"
 dependencies = [
  "bitflags",
  "fallible-iterator",
@@ -1617,6 +1581,7 @@ dependencies = [
  "libsqlite3-sys",
  "lru-cache",
  "memchr",
+ "smallvec",
  "time 0.1.43",
 ]
 
@@ -1902,12 +1867,6 @@ dependencies = [
  "quote",
  "syn",
 ]
-
-[[package]]
-name = "take_mut"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f764005d11ee5f36500a149ace24e00e3da98b0158b3e2d53a7495660d3f4d60"
 
 [[package]]
 name = "tar"
