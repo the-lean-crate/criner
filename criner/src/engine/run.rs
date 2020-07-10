@@ -192,7 +192,7 @@ pub fn blocking(
     report_settings: GlobStageRunSettings,
     download_crates_io_database_every_24_hours_starting_at: Option<time::Time>,
     root: prodash::Tree,
-    gui: Option<prodash::tui::TuiOptions>,
+    gui: Option<prodash::tui::Options>,
 ) -> Result<()> {
     let start_of_computation = SystemTime::now();
     let assets_dir = db.as_ref().join("assets");
@@ -220,6 +220,7 @@ pub fn blocking(
     match gui {
         Some(gui_options) => {
             let gui = smol::Task::spawn(prodash::tui::render_with_input(
+                std::io::stdout(),
                 root,
                 gui_options,
                 futures_util::stream::select(
