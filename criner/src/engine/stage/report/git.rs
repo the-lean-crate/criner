@@ -33,9 +33,7 @@ fn file_index_entry(path: PathBuf, file_size: usize) -> git2::IndexEntry {
 
 fn env_var(name: &str) -> Result<String> {
     std::env::var(name).map_err(|e| match e {
-        std::env::VarError::NotPresent => {
-            crate::Error::Message(format!("environment variable {:?} must be set", name))
-        }
+        std::env::VarError::NotPresent => crate::Error::Message(format!("environment variable {:?} must be set", name)),
         std::env::VarError::NotUnicode(_) => crate::Error::Message(format!(
             "environment variable {:?} was set but couldn't be decoded as UTF-8",
             name
@@ -69,14 +67,9 @@ pub fn select_callback(
                                 .and_then(|h| h.peel_to_tree())
                                 .map(|t| t.id())
                             {
-                                progress.info(format!(
-                                    "reading latest tree into in-memory index: {}",
-                                    tree_oid
-                                ));
+                                progress.info(format!("reading latest tree into in-memory index: {}", tree_oid));
                                 progress.blocked("reading tree into in-memory index", None);
-                                i.read_tree(
-                                    &repo.find_tree(tree_oid).expect("a tree object to exist"),
-                                )?;
+                                i.read_tree(&repo.find_tree(tree_oid).expect("a tree object to exist"))?;
                                 progress.done("read tree into memory index");
                             }
                         }
@@ -133,15 +126,10 @@ pub fn select_callback(
                     {
                         progress.set(3);
                         progress.blocked("writing commit", None);
-                        let current_time = git2::Time::new(
-                            SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() as i64,
-                            0,
-                        );
-                        let signature = git2::Signature::new(
-                            "Criner",
-                            "https://github.com/the-lean-crate/criner",
-                            &current_time,
-                        )?;
+                        let current_time =
+                            git2::Time::new(SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() as i64, 0);
+                        let signature =
+                            git2::Signature::new("Criner", "https://github.com/the-lean-crate/criner", &current_time)?;
                         let parent = repo
                             .head()
                             .and_then(|h| h.resolve())
@@ -154,9 +142,7 @@ pub fn select_callback(
                             &signature,
                             &signature,
                             &format!("update {} reports", req_count),
-                            &repo
-                                .find_tree(tree_oid)
-                                .expect("tree just written to be found"),
+                            &repo.find_tree(tree_oid).expect("tree just written to be found"),
                             match parent.as_ref() {
                                 Some(parent) => {
                                     parent_store.push(parent);
@@ -255,10 +241,7 @@ pub fn select_callback(
     }
 }
 
-pub fn repo_with_working_dir(
-    req: WriteRequest,
-    send: &WriteCallbackState,
-) -> BoxFuture<Result<WriteInstruction>> {
+pub fn repo_with_working_dir(req: WriteRequest, send: &WriteCallbackState) -> BoxFuture<Result<WriteInstruction>> {
     async move {
         send.as_ref()
             .expect("send to be available if a repo is available")
@@ -269,10 +252,7 @@ pub fn repo_with_working_dir(
     .boxed()
 }
 
-pub fn repo_bare(
-    req: WriteRequest,
-    send: &WriteCallbackState,
-) -> BoxFuture<Result<WriteInstruction>> {
+pub fn repo_bare(req: WriteRequest, send: &WriteCallbackState) -> BoxFuture<Result<WriteInstruction>> {
     async move {
         send.as_ref()
             .expect("send to be available if a repo is available")
@@ -283,9 +263,6 @@ pub fn repo_bare(
     .boxed()
 }
 
-pub fn not_available(
-    req: WriteRequest,
-    _state: &WriteCallbackState,
-) -> BoxFuture<Result<WriteInstruction>> {
+pub fn not_available(req: WriteRequest, _state: &WriteCallbackState) -> BoxFuture<Result<WriteInstruction>> {
     async move { Ok(WriteInstruction::DoWrite(req)) }.boxed()
 }

@@ -50,19 +50,13 @@ pub async fn process(
                     db.clone(),
                     processing_progress.add_child(format!("{}: ↓ IDLE", idx + 1)),
                     rx.clone(),
-                    work::iobound::Agent::new(
-                        &db,
-                        tx_cpu.clone(),
-                        |crate_name_and_version, task, _| {
-                            crate_name_and_version.map(|(crate_name, crate_version)| {
-                                work::cpubound::ExtractRequest {
-                                    download_task: task.clone(),
-                                    crate_name,
-                                    crate_version,
-                                }
-                            })
-                        },
-                    )?,
+                    work::iobound::Agent::new(&db, tx_cpu.clone(), |crate_name_and_version, task, _| {
+                        crate_name_and_version.map(|(crate_name, crate_version)| work::cpubound::ExtractRequest {
+                            download_task: task.clone(),
+                            crate_name,
+                            crate_version,
+                        })
+                    })?,
                     max_retries_on_timeout,
                 )
                 .map(|r| {

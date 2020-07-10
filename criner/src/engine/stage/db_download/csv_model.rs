@@ -79,11 +79,7 @@ where
 {
     use serde::Deserialize;
     let val = u8::deserialize(deserializer)?;
-    Ok(if val == 0 {
-        UserKind::User
-    } else {
-        UserKind::Team
-    })
+    Ok(if val == 0 { UserKind::User } else { UserKind::Team })
 }
 
 fn deserialize_json_map<'de, D>(deserializer: D) -> Result<Vec<Feature>, D::Error>
@@ -92,12 +88,8 @@ where
 {
     use serde::Deserialize;
     let val = std::borrow::Cow::<'de, str>::deserialize(deserializer)?;
-    let val: BTreeMap<String, Vec<String>> =
-        serde_json::from_str(&val).map_err(serde::de::Error::custom)?;
-    Ok(val
-        .into_iter()
-        .map(|(name, crates)| Feature { name, crates })
-        .collect())
+    let val: BTreeMap<String, Vec<String>> = serde_json::from_str(&val).map_err(serde::de::Error::custom)?;
+    Ok(val.into_iter().map(|(name, crates)| Feature { name, crates }).collect())
 }
 
 fn deserialize_yanked<'de, D>(deserializer: D) -> Result<bool, D::Error>

@@ -45,10 +45,8 @@ pub enum WriteInstruction {
 }
 
 pub type WriteCallbackState = Option<piper::Sender<WriteRequest>>;
-pub type WriteCallback = fn(
-    WriteRequest,
-    &WriteCallbackState,
-) -> futures_util::future::BoxFuture<Result<WriteInstruction>>;
+pub type WriteCallback =
+    fn(WriteRequest, &WriteCallbackState) -> futures_util::future::BoxFuture<Result<WriteInstruction>>;
 
 #[async_trait]
 pub trait Aggregate
@@ -56,25 +54,10 @@ where
     Self: Sized,
 {
     fn merge(self, other: Self) -> Self;
-    async fn complete(
-        &mut self,
-        progress: &mut prodash::tree::Item,
-        out: &mut Vec<u8>,
-    ) -> Result<()>;
-    async fn load_previous_state(
-        &self,
-        out_dir: &Path,
-        progress: &mut prodash::tree::Item,
-    ) -> Option<Self>;
-    async fn load_previous_top_level_state(
-        out_dir: &Path,
-        progress: &mut prodash::tree::Item,
-    ) -> Option<Self>;
-    async fn store_current_state(
-        &self,
-        out_dir: &Path,
-        progress: &mut prodash::tree::Item,
-    ) -> Result<()>;
+    async fn complete(&mut self, progress: &mut prodash::tree::Item, out: &mut Vec<u8>) -> Result<()>;
+    async fn load_previous_state(&self, out_dir: &Path, progress: &mut prodash::tree::Item) -> Option<Self>;
+    async fn load_previous_top_level_state(out_dir: &Path, progress: &mut prodash::tree::Item) -> Option<Self>;
+    async fn store_current_state(&self, out_dir: &Path, progress: &mut prodash::tree::Item) -> Result<()>;
 }
 
 #[async_trait]
@@ -87,13 +70,7 @@ pub trait Generator {
 
     fn fq_result_key(crate_name: &str, crate_version: &str, key_buf: &mut String);
     fn fq_report_key(crate_name: &str, crate_version: &str, key_buf: &mut String) {
-        ReportsTree::key_buf(
-            crate_name,
-            crate_version,
-            Self::name(),
-            Self::version(),
-            key_buf,
-        );
+        ReportsTree::key_buf(crate_name, crate_version, Self::name(), Self::version(), key_buf);
     }
 
     fn get_result(
@@ -131,12 +108,10 @@ pub trait Generator {
         }
         if let Some(mut report) = report {
             let previous_report = match cache_dir.as_ref() {
-                Some(cd) => {
-                    match Self::Report::load_previous_top_level_state(&cd, &mut progress).await {
-                        Some(r) => Some(r),
-                        None => report.load_previous_state(&cd, &mut progress).await,
-                    }
-                }
+                Some(cd) => match Self::Report::load_previous_top_level_state(&cd, &mut progress).await {
+                    Some(r) => Some(r),
+                    None => report.load_previous_state(&cd, &mut progress).await,
+                },
                 None => None,
             };
             report = match previous_report {
@@ -217,12 +192,9 @@ pub trait Generator {
                         let reports_key = key_buf.clone();
                         key_buf.clear();
 
-                        if let Some(result) =
-                            Self::get_result(connection.clone(), &name, &version, &mut key_buf)?
-                        {
+                        if let Some(result) = Self::get_result(connection.clone(), &name, &version, &mut key_buf)? {
                             let mut version_report =
-                                Self::generate_report(&name, &version, result, &mut progress)
-                                    .await?;
+                                Self::generate_report(&name, &version, result, &mut progress).await?;
 
                             out_buf = complete_and_write_report(
                                 &mut version_report,
@@ -261,9 +233,7 @@ pub trait Generator {
                             )
                             .await?;
                             if let Some(cd) = cache_dir.as_ref() {
-                                absolute_state
-                                    .store_current_state(&cd, &mut progress)
-                                    .await?;
+                                absolute_state.store_current_state(&cd, &mut progress).await?;
                             };
                         }
                         None => {
@@ -292,8 +262,7 @@ pub trait Generator {
         if !reports_to_mark_done.is_empty() {
             let mut connection = db.open_connection_no_async_with_busy_wait()?;
             progress.blocked("wait for write lock", None);
-            let transaction =
-                connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
+            let transaction = connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
             progress.init(
                 Some(reports_to_mark_done.len() as u32),
                 Some("report done markers written"),
@@ -351,12 +320,11 @@ async fn complete_and_write_report(
             }
             progress.halted("writing report to disk", None);
 
-            let content =
-                smol::Task::<std::result::Result<_, std::io::Error>>::blocking(async move {
-                    std::fs::write(path, &content)?;
-                    Ok(content)
-                })
-                .await?;
+            let content = smol::Task::<std::result::Result<_, std::io::Error>>::blocking(async move {
+                std::fs::write(path, &content)?;
+                Ok(content)
+            })
+            .await?;
             Ok(content)
         }
         WriteInstruction::Skip => Ok(Vec::new()),

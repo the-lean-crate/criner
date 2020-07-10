@@ -71,11 +71,7 @@ pub enum Fix {
 }
 
 impl Fix {
-    pub fn merge(
-        self,
-        rhs: Option<PotentialWaste>,
-        mut waste: Vec<TarHeader>,
-    ) -> (Fix, Vec<TarHeader>) {
+    pub fn merge(self, rhs: Option<PotentialWaste>, mut waste: Vec<TarHeader>) -> (Fix, Vec<TarHeader>) {
         match (self, rhs) {
             (
                 Fix::NewInclude {
@@ -182,8 +178,7 @@ impl std::ops::AddAssign for VersionInfo {
         } = rhs;
         self.all += all;
         self.waste += waste;
-        self.potential_gains =
-            add_optional_aggregate(self.potential_gains.clone(), potential_gains);
+        self.potential_gains = add_optional_aggregate(self.potential_gains.clone(), potential_gains);
         self.waste_latest_version =
             add_named_optional_aggregate(self.waste_latest_version.clone(), waste_latest_version);
     }
@@ -276,32 +271,23 @@ impl Report {
         let cargo_config = Self::cargo_config_from_entries(&entries);
         let (includes, excludes, compile_time_includes, build_script_name) =
             Self::cargo_config_into_includes_excludes(cargo_config, &entries, &entries_meta_data);
-        let (suggested_fix, wasted_files) =
-            match (includes, excludes, build_script_name, compile_time_includes) {
-                (Some(includes), Some(excludes), _presence_of_build_script_not_relevant, _) => {
-                    Self::compute_includes_from_includes_and_excludes(
-                        entries_meta_data,
-                        includes,
-                        excludes,
-                    )
-                }
-                (Some(includes), None, build_script_name, _) => {
-                    Self::enrich_includes(entries_meta_data, includes, build_script_name.is_some())
-                }
-                (None, Some(excludes), build_script_name, compile_time_includes) => {
-                    Self::enrich_excludes(
-                        entries_meta_data,
-                        excludes,
-                        compile_time_includes,
-                        build_script_name.is_some(),
-                    )
-                }
-                (None, None, build_script_name, compile_time_includes) => Self::standard_includes(
-                    entries_meta_data,
-                    build_script_name,
-                    compile_time_includes,
-                ),
-            };
+        let (suggested_fix, wasted_files) = match (includes, excludes, build_script_name, compile_time_includes) {
+            (Some(includes), Some(excludes), _presence_of_build_script_not_relevant, _) => {
+                Self::compute_includes_from_includes_and_excludes(entries_meta_data, includes, excludes)
+            }
+            (Some(includes), None, build_script_name, _) => {
+                Self::enrich_includes(entries_meta_data, includes, build_script_name.is_some())
+            }
+            (None, Some(excludes), build_script_name, compile_time_includes) => Self::enrich_excludes(
+                entries_meta_data,
+                excludes,
+                compile_time_includes,
+                build_script_name.is_some(),
+            ),
+            (None, None, build_script_name, compile_time_includes) => {
+                Self::standard_includes(entries_meta_data, build_script_name, compile_time_includes)
+            }
+        };
         let wasted_files = Self::convert_to_wasted_files(wasted_files);
         Report::Version {
             crate_name: crate_name.into(),

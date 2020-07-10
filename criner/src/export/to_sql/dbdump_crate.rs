@@ -78,10 +78,7 @@ impl<'a> SqlConvert for model::db_dump::Crate {
     }
 }
 
-fn do_it(
-    input_statement: &mut rusqlite::Statement,
-    transaction: &rusqlite::Transaction,
-) -> crate::Result<usize> {
+fn do_it(input_statement: &mut rusqlite::Statement, transaction: &rusqlite::Transaction) -> crate::Result<usize> {
     let mut insert_crate = transaction
         .prepare("
             REPLACE INTO 'crates.io-crate'
@@ -154,13 +151,7 @@ fn do_it(
             readme,
             repository,
             created_by.map(|actor| actor.github_id),
-            serde_json::to_string_pretty(
-                &owners
-                    .iter()
-                    .map(|actor| actor.github_id)
-                    .collect::<Vec<_>>()
-            )
-            .unwrap(),
+            serde_json::to_string_pretty(&owners.iter().map(|actor| actor.github_id).collect::<Vec<_>>()).unwrap(),
             serde_json::to_string_pretty(&keywords).unwrap(),
             serde_json::to_string_pretty(&categories).unwrap(),
         ])?;
@@ -197,10 +188,7 @@ fn do_it(
     Ok(count)
 }
 
-fn insert_actor_to_db(
-    insert_actor: &mut Statement,
-    actor: &model::db_dump::Actor,
-) -> rusqlite::Result<usize> {
+fn insert_actor_to_db(insert_actor: &mut Statement, actor: &model::db_dump::Actor) -> rusqlite::Result<usize> {
     insert_actor.execute(params![
         actor.crates_io_id,
         match actor.kind {

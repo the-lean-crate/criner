@@ -5,8 +5,8 @@ use std::collections::BTreeMap;
 use std::time::SystemTime;
 
 lazy_static! {
-    static ref PERSON: regex::Regex = regex::Regex::new("(?P<name>[\\w ]+)(<(?P<email>.*)>)?")
-        .expect("valid statically known regex");
+    static ref PERSON: regex::Regex =
+        regex::Regex::new("(?P<name>[\\w ]+)(<(?P<email>.*)>)?").expect("valid statically known regex");
 }
 
 impl From<csv_model::User> for db_dump::Actor {
@@ -161,11 +161,7 @@ impl From<String> for db_dump::Person {
         PERSON
             .captures(&v)
             .map(|cap| db_dump::Person {
-                name: cap
-                    .name("name")
-                    .expect("name should always exist")
-                    .as_str()
-                    .to_owned(),
+                name: cap.name("name").expect("name should always exist").as_str().to_owned(),
                 email: cap.name("email").map(|e| e.as_str().to_owned()),
             })
             .unwrap_or_default()
@@ -186,10 +182,7 @@ pub fn into_actors_by_id(
     teams: BTreeMap<csv_model::Id, csv_model::Team>,
     mut progress: prodash::tree::Item,
 ) -> BTreeMap<(db_dump::Id, db_dump::ActorKind), db_dump::Actor> {
-    progress.init(
-        Some((users.len() + teams.len()) as u32),
-        Some("users and teams"),
-    );
+    progress.init(Some((users.len() + teams.len()) as u32), Some("users and teams"));
     let mut map = BTreeMap::new();
 
     let mut count = 0;
@@ -227,8 +220,8 @@ pub fn into_versions_by_crate_id(
         let published_by = version.published_by;
         let version_id = version.id;
         let mut version: db_dump::CrateVersion = version.into();
-        version.published_by = published_by
-            .and_then(|user_id| actors.get(&(user_id, db_dump::ActorKind::User)).cloned());
+        version.published_by =
+            published_by.and_then(|user_id| actors.get(&(user_id, db_dump::ActorKind::User)).cloned());
         version_by_id.insert(version_id, (crate_id, version));
     }
     progress.done(format!(
@@ -237,13 +230,8 @@ pub fn into_versions_by_crate_id(
     ));
 
     let version_authors_len = version_authors.len();
-    progress.init(
-        Some(version_authors_len as u32),
-        Some("version authors assigned"),
-    );
-    for (vid, csv_model::VersionAuthor { name, version_id }) in
-        version_authors.into_iter().enumerate()
-    {
+    progress.init(Some(version_authors_len as u32), Some("version authors assigned"));
+    for (vid, csv_model::VersionAuthor { name, version_id }) in version_authors.into_iter().enumerate() {
         progress.set((vid + 1) as u32);
         version_by_id
             .get_mut(&version_id)
@@ -307,14 +295,7 @@ pub fn into_crates(
 
     progress.init(Some(crates_keywords.len() as u32), Some("crates keywords"));
     let crates_keywords_len = crates_keywords.len();
-    for (
-        idx,
-        csv_model::CratesKeyword {
-            keyword_id,
-            crate_id,
-        },
-    ) in crates_keywords.into_iter().enumerate()
-    {
+    for (idx, csv_model::CratesKeyword { keyword_id, crate_id }) in crates_keywords.into_iter().enumerate() {
         progress.set((idx + 1) as u32);
         crate_by_id
             .get_mut(&crate_id)
@@ -330,19 +311,9 @@ pub fn into_crates(
     }
     progress.done(format!("assigned {} keywords", crates_keywords_len));
 
-    progress.init(
-        Some(crates_categories.len() as u32),
-        Some("crates categories"),
-    );
+    progress.init(Some(crates_categories.len() as u32), Some("crates categories"));
     let crates_categories_len = crates_categories.len();
-    for (
-        idx,
-        csv_model::CratesCategory {
-            category_id,
-            crate_id,
-        },
-    ) in crates_categories.into_iter().enumerate()
-    {
+    for (idx, csv_model::CratesCategory { category_id, crate_id }) in crates_categories.into_iter().enumerate() {
         progress.set((idx + 1) as u32);
         crate_by_id
             .get_mut(&crate_id)
@@ -375,8 +346,7 @@ pub fn into_crates(
             .get(&(owner_id, owner_kind.into()))
             .expect("owner to exist for owner-id & kind combination")
             .to_owned();
-        let created_by =
-            created_by.and_then(|id| actors_by_id.get(&(id, db_dump::ActorKind::User)).cloned());
+        let created_by = created_by.and_then(|id| actors_by_id.get(&(id, db_dump::ActorKind::User)).cloned());
         let krate = crate_by_id
             .get_mut(&crate_id)
             .expect("crate id to match crate for owner assignment");

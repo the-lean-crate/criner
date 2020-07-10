@@ -68,11 +68,7 @@ pub async fn generate(
             }
             (
                 Some(cd),
-                git::select_callback(
-                    cpu_o_bound_processors,
-                    &waste_report_dir,
-                    progress.add_child("git"),
-                ),
+                git::select_callback(cpu_o_bound_processors, &waste_report_dir, progress.add_child("git")),
             )
         }
     };

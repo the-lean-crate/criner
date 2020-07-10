@@ -13,12 +13,11 @@ pub fn fix_to_wasted_files_aggregate(fix: Option<Fix>) -> Option<AggregateFileIn
         _ => None,
     }
     .map(|v| {
-        v.into_iter()
-            .fold(AggregateFileInfo::default(), |mut a, e| {
-                a.total_files += 1;
-                a.total_bytes += e.size;
-                a
-            })
+        v.into_iter().fold(AggregateFileInfo::default(), |mut a, e| {
+            a.total_files += 1;
+            a.total_bytes += e.size;
+            a
+        })
     })
 }
 
@@ -204,9 +203,7 @@ fn by_extension_section(wasted_by_extension: Dict<AggregateFileInfo>) -> Box<dyn
                 .iter()
                 .rev()
                 .skip(top_list)
-                .fold((0, 0), |(tf, tb), e| {
-                    (tf + e.1.total_files, tb + e.1.total_bytes)
-                }),
+                .fold((0, 0), |(tf, tb), e| (tf + e.1.total_files, tb + e.1.total_bytes)),
         ))
     } else {
         None
@@ -324,12 +321,11 @@ impl RenderOnce for Report {
                 let no_prefix = String::new();
                 let no_suffix = String::new();
                 let gains = potential_savings(&info_by_crate);
-                let (waste_in_bytes, wasted_files_count) =
-                    wasted_by_extension
-                        .iter()
-                        .fold((0, 0), |(waste_bytes, waste_files), e| {
-                            (waste_bytes + e.1.total_bytes, waste_files + e.1.total_files)
-                        });
+                let (waste_in_bytes, wasted_files_count) = wasted_by_extension
+                    .iter()
+                    .fold((0, 0), |(waste_bytes, waste_files), e| {
+                        (waste_bytes + e.1.total_bytes, waste_files + e.1.total_files)
+                    });
                 tmpl << html! {
                     : doctype::HTML;
                     html {

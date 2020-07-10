@@ -40,14 +40,8 @@ impl SqlConvert for model::Context {
         let date_stamp = day_date.duration_since(std::time::UNIX_EPOCH).unwrap();
 
         let model::Context {
-            counts:
-                model::Counts {
-                    crate_versions,
-                    crates,
-                },
-            durations: model::Durations {
-                fetch_crate_versions,
-            },
+            counts: model::Counts { crate_versions, crates },
+            durations: model::Durations { fetch_crate_versions },
         } = self;
 
         stm.execute(params![

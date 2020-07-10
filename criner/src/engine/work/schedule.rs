@@ -40,71 +40,47 @@ pub async fn tasks(
 ) -> Result<AsyncResult> {
     use SubmitResult::*;
     let mut key_buf = String::with_capacity(32);
-    let io_task = task_or_default(
-        tasks,
-        &mut key_buf,
-        krate,
-        iobound::default_persisted_download_task,
-    )?;
+    let io_task = task_or_default(tasks, &mut key_buf, krate, iobound::default_persisted_download_task)?;
 
     let kind = "crate";
-    let submit_result = submit_single(
-        startup_time,
-        io_task,
-        &mut progress,
-        perform_io,
-        1,
-        1,
-        || {
-            let dummy_task = iobound::default_persisted_download_task();
-            let mut task_key = String::new();
-            dummy_task.fq_key(&krate.name, &krate.version, &mut task_key);
+    let submit_result = submit_single(startup_time, io_task, &mut progress, perform_io, 1, 1, || {
+        let dummy_task = iobound::default_persisted_download_task();
+        let mut task_key = String::new();
+        dummy_task.fq_key(&krate.name, &krate.version, &mut task_key);
 
-            iobound::DownloadRequest {
-                output_file_path: download_file_path(
-                    &assets_dir,
-                    &krate.name,
-                    &krate.version,
-                    &dummy_task.process,
-                    &dummy_task.version,
-                    kind,
-                ),
-                progress_name: format!("{}:{}", krate.name, krate.version),
-                task_key,
-                crate_name_and_version: Some((krate.name.clone(), krate.version.clone())),
+        iobound::DownloadRequest {
+            output_file_path: download_file_path(
+                &assets_dir,
+                &krate.name,
+                &krate.version,
+                &dummy_task.process,
+                &dummy_task.version,
                 kind,
-                url: format!(
-                    "https://crates.io/api/v1/crates/{name}/{version}/download",
-                    name = krate.name,
-                    version = krate.version
-                ),
-            }
-        },
-    )
+            ),
+            progress_name: format!("{}:{}", krate.name, krate.version),
+            task_key,
+            crate_name_and_version: Some((krate.name.clone(), krate.version.clone())),
+            kind,
+            url: format!(
+                "https://crates.io/api/v1/crates/{name}/{version}/download",
+                name = krate.name,
+                version = krate.version
+            ),
+        }
+    })
     .await;
 
     Ok(match submit_result {
         PermanentFailure | Submitted => AsyncResult::Done,
         Done(download_crate_task) => {
-            let cpu_task = task_or_default(
-                tasks,
-                &mut key_buf,
-                krate,
-                cpubound::default_persisted_extraction_task,
-            )?;
-            submit_single(
-                startup_time,
-                cpu_task,
-                &mut progress,
-                perform_cpu,
-                2,
-                2,
-                || cpubound::ExtractRequest {
+            let cpu_task = task_or_default(tasks, &mut key_buf, krate, cpubound::default_persisted_extraction_task)?;
+            submit_single(startup_time, cpu_task, &mut progress, perform_cpu, 2, 2, || {
+                cpubound::ExtractRequest {
                     download_task: download_crate_task,
                     crate_name: krate.name.clone(),
                     crate_version: krate.version.clone(),
-                },
-            )
+                }
+            })
             .await;
             AsyncResult::Done
         }
@@ -175,9 +151,7 @@ fn crate_dir(assets_dir: &Path, crate_name: &str) -> PathBuf {
         1 => Path::new("1").join(crate_name),
         2 => Path::new("2").join(crate_name),
         3 => Path::new("3").join(&crate_name[..1]).join(&crate_name[1..]),
-        _ => Path::new(&crate_name[..2])
-            .join(&crate_name[2..4])
-            .join(crate_name),
+        _ => Path::new(&crate_name[..2]).join(&crate_name[2..4]).join(crate_name),
     };
     assets_dir.join(crate_path)
 }

@@ -1,7 +1,6 @@
 use crate::model::db_dump;
 use crate::{
-    engine::work, persistence::new_key_value_insertion, persistence::Db, persistence::TableAccess,
-    Error, Result,
+    engine::work, persistence::new_key_value_insertion, persistence::Db, persistence::TableAccess, Error, Result,
 };
 use bytesize::ByteSize;
 use futures_util::FutureExt;
@@ -33,15 +32,9 @@ fn store(db: Db, crates: Vec<db_dump::Crate>, mut progress: prodash::tree::Item)
     Ok(())
 }
 
-fn extract_and_ingest(
-    db: Db,
-    mut progress: prodash::tree::Item,
-    db_file_path: PathBuf,
-) -> Result<()> {
+fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: PathBuf) -> Result<()> {
     progress.init(None, Some("csv files"));
-    let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new(File::open(
-        db_file_path,
-    )?))?);
+    let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new(File::open(db_file_path)?))?);
     let whitelist_names = [
         "crates",
         "crate_owners",
@@ -76,11 +69,11 @@ fn extract_and_ingest(
         let entry_size = entry.header().size()?;
         num_bytes_seen += entry_size;
 
-        if let Some(name) = entry.path().ok().and_then(|p| {
-            whitelist_names
-                .iter()
-                .find(|n| p.ends_with(format!("{}.csv", n)))
-        }) {
+        if let Some(name) = entry
+            .path()
+            .ok()
+            .and_then(|p| whitelist_names.iter().find(|n| p.ends_with(format!("{}.csv", n))))
+        {
             let done_msg = format!(
                 "extracted '{}' with size {}",
                 entry.path()?.display(),
@@ -110,16 +103,12 @@ fn extract_and_ingest(
                     version_authors = Some(from_csv::vec(entry, "version_authors", &mut progress)?);
                 }
                 "crates_categories" => {
-                    crates_categories =
-                        Some(from_csv::vec(entry, "crates_categories", &mut progress)?);
+                    crates_categories = Some(from_csv::vec(entry, "crates_categories", &mut progress)?);
                 }
                 "crates_keywords" => {
                     crates_keywords = Some(from_csv::vec(entry, "crates_keywords", &mut progress)?);
                 }
-                _ => progress.fail(format!(
-                    "bug or oversight: Could not parse table of type {:?}",
-                    name
-                )),
+                _ => progress.fail(format!("bug or oversight: Could not parse table of type {:?}", name)),
             }
             progress.done(done_msg);
         }
@@ -132,21 +121,17 @@ fn extract_and_ingest(
 
     let users = users.ok_or_else(|| Error::Bug("expected users.csv in crates-io db dump"))?;
     let teams = teams.ok_or_else(|| Error::Bug("expected teams.csv in crates-io db dump"))?;
-    let versions =
-        versions.ok_or_else(|| Error::Bug("expected versions.csv in crates-io db dump"))?;
-    let version_authors = version_authors
-        .ok_or_else(|| Error::Bug("expected version_authors.csv in crates-io db dump"))?;
+    let versions = versions.ok_or_else(|| Error::Bug("expected versions.csv in crates-io db dump"))?;
+    let version_authors =
+        version_authors.ok_or_else(|| Error::Bug("expected version_authors.csv in crates-io db dump"))?;
     let crates = crates.ok_or_else(|| Error::Bug("expected crates.csv in crates-io db dump"))?;
-    let keywords =
-        keywords.ok_or_else(|| Error::Bug("expected keywords.csv in crates-io db dump"))?;
-    let crates_keywords = crates_keywords
-        .ok_or_else(|| Error::Bug("expected crates_keywords.csv in crates-io db dump"))?;
-    let categories =
-        categories.ok_or_else(|| Error::Bug("expected categories.csv in crates-io db dump"))?;
-    let crates_categories = crates_categories
-        .ok_or_else(|| Error::Bug("expected crates_categories.csv in crates-io db dump"))?;
-    let crate_owners =
-        crate_owners.ok_or_else(|| Error::Bug("expected crate_owners.csv in crates-io db dump"))?;
+    let keywords = keywords.ok_or_else(|| Error::Bug("expected keywords.csv in crates-io db dump"))?;
+    let crates_keywords =
+        crates_keywords.ok_or_else(|| Error::Bug("expected crates_keywords.csv in crates-io db dump"))?;
+    let categories = categories.ok_or_else(|| Error::Bug("expected categories.csv in crates-io db dump"))?;
+    let crates_categories =
+        crates_categories.ok_or_else(|| Error::Bug("expected crates_categories.csv in crates-io db dump"))?;
+    let crate_owners = crate_owners.ok_or_else(|| Error::Bug("expected crate_owners.csv in crates-io db dump"))?;
 
     progress.init(Some(4), Some("conversion steps"));
     progress.set_name("transform actors");
@@ -155,12 +140,8 @@ fn extract_and_ingest(
 
     progress.set_name("transform versions");
     progress.set(2);
-    let versions_by_crate_id = convert::into_versions_by_crate_id(
-        versions,
-        version_authors,
-        &actors_by_id,
-        progress.add_child("versions"),
-    );
+    let versions_by_crate_id =
+        convert::into_versions_by_crate_id(versions, version_authors, &actors_by_id, progress.add_child("versions"));
 
     progress.set_name("transform crates");
     progress.set(3);
@@ -187,11 +168,7 @@ fn cleanup(db_file_path: PathBuf, mut progress: prodash::tree::Item) -> Result<(
         .expect("parent directory for db dump")
         .join("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*")
         .with_extension(db_file_path.extension().expect("file extension"));
-    let pattern = glob::Pattern::new(
-        &glob_pattern
-            .to_str()
-            .expect("db dump path is valid utf8 string"),
-    )?;
+    let pattern = glob::Pattern::new(&glob_pattern.to_str().expect("db dump path is valid utf8 string"))?;
     if !pattern.matches_path(&db_file_path) {
         return Err(crate::Error::Message(format!(
             "BUG: Pattern {} did not match the original database path '{}'",
@@ -281,9 +258,6 @@ pub async fn schedule(
         }
     }
 
-    smol::blocking!(cleanup(
-        db_file_path,
-        progress.add_child("removing old db-dumps")
-    ))?;
+    smol::blocking!(cleanup(db_file_path, progress.add_child("removing old db-dumps")))?;
     Ok(())
 }

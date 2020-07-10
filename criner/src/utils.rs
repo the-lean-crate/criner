@@ -50,11 +50,7 @@ fn desired_launch_at(time: Option<time::Time>) -> time::OffsetDateTime {
     let now = time::OffsetDateTime::now_local();
     let mut desired = now.date().with_time(time).assume_offset(now.offset());
     if desired < now {
-        desired = desired
-            .date()
-            .next_day()
-            .with_time(time)
-            .assume_offset(now.offset());
+        desired = desired.date().next_day().with_time(time).assume_offset(now.offset());
     }
     desired
 }
@@ -181,11 +177,7 @@ where
 {
     let f_as_future = smol::Task::blocking(async move { f() });
     let selector = future::select(
-        Timer::after(
-            deadline
-                .duration_since(SystemTime::now())
-                .unwrap_or_default(),
-        ),
+        Timer::after(deadline.duration_since(SystemTime::now()).unwrap_or_default()),
         f_as_future,
     );
     match selector.await {

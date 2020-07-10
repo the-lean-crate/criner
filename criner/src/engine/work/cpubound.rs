@@ -66,10 +66,7 @@ impl crate::engine::work::generic::Processor for Agent {
                 let mut key = String::with_capacity(task_key.len() * 2);
                 dummy_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut key);
 
-                self.state = Some(ProcessingState {
-                    downloaded_crate,
-                    key,
-                });
+                self.state = Some(ProcessingState { downloaded_crate, key });
                 Ok((dummy_task, task_key, progress_info))
             }
         }
@@ -79,22 +76,10 @@ impl crate::engine::work::generic::Processor for Agent {
         "CPU IDLE".into()
     }
 
-    async fn process(
-        &mut self,
-        progress: &mut prodash::tree::Item,
-    ) -> std::result::Result<(), (Error, String)> {
-        let ProcessingState {
-            downloaded_crate,
-            key,
-        } = self.state.take().expect("state to be set");
-        extract_crate(
-            &self.results,
-            &key,
-            progress,
-            downloaded_crate,
-            &self.standard_bin_path,
-        )
-        .map_err(|err| (err, "Failed to extract crate".into()))
+    async fn process(&mut self, progress: &mut prodash::tree::Item) -> std::result::Result<(), (Error, String)> {
+        let ProcessingState { downloaded_crate, key } = self.state.take().expect("state to be set");
+        extract_crate(&self.results, &key, progress, downloaded_crate, &self.standard_bin_path)
+            .map_err(|err| (err, "Failed to extract crate".into()))
     }
 }
 
@@ -182,10 +167,7 @@ fn extract_crate(
                 &max_storage_size[..bytes_read]
             };
             files.push((
-                meta_data
-                    .last()
-                    .expect("to have pushed one just now")
-                    .to_owned(),
+                meta_data.last().expect("to have pushed one just now").to_owned(),
                 slice.to_owned().into(),
             ));
         }

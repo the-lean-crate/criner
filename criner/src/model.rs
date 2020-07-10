@@ -53,8 +53,7 @@ impl Add<&Context> for Context {
                 crates: self.counts.crates + rhs.counts.crates,
             },
             durations: Durations {
-                fetch_crate_versions: self.durations.fetch_crate_versions
-                    + rhs.durations.fetch_crate_versions,
+                fetch_crate_versions: self.durations.fetch_crate_versions + rhs.durations.fetch_crate_versions,
             },
         }
     }

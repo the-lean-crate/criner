@@ -29,10 +29,7 @@ fn path_to_storage_location(report: &Report, out_dir: &Path) -> PathBuf {
     path_from_prefix(out_dir, prefix)
 }
 
-pub fn vec_into_map_by_extension(
-    initial: Dict<AggregateFileInfo>,
-    from: Vec<WastedFile>,
-) -> Dict<AggregateFileInfo> {
+pub fn vec_into_map_by_extension(initial: Dict<AggregateFileInfo>, from: Vec<WastedFile>) -> Dict<AggregateFileInfo> {
     from.into_iter().fold(initial, |mut m, e| {
         let entry = m
             .entry(
@@ -57,12 +54,11 @@ pub fn fix_to_wasted_files_aggregate(fix: Option<Fix>) -> Option<AggregateFileIn
         _ => None,
     }
     .map(|v| {
-        v.into_iter()
-            .fold(AggregateFileInfo::default(), |mut a, e| {
-                a.total_files += 1;
-                a.total_bytes += e.size;
-                a
-            })
+        v.into_iter().fold(AggregateFileInfo::default(), |mut a, e| {
+            a.total_files += 1;
+            a.total_bytes += e.size;
+            a
+        })
     })
 }
 
@@ -190,9 +186,7 @@ impl crate::engine::report::generic::Aggregate for Report {
         match (self, other) {
             (lhs @ Version { .. }, rhs @ Version { .. }) => crate_from_version(lhs).merge(rhs),
             (version @ Version { .. }, krate @ Crate { .. }) => krate.merge(version),
-            (version @ Version { .. }, collection @ CrateCollection { .. }) => {
-                collection.merge(version)
-            }
+            (version @ Version { .. }, collection @ CrateCollection { .. }) => collection.merge(version),
             (collection @ CrateCollection { .. }, version @ Version { .. }) => {
                 collection.merge(crate_from_version(version))
             }
@@ -229,27 +223,19 @@ impl crate::engine::report::generic::Aggregate for Report {
                                 fix_to_wasted_files_aggregate(suggested_fix),
                             ),
                         ),
-                        wasted_by_extension: vec_into_map_by_extension(
-                            wasted_by_extension,
-                            wasted_files,
-                        ),
+                        wasted_by_extension: vec_into_map_by_extension(wasted_by_extension, wasted_files),
                     }
                 } else {
-                    collection_from_crate(
-                        lhs_crate_name,
-                        lhs_tsb,
-                        lhs_tf,
-                        info_by_version,
-                        wasted_by_extension,
+                    collection_from_crate(lhs_crate_name, lhs_tsb, lhs_tf, info_by_version, wasted_by_extension).merge(
+                        Version {
+                            crate_name: rhs_crate_name,
+                            crate_version,
+                            total_size_in_bytes: rhs_tsb,
+                            total_files: rhs_tf,
+                            wasted_files,
+                            suggested_fix,
+                        },
                     )
-                    .merge(Version {
-                        crate_name: rhs_crate_name,
-                        crate_version,
-                        total_size_in_bytes: rhs_tsb,
-                        total_files: rhs_tf,
-                        wasted_files,
-                        suggested_fix,
-                    })
                 }
             }
             (
@@ -269,15 +255,13 @@ impl crate::engine::report::generic::Aggregate for Report {
                 },
             ) => {
                 if lhs_crate_name != rhs_crate_name {
-                    collection_from_crate(lhs_crate_name, lhs_tsb, lhs_tf, lhs_ibv, lhs_wbe).merge(
-                        Crate {
-                            crate_name: rhs_crate_name,
-                            total_size_in_bytes: rhs_tsb,
-                            total_files: rhs_tf,
-                            info_by_version: rhs_ibv,
-                            wasted_by_extension: rhs_wbe,
-                        },
-                    )
+                    collection_from_crate(lhs_crate_name, lhs_tsb, lhs_tf, lhs_ibv, lhs_wbe).merge(Crate {
+                        crate_name: rhs_crate_name,
+                        total_size_in_bytes: rhs_tsb,
+                        total_files: rhs_tf,
+                        info_by_version: rhs_ibv,
+                        wasted_by_extension: rhs_wbe,
+                    })
                 } else {
                     Crate {
                         crate_name: lhs_crate_name,
@@ -333,11 +317,7 @@ impl crate::engine::report::generic::Aggregate for Report {
         }
     }
 
-    async fn complete(
-        &mut self,
-        _progress: &mut prodash::tree::Item,
-        out: &mut Vec<u8>,
-    ) -> Result<()> {
+    async fn complete(&mut self, _progress: &mut prodash::tree::Item, out: &mut Vec<u8>) -> Result<()> {
         use horrorshow::Template;
 
         let report = self.clone();
@@ -345,10 +325,7 @@ impl crate::engine::report::generic::Aggregate for Report {
         Ok(())
     }
 
-    async fn load_previous_top_level_state(
-        out_dir: &Path,
-        progress: &mut prodash::tree::Item,
-    ) -> Option<Self> {
+    async fn load_previous_top_level_state(out_dir: &Path, progress: &mut prodash::tree::Item) -> Option<Self> {
         let path = path_from_prefix(out_dir, TOP_LEVEL_REPORT_NAME);
         progress.blocked("loading previous top-level waste report from disk", None);
         smol::blocking!(std::fs::read(path))
@@ -356,22 +333,14 @@ impl crate::engine::report::generic::Aggregate for Report {
             .and_then(|v| rmp_serde::from_read(v.as_slice()).ok())
     }
 
-    async fn load_previous_state(
-        &self,
-        out_dir: &Path,
-        progress: &mut prodash::tree::Item,
-    ) -> Option<Self> {
+    async fn load_previous_state(&self, out_dir: &Path, progress: &mut prodash::tree::Item) -> Option<Self> {
         let path = path_to_storage_location(self, out_dir);
         progress.blocked("loading previous waste report from disk", None);
         smol::blocking!(std::fs::read(path))
             .ok()
             .and_then(|v| rmp_serde::from_read(v.as_slice()).ok())
     }
-    async fn store_current_state(
-        &self,
-        out_dir: &Path,
-        progress: &mut prodash::tree::Item,
-    ) -> Result<()> {
+    async fn store_current_state(&self, out_dir: &Path, progress: &mut prodash::tree::Item) -> Result<()> {
         let path = path_to_storage_location(self, out_dir);
         progress.blocked("storing current waste report to disk", None);
         let data = rmp_serde::to_vec(self)?;

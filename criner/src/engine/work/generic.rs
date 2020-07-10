@@ -5,16 +5,10 @@ use async_trait::async_trait;
 pub trait Processor {
     type Item;
 
-    fn set(
-        &mut self,
-        request: Self::Item,
-        progress: &mut prodash::tree::Item,
-    ) -> Result<(model::Task, String, String)>;
+    fn set(&mut self, request: Self::Item, progress: &mut prodash::tree::Item)
+        -> Result<(model::Task, String, String)>;
     fn idle_message(&self) -> String;
-    async fn process(
-        &mut self,
-        progress: &mut prodash::tree::Item,
-    ) -> std::result::Result<(), (Error, String)>;
+    async fn process(&mut self, progress: &mut prodash::tree::Item) -> std::result::Result<(), (Error, String)>;
     async fn schedule_next(&mut self, _progress: &mut prodash::tree::Item) -> Result<()> {
         Ok(())
     }
@@ -32,8 +26,7 @@ pub async fn processor<T: Clone>(
     while let Some(request) = r.recv().await {
         let mut try_count = 0;
         let (task, task_key) = loop {
-            let (dummy_task, task_key, progress_name) =
-                agent.set(request.clone(), &mut progress)?;
+            let (dummy_task, task_key, progress_name) = agent.set(request.clone(), &mut progress)?;
             progress.set_name(progress_name);
 
             let mut task = tasks.update(Some(&mut progress), &task_key, |mut t| {
@@ -49,10 +42,7 @@ pub async fn processor<T: Clone>(
 
             task.state = match res {
                 Err((err @ Error::Timeout(_, _), _)) if try_count < max_retries_on_timeout => {
-                    progress.fail(format!(
-                        "{} → retrying ({}/{})",
-                        err, try_count, max_retries_on_timeout
-                    ));
+                    progress.fail(format!("{} → retrying ({}/{})", err, try_count, max_retries_on_timeout));
                     continue;
                 }
                 Err((err, msg)) => {

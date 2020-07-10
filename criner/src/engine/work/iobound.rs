@@ -35,11 +35,7 @@ impl<Fn, FnResult> Agent<Fn, FnResult>
 where
     Fn: FnMut(Option<(String, String)>, &model::Task, &Path) -> Option<FnResult>,
 {
-    pub fn new(
-        db: &persistence::Db,
-        channel: piper::Sender<FnResult>,
-        make_state: Fn,
-    ) -> Result<Agent<Fn, FnResult>> {
+    pub fn new(db: &persistence::Db, channel: piper::Sender<FnResult>, make_state: Fn) -> Result<Agent<Fn, FnResult>> {
         let client = reqwest::ClientBuilder::new().gzip(true).build()?;
 
         let results = db.open_results()?;
@@ -87,27 +83,17 @@ where
                     content_type: None,
                 };
 
-                self.next_action_state = (self.make_state)(
-                    crate_name_and_version.clone(),
-                    &dummy_task,
-                    &output_file_path,
-                );
+                self.next_action_state =
+                    (self.make_state)(crate_name_and_version.clone(), &dummy_task, &output_file_path);
                 self.state = Some(ProcessingState {
                     url,
                     kind,
                     output_file_path,
-                    result_key: crate_name_and_version.as_ref().map(
-                        |(crate_name, crate_version)| {
-                            let mut result_key = String::with_capacity(task_key.len() * 2);
-                            task_result.fq_key(
-                                &crate_name,
-                                &crate_version,
-                                &dummy_task,
-                                &mut result_key,
-                            );
-                            result_key
-                        },
-                    ),
+                    result_key: crate_name_and_version.as_ref().map(|(crate_name, crate_version)| {
+                        let mut result_key = String::with_capacity(task_key.len() * 2);
+                        task_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut result_key);
+                        result_key
+                    }),
                 });
                 Ok((dummy_task, task_key, progress_name))
             }
@@ -118,10 +104,7 @@ where
         "↓ IDLE".into()
     }
 
-    async fn process(
-        &mut self,
-        progress: &mut prodash::tree::Item,
-    ) -> std::result::Result<(), (Error, String)> {
+    async fn process(&mut self, progress: &mut prodash::tree::Item) -> std::result::Result<(), (Error, String)> {
         let ProcessingState {
             url,
             kind,
@@ -186,9 +169,7 @@ async fn download_file_and_store_result(
 ) -> Result<()> {
     {
         let out_file = out_file.clone();
-        smol::blocking!(std::fs::create_dir_all(
-            &out_file.parent().expect("parent directory")
-        ))?;
+        smol::blocking!(std::fs::create_dir_all(&out_file.parent().expect("parent directory")))?;
     }
 
     // NOTE: We assume that the files we download never change, and we assume the server supports resumption!
@@ -254,9 +235,7 @@ async fn download_file_and_store_result(
                     .append(!truncate)
                     .open(out_file))
             }
-            .map_err(|err| {
-                crate::Error::Message(format!("Failed to open '{}': {}", out_file.display(), err))
-            })?,
+            .map_err(|err| crate::Error::Message(format!("Failed to open '{}': {}", out_file.display(), err)))?,
         );
 
         let mut bytes_received = start_byte as usize;

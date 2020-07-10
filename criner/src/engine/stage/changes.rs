@@ -44,10 +44,7 @@ pub async fn fetch(
                         "Fetching crates index ({} received)",
                         bytesize::ByteSize(p.received_bytes() as u64)
                     ));
-                    subprogress.init(
-                        Some((p.total_deltas() + p.total_objects()) as u32),
-                        Some("objects"),
-                    );
+                    subprogress.init(Some((p.total_deltas() + p.total_objects()) as u32), Some("objects"));
                     subprogress.set((p.indexed_deltas() + p.received_objects()) as u32);
                     true
                 });
@@ -77,8 +74,7 @@ pub async fn fetch(
             let mut crates_lut = {
                 let transaction = connection.transaction()?;
                 store_progress.blocked("caching crates", None);
-                let mut statement =
-                    new_key_value_query_old_to_new(CrateTable::table_name(), &transaction)?;
+                let mut statement = new_key_value_query_old_to_new(CrateTable::table_name(), &transaction)?;
                 let iter = key_value_iter::<model::Crate>(&mut statement)?.flat_map(Result::ok);
                 BTreeMap::from_iter(iter)
             };
@@ -88,15 +84,10 @@ pub async fn fetch(
             let mut new_crate_versions = 0;
             let mut new_crates = 0;
             store_progress.blocked("write lock for crate versions", None);
-            let transaction =
-                connection.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+            let transaction = connection.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
             {
-                let mut statement =
-                    new_key_value_insertion(CrateVersionTable::table_name(), &transaction)?;
-                for (versions_stored, version) in crate_versions
-                    .into_iter()
-                    .map(model::CrateVersion::from)
-                    .enumerate()
+                let mut statement = new_key_value_insertion(CrateVersionTable::table_name(), &transaction)?;
+                for (versions_stored, version) in crate_versions.into_iter().map(model::CrateVersion::from).enumerate()
                 {
                     key_buf.clear();
                     version.key_buf(&mut key_buf);
@@ -125,14 +116,12 @@ pub async fn fetch(
 
             let transaction = {
                 store_progress.blocked("write lock for crates", None);
-                let mut t = connection
-                    .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+                let mut t = connection.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
                 t.set_drop_behavior(rusqlite::DropBehavior::Commit);
                 t
             };
             {
-                let mut statement =
-                    new_key_value_insertion(CrateTable::table_name(), &transaction)?;
+                let mut statement = new_key_value_insertion(CrateTable::table_name(), &transaction)?;
                 store_progress.init(Some(crates_lut.len() as u32), Some("crates"));
                 for (cid, (key, value)) in crates_lut.into_iter().enumerate() {
                     statement.execute(params![key, rmp_serde::to_vec(&value)?])?;
@@ -142,8 +131,7 @@ pub async fn fetch(
             store_progress.blocked("commit crates", None);
             transaction.commit()?;
 
-            Index::from_path_or_cloned(index_path)?
-                .set_last_seen_reference(last_seen_git_object)?;
+            Index::from_path_or_cloned(index_path)?.set_last_seen_reference(last_seen_git_object)?;
             db.open_context()?.update_today(|c| {
                 c.counts.crate_versions += new_crate_versions;
                 c.counts.crates += new_crates;
@@ -151,10 +139,7 @@ pub async fn fetch(
                     .duration_since(start)
                     .unwrap_or_else(|_| Duration::default())
             })?;
-            store_progress.done(format!(
-                "Stored {} crate versions to database",
-                crate_versions_len
-            ));
+            store_progress.done(format!("Stored {} crate versions to database", crate_versions_len));
             Ok::<_, Error>(())
         }
     })

@@ -52,15 +52,9 @@ fn avr_libc_missing_build_script_even_though_it_is_there() {
                 ("avr-libc/doc/LICENSE-Changes/PERM-Joerg-Wunsch", 1566),
                 ("avr-libc/doc/LICENSE-Changes/PERM-Juergen-Schilling", 1805),
                 ("avr-libc/doc/LICENSE-Changes/PERM-Keith-Gudger", 1611),
-                (
-                    "avr-libc/doc/LICENSE-Changes/PERM-Marek-Michalkiewicz",
-                    2702
-                ),
+                ("avr-libc/doc/LICENSE-Changes/PERM-Marek-Michalkiewicz", 2702),
                 ("avr-libc/doc/LICENSE-Changes/PERM-Micheal-Stumpf", 2366),
-                (
-                    "avr-libc/doc/LICENSE-Changes/PERM-Nils-Kristian-Strom",
-                    1017
-                ),
+                ("avr-libc/doc/LICENSE-Changes/PERM-Nils-Kristian-Strom", 1017),
                 ("avr-libc/doc/LICENSE-Changes/PERM-Peter-Jansen", 2161),
                 ("avr-libc/doc/LICENSE-Changes/PERM-Reinhard-Jessich", 1734),
                 ("avr-libc/doc/LICENSE-Changes/PERM-Steinar-Haugen", 1660),
@@ -114,14 +108,8 @@ fn avr_libc_missing_build_script_even_though_it_is_there() {
                 ("avr-libc/doc/examples/demo/iocompat.h", 5665),
                 ("avr-libc/doc/examples/largedemo/Makefile", 2046),
                 ("avr-libc/doc/examples/largedemo/largedemo-setup.jpg", 71742),
-                (
-                    "avr-libc/doc/examples/largedemo/largedemo-wiring.jpg",
-                    45703
-                ),
-                (
-                    "avr-libc/doc/examples/largedemo/largedemo-wiring2.jpg",
-                    46337
-                ),
+                ("avr-libc/doc/examples/largedemo/largedemo-wiring.jpg", 45703),
+                ("avr-libc/doc/examples/largedemo/largedemo-wiring2.jpg", 46337),
                 ("avr-libc/doc/examples/largedemo/largedemo.c", 12200),
                 ("avr-libc/doc/examples/largedemo/largedemo.dox", 17503),
                 ("avr-libc/doc/examples/stdiodemo/Makefile", 1817),
@@ -130,10 +118,7 @@ fn avr_libc_missing_build_script_even_though_it_is_there() {
                 ("avr-libc/doc/examples/stdiodemo/hd44780.h", 2803),
                 ("avr-libc/doc/examples/stdiodemo/lcd.c", 1993),
                 ("avr-libc/doc/examples/stdiodemo/lcd.h", 719),
-                (
-                    "avr-libc/doc/examples/stdiodemo/stdiodemo-setup.jpg",
-                    100670
-                ),
+                ("avr-libc/doc/examples/stdiodemo/stdiodemo-setup.jpg", 100670),
                 ("avr-libc/doc/examples/stdiodemo/stdiodemo.c", 2065),
                 ("avr-libc/doc/examples/stdiodemo/stdiodemo.dox", 21760),
                 ("avr-libc/doc/examples/stdiodemo/uart.c", 4215),
@@ -325,14 +310,8 @@ fn avr_libc_missing_build_script_even_though_it_is_there() {
                 ("avr-libc/tests/simulate/regression/bug-19281.c", 1770),
                 ("avr-libc/tests/simulate/regression/bug-21872-1.c", 2841),
                 ("avr-libc/tests/simulate/regression/bug-21872-2.c", 2852),
-                (
-                    "avr-libc/tests/simulate/regression/bug-21905-scanf_flt.c",
-                    2093
-                ),
-                (
-                    "avr-libc/tests/simulate/regression/bug-21906-scanf_flt.c",
-                    1938
-                ),
+                ("avr-libc/tests/simulate/regression/bug-21905-scanf_flt.c", 2093),
+                ("avr-libc/tests/simulate/regression/bug-21906-scanf_flt.c", 1938),
                 ("avr-libc/tests/simulate/regression/bug-21955.c", 5407),
                 ("avr-libc/tests/simulate/regression/bug-22593.c", 2407),
                 ("avr-libc/tests/simulate/regression/bug-22800.c", 2759),
@@ -344,14 +323,8 @@ fn avr_libc_missing_build_script_even_though_it_is_there() {
                 ("avr-libc/tests/simulate/regression/bug-28135.c", 2904),
                 ("avr-libc/tests/simulate/regression/bug-31644.c", 3294),
                 ("avr-libc/tests/simulate/regression/bug-35093.c", 2978),
-                (
-                    "avr-libc/tests/simulate/regression/bug-35366-1-printf_flt.c",
-                    2598
-                ),
-                (
-                    "avr-libc/tests/simulate/regression/bug-35366-2-printf_flt.c",
-                    2363
-                ),
+                ("avr-libc/tests/simulate/regression/bug-35366-1-printf_flt.c", 2598),
+                ("avr-libc/tests/simulate/regression/bug-35366-2-printf_flt.c", 2363),
                 ("avr-libc/tests/simulate/regression/bug-37778.c", 1857),
                 ("avr-libc/tests/simulate/runtest.sh", 9619),
                 ("avr-libc/tests/simulate/scanf/scanf-nul.c", 4179),
@@ -531,11 +504,7 @@ fn avr_libc_missing_build_script_even_though_it_is_there() {
 #[test]
 fn fermium_build_script() {
     assert_eq!(
-        Report::from_package(
-            "a",
-            "1",
-            tar_package("fermium-20.12.0-alpha2-extract_crate-1.0.0")
-        ),
+        Report::from_package("a", "1", tar_package("fermium-20.12.0-alpha2-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -555,102 +524,39 @@ fn fermium_build_script() {
                 ("win32-dynamic-link-files/x86/SDL2.dll", 1220096),
                 ("win32-dynamic-link-files/x86/SDL2.lib", 154422),
                 ("win32_bindings.bat", 191),
-                (
-                    "SDL2-2.0.12/VisualC/tests/checkkeys/checkkeys.vcxproj",
-                    13304
-                ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/controllermap/controllermap.vcxproj",
-                    16225
-                ),
+                ("SDL2-2.0.12/VisualC/tests/checkkeys/checkkeys.vcxproj", 13304),
+                ("SDL2-2.0.12/VisualC/tests/controllermap/controllermap.vcxproj", 16225),
                 ("SDL2-2.0.12/VisualC/tests/loopwave/loopwave.vcxproj", 13394),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testatomic/testatomic.vcxproj",
-                    11545
-                ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testautomation/testautomation.vcxproj",
-                    13194
-                ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testdraw2/testdraw2.vcxproj",
-                    11862
-                ),
+                ("SDL2-2.0.12/VisualC/tests/testatomic/testatomic.vcxproj", 11545),
+                ("SDL2-2.0.12/VisualC/tests/testautomation/testautomation.vcxproj", 13194),
+                ("SDL2-2.0.12/VisualC/tests/testdraw2/testdraw2.vcxproj", 11862),
                 ("SDL2-2.0.12/VisualC/tests/testfile/testfile.vcxproj", 11533),
                 (
                     "SDL2-2.0.12/VisualC/tests/testgamecontroller/testgamecontroller.vcxproj",
                     16255
                 ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testgesture/testgesture.vcxproj",
-                    11874
-                ),
+                ("SDL2-2.0.12/VisualC/tests/testgesture/testgesture.vcxproj", 11874),
                 ("SDL2-2.0.12/VisualC/tests/testgl2/testgl2.vcxproj", 12278),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testgles2/testgles2.vcxproj",
-                    11911
-                ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testjoystick/testjoystick.vcxproj",
-                    11557
-                ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testoverlay2/testoverlay2.vcxproj",
-                    13188
-                ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testplatform/testplatform.vcxproj",
-                    12713
-                ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testpower/testpower.vcxproj",
-                    11539
-                ),
+                ("SDL2-2.0.12/VisualC/tests/testgles2/testgles2.vcxproj", 11911),
+                ("SDL2-2.0.12/VisualC/tests/testjoystick/testjoystick.vcxproj", 11557),
+                ("SDL2-2.0.12/VisualC/tests/testoverlay2/testoverlay2.vcxproj", 13188),
+                ("SDL2-2.0.12/VisualC/tests/testplatform/testplatform.vcxproj", 12713),
+                ("SDL2-2.0.12/VisualC/tests/testpower/testpower.vcxproj", 11539),
                 (
                     "SDL2-2.0.12/VisualC/tests/testrendertarget/testrendertarget.vcxproj",
                     15017
                 ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testrumble/testrumble.vcxproj",
-                    11545
-                ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testscale/testscale.vcxproj",
-                    14975
-                ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testshape/testshape.vcxproj",
-                    11539
-                ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testsprite2/testsprite2.vcxproj",
-                    13445
-                ),
-                (
-                    "SDL2-2.0.12/VisualC/tests/testvulkan/testvulkan.vcxproj",
-                    11603
-                ),
+                ("SDL2-2.0.12/VisualC/tests/testrumble/testrumble.vcxproj", 11545),
+                ("SDL2-2.0.12/VisualC/tests/testscale/testscale.vcxproj", 14975),
+                ("SDL2-2.0.12/VisualC/tests/testshape/testshape.vcxproj", 11539),
+                ("SDL2-2.0.12/VisualC/tests/testsprite2/testsprite2.vcxproj", 13445),
+                ("SDL2-2.0.12/VisualC/tests/testvulkan/testvulkan.vcxproj", 11603),
                 ("SDL2-2.0.12/VisualC/tests/testyuv/testyuv.vcxproj", 13571),
-                (
-                    "SDL2-2.0.12/VisualC-WinRT/tests/loopwave/Assets/Logo.png",
-                    801
-                ),
-                (
-                    "SDL2-2.0.12/VisualC-WinRT/tests/loopwave/Assets/SmallLogo.png",
-                    329
-                ),
-                (
-                    "SDL2-2.0.12/VisualC-WinRT/tests/loopwave/Assets/SplashScreen.png",
-                    2146
-                ),
-                (
-                    "SDL2-2.0.12/VisualC-WinRT/tests/loopwave/Assets/StoreLogo.png",
-                    429
-                ),
-                (
-                    "SDL2-2.0.12/VisualC-WinRT/tests/loopwave/Package.appxmanifest",
-                    1313
-                ),
+                ("SDL2-2.0.12/VisualC-WinRT/tests/loopwave/Assets/Logo.png", 801),
+                ("SDL2-2.0.12/VisualC-WinRT/tests/loopwave/Assets/SmallLogo.png", 329),
+                ("SDL2-2.0.12/VisualC-WinRT/tests/loopwave/Assets/SplashScreen.png", 2146),
+                ("SDL2-2.0.12/VisualC-WinRT/tests/loopwave/Assets/StoreLogo.png", 429),
+                ("SDL2-2.0.12/VisualC-WinRT/tests/loopwave/Package.appxmanifest", 1313),
                 (
                     "SDL2-2.0.12/VisualC-WinRT/tests/loopwave/loopwave_VS2012.vcxproj",
                     10174
@@ -659,26 +565,14 @@ fn fermium_build_script() {
                     "SDL2-2.0.12/VisualC-WinRT/tests/loopwave/loopwave_VS2012_TemporaryKey.pfx",
                     2504
                 ),
-                (
-                    "SDL2-2.0.12/VisualC-WinRT/tests/testthread/Assets/Logo.png",
-                    801
-                ),
-                (
-                    "SDL2-2.0.12/VisualC-WinRT/tests/testthread/Assets/SmallLogo.png",
-                    329
-                ),
+                ("SDL2-2.0.12/VisualC-WinRT/tests/testthread/Assets/Logo.png", 801),
+                ("SDL2-2.0.12/VisualC-WinRT/tests/testthread/Assets/SmallLogo.png", 329),
                 (
                     "SDL2-2.0.12/VisualC-WinRT/tests/testthread/Assets/SplashScreen.png",
                     2146
                 ),
-                (
-                    "SDL2-2.0.12/VisualC-WinRT/tests/testthread/Assets/StoreLogo.png",
-                    429
-                ),
-                (
-                    "SDL2-2.0.12/VisualC-WinRT/tests/testthread/Package.appxmanifest",
-                    1321
-                ),
+                ("SDL2-2.0.12/VisualC-WinRT/tests/testthread/Assets/StoreLogo.png", 429),
+                ("SDL2-2.0.12/VisualC-WinRT/tests/testthread/Package.appxmanifest", 1321),
                 (
                     "SDL2-2.0.12/VisualC-WinRT/tests/testthread/testthread_VS2012.vcxproj",
                     9465
@@ -689,10 +583,7 @@ fn fermium_build_script() {
                 ),
                 ("SDL2-2.0.12/Xcode-iOS/Demos/Default.png", 18383),
                 ("SDL2-2.0.12/Xcode-iOS/Demos/Icon.png", 2409),
-                (
-                    "SDL2-2.0.12/Xcode-iOS/Demos/data/bitmapfont/kromasky_16x16.bmp",
-                    45368
-                ),
+                ("SDL2-2.0.12/Xcode-iOS/Demos/data/bitmapfont/kromasky_16x16.bmp", 45368),
                 ("SDL2-2.0.12/Xcode-iOS/Demos/data/icon.bmp", 578),
                 ("SDL2-2.0.12/Xcode-iOS/Demos/data/ship.bmp", 12344),
                 ("SDL2-2.0.12/Xcode-iOS/Demos/data/space.bmp", 460856),
@@ -701,14 +592,8 @@ fn fermium_build_script() {
                     "SDL2-2.0.12/Xcode-iOS/Template/SDL iOS Application/Default-568h@2x.png",
                     83791
                 ),
-                (
-                    "SDL2-2.0.12/Xcode-iOS/Template/SDL iOS Application/Default.png",
-                    18383
-                ),
-                (
-                    "SDL2-2.0.12/Xcode-iOS/Template/SDL iOS Application/Icon.png",
-                    2409
-                ),
+                ("SDL2-2.0.12/Xcode-iOS/Template/SDL iOS Application/Default.png", 18383),
+                ("SDL2-2.0.12/Xcode-iOS/Template/SDL iOS Application/Icon.png", 2409),
                 (
                     "SDL2-2.0.12/android-project/app/src/main/res/mipmap-hdpi/ic_launcher.png",
                     2683
@@ -763,10 +648,7 @@ fn fermium_build_script() {
                 ("SDL2-2.0.12/src/test/SDL_test_imageBlitBlend.c", 212200),
                 ("SDL2-2.0.12/src/test/SDL_test_imageFace.c", 16758),
                 ("SDL2-2.0.12/src/test/SDL_test_imagePrimitives.c", 37445),
-                (
-                    "SDL2-2.0.12/src/test/SDL_test_imagePrimitivesBlend.c",
-                    52011
-                ),
+                ("SDL2-2.0.12/src/test/SDL_test_imagePrimitivesBlend.c", 52011),
                 ("SDL2-2.0.12/src/test/SDL_test_log.c", 3604),
                 ("SDL2-2.0.12/src/test/SDL_test_md5.c", 11663),
                 ("SDL2-2.0.12/src/test/SDL_test_memory.c", 7855),
@@ -966,24 +848,1057 @@ fn fermium_build_script() {
 #[test]
 fn grpcio_sys_lean_with_potential() {
     assert_eq!(
-        Report::from_package(
-            "a",
-            "1",
-            tar_package("grpcio-sys-0.5.0_extract_crate-1.0.0")
-        ),
+        Report::from_package("a", "1", tar_package("grpcio-sys-0.5.0_extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
             total_size_in_bytes: 36550562,
             total_files: 3555,
-            wasted_files: [("grpc/bazel/test/python_test_repo/BUILD", 2827), ("grpc/bazel/test/python_test_repo/README.md", 190), ("grpc/bazel/test/python_test_repo/WORKSPACE", 252), ("grpc/bazel/test/python_test_repo/dummy_plugin.py", 1322), ("grpc/bazel/test/python_test_repo/helloworld.proto", 1316), ("grpc/bazel/test/python_test_repo/helloworld.py", 2548), ("grpc/bazel/test/python_test_repo/helloworld_moved.py", 2584), ("grpc/bazel/test/python_test_repo/tools/bazel", 23), ("grpc/include/grpc++/test/mock_stream.h", 951), ("grpc/include/grpc++/test/server_context_test_spouse.h", 1011), ("grpc/include/grpcpp/test/default_reactor_test_peer.h", 1973), ("grpc/include/grpcpp/test/mock_stream.h", 3975), ("grpc/include/grpcpp/test/server_context_test_spouse.h", 2077), ("grpc/src/benchmark/gen_build_yaml.py", 1119), ("grpc/src/proto/grpc/testing/BUILD", 4964), ("grpc/src/proto/grpc/testing/benchmark_service.proto", 1894), ("grpc/src/proto/grpc/testing/compiler_test.proto", 1968), ("grpc/src/proto/grpc/testing/control.proto", 9193), ("grpc/src/proto/grpc/testing/duplicate/BUILD", 913), ("grpc/src/proto/grpc/testing/duplicate/echo_duplicate.proto", 965), ("grpc/src/proto/grpc/testing/echo.proto", 1431), ("grpc/src/proto/grpc/testing/echo_messages.proto", 1937), ("grpc/src/proto/grpc/testing/empty.proto", 985), ("grpc/src/proto/grpc/testing/empty_service.proto", 768), ("grpc/src/proto/grpc/testing/messages.proto", 6418), ("grpc/src/proto/grpc/testing/metrics.proto", 1508), ("grpc/src/proto/grpc/testing/payloads.proto", 1142), ("grpc/src/proto/grpc/testing/proto2/BUILD.bazel", 625), ("grpc/src/proto/grpc/testing/proto2/empty2.proto", 721), ("grpc/src/proto/grpc/testing/proto2/empty2_extensions.proto", 972), ("grpc/src/proto/grpc/testing/proxy-service.proto", 987), ("grpc/src/proto/grpc/testing/report_qps_scenario_service.proto", 975), ("grpc/src/proto/grpc/testing/simple_messages.proto", 689), ("grpc/src/proto/grpc/testing/stats.proto", 2418), ("grpc/src/proto/grpc/testing/test.proto", 3371), ("grpc/src/proto/grpc/testing/worker_service.proto", 1892), ("grpc/src/proto/grpc/testing/xds/BUILD", 1406), ("grpc/src/proto/grpc/testing/xds/ads_for_test.proto", 2348), ("grpc/src/proto/grpc/testing/xds/eds_for_test.proto", 23201), ("grpc/src/proto/grpc/testing/xds/lrs_for_test.proto", 8201), ("grpc/src/proto/grpc/testing/xds/orca_load_report_for_test.proto", 2388), ("grpc/test/build/boringssl.c", 918), ("grpc/test/build/c-ares.c", 856), ("grpc/test/build/check_epollexclusive.c", 777), ("grpc/test/build/empty.c", 641), ("grpc/test/build/extra-semi.c", 641), ("grpc/test/build/no-c++14-compat.cc", 641), ("grpc/test/build/no-maybe-uninitialized.c", 641), ("grpc/test/build/no-shift-negative-value.c", 641), ("grpc/test/build/no-unknown-warning-option.c", 622), ("grpc/test/build/no-unused-but-set-variable.c", 641), ("grpc/test/build/openssl-alpn.c", 860), ("grpc/test/build/perftools.c", 738), ("grpc/test/build/protobuf.cc", 880), ("grpc/test/build/shadow.c", 821), ("grpc/test/build/systemtap.c", 771), ("grpc/test/build/zlib.c", 817), ("grpc/test/build_test/BUILD", 916), ("grpc/test/core/security/alts_credentials_fuzzer.cc", 4245), ("grpc/test/core/security/alts_security_connector_test.cc", 6859), ("grpc/test/core/security/auth_context_test.cc", 5956), ("grpc/test/core/security/check_gcp_environment_linux_test.cc", 2924), ("grpc/test/core/security/check_gcp_environment_windows_test.cc", 3110), ("grpc/test/core/security/control_plane_credentials_test.cc", 19554), ("grpc/test/core/security/create_jwt.cc", 3240), ("grpc/test/core/security/credentials_test.cc", 68835), ("grpc/test/core/security/fetch_oauth2.cc", 5495), ("grpc/test/core/security/grpc_alts_credentials_options_test.cc", 3622), ("grpc/test/core/security/json_token_test.cc", 19505), ("grpc/test/core/security/jwt_verifier_test.cc", 26028), ("grpc/test/core/security/linux_system_roots_test.cc", 3360), ("grpc/test/core/security/oauth2_utils.cc", 3802), ("grpc/test/core/security/print_google_default_creds_token.cc", 4120), ("grpc/test/core/security/secure_endpoint_test.cc", 8687), ("grpc/test/core/security/security_connector_test.cc", 20080), ("grpc/test/core/security/spiffe_security_connector_test.cc", 9957), ("grpc/test/core/security/ssl_credentials_test.cc", 2106), ("grpc/test/core/security/ssl_server_fuzzer.cc", 4403), ("grpc/test/core/security/verify_jwt.cc", 3693), ("grpc/test/core/util/cmdline.cc", 8765), ("grpc/test/distrib/cpp/run_distrib_test_cmake.bat", 3293), ("grpc/test/distrib/cpp/run_distrib_test_cmake.sh", 2146), ("grpc/test/distrib/cpp/run_distrib_test_cmake_as_externalproject.bat", 1843), ("grpc/test/distrib/cpp/run_distrib_test_cmake_as_externalproject.sh", 1579), ("grpc/test/distrib/cpp/run_distrib_test_cmake_as_submodule.sh", 837), ("grpc/test/distrib/cpp/run_distrib_test_cmake_pkgconfig.sh", 2229), ("grpc/test/distrib/cpp/run_distrib_test_routeguide.sh", 932), ("grpc/test/distrib/csharp/DistribTest/DistribTest.csproj", 7483), ("grpc/test/distrib/csharp/DistribTest/DistribTestDotNet.csproj", 1408), ("grpc/test/distrib/csharp/DistribTest/Program.cs", 2210), ("grpc/test/distrib/csharp/DistribTest/Properties/AssemblyInfo.cs", 2093), ("grpc/test/distrib/csharp/DistribTest/packages.config", 1115), ("grpc/test/distrib/csharp/DistribTest/testcodegen.proto", 800), ("grpc/test/distrib/csharp/DistribTest.sln", 1356), ("grpc/test/distrib/csharp/NuGet.Config", 260), ("grpc/test/distrib/csharp/build_vs2015.bat", 898), ("grpc/test/distrib/csharp/run_distrib_test.bat", 1704), ("grpc/test/distrib/csharp/run_distrib_test.sh", 945), ("grpc/test/distrib/csharp/run_distrib_test_dotnetcli.sh", 1504), ("grpc/test/distrib/csharp/update_version.sh", 1276), ("grpc/test/distrib/php/distribtest.php", 936), ("grpc/test/distrib/php/run_distrib_test.sh", 845), ("grpc/test/distrib/php/run_distrib_test_macos.sh", 850), ("grpc/test/distrib/python/distribtest.py", 802), ("grpc/test/distrib/python/run_binary_distrib_test.sh", 667), ("grpc/test/distrib/python/run_source_distrib_test.sh", 667), ("grpc/test/distrib/python/test_packages.sh", 2488), ("grpc/test/distrib/ruby/Gemfile", 229), ("grpc/test/distrib/ruby/distribtest.gemspec", 592), ("grpc/test/distrib/ruby/distribtest.rb", 857), ("grpc/test/distrib/ruby/run_distrib_test.sh", 2414), ("grpc/test/http2_test/http2_base_server.py", 8570), ("grpc/test/http2_test/http2_server_health_check.py", 1323), ("grpc/test/http2_test/http2_test_server.py", 4084), ("grpc/test/http2_test/messages_pb2.py", 25209), ("grpc/test/http2_test/test_data_frame_padding.py", 3758), ("grpc/test/http2_test/test_goaway.py", 2633), ("grpc/test/http2_test/test_max_streams.py", 1974), ("grpc/test/http2_test/test_ping.py", 2135), ("grpc/test/http2_test/test_rst_after_data.py", 1723), ("grpc/test/http2_test/test_rst_after_header.py", 1247), ("grpc/test/http2_test/test_rst_during_data.py", 1799), ("grpc/third_party/boringssl/crypto/abi_self_test.cc", 22823), ("grpc/third_party/boringssl/crypto/asn1/asn1_test.cc", 6059), ("grpc/third_party/boringssl/crypto/base64/base64_test.cc", 9638), ("grpc/third_party/boringssl/crypto/bio/bio_test.cc", 10959), ("grpc/third_party/boringssl/crypto/buf/buf_test.cc", 3258), ("grpc/third_party/boringssl/crypto/bytestring/bytestring_test.cc", 44305), ("grpc/third_party/boringssl/crypto/chacha/chacha_test.cc", 15890), ("grpc/third_party/boringssl/crypto/cipher_extra/aead_test.cc", 33716), ("grpc/third_party/boringssl/crypto/cipher_extra/cipher_test.cc", 13221), ("grpc/third_party/boringssl/crypto/cmac/cavp_3des_cmac_tests.txt", 41961), ("grpc/third_party/boringssl/crypto/cmac/cavp_aes128_cmac_tests.txt", 53587), ("grpc/third_party/boringssl/crypto/cmac/cavp_aes192_cmac_tests.txt", 69750), ("grpc/third_party/boringssl/crypto/cmac/cavp_aes256_cmac_tests.txt", 61387), ("grpc/third_party/boringssl/crypto/cmac/cmac_test.cc", 9607), ("grpc/third_party/boringssl/crypto/compiler_test.cc", 7232), ("grpc/third_party/boringssl/crypto/constant_time_test.cc", 5954), ("grpc/third_party/boringssl/crypto/cpu-arm-linux_test.cc", 7460), ("grpc/third_party/boringssl/crypto/curve25519/ed25519_test.cc", 3431), ("grpc/third_party/boringssl/crypto/curve25519/ed25519_tests.txt", 446783), ("grpc/third_party/boringssl/crypto/curve25519/spake25519_test.cc", 5156), ("grpc/third_party/boringssl/crypto/curve25519/x25519_test.cc", 5677), ("grpc/third_party/boringssl/crypto/dh/dh_test.cc", 18347), ("grpc/third_party/boringssl/crypto/digest_extra/digest_test.cc", 12255), ("grpc/third_party/boringssl/crypto/dsa/dsa_test.cc", 11982), ("grpc/third_party/boringssl/crypto/ecdh_extra/ecdh_test.cc", 11349), ("grpc/third_party/boringssl/crypto/ecdh_extra/ecdh_tests.txt", 58307), ("grpc/third_party/boringssl/crypto/err/err_test.cc", 7707), ("grpc/third_party/boringssl/crypto/evp/evp_extra_test.cc", 39649), ("grpc/third_party/boringssl/crypto/evp/evp_test.cc", 24359), ("grpc/third_party/boringssl/crypto/evp/evp_tests.txt", 136462), ("grpc/third_party/boringssl/crypto/evp/pbkdf_test.cc", 6990), ("grpc/third_party/boringssl/crypto/evp/scrypt_test.cc", 4393), ("grpc/third_party/boringssl/crypto/evp/scrypt_tests.txt", 1300), ("grpc/third_party/boringssl/crypto/fipsmodule/aes/aes_test.cc", 15589), ("grpc/third_party/boringssl/crypto/fipsmodule/aes/aes_tests.txt", 2270), ("grpc/third_party/boringssl/crypto/fipsmodule/bn/bn_test.cc", 112955), ("grpc/third_party/boringssl/crypto/fipsmodule/bn/bn_tests.txt", 909405), ("grpc/third_party/boringssl/crypto/fipsmodule/bn/check_bn_tests.go", 8018), ("grpc/third_party/boringssl/crypto/fipsmodule/bn/miller_rabin_tests.txt", 7589), ("grpc/third_party/boringssl/crypto/fipsmodule/ec/ec_scalar_base_mult_tests.txt", 158271), ("grpc/third_party/boringssl/crypto/fipsmodule/ec/ec_test.cc", 39999), ("grpc/third_party/boringssl/crypto/fipsmodule/ec/make_ec_scalar_base_mult_tests.go", 1938), ("grpc/third_party/boringssl/crypto/fipsmodule/ec/p256-x86_64_test.cc", 20169), ("grpc/third_party/boringssl/crypto/fipsmodule/ec/p256-x86_64_tests.txt", 65077), ("grpc/third_party/boringssl/crypto/fipsmodule/ecdsa/ecdsa_sign_tests.txt", 169648), ("grpc/third_party/boringssl/crypto/fipsmodule/ecdsa/ecdsa_test.cc", 16780), ("grpc/third_party/boringssl/crypto/fipsmodule/ecdsa/ecdsa_verify_tests.txt", 170210), ("grpc/third_party/boringssl/crypto/fipsmodule/intcheck1.png", 30054), ("grpc/third_party/boringssl/crypto/fipsmodule/intcheck2.png", 99269), ("grpc/third_party/boringssl/crypto/fipsmodule/intcheck3.png", 81319), ("grpc/third_party/boringssl/crypto/fipsmodule/md5/md5_test.cc", 1299), ("grpc/third_party/boringssl/crypto/fipsmodule/modes/gcm_test.cc", 8348), ("grpc/third_party/boringssl/crypto/fipsmodule/modes/gcm_tests.txt", 9321), ("grpc/third_party/boringssl/crypto/fipsmodule/rand/ctrdrbg_test.cc", 4937), ("grpc/third_party/boringssl/crypto/fipsmodule/rand/urandom_test.cc", 15052), ("grpc/third_party/boringssl/crypto/fipsmodule/sha/sha_test.cc", 2168), ("grpc/third_party/boringssl/crypto/hkdf/hkdf_test.cc", 11009), ("grpc/third_party/boringssl/crypto/hmac_extra/hmac_test.cc", 5813), ("grpc/third_party/boringssl/crypto/hmac_extra/hmac_tests.txt", 6321), ("grpc/third_party/boringssl/crypto/hrss/hrss_test.cc", 25290), ("grpc/third_party/boringssl/crypto/impl_dispatch_test.cc", 4957), ("grpc/third_party/boringssl/crypto/lhash/lhash_test.cc", 4698), ("grpc/third_party/boringssl/crypto/obj/obj_test.cc", 7521), ("grpc/third_party/boringssl/crypto/pem/pem_test.cc", 1746), ("grpc/third_party/boringssl/crypto/pkcs7/pkcs7_test.cc", 40093), ("grpc/third_party/boringssl/crypto/pkcs8/pkcs12_test.cc", 130637), ("grpc/third_party/boringssl/crypto/pkcs8/pkcs8_test.cc", 20688), ("grpc/third_party/boringssl/crypto/poly1305/poly1305_test.cc", 3660), ("grpc/third_party/boringssl/crypto/poly1305/poly1305_tests.txt", 74551), ("grpc/third_party/boringssl/crypto/pool/pool_test.cc", 4904), ("grpc/third_party/boringssl/crypto/rand_extra/rand_test.cc", 6141), ("grpc/third_party/boringssl/crypto/refcount_test.cc", 2418), ("grpc/third_party/boringssl/crypto/rsa_extra/rsa_test.cc", 52015), ("grpc/third_party/boringssl/crypto/self_test.cc", 944), ("grpc/third_party/boringssl/crypto/siphash/siphash_test.cc", 1909), ("grpc/third_party/boringssl/crypto/siphash/siphash_tests.txt", 90795), ("grpc/third_party/boringssl/crypto/stack/stack_test.cc", 12947), ("grpc/third_party/boringssl/crypto/test/CMakeLists.txt", 610), ("grpc/third_party/boringssl/crypto/test/abi_test.cc", 25027), ("grpc/third_party/boringssl/crypto/test/abi_test.h", 20560), ("grpc/third_party/boringssl/crypto/test/asm/trampoline-armv4.pl", 5633), ("grpc/third_party/boringssl/crypto/test/asm/trampoline-armv8.pl", 6157), ("grpc/third_party/boringssl/crypto/test/asm/trampoline-x86.pl", 4210), ("grpc/third_party/boringssl/crypto/test/asm/trampoline-x86_64.pl", 17511), ("grpc/third_party/boringssl/crypto/test/file_test.cc", 14573), ("grpc/third_party/boringssl/crypto/test/file_test.h", 11015), ("grpc/third_party/boringssl/crypto/test/file_test_gtest.cc", 3205), ("grpc/third_party/boringssl/crypto/test/gtest_main.cc", 2906), ("grpc/third_party/boringssl/crypto/test/gtest_main.h", 2582), ("grpc/third_party/boringssl/crypto/test/malloc.cc", 4045), ("grpc/third_party/boringssl/crypto/test/test_util.cc", 1394), ("grpc/third_party/boringssl/crypto/test/test_util.h", 2172), ("grpc/third_party/boringssl/crypto/test/wycheproof_util.cc", 3893), ("grpc/third_party/boringssl/crypto/test/wycheproof_util.h", 1928), ("grpc/third_party/boringssl/crypto/thread_test.cc", 4275), ("grpc/third_party/boringssl/crypto/x509/x509_test.cc", 100531), ("grpc/third_party/boringssl/crypto/x509/x509_time_test.cc", 4751), ("grpc/third_party/boringssl/crypto/x509v3/tab_test.cc", 3293), ("grpc/third_party/boringssl/crypto/x509v3/v3name_test.cc", 14254), ("grpc/third_party/boringssl/decrepit/blowfish/blowfish_test.cc", 6886), ("grpc/third_party/boringssl/decrepit/cast/cast_test.cc", 5261), ("grpc/third_party/boringssl/decrepit/cfb/cfb_test.cc", 5579), ("grpc/third_party/boringssl/decrepit/ripemd/ripemd_test.cc", 4486), ("grpc/third_party/boringssl/ssl/span_test.cc", 2627), ("grpc/third_party/boringssl/ssl/ssl_c_test.c", 539), ("grpc/third_party/boringssl/ssl/ssl_test.cc", 216942), ("grpc/third_party/boringssl/ssl/test/CMakeLists.txt", 722), ("grpc/third_party/boringssl/ssl/test/PORTING.md", 4833), ("grpc/third_party/boringssl/ssl/test/README.md", 1992), ("grpc/third_party/boringssl/ssl/test/async_bio.cc", 4368), ("grpc/third_party/boringssl/ssl/test/async_bio.h", 1898), ("grpc/third_party/boringssl/ssl/test/bssl_shim.cc", 39587), ("grpc/third_party/boringssl/ssl/test/fuzzer.h", 25260), ("grpc/third_party/boringssl/ssl/test/fuzzer_tags.h", 1983), ("grpc/third_party/boringssl/ssl/test/handshake_util.cc", 15380), ("grpc/third_party/boringssl/ssl/test/handshake_util.h", 2527), ("grpc/third_party/boringssl/ssl/test/handshaker.cc", 5384), ("grpc/third_party/boringssl/ssl/test/packeted_bio.cc", 6797), ("grpc/third_party/boringssl/ssl/test/packeted_bio.h", 1703), ("grpc/third_party/boringssl/ssl/test/runner/alert.go", 3778), ("grpc/third_party/boringssl/ssl/test/runner/cert.pem", 1368), ("grpc/third_party/boringssl/ssl/test/runner/chacha20_poly1305.go", 5718), ("grpc/third_party/boringssl/ssl/test/runner/chacha20_poly1305_test.go", 5763), ("grpc/third_party/boringssl/ssl/test/runner/channel_id_key.pem", 232), ("grpc/third_party/boringssl/ssl/test/runner/cipher_suites.go", 16763), ("grpc/third_party/boringssl/ssl/test/runner/common.go", 74220), ("grpc/third_party/boringssl/ssl/test/runner/conn.go", 59424), ("grpc/third_party/boringssl/ssl/test/runner/curve25519/const_amd64.h", 352), ("grpc/third_party/boringssl/ssl/test/runner/curve25519/const_amd64.s", 664), ("grpc/third_party/boringssl/ssl/test/runner/curve25519/cswap_amd64.s", 1640), ("grpc/third_party/boringssl/ssl/test/runner/curve25519/curve25519.go", 22883), ("grpc/third_party/boringssl/ssl/test/runner/curve25519/curve25519_test.go", 634), ("grpc/third_party/boringssl/ssl/test/runner/curve25519/doc.go", 1066), ("grpc/third_party/boringssl/ssl/test/runner/curve25519/freeze_amd64.s", 1316), ("grpc/third_party/boringssl/ssl/test/runner/curve25519/ladderstep_amd64.s", 21334), ("grpc/third_party/boringssl/ssl/test/runner/curve25519/mont25519_amd64.go", 5513), ("grpc/third_party/boringssl/ssl/test/runner/curve25519/mul_amd64.s", 2718), ("grpc/third_party/boringssl/ssl/test/runner/curve25519/square_amd64.s", 2183), ("grpc/third_party/boringssl/ssl/test/runner/deterministic.go", 1297), ("grpc/third_party/boringssl/ssl/test/runner/dtls.go", 15905), ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p224_cert.pem", 676), ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p224_key.pem", 221), ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p256_cert.pem", 700), ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p256_key.pem", 246), ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p384_cert.pem", 906), ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p384_key.pem", 312), ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p521_cert.pem", 1010), ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p521_key.pem", 386), ("grpc/third_party/boringssl/ssl/test/runner/ed25519_cert.pem", 614), ("grpc/third_party/boringssl/ssl/test/runner/ed25519_key.pem", 122), ("grpc/third_party/boringssl/ssl/test/runner/fuzzer_mode.json", 3296), ("grpc/third_party/boringssl/ssl/test/runner/handshake_client.go", 63710), ("grpc/third_party/boringssl/ssl/test/runner/handshake_messages.go", 67903), ("grpc/third_party/boringssl/ssl/test/runner/handshake_server.go", 68978), ("grpc/third_party/boringssl/ssl/test/runner/hkdf.go", 1768), ("grpc/third_party/boringssl/ssl/test/runner/hkdf_test.go", 9108), ("grpc/third_party/boringssl/ssl/test/runner/hrss/hrss.go", 26984), ("grpc/third_party/boringssl/ssl/test/runner/key.pem", 1732), ("grpc/third_party/boringssl/ssl/test/runner/key_agreement.go", 27834), ("grpc/third_party/boringssl/ssl/test/runner/packet_adapter.go", 4746), ("grpc/third_party/boringssl/ssl/test/runner/poly1305/poly1305.go", 1281), ("grpc/third_party/boringssl/ssl/test/runner/poly1305/poly1305_test.go", 3018), ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_amd64.go", 716), ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_amd64.s", 3165), ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_arm.go", 740), ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_arm.s", 12285), ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_noasm.go", 539), ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_ref.go", 4802), ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_s390x.go", 1560), ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_s390x.s", 9045), ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_vmsl_s390x.s", 25099), ("grpc/third_party/boringssl/ssl/test/runner/poly1305/vectors_test.go", 182527), ("grpc/third_party/boringssl/ssl/test/runner/prf.go", 15654), ("grpc/third_party/boringssl/ssl/test/runner/recordingconn.go", 4587), ("grpc/third_party/boringssl/ssl/test/runner/rsa_1024_cert.pem", 890), ("grpc/third_party/boringssl/ssl/test/runner/rsa_1024_key.pem", 932), ("grpc/third_party/boringssl/ssl/test/runner/rsa_chain_cert.pem", 2090), ("grpc/third_party/boringssl/ssl/test/runner/rsa_chain_key.pem", 1732), ("grpc/third_party/boringssl/ssl/test/runner/runner.go", 440631), ("grpc/third_party/boringssl/ssl/test/runner/runner_test.go", 862), ("grpc/third_party/boringssl/ssl/test/runner/shim_ticket.go", 6538), ("grpc/third_party/boringssl/ssl/test/runner/sign.go", 9386), ("grpc/third_party/boringssl/ssl/test/runner/ticket.go", 5233), ("grpc/third_party/boringssl/ssl/test/runner/tls.go", 8122), ("grpc/third_party/boringssl/ssl/test/settings_writer.cc", 3223), ("grpc/third_party/boringssl/ssl/test/settings_writer.h", 1476), ("grpc/third_party/boringssl/ssl/test/test_config.cc", 56771), ("grpc/third_party/boringssl/ssl/test/test_config.h", 7047), ("grpc/third_party/boringssl/ssl/test/test_state.cc", 5576), ("grpc/third_party/boringssl/ssl/test/test_state.h", 3344), ("grpc/third_party/boringssl/util/all_tests.go", 14096), ("grpc/third_party/boringssl/util/all_tests.json", 264), ("grpc/third_party/boringssl/util/ar/ar_test.go", 3010), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_aes_gcm_test.cc", 5111), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_aes_test.cc", 6395), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_ctr_drbg_test.cc", 3928), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_ecdsa2_keypair_test.cc", 3307), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_ecdsa2_pkv_test.cc", 2172), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_ecdsa2_siggen_test.cc", 4333), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_ecdsa2_sigver_test.cc", 2881), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_hmac_test.cc", 2749), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_kas_test.cc", 4840), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_keywrap_test.cc", 4633), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_rsa2_keygen_test.cc", 3267), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_rsa2_siggen_test.cc", 3876), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_rsa2_sigver_test.cc", 3442), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_sha_monte_test.cc", 2865), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_sha_test.cc", 2576), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_tdes_test.cc", 10594), ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_tlskdf_test.cc", 4157), ("grpc/third_party/boringssl/util/fipstools/delocate/delocate_test.go", 2766), ("grpc/third_party/boringssl/util/run_android_tests.go", 10042), ("grpc/third_party/cares/cares/test/CMakeLists.txt", 2039), ("grpc/third_party/cares/cares/test/Makefile.am", 1408), ("grpc/third_party/cares/cares/test/Makefile.inc", 743), ("grpc/third_party/cares/cares/test/Makefile.m32", 1778), ("grpc/third_party/cares/cares/test/Makefile.msvc", 11457), ("grpc/third_party/cares/cares/test/README.md", 6217), ("grpc/third_party/cares/cares/test/ares-fuzz.c", 1621), ("grpc/third_party/cares/cares/test/ares-test-fuzz-name.c", 626), ("grpc/third_party/cares/cares/test/ares-test-fuzz.c", 1484), ("grpc/third_party/cares/cares/test/ares-test-init.cc", 22429), ("grpc/third_party/cares/cares/test/ares-test-internal.cc", 18383), ("grpc/third_party/cares/cares/test/ares-test-live.cc", 23767), ("grpc/third_party/cares/cares/test/ares-test-main.cc", 1158), ("grpc/third_party/cares/cares/test/ares-test-misc.cc", 18878), ("grpc/third_party/cares/cares/test/ares-test-mock.cc", 42740), ("grpc/third_party/cares/cares/test/ares-test-ns.cc", 6232), ("grpc/third_party/cares/cares/test/ares-test-parse-a.cc", 14262), ("grpc/third_party/cares/cares/test/ares-test-parse-aaaa.cc", 7680), ("grpc/third_party/cares/cares/test/ares-test-parse-mx.cc", 4640), ("grpc/third_party/cares/cares/test/ares-test-parse-naptr.cc", 5459), ("grpc/third_party/cares/cares/test/ares-test-parse-ns.cc", 4313), ("grpc/third_party/cares/cares/test/ares-test-parse-ptr.cc", 10805), ("grpc/third_party/cares/cares/test/ares-test-parse-soa.cc", 3774), ("grpc/third_party/cares/cares/test/ares-test-parse-srv.cc", 11188), ("grpc/third_party/cares/cares/test/ares-test-parse-txt.cc", 9167), ("grpc/third_party/cares/cares/test/ares-test-parse.cc", 6942), ("grpc/third_party/cares/cares/test/ares-test.cc", 20026), ("grpc/third_party/cares/cares/test/ares-test.h", 13886), ("grpc/third_party/cares/cares/test/buildconf", 25), ("grpc/third_party/cares/cares/test/configure.ac", 515), ("grpc/third_party/cares/cares/test/dns-dump.cc", 801), ("grpc/third_party/cares/cares/test/dns-proto-test.cc", 3936), ("grpc/third_party/cares/cares/test/dns-proto.cc", 18889), ("grpc/third_party/cares/cares/test/dns-proto.h", 8260), ("grpc/third_party/cares/cares/test/fuzzcheck.sh", 125), ("grpc/third_party/cares/cares/test/fuzzinput/004a216d3cff18b0c5c6b68b807f1529", 32), ("grpc/third_party/cares/cares/test/fuzzinput/00539467ca159b36aea95e61f9729115", 82), ("grpc/third_party/cares/cares/test/fuzzinput/00e846db8f43f2f507cd1666ed5a753e", 62), ("grpc/third_party/cares/cares/test/fuzzinput/0177b7566f08c013699eaea9a77abeb3", 64), ("grpc/third_party/cares/cares/test/fuzzinput/020a4fa317715bfdb236ed13751e6b65", 31), ("grpc/third_party/cares/cares/test/fuzzinput/0310f2e81bea31f4fe3f330872a877dd", 68), ("grpc/third_party/cares/cares/test/fuzzinput/0449be67df1730b2d0887d412a9b7cc4", 33), ("grpc/third_party/cares/cares/test/fuzzinput/0449dd14f7aa94bf0d716bfe09b287a8", 31), ("grpc/third_party/cares/cares/test/fuzzinput/04c93cdf7208979aa4df80a3a0d5a2d8", 31), ("grpc/third_party/cares/cares/test/fuzzinput/0567e7171e08e75f3f91c4ca74c17adc", 32), ("grpc/third_party/cares/cares/test/fuzzinput/05ba948578a397e9cbc6a7b3e78622fa", 64), ("grpc/third_party/cares/cares/test/fuzzinput/060afe5ed25f3e2e86167e545f27edca", 136), ("grpc/third_party/cares/cares/test/fuzzinput/06d47d3681493f1b1d41236f460d896f", 60), ("grpc/third_party/cares/cares/test/fuzzinput/0724a810b0e131c2fddb6de9003b9064", 33), ("grpc/third_party/cares/cares/test/fuzzinput/0b5279148826f5b962bcf1896bdb4ede", 102), ("grpc/third_party/cares/cares/test/fuzzinput/114048c0f6b10bdc67ce9166405d195e", 62), ("grpc/third_party/cares/cares/test/fuzzinput/11b8464a0ef8735d202955c34c36b0c7", 76), ("grpc/third_party/cares/cares/test/fuzzinput/11cb626f1668c7b41954ce7d768fe528", 60), ("grpc/third_party/cares/cares/test/fuzzinput/14b133bf18125b75a1976fa63a1df6b7", 62), ("grpc/third_party/cares/cares/test/fuzzinput/153c6b3afa8faa03c8bc28f936a6d4cf", 67), ("grpc/third_party/cares/cares/test/fuzzinput/182cad2a342ed7317b7c21a5d17020d1", 60), ("grpc/third_party/cares/cares/test/fuzzinput/1c61a61bb7057b52c5b15188345a5238", 21), ("grpc/third_party/cares/cares/test/fuzzinput/1dbe2cf62ed2e4fa1c3cb473f08710b5", 29), ("grpc/third_party/cares/cares/test/fuzzinput/21199be504fcfece5c7096ee0dbba507", 107), ("grpc/third_party/cares/cares/test/fuzzinput/21891480074b5635dbbe7137bdcabccd", 32), ("grpc/third_party/cares/cares/test/fuzzinput/233aea42e15aa73e131eefabf16088c9", 32), ("grpc/third_party/cares/cares/test/fuzzinput/24660d4e7ac7aa21d600ea7a3d198bbb", 108), ("grpc/third_party/cares/cares/test/fuzzinput/25589deb55c08429345f289d1c9b0254", 57), ("grpc/third_party/cares/cares/test/fuzzinput/2573bd823e4da11f727a17f8e1f35c26", 29), ("grpc/third_party/cares/cares/test/fuzzinput/276f12da56866273e76059ad0e7be97e", 32), ("grpc/third_party/cares/cares/test/fuzzinput/29198a2e380cb19babec9e02116d213e", 29), ("grpc/third_party/cares/cares/test/fuzzinput/2c94ba9434b1a1b9396fc5364f101363", 40), ("grpc/third_party/cares/cares/test/fuzzinput/2d578c357dc2f5e02dc55cddb30641d1", 102), ("grpc/third_party/cares/cares/test/fuzzinput/2dff6cc5a223e67fde9e5e79af456992", 134), ("grpc/third_party/cares/cares/test/fuzzinput/2f103b1f9477f2d8934bd84328d51c75", 110), ("grpc/third_party/cares/cares/test/fuzzinput/31cd3a8413de13d9624adbb1613784bf", 32), ("grpc/third_party/cares/cares/test/fuzzinput/36415bdf1d180098fe6234b4186e69f3", 31), ("grpc/third_party/cares/cares/test/fuzzinput/3a04a80f0242e8dff0cd732e7c4767da", 377), ("grpc/third_party/cares/cares/test/fuzzinput/44d0f973b7b0fb3e4a07770c943dcd5a", 32), ("grpc/third_party/cares/cares/test/fuzzinput/50bc00daa0ddcd6cfb2b5d9f62c81f47", 76), ("grpc/third_party/cares/cares/test/fuzzinput/51ed2d1fb77b3078b54e94e85606b7df", 160), ("grpc/third_party/cares/cares/test/fuzzinput/5c5e0e899cf2e7d053a9e45fb76f6e5a", 56), ("grpc/third_party/cares/cares/test/fuzzinput/70152ed033f139443fbfb1b858bb3b1b", 32), ("grpc/third_party/cares/cares/test/fuzzinput/7030ca2b24e5a7f9dd8f62096a48eb33", 48), ("grpc/third_party/cares/cares/test/fuzzinput/71eec1a0ef2d25bb9e2ef17f23be7e9e", 92), ("grpc/third_party/cares/cares/test/fuzzinput/7a6b0177210ea4ef40b254daf99393c5", 94), ("grpc/third_party/cares/cares/test/fuzzinput/7f1567733711ffb61839621af0cbfa33", 21), ("grpc/third_party/cares/cares/test/fuzzinput/850c6d57c5bb7be8205fc2438d14d7e5", 179), ("grpc/third_party/cares/cares/test/fuzzinput/a5c8cd2784a5792b9e91c2d7895b3b34", 102), ("grpc/third_party/cares/cares/test/fuzzinput/a9135cdc7151d023300ff194bad90af9", 102), ("grpc/third_party/cares/cares/test/fuzzinput/af2597e8ac7dec1e8b4a47518312912a", 100), ("grpc/third_party/cares/cares/test/fuzzinput/answer_a", 62), ("grpc/third_party/cares/cares/test/fuzzinput/answer_aaaa", 62), ("grpc/third_party/cares/cares/test/fuzzinput/b3f53ef826b831bb09dd25c7f5960249", 56), ("grpc/third_party/cares/cares/test/fuzzinput/cda0f8751f5c4993974c2b549d29bcc8", 102), ("grpc/third_party/cares/cares/test/fuzzinput/ce6c26c0e469339873d0e7f616ab0945", 48), ("grpc/third_party/cares/cares/test/fuzzinput/e4dd7e7c2dd4ed7c2e17a6af5d04f9c9", 83), ("grpc/third_party/cares/cares/test/fuzzinput/ed50ed8ee36230a5a69746ad830437e5", 48), ("grpc/third_party/cares/cares/test/fuzzinput/f1b900d50806021953321c3b604ee497", 108), ("grpc/third_party/cares/cares/test/fuzzinput/f6606f624be8c628328cea01d2cd07a9", 37), ("grpc/third_party/cares/cares/test/fuzzinput/f89f6c8176b564a7dd646f14305573ce", 48), ("grpc/third_party/cares/cares/test/fuzzinput/f9ad508d2dbd08d3aaaabc7d1174677d", 78), ("grpc/third_party/cares/cares/test/fuzzinput/multi-indir", 9598), ("grpc/third_party/cares/cares/test/fuzznames/name01", 11), ("grpc/third_party/cares/cares/test/fuzznames/name02", 11), ("grpc/third_party/cares/cares/test/fuzznames/name03", 88), ("grpc/third_party/cares/cares/test/fuzznames/name04", 25), ("grpc/third_party/cares/cares/test/fuzznames/name05", 20), ("grpc/third_party/cares/cares/test/fuzznames/name06", 14), ("grpc/third_party/cares/cares/test/fuzznames/name07", 12), ("grpc/third_party/cares/cares/test/fuzznames/name08", 18), ("grpc/third_party/cares/cares/test/fuzznames/name09", 31), ("grpc/third_party/cares/cares/test/gmock-1.8.0/gmock/gmock.h", 582989), ("grpc/third_party/cares/cares/test/gmock-1.8.0/gmock-gtest-all.cc", 451062), ("grpc/third_party/cares/cares/test/gmock-1.8.0/gtest/gtest.h", 871268), ("grpc/third_party/upb/examples/bazel/BUILD", 307), ("grpc/third_party/upb/examples/bazel/WORKSPACE", 320), ("grpc/third_party/upb/examples/bazel/foo.proto", 96), ("grpc/third_party/upb/examples/bazel/test_binary.c", 375), ("grpc/third_party/upb/tests/benchmark.cc", 1110), ("grpc/third_party/upb/tests/bindings/googlepb/test_vs_proto2.cc", 5432), ("grpc/third_party/upb/tests/bindings/lua/test_upb.lua", 21652), ("grpc/third_party/upb/tests/bindings/lua/test_upb.pb.lua", 2555), ("grpc/third_party/upb/tests/bindings/ruby/upb.rb", 1552), ("grpc/third_party/upb/tests/conformance_upb.c", 5002), ("grpc/third_party/upb/tests/conformance_upb_failures.txt", 61), ("grpc/third_party/upb/tests/corpus/README", 26), ("grpc/third_party/upb/tests/corpus/temp.cc", 15), ("grpc/third_party/upb/tests/file_descriptor_parsenew_fuzzer.cc", 381), ("grpc/third_party/upb/tests/google_message1.dat", 228), ("grpc/third_party/upb/tests/google_message2.dat", 84570), ("grpc/third_party/upb/tests/google_messages.proto", 4886), ("grpc/third_party/upb/tests/json/enum_from_separate_file.proto", 125), ("grpc/third_party/upb/tests/json/test.proto", 1133), ("grpc/third_party/upb/tests/json/test.proto.pb", 1958), ("grpc/third_party/upb/tests/json/test_json.cc", 7531), ("grpc/third_party/upb/tests/pb/test_decoder.cc", 40249), ("grpc/third_party/upb/tests/pb/test_decoder.proto", 4850), ("grpc/third_party/upb/tests/pb/test_encoder.cc", 1485), ("grpc/third_party/upb/tests/pb/test_varint.c", 3613), ("grpc/third_party/upb/tests/test.proto", 1113), ("grpc/third_party/upb/tests/test.proto.pb", 652), ("grpc/third_party/upb/tests/test_cpp.cc", 29010), ("grpc/third_party/upb/tests/test_cpp.proto", 239), ("grpc/third_party/upb/tests/test_table.cc", 18887), ("grpc/third_party/upb/tests/test_util.h", 6075), ("grpc/third_party/upb/tests/testmain.cc", 259), ("grpc/third_party/upb/tests/upb_test.h", 1067), ("grpc/third_party/upb/tools/staleness_test.py", 698), ("grpc/tools/buildgen/plugins/make_fuzzer_tests.py", 1896), ("grpc/tools/dockerfile/test/bazel/Dockerfile", 2810), ("grpc/tools/dockerfile/test/csharp_stretch_x64/Dockerfile", 3431), ("grpc/tools/dockerfile/test/cxx_alpine_x64/Dockerfile", 1507), ("grpc/tools/dockerfile/test/cxx_buster_x64/Dockerfile", 1889), ("grpc/tools/dockerfile/test/cxx_jessie_x64/Dockerfile", 2761), ("grpc/tools/dockerfile/test/cxx_jessie_x86/Dockerfile", 2624), ("grpc/tools/dockerfile/test/cxx_sanitizers_jessie_x64/Dockerfile", 2315), ("grpc/tools/dockerfile/test/cxx_ubuntu1404_x64/Dockerfile", 1966), ("grpc/tools/dockerfile/test/cxx_ubuntu1604_x64/Dockerfile", 2198), ("grpc/tools/dockerfile/test/cxx_ubuntu1804_x64/Dockerfile", 1888), ("grpc/tools/dockerfile/test/fuzzer/Dockerfile", 3741), ("grpc/tools/dockerfile/test/node_jessie_x64/Dockerfile", 2702), ("grpc/tools/dockerfile/test/php7_jessie_x64/Dockerfile", 2293), ("grpc/tools/dockerfile/test/php_jessie_x64/Dockerfile", 2029), ("grpc/tools/dockerfile/test/python_alpine_x64/Dockerfile", 1225), ("grpc/tools/dockerfile/test/python_stretch_2.7_x64/Dockerfile", 1743), ("grpc/tools/dockerfile/test/python_stretch_3.5_x64/Dockerfile", 1869), ("grpc/tools/dockerfile/test/python_stretch_3.6_x64/Dockerfile", 2321), ("grpc/tools/dockerfile/test/python_stretch_3.7_x64/Dockerfile", 1942), ("grpc/tools/dockerfile/test/python_stretch_3.8_x64/Dockerfile", 2331), ("grpc/tools/dockerfile/test/python_stretch_default_x64/Dockerfile", 2533), ("grpc/tools/dockerfile/test/ruby_jessie_x64/Dockerfile", 2430), ("grpc/tools/dockerfile/test/sanity/Dockerfile", 3645), ("grpc/tools/fuzzer/options/hpack_parser_fuzzer_test.options", 53), ("grpc/tools/fuzzer/options/uri_fuzzer_test.options", 28), ("grpc/tools/fuzzer/runners/hpack_parser_fuzzer_test.sh", 1038), ("grpc/tools/fuzzer/runners/http_request_fuzzer_test.sh", 957), ("grpc/tools/fuzzer/runners/http_response_fuzzer_test.sh", 959), ("grpc/tools/fuzzer/runners/json_fuzzer_test.sh", 940), ("grpc/tools/fuzzer/runners/nanopb_fuzzer_response_test.sh", 962), ("grpc/tools/fuzzer/runners/nanopb_fuzzer_serverlist_test.sh", 966), ("grpc/tools/fuzzer/runners/uri_fuzzer_test.sh", 953), ("grpc/tools/http2_interop/http2interop_test.go", 4827), ("grpc/tools/http2_interop/s6.5_test.go", 1063), ("grpc/tools/internal_ci/linux/grpc_bazel_test.cfg", 893), ("grpc/tools/internal_ci/linux/grpc_python_bazel_test.cfg", 900), ("grpc/tools/internal_ci/linux/grpc_run_grpclb_interop_tests.sh", 965), ("grpc/tools/internal_ci/linux/grpc_run_interop_tests.sh", 887), ("grpc/tools/internal_ci/macos/grpc_bazel_cpp_ios_tests.cfg", 775), ("grpc/tools/internal_ci/macos/grpc_run_bazel_c_cpp_tests.sh", 1880), ("grpc/tools/internal_ci/macos/grpc_run_bazel_cpp_ios_tests.sh", 1034), ("grpc/tools/internal_ci/macos/grpc_run_bazel_isolated_tests.sh", 1430), ("grpc/tools/interop_matrix/run_interop_matrix_tests.py", 11530), ("grpc/tools/run_tests/README.md", 2564), ("grpc/tools/run_tests/artifacts/__init__.py", 590), ("grpc/tools/run_tests/artifacts/artifact_targets.py", 17332), ("grpc/tools/run_tests/artifacts/build_artifact_csharp.bat", 1804), ("grpc/tools/run_tests/artifacts/build_artifact_csharp.sh", 1045), ("grpc/tools/run_tests/artifacts/build_artifact_csharp_android.sh", 861), ("grpc/tools/run_tests/artifacts/build_artifact_csharp_ios.sh", 808), ("grpc/tools/run_tests/artifacts/build_artifact_php.sh", 734), ("grpc/tools/run_tests/artifacts/build_artifact_protoc.bat", 1195), ("grpc/tools/run_tests/artifacts/build_artifact_protoc.sh", 866), ("grpc/tools/run_tests/artifacts/build_artifact_python.bat", 2022), ("grpc/tools/run_tests/artifacts/build_artifact_python.sh", 5205), ("grpc/tools/run_tests/artifacts/build_artifact_ruby.sh", 1652), ("grpc/tools/run_tests/artifacts/build_package_php.sh", 888), ("grpc/tools/run_tests/artifacts/build_package_python.sh", 1864), ("grpc/tools/run_tests/artifacts/build_package_ruby.sh", 2192), ("grpc/tools/run_tests/artifacts/distribtest_targets.py", 13315), ("grpc/tools/run_tests/artifacts/package_targets.py", 5065), ("grpc/tools/run_tests/artifacts/run_in_workspace.sh", 1331), ("grpc/tools/run_tests/build_stats/build_stats_schema.json", 1082), ("grpc/tools/run_tests/build_stats/build_stats_schema_no_matrix.json", 847), ("grpc/tools/run_tests/dockerize/build_and_run_docker.sh", 3099), ("grpc/tools/run_tests/dockerize/build_docker_and_run_tests.sh", 3176), ("grpc/tools/run_tests/dockerize/build_interop_image.sh", 4730), ("grpc/tools/run_tests/dockerize/docker_run.sh", 1528), ("grpc/tools/run_tests/dockerize/docker_run_tests.sh", 1742), ("grpc/tools/run_tests/helper_scripts/build_csharp.bat", 820), ("grpc/tools/run_tests/helper_scripts/build_csharp.sh", 978), ("grpc/tools/run_tests/helper_scripts/build_php.sh", 1018), ("grpc/tools/run_tests/helper_scripts/build_python.sh", 6201), ("grpc/tools/run_tests/helper_scripts/build_python_msys2.sh", 739), ("grpc/tools/run_tests/helper_scripts/build_ruby.sh", 806), ("grpc/tools/run_tests/helper_scripts/bundle_install_wrapper.sh", 946), ("grpc/tools/run_tests/helper_scripts/post_tests_c.sh", 988), ("grpc/tools/run_tests/helper_scripts/post_tests_csharp.bat", 1428), ("grpc/tools/run_tests/helper_scripts/post_tests_csharp.sh", 1115), ("grpc/tools/run_tests/helper_scripts/post_tests_php.sh", 1062), ("grpc/tools/run_tests/helper_scripts/post_tests_python.sh", 836), ("grpc/tools/run_tests/helper_scripts/post_tests_ruby.sh", 1024), ("grpc/tools/run_tests/helper_scripts/pre_build_cmake.bat", 910), ("grpc/tools/run_tests/helper_scripts/pre_build_cmake.sh", 821), ("grpc/tools/run_tests/helper_scripts/pre_build_csharp.bat", 1113), ("grpc/tools/run_tests/helper_scripts/pre_build_csharp.sh", 839), ("grpc/tools/run_tests/helper_scripts/pre_build_ruby.sh", 774), ("grpc/tools/run_tests/helper_scripts/run_grpc-node.sh", 958), ("grpc/tools/run_tests/helper_scripts/run_python.sh", 928), ("grpc/tools/run_tests/helper_scripts/run_ruby.sh", 683), ("grpc/tools/run_tests/helper_scripts/run_ruby_end2end_tests.sh", 1853), ("grpc/tools/run_tests/helper_scripts/run_tests_in_workspace.sh", 1369), ("grpc/tools/run_tests/interop/interop_html_report.template", 6464), ("grpc/tools/run_tests/interop/with_nvm.sh", 723), ("grpc/tools/run_tests/interop/with_rvm.sh", 736), ("grpc/tools/run_tests/lb_interop_tests/gen_build_yaml.py", 12364), ("grpc/tools/run_tests/performance/README.md", 5432), ("grpc/tools/run_tests/performance/__init__.py", 590), ("grpc/tools/run_tests/performance/bq_upload_result.py", 7252), ("grpc/tools/run_tests/performance/build_performance.sh", 2778), ("grpc/tools/run_tests/performance/build_performance_go.sh", 1018), ("grpc/tools/run_tests/performance/build_performance_node.sh", 763), ("grpc/tools/run_tests/performance/build_performance_php7.sh", 938), ("grpc/tools/run_tests/performance/kill_workers.sh", 1406), ("grpc/tools/run_tests/performance/massage_qps_stats.py", 29190), ("grpc/tools/run_tests/performance/massage_qps_stats_helpers.py", 2374), ("grpc/tools/run_tests/performance/patch_scenario_results_schema.py", 1901), ("grpc/tools/run_tests/performance/process_local_perf_flamegraphs.sh", 1021), ("grpc/tools/run_tests/performance/process_remote_perf_flamegraphs.sh", 1268), ("grpc/tools/run_tests/performance/remote_host_build.sh", 838), ("grpc/tools/run_tests/performance/remote_host_prepare.sh", 2036), ("grpc/tools/run_tests/performance/run_netperf.sh", 1027), ("grpc/tools/run_tests/performance/run_qps_driver.sh", 816), ("grpc/tools/run_tests/performance/run_worker_csharp.sh", 796), ("grpc/tools/run_tests/performance/run_worker_go.sh", 697), ("grpc/tools/run_tests/performance/run_worker_java.sh", 828), ("grpc/tools/run_tests/performance/run_worker_node.sh", 886), ("grpc/tools/run_tests/performance/run_worker_php.sh", 774), ("grpc/tools/run_tests/performance/run_worker_python.sh", 777), ("grpc/tools/run_tests/performance/run_worker_ruby.sh", 717), ("grpc/tools/run_tests/performance/run_worker_rust.sh", 610), ("grpc/tools/run_tests/performance/scenario_config.py", 51172), ("grpc/tools/run_tests/performance/scenario_result_schema.json", 48024), ("grpc/tools/run_tests/python_utils/__init__.py", 590), ("grpc/tools/run_tests/python_utils/antagonist.py", 706), ("grpc/tools/run_tests/python_utils/check_on_pr.py", 4919), ("grpc/tools/run_tests/python_utils/dockerjob.py", 5407), ("grpc/tools/run_tests/python_utils/filter_pull_request_tests.py", 7906), ("grpc/tools/run_tests/python_utils/jobset.py", 21482), ("grpc/tools/run_tests/python_utils/port_server.py", 6752), ("grpc/tools/run_tests/python_utils/report_utils.py", 7347), ("grpc/tools/run_tests/python_utils/start_port_server.py", 4956), ("grpc/tools/run_tests/python_utils/upload_rbe_results.py", 10058), ("grpc/tools/run_tests/python_utils/upload_test_results.py", 7187), ("grpc/tools/run_tests/python_utils/watch_dirs.py", 2250), ("grpc/tools/run_tests/run_build_statistics.py", 10778), ("grpc/tools/run_tests/run_grpclb_interop_tests.py", 23219), ("grpc/tools/run_tests/run_interop_tests.py", 57702), ("grpc/tools/run_tests/run_microbenchmark.py", 9105), ("grpc/tools/run_tests/run_performance_tests.py", 27914), ("grpc/tools/run_tests/run_tests.py", 69674), ("grpc/tools/run_tests/run_tests_matrix.py", 22501), ("grpc/tools/run_tests/sanity/check_bad_dependencies.sh", 1428), ("grpc/tools/run_tests/sanity/check_bazel_workspace.py", 6060), ("grpc/tools/run_tests/sanity/check_buildifier.sh", 1109), ("grpc/tools/run_tests/sanity/check_cache_mk.sh", 699), ("grpc/tools/run_tests/sanity/check_deprecated_grpc++.py", 7935), ("grpc/tools/run_tests/sanity/check_owners.sh", 837), ("grpc/tools/run_tests/sanity/check_port_platform.py", 2783), ("grpc/tools/run_tests/sanity/check_qps_scenario_changes.py", 1368), ("grpc/tools/run_tests/sanity/check_shellcheck.sh", 837), ("grpc/tools/run_tests/sanity/check_submodules.sh", 2108), ("grpc/tools/run_tests/sanity/check_test_filtering.py", 7009), ("grpc/tools/run_tests/sanity/check_tracer_sanity.py", 1452), ("grpc/tools/run_tests/sanity/check_version.py", 2973), ("grpc/tools/run_tests/sanity/core_banned_functions.py", 3033), ("grpc/tools/run_tests/sanity/core_untyped_structs.sh", 820), ("grpc/tools/run_tests/sanity/cpp_banned_constructs.sh", 1311), ("grpc/tools/run_tests/sanity/sanity_tests.yaml", 1501), ("grpc/tools/run_tests/start_port_server.py", 1000), ("grpc/tools/run_tests/task_runner.py", 3991)]
-                .iter()
-                .map(|(p, s)| (p.to_string(), *s))
-                .collect(),
+            wasted_files: [
+                ("grpc/bazel/test/python_test_repo/BUILD", 2827),
+                ("grpc/bazel/test/python_test_repo/README.md", 190),
+                ("grpc/bazel/test/python_test_repo/WORKSPACE", 252),
+                ("grpc/bazel/test/python_test_repo/dummy_plugin.py", 1322),
+                ("grpc/bazel/test/python_test_repo/helloworld.proto", 1316),
+                ("grpc/bazel/test/python_test_repo/helloworld.py", 2548),
+                ("grpc/bazel/test/python_test_repo/helloworld_moved.py", 2584),
+                ("grpc/bazel/test/python_test_repo/tools/bazel", 23),
+                ("grpc/include/grpc++/test/mock_stream.h", 951),
+                ("grpc/include/grpc++/test/server_context_test_spouse.h", 1011),
+                ("grpc/include/grpcpp/test/default_reactor_test_peer.h", 1973),
+                ("grpc/include/grpcpp/test/mock_stream.h", 3975),
+                ("grpc/include/grpcpp/test/server_context_test_spouse.h", 2077),
+                ("grpc/src/benchmark/gen_build_yaml.py", 1119),
+                ("grpc/src/proto/grpc/testing/BUILD", 4964),
+                ("grpc/src/proto/grpc/testing/benchmark_service.proto", 1894),
+                ("grpc/src/proto/grpc/testing/compiler_test.proto", 1968),
+                ("grpc/src/proto/grpc/testing/control.proto", 9193),
+                ("grpc/src/proto/grpc/testing/duplicate/BUILD", 913),
+                ("grpc/src/proto/grpc/testing/duplicate/echo_duplicate.proto", 965),
+                ("grpc/src/proto/grpc/testing/echo.proto", 1431),
+                ("grpc/src/proto/grpc/testing/echo_messages.proto", 1937),
+                ("grpc/src/proto/grpc/testing/empty.proto", 985),
+                ("grpc/src/proto/grpc/testing/empty_service.proto", 768),
+                ("grpc/src/proto/grpc/testing/messages.proto", 6418),
+                ("grpc/src/proto/grpc/testing/metrics.proto", 1508),
+                ("grpc/src/proto/grpc/testing/payloads.proto", 1142),
+                ("grpc/src/proto/grpc/testing/proto2/BUILD.bazel", 625),
+                ("grpc/src/proto/grpc/testing/proto2/empty2.proto", 721),
+                ("grpc/src/proto/grpc/testing/proto2/empty2_extensions.proto", 972),
+                ("grpc/src/proto/grpc/testing/proxy-service.proto", 987),
+                ("grpc/src/proto/grpc/testing/report_qps_scenario_service.proto", 975),
+                ("grpc/src/proto/grpc/testing/simple_messages.proto", 689),
+                ("grpc/src/proto/grpc/testing/stats.proto", 2418),
+                ("grpc/src/proto/grpc/testing/test.proto", 3371),
+                ("grpc/src/proto/grpc/testing/worker_service.proto", 1892),
+                ("grpc/src/proto/grpc/testing/xds/BUILD", 1406),
+                ("grpc/src/proto/grpc/testing/xds/ads_for_test.proto", 2348),
+                ("grpc/src/proto/grpc/testing/xds/eds_for_test.proto", 23201),
+                ("grpc/src/proto/grpc/testing/xds/lrs_for_test.proto", 8201),
+                ("grpc/src/proto/grpc/testing/xds/orca_load_report_for_test.proto", 2388),
+                ("grpc/test/build/boringssl.c", 918),
+                ("grpc/test/build/c-ares.c", 856),
+                ("grpc/test/build/check_epollexclusive.c", 777),
+                ("grpc/test/build/empty.c", 641),
+                ("grpc/test/build/extra-semi.c", 641),
+                ("grpc/test/build/no-c++14-compat.cc", 641),
+                ("grpc/test/build/no-maybe-uninitialized.c", 641),
+                ("grpc/test/build/no-shift-negative-value.c", 641),
+                ("grpc/test/build/no-unknown-warning-option.c", 622),
+                ("grpc/test/build/no-unused-but-set-variable.c", 641),
+                ("grpc/test/build/openssl-alpn.c", 860),
+                ("grpc/test/build/perftools.c", 738),
+                ("grpc/test/build/protobuf.cc", 880),
+                ("grpc/test/build/shadow.c", 821),
+                ("grpc/test/build/systemtap.c", 771),
+                ("grpc/test/build/zlib.c", 817),
+                ("grpc/test/build_test/BUILD", 916),
+                ("grpc/test/core/security/alts_credentials_fuzzer.cc", 4245),
+                ("grpc/test/core/security/alts_security_connector_test.cc", 6859),
+                ("grpc/test/core/security/auth_context_test.cc", 5956),
+                ("grpc/test/core/security/check_gcp_environment_linux_test.cc", 2924),
+                ("grpc/test/core/security/check_gcp_environment_windows_test.cc", 3110),
+                ("grpc/test/core/security/control_plane_credentials_test.cc", 19554),
+                ("grpc/test/core/security/create_jwt.cc", 3240),
+                ("grpc/test/core/security/credentials_test.cc", 68835),
+                ("grpc/test/core/security/fetch_oauth2.cc", 5495),
+                ("grpc/test/core/security/grpc_alts_credentials_options_test.cc", 3622),
+                ("grpc/test/core/security/json_token_test.cc", 19505),
+                ("grpc/test/core/security/jwt_verifier_test.cc", 26028),
+                ("grpc/test/core/security/linux_system_roots_test.cc", 3360),
+                ("grpc/test/core/security/oauth2_utils.cc", 3802),
+                ("grpc/test/core/security/print_google_default_creds_token.cc", 4120),
+                ("grpc/test/core/security/secure_endpoint_test.cc", 8687),
+                ("grpc/test/core/security/security_connector_test.cc", 20080),
+                ("grpc/test/core/security/spiffe_security_connector_test.cc", 9957),
+                ("grpc/test/core/security/ssl_credentials_test.cc", 2106),
+                ("grpc/test/core/security/ssl_server_fuzzer.cc", 4403),
+                ("grpc/test/core/security/verify_jwt.cc", 3693),
+                ("grpc/test/core/util/cmdline.cc", 8765),
+                ("grpc/test/distrib/cpp/run_distrib_test_cmake.bat", 3293),
+                ("grpc/test/distrib/cpp/run_distrib_test_cmake.sh", 2146),
+                (
+                    "grpc/test/distrib/cpp/run_distrib_test_cmake_as_externalproject.bat",
+                    1843
+                ),
+                (
+                    "grpc/test/distrib/cpp/run_distrib_test_cmake_as_externalproject.sh",
+                    1579
+                ),
+                ("grpc/test/distrib/cpp/run_distrib_test_cmake_as_submodule.sh", 837),
+                ("grpc/test/distrib/cpp/run_distrib_test_cmake_pkgconfig.sh", 2229),
+                ("grpc/test/distrib/cpp/run_distrib_test_routeguide.sh", 932),
+                ("grpc/test/distrib/csharp/DistribTest/DistribTest.csproj", 7483),
+                ("grpc/test/distrib/csharp/DistribTest/DistribTestDotNet.csproj", 1408),
+                ("grpc/test/distrib/csharp/DistribTest/Program.cs", 2210),
+                ("grpc/test/distrib/csharp/DistribTest/Properties/AssemblyInfo.cs", 2093),
+                ("grpc/test/distrib/csharp/DistribTest/packages.config", 1115),
+                ("grpc/test/distrib/csharp/DistribTest/testcodegen.proto", 800),
+                ("grpc/test/distrib/csharp/DistribTest.sln", 1356),
+                ("grpc/test/distrib/csharp/NuGet.Config", 260),
+                ("grpc/test/distrib/csharp/build_vs2015.bat", 898),
+                ("grpc/test/distrib/csharp/run_distrib_test.bat", 1704),
+                ("grpc/test/distrib/csharp/run_distrib_test.sh", 945),
+                ("grpc/test/distrib/csharp/run_distrib_test_dotnetcli.sh", 1504),
+                ("grpc/test/distrib/csharp/update_version.sh", 1276),
+                ("grpc/test/distrib/php/distribtest.php", 936),
+                ("grpc/test/distrib/php/run_distrib_test.sh", 845),
+                ("grpc/test/distrib/php/run_distrib_test_macos.sh", 850),
+                ("grpc/test/distrib/python/distribtest.py", 802),
+                ("grpc/test/distrib/python/run_binary_distrib_test.sh", 667),
+                ("grpc/test/distrib/python/run_source_distrib_test.sh", 667),
+                ("grpc/test/distrib/python/test_packages.sh", 2488),
+                ("grpc/test/distrib/ruby/Gemfile", 229),
+                ("grpc/test/distrib/ruby/distribtest.gemspec", 592),
+                ("grpc/test/distrib/ruby/distribtest.rb", 857),
+                ("grpc/test/distrib/ruby/run_distrib_test.sh", 2414),
+                ("grpc/test/http2_test/http2_base_server.py", 8570),
+                ("grpc/test/http2_test/http2_server_health_check.py", 1323),
+                ("grpc/test/http2_test/http2_test_server.py", 4084),
+                ("grpc/test/http2_test/messages_pb2.py", 25209),
+                ("grpc/test/http2_test/test_data_frame_padding.py", 3758),
+                ("grpc/test/http2_test/test_goaway.py", 2633),
+                ("grpc/test/http2_test/test_max_streams.py", 1974),
+                ("grpc/test/http2_test/test_ping.py", 2135),
+                ("grpc/test/http2_test/test_rst_after_data.py", 1723),
+                ("grpc/test/http2_test/test_rst_after_header.py", 1247),
+                ("grpc/test/http2_test/test_rst_during_data.py", 1799),
+                ("grpc/third_party/boringssl/crypto/abi_self_test.cc", 22823),
+                ("grpc/third_party/boringssl/crypto/asn1/asn1_test.cc", 6059),
+                ("grpc/third_party/boringssl/crypto/base64/base64_test.cc", 9638),
+                ("grpc/third_party/boringssl/crypto/bio/bio_test.cc", 10959),
+                ("grpc/third_party/boringssl/crypto/buf/buf_test.cc", 3258),
+                ("grpc/third_party/boringssl/crypto/bytestring/bytestring_test.cc", 44305),
+                ("grpc/third_party/boringssl/crypto/chacha/chacha_test.cc", 15890),
+                ("grpc/third_party/boringssl/crypto/cipher_extra/aead_test.cc", 33716),
+                ("grpc/third_party/boringssl/crypto/cipher_extra/cipher_test.cc", 13221),
+                ("grpc/third_party/boringssl/crypto/cmac/cavp_3des_cmac_tests.txt", 41961),
+                (
+                    "grpc/third_party/boringssl/crypto/cmac/cavp_aes128_cmac_tests.txt",
+                    53587
+                ),
+                (
+                    "grpc/third_party/boringssl/crypto/cmac/cavp_aes192_cmac_tests.txt",
+                    69750
+                ),
+                (
+                    "grpc/third_party/boringssl/crypto/cmac/cavp_aes256_cmac_tests.txt",
+                    61387
+                ),
+                ("grpc/third_party/boringssl/crypto/cmac/cmac_test.cc", 9607),
+                ("grpc/third_party/boringssl/crypto/compiler_test.cc", 7232),
+                ("grpc/third_party/boringssl/crypto/constant_time_test.cc", 5954),
+                ("grpc/third_party/boringssl/crypto/cpu-arm-linux_test.cc", 7460),
+                ("grpc/third_party/boringssl/crypto/curve25519/ed25519_test.cc", 3431),
+                ("grpc/third_party/boringssl/crypto/curve25519/ed25519_tests.txt", 446783),
+                ("grpc/third_party/boringssl/crypto/curve25519/spake25519_test.cc", 5156),
+                ("grpc/third_party/boringssl/crypto/curve25519/x25519_test.cc", 5677),
+                ("grpc/third_party/boringssl/crypto/dh/dh_test.cc", 18347),
+                ("grpc/third_party/boringssl/crypto/digest_extra/digest_test.cc", 12255),
+                ("grpc/third_party/boringssl/crypto/dsa/dsa_test.cc", 11982),
+                ("grpc/third_party/boringssl/crypto/ecdh_extra/ecdh_test.cc", 11349),
+                ("grpc/third_party/boringssl/crypto/ecdh_extra/ecdh_tests.txt", 58307),
+                ("grpc/third_party/boringssl/crypto/err/err_test.cc", 7707),
+                ("grpc/third_party/boringssl/crypto/evp/evp_extra_test.cc", 39649),
+                ("grpc/third_party/boringssl/crypto/evp/evp_test.cc", 24359),
+                ("grpc/third_party/boringssl/crypto/evp/evp_tests.txt", 136462),
+                ("grpc/third_party/boringssl/crypto/evp/pbkdf_test.cc", 6990),
+                ("grpc/third_party/boringssl/crypto/evp/scrypt_test.cc", 4393),
+                ("grpc/third_party/boringssl/crypto/evp/scrypt_tests.txt", 1300),
+                ("grpc/third_party/boringssl/crypto/fipsmodule/aes/aes_test.cc", 15589),
+                ("grpc/third_party/boringssl/crypto/fipsmodule/aes/aes_tests.txt", 2270),
+                ("grpc/third_party/boringssl/crypto/fipsmodule/bn/bn_test.cc", 112955),
+                ("grpc/third_party/boringssl/crypto/fipsmodule/bn/bn_tests.txt", 909405),
+                (
+                    "grpc/third_party/boringssl/crypto/fipsmodule/bn/check_bn_tests.go",
+                    8018
+                ),
+                (
+                    "grpc/third_party/boringssl/crypto/fipsmodule/bn/miller_rabin_tests.txt",
+                    7589
+                ),
+                (
+                    "grpc/third_party/boringssl/crypto/fipsmodule/ec/ec_scalar_base_mult_tests.txt",
+                    158271
+                ),
+                ("grpc/third_party/boringssl/crypto/fipsmodule/ec/ec_test.cc", 39999),
+                (
+                    "grpc/third_party/boringssl/crypto/fipsmodule/ec/make_ec_scalar_base_mult_tests.go",
+                    1938
+                ),
+                (
+                    "grpc/third_party/boringssl/crypto/fipsmodule/ec/p256-x86_64_test.cc",
+                    20169
+                ),
+                (
+                    "grpc/third_party/boringssl/crypto/fipsmodule/ec/p256-x86_64_tests.txt",
+                    65077
+                ),
+                (
+                    "grpc/third_party/boringssl/crypto/fipsmodule/ecdsa/ecdsa_sign_tests.txt",
+                    169648
+                ),
+                (
+                    "grpc/third_party/boringssl/crypto/fipsmodule/ecdsa/ecdsa_test.cc",
+                    16780
+                ),
+                (
+                    "grpc/third_party/boringssl/crypto/fipsmodule/ecdsa/ecdsa_verify_tests.txt",
+                    170210
+                ),
+                ("grpc/third_party/boringssl/crypto/fipsmodule/intcheck1.png", 30054),
+                ("grpc/third_party/boringssl/crypto/fipsmodule/intcheck2.png", 99269),
+                ("grpc/third_party/boringssl/crypto/fipsmodule/intcheck3.png", 81319),
+                ("grpc/third_party/boringssl/crypto/fipsmodule/md5/md5_test.cc", 1299),
+                ("grpc/third_party/boringssl/crypto/fipsmodule/modes/gcm_test.cc", 8348),
+                ("grpc/third_party/boringssl/crypto/fipsmodule/modes/gcm_tests.txt", 9321),
+                (
+                    "grpc/third_party/boringssl/crypto/fipsmodule/rand/ctrdrbg_test.cc",
+                    4937
+                ),
+                (
+                    "grpc/third_party/boringssl/crypto/fipsmodule/rand/urandom_test.cc",
+                    15052
+                ),
+                ("grpc/third_party/boringssl/crypto/fipsmodule/sha/sha_test.cc", 2168),
+                ("grpc/third_party/boringssl/crypto/hkdf/hkdf_test.cc", 11009),
+                ("grpc/third_party/boringssl/crypto/hmac_extra/hmac_test.cc", 5813),
+                ("grpc/third_party/boringssl/crypto/hmac_extra/hmac_tests.txt", 6321),
+                ("grpc/third_party/boringssl/crypto/hrss/hrss_test.cc", 25290),
+                ("grpc/third_party/boringssl/crypto/impl_dispatch_test.cc", 4957),
+                ("grpc/third_party/boringssl/crypto/lhash/lhash_test.cc", 4698),
+                ("grpc/third_party/boringssl/crypto/obj/obj_test.cc", 7521),
+                ("grpc/third_party/boringssl/crypto/pem/pem_test.cc", 1746),
+                ("grpc/third_party/boringssl/crypto/pkcs7/pkcs7_test.cc", 40093),
+                ("grpc/third_party/boringssl/crypto/pkcs8/pkcs12_test.cc", 130637),
+                ("grpc/third_party/boringssl/crypto/pkcs8/pkcs8_test.cc", 20688),
+                ("grpc/third_party/boringssl/crypto/poly1305/poly1305_test.cc", 3660),
+                ("grpc/third_party/boringssl/crypto/poly1305/poly1305_tests.txt", 74551),
+                ("grpc/third_party/boringssl/crypto/pool/pool_test.cc", 4904),
+                ("grpc/third_party/boringssl/crypto/rand_extra/rand_test.cc", 6141),
+                ("grpc/third_party/boringssl/crypto/refcount_test.cc", 2418),
+                ("grpc/third_party/boringssl/crypto/rsa_extra/rsa_test.cc", 52015),
+                ("grpc/third_party/boringssl/crypto/self_test.cc", 944),
+                ("grpc/third_party/boringssl/crypto/siphash/siphash_test.cc", 1909),
+                ("grpc/third_party/boringssl/crypto/siphash/siphash_tests.txt", 90795),
+                ("grpc/third_party/boringssl/crypto/stack/stack_test.cc", 12947),
+                ("grpc/third_party/boringssl/crypto/test/CMakeLists.txt", 610),
+                ("grpc/third_party/boringssl/crypto/test/abi_test.cc", 25027),
+                ("grpc/third_party/boringssl/crypto/test/abi_test.h", 20560),
+                ("grpc/third_party/boringssl/crypto/test/asm/trampoline-armv4.pl", 5633),
+                ("grpc/third_party/boringssl/crypto/test/asm/trampoline-armv8.pl", 6157),
+                ("grpc/third_party/boringssl/crypto/test/asm/trampoline-x86.pl", 4210),
+                ("grpc/third_party/boringssl/crypto/test/asm/trampoline-x86_64.pl", 17511),
+                ("grpc/third_party/boringssl/crypto/test/file_test.cc", 14573),
+                ("grpc/third_party/boringssl/crypto/test/file_test.h", 11015),
+                ("grpc/third_party/boringssl/crypto/test/file_test_gtest.cc", 3205),
+                ("grpc/third_party/boringssl/crypto/test/gtest_main.cc", 2906),
+                ("grpc/third_party/boringssl/crypto/test/gtest_main.h", 2582),
+                ("grpc/third_party/boringssl/crypto/test/malloc.cc", 4045),
+                ("grpc/third_party/boringssl/crypto/test/test_util.cc", 1394),
+                ("grpc/third_party/boringssl/crypto/test/test_util.h", 2172),
+                ("grpc/third_party/boringssl/crypto/test/wycheproof_util.cc", 3893),
+                ("grpc/third_party/boringssl/crypto/test/wycheproof_util.h", 1928),
+                ("grpc/third_party/boringssl/crypto/thread_test.cc", 4275),
+                ("grpc/third_party/boringssl/crypto/x509/x509_test.cc", 100531),
+                ("grpc/third_party/boringssl/crypto/x509/x509_time_test.cc", 4751),
+                ("grpc/third_party/boringssl/crypto/x509v3/tab_test.cc", 3293),
+                ("grpc/third_party/boringssl/crypto/x509v3/v3name_test.cc", 14254),
+                ("grpc/third_party/boringssl/decrepit/blowfish/blowfish_test.cc", 6886),
+                ("grpc/third_party/boringssl/decrepit/cast/cast_test.cc", 5261),
+                ("grpc/third_party/boringssl/decrepit/cfb/cfb_test.cc", 5579),
+                ("grpc/third_party/boringssl/decrepit/ripemd/ripemd_test.cc", 4486),
+                ("grpc/third_party/boringssl/ssl/span_test.cc", 2627),
+                ("grpc/third_party/boringssl/ssl/ssl_c_test.c", 539),
+                ("grpc/third_party/boringssl/ssl/ssl_test.cc", 216942),
+                ("grpc/third_party/boringssl/ssl/test/CMakeLists.txt", 722),
+                ("grpc/third_party/boringssl/ssl/test/PORTING.md", 4833),
+                ("grpc/third_party/boringssl/ssl/test/README.md", 1992),
+                ("grpc/third_party/boringssl/ssl/test/async_bio.cc", 4368),
+                ("grpc/third_party/boringssl/ssl/test/async_bio.h", 1898),
+                ("grpc/third_party/boringssl/ssl/test/bssl_shim.cc", 39587),
+                ("grpc/third_party/boringssl/ssl/test/fuzzer.h", 25260),
+                ("grpc/third_party/boringssl/ssl/test/fuzzer_tags.h", 1983),
+                ("grpc/third_party/boringssl/ssl/test/handshake_util.cc", 15380),
+                ("grpc/third_party/boringssl/ssl/test/handshake_util.h", 2527),
+                ("grpc/third_party/boringssl/ssl/test/handshaker.cc", 5384),
+                ("grpc/third_party/boringssl/ssl/test/packeted_bio.cc", 6797),
+                ("grpc/third_party/boringssl/ssl/test/packeted_bio.h", 1703),
+                ("grpc/third_party/boringssl/ssl/test/runner/alert.go", 3778),
+                ("grpc/third_party/boringssl/ssl/test/runner/cert.pem", 1368),
+                ("grpc/third_party/boringssl/ssl/test/runner/chacha20_poly1305.go", 5718),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/chacha20_poly1305_test.go",
+                    5763
+                ),
+                ("grpc/third_party/boringssl/ssl/test/runner/channel_id_key.pem", 232),
+                ("grpc/third_party/boringssl/ssl/test/runner/cipher_suites.go", 16763),
+                ("grpc/third_party/boringssl/ssl/test/runner/common.go", 74220),
+                ("grpc/third_party/boringssl/ssl/test/runner/conn.go", 59424),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/curve25519/const_amd64.h",
+                    352
+                ),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/curve25519/const_amd64.s",
+                    664
+                ),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/curve25519/cswap_amd64.s",
+                    1640
+                ),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/curve25519/curve25519.go",
+                    22883
+                ),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/curve25519/curve25519_test.go",
+                    634
+                ),
+                ("grpc/third_party/boringssl/ssl/test/runner/curve25519/doc.go", 1066),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/curve25519/freeze_amd64.s",
+                    1316
+                ),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/curve25519/ladderstep_amd64.s",
+                    21334
+                ),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/curve25519/mont25519_amd64.go",
+                    5513
+                ),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/curve25519/mul_amd64.s",
+                    2718
+                ),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/curve25519/square_amd64.s",
+                    2183
+                ),
+                ("grpc/third_party/boringssl/ssl/test/runner/deterministic.go", 1297),
+                ("grpc/third_party/boringssl/ssl/test/runner/dtls.go", 15905),
+                ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p224_cert.pem", 676),
+                ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p224_key.pem", 221),
+                ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p256_cert.pem", 700),
+                ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p256_key.pem", 246),
+                ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p384_cert.pem", 906),
+                ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p384_key.pem", 312),
+                ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p521_cert.pem", 1010),
+                ("grpc/third_party/boringssl/ssl/test/runner/ecdsa_p521_key.pem", 386),
+                ("grpc/third_party/boringssl/ssl/test/runner/ed25519_cert.pem", 614),
+                ("grpc/third_party/boringssl/ssl/test/runner/ed25519_key.pem", 122),
+                ("grpc/third_party/boringssl/ssl/test/runner/fuzzer_mode.json", 3296),
+                ("grpc/third_party/boringssl/ssl/test/runner/handshake_client.go", 63710),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/handshake_messages.go",
+                    67903
+                ),
+                ("grpc/third_party/boringssl/ssl/test/runner/handshake_server.go", 68978),
+                ("grpc/third_party/boringssl/ssl/test/runner/hkdf.go", 1768),
+                ("grpc/third_party/boringssl/ssl/test/runner/hkdf_test.go", 9108),
+                ("grpc/third_party/boringssl/ssl/test/runner/hrss/hrss.go", 26984),
+                ("grpc/third_party/boringssl/ssl/test/runner/key.pem", 1732),
+                ("grpc/third_party/boringssl/ssl/test/runner/key_agreement.go", 27834),
+                ("grpc/third_party/boringssl/ssl/test/runner/packet_adapter.go", 4746),
+                ("grpc/third_party/boringssl/ssl/test/runner/poly1305/poly1305.go", 1281),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/poly1305/poly1305_test.go",
+                    3018
+                ),
+                ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_amd64.go", 716),
+                ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_amd64.s", 3165),
+                ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_arm.go", 740),
+                ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_arm.s", 12285),
+                ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_noasm.go", 539),
+                ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_ref.go", 4802),
+                ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_s390x.go", 1560),
+                ("grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_s390x.s", 9045),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/poly1305/sum_vmsl_s390x.s",
+                    25099
+                ),
+                (
+                    "grpc/third_party/boringssl/ssl/test/runner/poly1305/vectors_test.go",
+                    182527
+                ),
+                ("grpc/third_party/boringssl/ssl/test/runner/prf.go", 15654),
+                ("grpc/third_party/boringssl/ssl/test/runner/recordingconn.go", 4587),
+                ("grpc/third_party/boringssl/ssl/test/runner/rsa_1024_cert.pem", 890),
+                ("grpc/third_party/boringssl/ssl/test/runner/rsa_1024_key.pem", 932),
+                ("grpc/third_party/boringssl/ssl/test/runner/rsa_chain_cert.pem", 2090),
+                ("grpc/third_party/boringssl/ssl/test/runner/rsa_chain_key.pem", 1732),
+                ("grpc/third_party/boringssl/ssl/test/runner/runner.go", 440631),
+                ("grpc/third_party/boringssl/ssl/test/runner/runner_test.go", 862),
+                ("grpc/third_party/boringssl/ssl/test/runner/shim_ticket.go", 6538),
+                ("grpc/third_party/boringssl/ssl/test/runner/sign.go", 9386),
+                ("grpc/third_party/boringssl/ssl/test/runner/ticket.go", 5233),
+                ("grpc/third_party/boringssl/ssl/test/runner/tls.go", 8122),
+                ("grpc/third_party/boringssl/ssl/test/settings_writer.cc", 3223),
+                ("grpc/third_party/boringssl/ssl/test/settings_writer.h", 1476),
+                ("grpc/third_party/boringssl/ssl/test/test_config.cc", 56771),
+                ("grpc/third_party/boringssl/ssl/test/test_config.h", 7047),
+                ("grpc/third_party/boringssl/ssl/test/test_state.cc", 5576),
+                ("grpc/third_party/boringssl/ssl/test/test_state.h", 3344),
+                ("grpc/third_party/boringssl/util/all_tests.go", 14096),
+                ("grpc/third_party/boringssl/util/all_tests.json", 264),
+                ("grpc/third_party/boringssl/util/ar/ar_test.go", 3010),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_aes_gcm_test.cc",
+                    5111
+                ),
+                ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_aes_test.cc", 6395),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_ctr_drbg_test.cc",
+                    3928
+                ),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_ecdsa2_keypair_test.cc",
+                    3307
+                ),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_ecdsa2_pkv_test.cc",
+                    2172
+                ),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_ecdsa2_siggen_test.cc",
+                    4333
+                ),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_ecdsa2_sigver_test.cc",
+                    2881
+                ),
+                ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_hmac_test.cc", 2749),
+                ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_kas_test.cc", 4840),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_keywrap_test.cc",
+                    4633
+                ),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_rsa2_keygen_test.cc",
+                    3267
+                ),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_rsa2_siggen_test.cc",
+                    3876
+                ),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_rsa2_sigver_test.cc",
+                    3442
+                ),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_sha_monte_test.cc",
+                    2865
+                ),
+                ("grpc/third_party/boringssl/util/fipstools/cavp/cavp_sha_test.cc", 2576),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_tdes_test.cc",
+                    10594
+                ),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/cavp/cavp_tlskdf_test.cc",
+                    4157
+                ),
+                (
+                    "grpc/third_party/boringssl/util/fipstools/delocate/delocate_test.go",
+                    2766
+                ),
+                ("grpc/third_party/boringssl/util/run_android_tests.go", 10042),
+                ("grpc/third_party/cares/cares/test/CMakeLists.txt", 2039),
+                ("grpc/third_party/cares/cares/test/Makefile.am", 1408),
+                ("grpc/third_party/cares/cares/test/Makefile.inc", 743),
+                ("grpc/third_party/cares/cares/test/Makefile.m32", 1778),
+                ("grpc/third_party/cares/cares/test/Makefile.msvc", 11457),
+                ("grpc/third_party/cares/cares/test/README.md", 6217),
+                ("grpc/third_party/cares/cares/test/ares-fuzz.c", 1621),
+                ("grpc/third_party/cares/cares/test/ares-test-fuzz-name.c", 626),
+                ("grpc/third_party/cares/cares/test/ares-test-fuzz.c", 1484),
+                ("grpc/third_party/cares/cares/test/ares-test-init.cc", 22429),
+                ("grpc/third_party/cares/cares/test/ares-test-internal.cc", 18383),
+                ("grpc/third_party/cares/cares/test/ares-test-live.cc", 23767),
+                ("grpc/third_party/cares/cares/test/ares-test-main.cc", 1158),
+                ("grpc/third_party/cares/cares/test/ares-test-misc.cc", 18878),
+                ("grpc/third_party/cares/cares/test/ares-test-mock.cc", 42740),
+                ("grpc/third_party/cares/cares/test/ares-test-ns.cc", 6232),
+                ("grpc/third_party/cares/cares/test/ares-test-parse-a.cc", 14262),
+                ("grpc/third_party/cares/cares/test/ares-test-parse-aaaa.cc", 7680),
+                ("grpc/third_party/cares/cares/test/ares-test-parse-mx.cc", 4640),
+                ("grpc/third_party/cares/cares/test/ares-test-parse-naptr.cc", 5459),
+                ("grpc/third_party/cares/cares/test/ares-test-parse-ns.cc", 4313),
+                ("grpc/third_party/cares/cares/test/ares-test-parse-ptr.cc", 10805),
+                ("grpc/third_party/cares/cares/test/ares-test-parse-soa.cc", 3774),
+                ("grpc/third_party/cares/cares/test/ares-test-parse-srv.cc", 11188),
+                ("grpc/third_party/cares/cares/test/ares-test-parse-txt.cc", 9167),
+                ("grpc/third_party/cares/cares/test/ares-test-parse.cc", 6942),
+                ("grpc/third_party/cares/cares/test/ares-test.cc", 20026),
+                ("grpc/third_party/cares/cares/test/ares-test.h", 13886),
+                ("grpc/third_party/cares/cares/test/buildconf", 25),
+                ("grpc/third_party/cares/cares/test/configure.ac", 515),
+                ("grpc/third_party/cares/cares/test/dns-dump.cc", 801),
+                ("grpc/third_party/cares/cares/test/dns-proto-test.cc", 3936),
+                ("grpc/third_party/cares/cares/test/dns-proto.cc", 18889),
+                ("grpc/third_party/cares/cares/test/dns-proto.h", 8260),
+                ("grpc/third_party/cares/cares/test/fuzzcheck.sh", 125),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/004a216d3cff18b0c5c6b68b807f1529",
+                    32
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/00539467ca159b36aea95e61f9729115",
+                    82
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/00e846db8f43f2f507cd1666ed5a753e",
+                    62
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/0177b7566f08c013699eaea9a77abeb3",
+                    64
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/020a4fa317715bfdb236ed13751e6b65",
+                    31
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/0310f2e81bea31f4fe3f330872a877dd",
+                    68
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/0449be67df1730b2d0887d412a9b7cc4",
+                    33
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/0449dd14f7aa94bf0d716bfe09b287a8",
+                    31
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/04c93cdf7208979aa4df80a3a0d5a2d8",
+                    31
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/0567e7171e08e75f3f91c4ca74c17adc",
+                    32
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/05ba948578a397e9cbc6a7b3e78622fa",
+                    64
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/060afe5ed25f3e2e86167e545f27edca",
+                    136
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/06d47d3681493f1b1d41236f460d896f",
+                    60
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/0724a810b0e131c2fddb6de9003b9064",
+                    33
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/0b5279148826f5b962bcf1896bdb4ede",
+                    102
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/114048c0f6b10bdc67ce9166405d195e",
+                    62
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/11b8464a0ef8735d202955c34c36b0c7",
+                    76
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/11cb626f1668c7b41954ce7d768fe528",
+                    60
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/14b133bf18125b75a1976fa63a1df6b7",
+                    62
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/153c6b3afa8faa03c8bc28f936a6d4cf",
+                    67
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/182cad2a342ed7317b7c21a5d17020d1",
+                    60
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/1c61a61bb7057b52c5b15188345a5238",
+                    21
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/1dbe2cf62ed2e4fa1c3cb473f08710b5",
+                    29
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/21199be504fcfece5c7096ee0dbba507",
+                    107
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/21891480074b5635dbbe7137bdcabccd",
+                    32
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/233aea42e15aa73e131eefabf16088c9",
+                    32
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/24660d4e7ac7aa21d600ea7a3d198bbb",
+                    108
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/25589deb55c08429345f289d1c9b0254",
+                    57
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/2573bd823e4da11f727a17f8e1f35c26",
+                    29
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/276f12da56866273e76059ad0e7be97e",
+                    32
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/29198a2e380cb19babec9e02116d213e",
+                    29
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/2c94ba9434b1a1b9396fc5364f101363",
+                    40
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/2d578c357dc2f5e02dc55cddb30641d1",
+                    102
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/2dff6cc5a223e67fde9e5e79af456992",
+                    134
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/2f103b1f9477f2d8934bd84328d51c75",
+                    110
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/31cd3a8413de13d9624adbb1613784bf",
+                    32
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/36415bdf1d180098fe6234b4186e69f3",
+                    31
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/3a04a80f0242e8dff0cd732e7c4767da",
+                    377
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/44d0f973b7b0fb3e4a07770c943dcd5a",
+                    32
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/50bc00daa0ddcd6cfb2b5d9f62c81f47",
+                    76
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/51ed2d1fb77b3078b54e94e85606b7df",
+                    160
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/5c5e0e899cf2e7d053a9e45fb76f6e5a",
+                    56
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/70152ed033f139443fbfb1b858bb3b1b",
+                    32
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/7030ca2b24e5a7f9dd8f62096a48eb33",
+                    48
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/71eec1a0ef2d25bb9e2ef17f23be7e9e",
+                    92
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/7a6b0177210ea4ef40b254daf99393c5",
+                    94
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/7f1567733711ffb61839621af0cbfa33",
+                    21
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/850c6d57c5bb7be8205fc2438d14d7e5",
+                    179
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/a5c8cd2784a5792b9e91c2d7895b3b34",
+                    102
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/a9135cdc7151d023300ff194bad90af9",
+                    102
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/af2597e8ac7dec1e8b4a47518312912a",
+                    100
+                ),
+                ("grpc/third_party/cares/cares/test/fuzzinput/answer_a", 62),
+                ("grpc/third_party/cares/cares/test/fuzzinput/answer_aaaa", 62),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/b3f53ef826b831bb09dd25c7f5960249",
+                    56
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/cda0f8751f5c4993974c2b549d29bcc8",
+                    102
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/ce6c26c0e469339873d0e7f616ab0945",
+                    48
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/e4dd7e7c2dd4ed7c2e17a6af5d04f9c9",
+                    83
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/ed50ed8ee36230a5a69746ad830437e5",
+                    48
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/f1b900d50806021953321c3b604ee497",
+                    108
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/f6606f624be8c628328cea01d2cd07a9",
+                    37
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/f89f6c8176b564a7dd646f14305573ce",
+                    48
+                ),
+                (
+                    "grpc/third_party/cares/cares/test/fuzzinput/f9ad508d2dbd08d3aaaabc7d1174677d",
+                    78
+                ),
+                ("grpc/third_party/cares/cares/test/fuzzinput/multi-indir", 9598),
+                ("grpc/third_party/cares/cares/test/fuzznames/name01", 11),
+                ("grpc/third_party/cares/cares/test/fuzznames/name02", 11),
+                ("grpc/third_party/cares/cares/test/fuzznames/name03", 88),
+                ("grpc/third_party/cares/cares/test/fuzznames/name04", 25),
+                ("grpc/third_party/cares/cares/test/fuzznames/name05", 20),
+                ("grpc/third_party/cares/cares/test/fuzznames/name06", 14),
+                ("grpc/third_party/cares/cares/test/fuzznames/name07", 12),
+                ("grpc/third_party/cares/cares/test/fuzznames/name08", 18),
+                ("grpc/third_party/cares/cares/test/fuzznames/name09", 31),
+                ("grpc/third_party/cares/cares/test/gmock-1.8.0/gmock/gmock.h", 582989),
+                (
+                    "grpc/third_party/cares/cares/test/gmock-1.8.0/gmock-gtest-all.cc",
+                    451062
+                ),
+                ("grpc/third_party/cares/cares/test/gmock-1.8.0/gtest/gtest.h", 871268),
+                ("grpc/third_party/upb/examples/bazel/BUILD", 307),
+                ("grpc/third_party/upb/examples/bazel/WORKSPACE", 320),
+                ("grpc/third_party/upb/examples/bazel/foo.proto", 96),
+                ("grpc/third_party/upb/examples/bazel/test_binary.c", 375),
+                ("grpc/third_party/upb/tests/benchmark.cc", 1110),
+                ("grpc/third_party/upb/tests/bindings/googlepb/test_vs_proto2.cc", 5432),
+                ("grpc/third_party/upb/tests/bindings/lua/test_upb.lua", 21652),
+                ("grpc/third_party/upb/tests/bindings/lua/test_upb.pb.lua", 2555),
+                ("grpc/third_party/upb/tests/bindings/ruby/upb.rb", 1552),
+                ("grpc/third_party/upb/tests/conformance_upb.c", 5002),
+                ("grpc/third_party/upb/tests/conformance_upb_failures.txt", 61),
+                ("grpc/third_party/upb/tests/corpus/README", 26),
+                ("grpc/third_party/upb/tests/corpus/temp.cc", 15),
+                ("grpc/third_party/upb/tests/file_descriptor_parsenew_fuzzer.cc", 381),
+                ("grpc/third_party/upb/tests/google_message1.dat", 228),
+                ("grpc/third_party/upb/tests/google_message2.dat", 84570),
+                ("grpc/third_party/upb/tests/google_messages.proto", 4886),
+                ("grpc/third_party/upb/tests/json/enum_from_separate_file.proto", 125),
+                ("grpc/third_party/upb/tests/json/test.proto", 1133),
+                ("grpc/third_party/upb/tests/json/test.proto.pb", 1958),
+                ("grpc/third_party/upb/tests/json/test_json.cc", 7531),
+                ("grpc/third_party/upb/tests/pb/test_decoder.cc", 40249),
+                ("grpc/third_party/upb/tests/pb/test_decoder.proto", 4850),
+                ("grpc/third_party/upb/tests/pb/test_encoder.cc", 1485),
+                ("grpc/third_party/upb/tests/pb/test_varint.c", 3613),
+                ("grpc/third_party/upb/tests/test.proto", 1113),
+                ("grpc/third_party/upb/tests/test.proto.pb", 652),
+                ("grpc/third_party/upb/tests/test_cpp.cc", 29010),
+                ("grpc/third_party/upb/tests/test_cpp.proto", 239),
+                ("grpc/third_party/upb/tests/test_table.cc", 18887),
+                ("grpc/third_party/upb/tests/test_util.h", 6075),
+                ("grpc/third_party/upb/tests/testmain.cc", 259),
+                ("grpc/third_party/upb/tests/upb_test.h", 1067),
+                ("grpc/third_party/upb/tools/staleness_test.py", 698),
+                ("grpc/tools/buildgen/plugins/make_fuzzer_tests.py", 1896),
+                ("grpc/tools/dockerfile/test/bazel/Dockerfile", 2810),
+                ("grpc/tools/dockerfile/test/csharp_stretch_x64/Dockerfile", 3431),
+                ("grpc/tools/dockerfile/test/cxx_alpine_x64/Dockerfile", 1507),
+                ("grpc/tools/dockerfile/test/cxx_buster_x64/Dockerfile", 1889),
+                ("grpc/tools/dockerfile/test/cxx_jessie_x64/Dockerfile", 2761),
+                ("grpc/tools/dockerfile/test/cxx_jessie_x86/Dockerfile", 2624),
+                ("grpc/tools/dockerfile/test/cxx_sanitizers_jessie_x64/Dockerfile", 2315),
+                ("grpc/tools/dockerfile/test/cxx_ubuntu1404_x64/Dockerfile", 1966),
+                ("grpc/tools/dockerfile/test/cxx_ubuntu1604_x64/Dockerfile", 2198),
+                ("grpc/tools/dockerfile/test/cxx_ubuntu1804_x64/Dockerfile", 1888),
+                ("grpc/tools/dockerfile/test/fuzzer/Dockerfile", 3741),
+                ("grpc/tools/dockerfile/test/node_jessie_x64/Dockerfile", 2702),
+                ("grpc/tools/dockerfile/test/php7_jessie_x64/Dockerfile", 2293),
+                ("grpc/tools/dockerfile/test/php_jessie_x64/Dockerfile", 2029),
+                ("grpc/tools/dockerfile/test/python_alpine_x64/Dockerfile", 1225),
+                ("grpc/tools/dockerfile/test/python_stretch_2.7_x64/Dockerfile", 1743),
+                ("grpc/tools/dockerfile/test/python_stretch_3.5_x64/Dockerfile", 1869),
+                ("grpc/tools/dockerfile/test/python_stretch_3.6_x64/Dockerfile", 2321),
+                ("grpc/tools/dockerfile/test/python_stretch_3.7_x64/Dockerfile", 1942),
+                ("grpc/tools/dockerfile/test/python_stretch_3.8_x64/Dockerfile", 2331),
+                ("grpc/tools/dockerfile/test/python_stretch_default_x64/Dockerfile", 2533),
+                ("grpc/tools/dockerfile/test/ruby_jessie_x64/Dockerfile", 2430),
+                ("grpc/tools/dockerfile/test/sanity/Dockerfile", 3645),
+                ("grpc/tools/fuzzer/options/hpack_parser_fuzzer_test.options", 53),
+                ("grpc/tools/fuzzer/options/uri_fuzzer_test.options", 28),
+                ("grpc/tools/fuzzer/runners/hpack_parser_fuzzer_test.sh", 1038),
+                ("grpc/tools/fuzzer/runners/http_request_fuzzer_test.sh", 957),
+                ("grpc/tools/fuzzer/runners/http_response_fuzzer_test.sh", 959),
+                ("grpc/tools/fuzzer/runners/json_fuzzer_test.sh", 940),
+                ("grpc/tools/fuzzer/runners/nanopb_fuzzer_response_test.sh", 962),
+                ("grpc/tools/fuzzer/runners/nanopb_fuzzer_serverlist_test.sh", 966),
+                ("grpc/tools/fuzzer/runners/uri_fuzzer_test.sh", 953),
+                ("grpc/tools/http2_interop/http2interop_test.go", 4827),
+                ("grpc/tools/http2_interop/s6.5_test.go", 1063),
+                ("grpc/tools/internal_ci/linux/grpc_bazel_test.cfg", 893),
+                ("grpc/tools/internal_ci/linux/grpc_python_bazel_test.cfg", 900),
+                ("grpc/tools/internal_ci/linux/grpc_run_grpclb_interop_tests.sh", 965),
+                ("grpc/tools/internal_ci/linux/grpc_run_interop_tests.sh", 887),
+                ("grpc/tools/internal_ci/macos/grpc_bazel_cpp_ios_tests.cfg", 775),
+                ("grpc/tools/internal_ci/macos/grpc_run_bazel_c_cpp_tests.sh", 1880),
+                ("grpc/tools/internal_ci/macos/grpc_run_bazel_cpp_ios_tests.sh", 1034),
+                ("grpc/tools/internal_ci/macos/grpc_run_bazel_isolated_tests.sh", 1430),
+                ("grpc/tools/interop_matrix/run_interop_matrix_tests.py", 11530),
+                ("grpc/tools/run_tests/README.md", 2564),
+                ("grpc/tools/run_tests/artifacts/__init__.py", 590),
+                ("grpc/tools/run_tests/artifacts/artifact_targets.py", 17332),
+                ("grpc/tools/run_tests/artifacts/build_artifact_csharp.bat", 1804),
+                ("grpc/tools/run_tests/artifacts/build_artifact_csharp.sh", 1045),
+                ("grpc/tools/run_tests/artifacts/build_artifact_csharp_android.sh", 861),
+                ("grpc/tools/run_tests/artifacts/build_artifact_csharp_ios.sh", 808),
+                ("grpc/tools/run_tests/artifacts/build_artifact_php.sh", 734),
+                ("grpc/tools/run_tests/artifacts/build_artifact_protoc.bat", 1195),
+                ("grpc/tools/run_tests/artifacts/build_artifact_protoc.sh", 866),
+                ("grpc/tools/run_tests/artifacts/build_artifact_python.bat", 2022),
+                ("grpc/tools/run_tests/artifacts/build_artifact_python.sh", 5205),
+                ("grpc/tools/run_tests/artifacts/build_artifact_ruby.sh", 1652),
+                ("grpc/tools/run_tests/artifacts/build_package_php.sh", 888),
+                ("grpc/tools/run_tests/artifacts/build_package_python.sh", 1864),
+                ("grpc/tools/run_tests/artifacts/build_package_ruby.sh", 2192),
+                ("grpc/tools/run_tests/artifacts/distribtest_targets.py", 13315),
+                ("grpc/tools/run_tests/artifacts/package_targets.py", 5065),
+                ("grpc/tools/run_tests/artifacts/run_in_workspace.sh", 1331),
+                ("grpc/tools/run_tests/build_stats/build_stats_schema.json", 1082),
+                (
+                    "grpc/tools/run_tests/build_stats/build_stats_schema_no_matrix.json",
+                    847
+                ),
+                ("grpc/tools/run_tests/dockerize/build_and_run_docker.sh", 3099),
+                ("grpc/tools/run_tests/dockerize/build_docker_and_run_tests.sh", 3176),
+                ("grpc/tools/run_tests/dockerize/build_interop_image.sh", 4730),
+                ("grpc/tools/run_tests/dockerize/docker_run.sh", 1528),
+                ("grpc/tools/run_tests/dockerize/docker_run_tests.sh", 1742),
+                ("grpc/tools/run_tests/helper_scripts/build_csharp.bat", 820),
+                ("grpc/tools/run_tests/helper_scripts/build_csharp.sh", 978),
+                ("grpc/tools/run_tests/helper_scripts/build_php.sh", 1018),
+                ("grpc/tools/run_tests/helper_scripts/build_python.sh", 6201),
+                ("grpc/tools/run_tests/helper_scripts/build_python_msys2.sh", 739),
+                ("grpc/tools/run_tests/helper_scripts/build_ruby.sh", 806),
+                ("grpc/tools/run_tests/helper_scripts/bundle_install_wrapper.sh", 946),
+                ("grpc/tools/run_tests/helper_scripts/post_tests_c.sh", 988),
+                ("grpc/tools/run_tests/helper_scripts/post_tests_csharp.bat", 1428),
+                ("grpc/tools/run_tests/helper_scripts/post_tests_csharp.sh", 1115),
+                ("grpc/tools/run_tests/helper_scripts/post_tests_php.sh", 1062),
+                ("grpc/tools/run_tests/helper_scripts/post_tests_python.sh", 836),
+                ("grpc/tools/run_tests/helper_scripts/post_tests_ruby.sh", 1024),
+                ("grpc/tools/run_tests/helper_scripts/pre_build_cmake.bat", 910),
+                ("grpc/tools/run_tests/helper_scripts/pre_build_cmake.sh", 821),
+                ("grpc/tools/run_tests/helper_scripts/pre_build_csharp.bat", 1113),
+                ("grpc/tools/run_tests/helper_scripts/pre_build_csharp.sh", 839),
+                ("grpc/tools/run_tests/helper_scripts/pre_build_ruby.sh", 774),
+                ("grpc/tools/run_tests/helper_scripts/run_grpc-node.sh", 958),
+                ("grpc/tools/run_tests/helper_scripts/run_python.sh", 928),
+                ("grpc/tools/run_tests/helper_scripts/run_ruby.sh", 683),
+                ("grpc/tools/run_tests/helper_scripts/run_ruby_end2end_tests.sh", 1853),
+                ("grpc/tools/run_tests/helper_scripts/run_tests_in_workspace.sh", 1369),
+                ("grpc/tools/run_tests/interop/interop_html_report.template", 6464),
+                ("grpc/tools/run_tests/interop/with_nvm.sh", 723),
+                ("grpc/tools/run_tests/interop/with_rvm.sh", 736),
+                ("grpc/tools/run_tests/lb_interop_tests/gen_build_yaml.py", 12364),
+                ("grpc/tools/run_tests/performance/README.md", 5432),
+                ("grpc/tools/run_tests/performance/__init__.py", 590),
+                ("grpc/tools/run_tests/performance/bq_upload_result.py", 7252),
+                ("grpc/tools/run_tests/performance/build_performance.sh", 2778),
+                ("grpc/tools/run_tests/performance/build_performance_go.sh", 1018),
+                ("grpc/tools/run_tests/performance/build_performance_node.sh", 763),
+                ("grpc/tools/run_tests/performance/build_performance_php7.sh", 938),
+                ("grpc/tools/run_tests/performance/kill_workers.sh", 1406),
+                ("grpc/tools/run_tests/performance/massage_qps_stats.py", 29190),
+                ("grpc/tools/run_tests/performance/massage_qps_stats_helpers.py", 2374),
+                (
+                    "grpc/tools/run_tests/performance/patch_scenario_results_schema.py",
+                    1901
+                ),
+                (
+                    "grpc/tools/run_tests/performance/process_local_perf_flamegraphs.sh",
+                    1021
+                ),
+                (
+                    "grpc/tools/run_tests/performance/process_remote_perf_flamegraphs.sh",
+                    1268
+                ),
+                ("grpc/tools/run_tests/performance/remote_host_build.sh", 838),
+                ("grpc/tools/run_tests/performance/remote_host_prepare.sh", 2036),
+                ("grpc/tools/run_tests/performance/run_netperf.sh", 1027),
+                ("grpc/tools/run_tests/performance/run_qps_driver.sh", 816),
+                ("grpc/tools/run_tests/performance/run_worker_csharp.sh", 796),
+                ("grpc/tools/run_tests/performance/run_worker_go.sh", 697),
+                ("grpc/tools/run_tests/performance/run_worker_java.sh", 828),
+                ("grpc/tools/run_tests/performance/run_worker_node.sh", 886),
+                ("grpc/tools/run_tests/performance/run_worker_php.sh", 774),
+                ("grpc/tools/run_tests/performance/run_worker_python.sh", 777),
+                ("grpc/tools/run_tests/performance/run_worker_ruby.sh", 717),
+                ("grpc/tools/run_tests/performance/run_worker_rust.sh", 610),
+                ("grpc/tools/run_tests/performance/scenario_config.py", 51172),
+                ("grpc/tools/run_tests/performance/scenario_result_schema.json", 48024),
+                ("grpc/tools/run_tests/python_utils/__init__.py", 590),
+                ("grpc/tools/run_tests/python_utils/antagonist.py", 706),
+                ("grpc/tools/run_tests/python_utils/check_on_pr.py", 4919),
+                ("grpc/tools/run_tests/python_utils/dockerjob.py", 5407),
+                ("grpc/tools/run_tests/python_utils/filter_pull_request_tests.py", 7906),
+                ("grpc/tools/run_tests/python_utils/jobset.py", 21482),
+                ("grpc/tools/run_tests/python_utils/port_server.py", 6752),
+                ("grpc/tools/run_tests/python_utils/report_utils.py", 7347),
+                ("grpc/tools/run_tests/python_utils/start_port_server.py", 4956),
+                ("grpc/tools/run_tests/python_utils/upload_rbe_results.py", 10058),
+                ("grpc/tools/run_tests/python_utils/upload_test_results.py", 7187),
+                ("grpc/tools/run_tests/python_utils/watch_dirs.py", 2250),
+                ("grpc/tools/run_tests/run_build_statistics.py", 10778),
+                ("grpc/tools/run_tests/run_grpclb_interop_tests.py", 23219),
+                ("grpc/tools/run_tests/run_interop_tests.py", 57702),
+                ("grpc/tools/run_tests/run_microbenchmark.py", 9105),
+                ("grpc/tools/run_tests/run_performance_tests.py", 27914),
+                ("grpc/tools/run_tests/run_tests.py", 69674),
+                ("grpc/tools/run_tests/run_tests_matrix.py", 22501),
+                ("grpc/tools/run_tests/sanity/check_bad_dependencies.sh", 1428),
+                ("grpc/tools/run_tests/sanity/check_bazel_workspace.py", 6060),
+                ("grpc/tools/run_tests/sanity/check_buildifier.sh", 1109),
+                ("grpc/tools/run_tests/sanity/check_cache_mk.sh", 699),
+                ("grpc/tools/run_tests/sanity/check_deprecated_grpc++.py", 7935),
+                ("grpc/tools/run_tests/sanity/check_owners.sh", 837),
+                ("grpc/tools/run_tests/sanity/check_port_platform.py", 2783),
+                ("grpc/tools/run_tests/sanity/check_qps_scenario_changes.py", 1368),
+                ("grpc/tools/run_tests/sanity/check_shellcheck.sh", 837),
+                ("grpc/tools/run_tests/sanity/check_submodules.sh", 2108),
+                ("grpc/tools/run_tests/sanity/check_test_filtering.py", 7009),
+                ("grpc/tools/run_tests/sanity/check_tracer_sanity.py", 1452),
+                ("grpc/tools/run_tests/sanity/check_version.py", 2973),
+                ("grpc/tools/run_tests/sanity/core_banned_functions.py", 3033),
+                ("grpc/tools/run_tests/sanity/core_untyped_structs.sh", 820),
+                ("grpc/tools/run_tests/sanity/cpp_banned_constructs.sh", 1311),
+                ("grpc/tools/run_tests/sanity/sanity_tests.yaml", 1501),
+                ("grpc/tools/run_tests/start_port_server.py", 1000),
+                ("grpc/tools/run_tests/task_runner.py", 3991)
+            ]
+            .iter()
+            .map(|(p, s)| (p.to_string(), *s))
+            .collect(),
             suggested_fix: Some(Fix::EnrichedExclude {
-                exclude: ["grpc/doc/*", "grpc/etc/*", "grpc/examples/*", "grpc/Makefile", "grpc/templates/*", "grpc/src/android/*", "grpc/src/csharp/*", "grpc/src/boringssl/crypto_test_data.cc", "grpc/src/node/*", "grpc/src/objective-c/*", "grpc/src/php/*", "grpc/src/python/*", "grpc/src/ruby/*", "grpc/vsprojects/*", "grpc/test/core/end2end/*", "grpc/third_party/zlib/*", "grpc/third_party/abseil-cpp/*", "grpc/third_party/benchmark/*", "grpc/third_party/bloaty/*", "grpc/third_party/boringssl/fuzz/*", "grpc/third_party/boringssl/crypto/cipher_extra/test/*", "grpc/third_party/boringssl/third_party/android-cmake/*", "grpc/third_party/boringssl/third_party/wycheproof_testvectors", "grpc/third_party/boringssl/third_party/googletest", "!grpc/third_party/boringssl/third_party/googletest/src/gtest-all.cc", "grpc/third_party/boringssl-with-bazel/*", "grpc/third_party/gflags/*", "grpc/third_party/googletest/*", "grpc/third_party/libcxx/*", "grpc/third_party/libcxxabi/*", "grpc/third_party/objective_c/*", "grpc/third_party/protobuf/*", "grpc/third_party/rake-compiler-dock/*", "grpc/third_party/toolchan/*", "grpc/tools/run_tests/generated/*", "grpc/test/core/", "!grpc/test/core/security/*.cc", "!grpc/test/core/util/cmdline.cc", "grpc/test/cpp", "**/*.png", "**/benchmark/*", "**/test/*", "**/*_test.*", "**/tests/*", "**/*_tests.*", "**/*_tests/*", "**/testing/*", "**/examples/*"].iter().map(|p| p.to_string()).collect(),
-                exclude_added: ["**/*.png", "**/benchmark/*", "**/test/*", "**/*_test.*", "**/tests/*", "**/*_tests.*", "**/*_tests/*", "**/testing/*", "**/examples/*"].iter().map(|p|p.to_string()).collect(),
-                has_build_script: true })
+                exclude: [
+                    "grpc/doc/*",
+                    "grpc/etc/*",
+                    "grpc/examples/*",
+                    "grpc/Makefile",
+                    "grpc/templates/*",
+                    "grpc/src/android/*",
+                    "grpc/src/csharp/*",
+                    "grpc/src/boringssl/crypto_test_data.cc",
+                    "grpc/src/node/*",
+                    "grpc/src/objective-c/*",
+                    "grpc/src/php/*",
+                    "grpc/src/python/*",
+                    "grpc/src/ruby/*",
+                    "grpc/vsprojects/*",
+                    "grpc/test/core/end2end/*",
+                    "grpc/third_party/zlib/*",
+                    "grpc/third_party/abseil-cpp/*",
+                    "grpc/third_party/benchmark/*",
+                    "grpc/third_party/bloaty/*",
+                    "grpc/third_party/boringssl/fuzz/*",
+                    "grpc/third_party/boringssl/crypto/cipher_extra/test/*",
+                    "grpc/third_party/boringssl/third_party/android-cmake/*",
+                    "grpc/third_party/boringssl/third_party/wycheproof_testvectors",
+                    "grpc/third_party/boringssl/third_party/googletest",
+                    "!grpc/third_party/boringssl/third_party/googletest/src/gtest-all.cc",
+                    "grpc/third_party/boringssl-with-bazel/*",
+                    "grpc/third_party/gflags/*",
+                    "grpc/third_party/googletest/*",
+                    "grpc/third_party/libcxx/*",
+                    "grpc/third_party/libcxxabi/*",
+                    "grpc/third_party/objective_c/*",
+                    "grpc/third_party/protobuf/*",
+                    "grpc/third_party/rake-compiler-dock/*",
+                    "grpc/third_party/toolchan/*",
+                    "grpc/tools/run_tests/generated/*",
+                    "grpc/test/core/",
+                    "!grpc/test/core/security/*.cc",
+                    "!grpc/test/core/util/cmdline.cc",
+                    "grpc/test/cpp",
+                    "**/*.png",
+                    "**/benchmark/*",
+                    "**/test/*",
+                    "**/*_test.*",
+                    "**/tests/*",
+                    "**/*_tests.*",
+                    "**/*_tests/*",
+                    "**/testing/*",
+                    "**/examples/*"
+                ]
+                .iter()
+                .map(|p| p.to_string())
+                .collect(),
+                exclude_added: [
+                    "**/*.png",
+                    "**/benchmark/*",
+                    "**/test/*",
+                    "**/*_test.*",
+                    "**/tests/*",
+                    "**/*_tests.*",
+                    "**/*_tests/*",
+                    "**/testing/*",
+                    "**/examples/*"
+                ]
+                .iter()
+                .map(|p| p.to_string())
+                .collect(),
+                has_build_script: true
+            })
         }
     );
 }
@@ -991,11 +1906,7 @@ fn grpcio_sys_lean_with_potential() {
 #[test]
 fn openblas_provider_even_more_info_from_build_script_and_something_to_optimize_for() {
     assert_eq!(
-        Report::from_package(
-            "a",
-            "1",
-            tar_package("openblas_provider-0.4.0-extract_crate-1.0.0")
-        ),
+        Report::from_package("a", "1", tar_package("openblas_provider-0.4.0-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -1120,31 +2031,13 @@ fn openblas_provider_even_more_info_from_build_script_and_something_to_optimize_
                 ("source/lapack-netlib/CBLAS/testing/zin3", 1077),
                 ("source/lapack-netlib/DOCS/lapack.png", 15912),
                 ("source/lapack-netlib/LAPACKE/example/CMakeLists.txt", 1174),
-                (
-                    "source/lapack-netlib/LAPACKE/example/example_DGELS_colmajor.c",
-                    2916
-                ),
-                (
-                    "source/lapack-netlib/LAPACKE/example/example_DGELS_rowmajor.c",
-                    2910
-                ),
-                (
-                    "source/lapack-netlib/LAPACKE/example/example_DGESV_colmajor.c",
-                    3642
-                ),
-                (
-                    "source/lapack-netlib/LAPACKE/example/example_DGESV_rowmajor.c",
-                    3594
-                ),
+                ("source/lapack-netlib/LAPACKE/example/example_DGELS_colmajor.c", 2916),
+                ("source/lapack-netlib/LAPACKE/example/example_DGELS_rowmajor.c", 2910),
+                ("source/lapack-netlib/LAPACKE/example/example_DGESV_colmajor.c", 3642),
+                ("source/lapack-netlib/LAPACKE/example/example_DGESV_rowmajor.c", 3594),
                 ("source/lapack-netlib/LAPACKE/example/example_user.c", 3408),
-                (
-                    "source/lapack-netlib/LAPACKE/example/lapacke_example_aux.c",
-                    1038
-                ),
-                (
-                    "source/lapack-netlib/LAPACKE/example/lapacke_example_aux.h",
-                    359
-                ),
+                ("source/lapack-netlib/LAPACKE/example/lapacke_example_aux.c", 1038),
+                ("source/lapack-netlib/LAPACKE/example/lapacke_example_aux.h", 359),
                 ("source/lapack-netlib/LAPACKE/example/Makefile", 1063),
                 ("source/test/cblat1.f", 31188),
                 ("source/test/cblat2.dat", 1546),
@@ -1720,22 +2613,10 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLINFO_CONDITION_UNMET.3", 2613),
                 ("curl/docs/libcurl/opts/CURLINFO_CONNECT_TIME.3", 2278),
                 ("curl/docs/libcurl/opts/CURLINFO_CONNECT_TIME_T.3", 2381),
-                (
-                    "curl/docs/libcurl/opts/CURLINFO_CONTENT_LENGTH_DOWNLOAD.3",
-                    2376
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLINFO_CONTENT_LENGTH_DOWNLOAD_T.3",
-                    2306
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLINFO_CONTENT_LENGTH_UPLOAD.3",
-                    2315
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLINFO_CONTENT_LENGTH_UPLOAD_T.3",
-                    2242
-                ),
+                ("curl/docs/libcurl/opts/CURLINFO_CONTENT_LENGTH_DOWNLOAD.3", 2376),
+                ("curl/docs/libcurl/opts/CURLINFO_CONTENT_LENGTH_DOWNLOAD_T.3", 2306),
+                ("curl/docs/libcurl/opts/CURLINFO_CONTENT_LENGTH_UPLOAD.3", 2315),
+                ("curl/docs/libcurl/opts/CURLINFO_CONTENT_LENGTH_UPLOAD_T.3", 2242),
                 ("curl/docs/libcurl/opts/CURLINFO_CONTENT_TYPE.3", 2413),
                 ("curl/docs/libcurl/opts/CURLINFO_COOKIELIST.3", 2897),
                 ("curl/docs/libcurl/opts/CURLINFO_EFFECTIVE_URL.3", 2381),
@@ -1760,10 +2641,7 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLINFO_PRIVATE.3", 2277),
                 ("curl/docs/libcurl/opts/CURLINFO_PROTOCOL.3", 2543),
                 ("curl/docs/libcurl/opts/CURLINFO_PROXYAUTH_AVAIL.3", 2670),
-                (
-                    "curl/docs/libcurl/opts/CURLINFO_PROXY_SSL_VERIFYRESULT.3",
-                    2317
-                ),
+                ("curl/docs/libcurl/opts/CURLINFO_PROXY_SSL_VERIFYRESULT.3", 2317),
                 ("curl/docs/libcurl/opts/CURLINFO_REDIRECT_COUNT.3", 2063),
                 ("curl/docs/libcurl/opts/CURLINFO_REDIRECT_TIME.3", 2357),
                 ("curl/docs/libcurl/opts/CURLINFO_REDIRECT_TIME_T.3", 2462),
@@ -1787,44 +2665,20 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLINFO_SSL_ENGINES.3", 2428),
                 ("curl/docs/libcurl/opts/CURLINFO_SSL_VERIFYRESULT.3", 2270),
                 ("curl/docs/libcurl/opts/CURLINFO_STARTTRANSFER_TIME.3", 2413),
-                (
-                    "curl/docs/libcurl/opts/CURLINFO_STARTTRANSFER_TIME_T.3",
-                    2516
-                ),
+                ("curl/docs/libcurl/opts/CURLINFO_STARTTRANSFER_TIME_T.3", 2516),
                 ("curl/docs/libcurl/opts/CURLINFO_TLS_SESSION.3", 2861),
                 ("curl/docs/libcurl/opts/CURLINFO_TLS_SSL_PTR.3", 6428),
                 ("curl/docs/libcurl/opts/CURLINFO_TOTAL_TIME.3", 2324),
                 ("curl/docs/libcurl/opts/CURLINFO_TOTAL_TIME_T.3", 2429),
-                (
-                    "curl/docs/libcurl/opts/CURLMOPT_CHUNK_LENGTH_PENALTY_SIZE.3",
-                    2328
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLMOPT_CONTENT_LENGTH_PENALTY_SIZE.3",
-                    2269
-                ),
+                ("curl/docs/libcurl/opts/CURLMOPT_CHUNK_LENGTH_PENALTY_SIZE.3", 2328),
+                ("curl/docs/libcurl/opts/CURLMOPT_CONTENT_LENGTH_PENALTY_SIZE.3", 2269),
                 ("curl/docs/libcurl/opts/CURLMOPT_MAXCONNECTS.3", 2546),
-                (
-                    "curl/docs/libcurl/opts/CURLMOPT_MAX_CONCURRENT_STREAMS.3",
-                    2180
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLMOPT_MAX_HOST_CONNECTIONS.3",
-                    2707
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLMOPT_MAX_PIPELINE_LENGTH.3",
-                    2412
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLMOPT_MAX_TOTAL_CONNECTIONS.3",
-                    2417
-                ),
+                ("curl/docs/libcurl/opts/CURLMOPT_MAX_CONCURRENT_STREAMS.3", 2180),
+                ("curl/docs/libcurl/opts/CURLMOPT_MAX_HOST_CONNECTIONS.3", 2707),
+                ("curl/docs/libcurl/opts/CURLMOPT_MAX_PIPELINE_LENGTH.3", 2412),
+                ("curl/docs/libcurl/opts/CURLMOPT_MAX_TOTAL_CONNECTIONS.3", 2417),
                 ("curl/docs/libcurl/opts/CURLMOPT_PIPELINING.3", 3757),
-                (
-                    "curl/docs/libcurl/opts/CURLMOPT_PIPELINING_SERVER_BL.3",
-                    2455
-                ),
+                ("curl/docs/libcurl/opts/CURLMOPT_PIPELINING_SERVER_BL.3", 2455),
                 ("curl/docs/libcurl/opts/CURLMOPT_PIPELINING_SITE_BL.3", 2189),
                 ("curl/docs/libcurl/opts/CURLMOPT_PUSHDATA.3", 2694),
                 ("curl/docs/libcurl/opts/CURLMOPT_PUSHFUNCTION.3", 5264),
@@ -1832,10 +2686,7 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLMOPT_SOCKETFUNCTION.3", 3989),
                 ("curl/docs/libcurl/opts/CURLMOPT_TIMERDATA.3", 2608),
                 ("curl/docs/libcurl/opts/CURLMOPT_TIMERFUNCTION.3", 3809),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_ABSTRACT_UNIX_SOCKET.3",
-                    2565
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_ABSTRACT_UNIX_SOCKET.3", 2565),
                 ("curl/docs/libcurl/opts/CURLOPT_ACCEPTTIMEOUT_MS.3", 2074),
                 ("curl/docs/libcurl/opts/CURLOPT_ACCEPT_ENCODING.3", 4431),
                 ("curl/docs/libcurl/opts/CURLOPT_ADDRESS_SCOPE.3", 2093),
@@ -1856,18 +2707,9 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLOPT_CONNECTTIMEOUT_MS.3", 2411),
                 ("curl/docs/libcurl/opts/CURLOPT_CONNECT_ONLY.3", 2580),
                 ("curl/docs/libcurl/opts/CURLOPT_CONNECT_TO.3", 4690),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_CONV_FROM_NETWORK_FUNCTION.3",
-                    3881
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_CONV_FROM_UTF8_FUNCTION.3",
-                    3763
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_CONV_TO_NETWORK_FUNCTION.3",
-                    3807
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_CONV_FROM_NETWORK_FUNCTION.3", 3881),
+                ("curl/docs/libcurl/opts/CURLOPT_CONV_FROM_UTF8_FUNCTION.3", 3763),
+                ("curl/docs/libcurl/opts/CURLOPT_CONV_TO_NETWORK_FUNCTION.3", 3807),
                 ("curl/docs/libcurl/opts/CURLOPT_COOKIE.3", 3400),
                 ("curl/docs/libcurl/opts/CURLOPT_COOKIEFILE.3", 3386),
                 ("curl/docs/libcurl/opts/CURLOPT_COOKIEJAR.3", 3167),
@@ -1882,30 +2724,18 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLOPT_DEBUGFUNCTION.3", 5412),
                 ("curl/docs/libcurl/opts/CURLOPT_DEFAULT_PROTOCOL.3", 2973),
                 ("curl/docs/libcurl/opts/CURLOPT_DIRLISTONLY.3", 2913),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_DISALLOW_USERNAME_IN_URL.3",
-                    2133
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_DISALLOW_USERNAME_IN_URL.3", 2133),
                 ("curl/docs/libcurl/opts/CURLOPT_DNS_CACHE_TIMEOUT.3", 2889),
                 ("curl/docs/libcurl/opts/CURLOPT_DNS_INTERFACE.3", 2389),
                 ("curl/docs/libcurl/opts/CURLOPT_DNS_LOCAL_IP4.3", 2469),
                 ("curl/docs/libcurl/opts/CURLOPT_DNS_LOCAL_IP6.3", 2467),
                 ("curl/docs/libcurl/opts/CURLOPT_DNS_SERVERS.3", 2518),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_DNS_SHUFFLE_ADDRESSES.3",
-                    2730
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_DNS_USE_GLOBAL_CACHE.3",
-                    2431
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_DNS_SHUFFLE_ADDRESSES.3", 2730),
+                ("curl/docs/libcurl/opts/CURLOPT_DNS_USE_GLOBAL_CACHE.3", 2431),
                 ("curl/docs/libcurl/opts/CURLOPT_DOH_URL.3", 2844),
                 ("curl/docs/libcurl/opts/CURLOPT_EGDSOCKET.3", 2197),
                 ("curl/docs/libcurl/opts/CURLOPT_ERRORBUFFER.3", 3498),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_EXPECT_100_TIMEOUT_MS.3",
-                    2261
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_EXPECT_100_TIMEOUT_MS.3", 2261),
                 ("curl/docs/libcurl/opts/CURLOPT_FAILONERROR.3", 2680),
                 ("curl/docs/libcurl/opts/CURLOPT_FILETIME.3", 2421),
                 ("curl/docs/libcurl/opts/CURLOPT_FNMATCH_DATA.3", 2356),
@@ -1916,29 +2746,17 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLOPT_FTPPORT.3", 3221),
                 ("curl/docs/libcurl/opts/CURLOPT_FTPSSLAUTH.3", 2437),
                 ("curl/docs/libcurl/opts/CURLOPT_FTP_ACCOUNT.3", 2197),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_FTP_ALTERNATIVE_TO_USER.3",
-                    2407
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_FTP_CREATE_MISSING_DIRS.3",
-                    3186
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_FTP_ALTERNATIVE_TO_USER.3", 2407),
+                ("curl/docs/libcurl/opts/CURLOPT_FTP_CREATE_MISSING_DIRS.3", 3186),
                 ("curl/docs/libcurl/opts/CURLOPT_FTP_FILEMETHOD.3", 2906),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_FTP_RESPONSE_TIMEOUT.3",
-                    2562
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_FTP_RESPONSE_TIMEOUT.3", 2562),
                 ("curl/docs/libcurl/opts/CURLOPT_FTP_SKIP_PASV_IP.3", 2494),
                 ("curl/docs/libcurl/opts/CURLOPT_FTP_SSL_CCC.3", 2548),
                 ("curl/docs/libcurl/opts/CURLOPT_FTP_USE_EPRT.3", 1949),
                 ("curl/docs/libcurl/opts/CURLOPT_FTP_USE_EPSV.3", 2274),
                 ("curl/docs/libcurl/opts/CURLOPT_FTP_USE_PRET.3", 2173),
                 ("curl/docs/libcurl/opts/CURLOPT_GSSAPI_DELEGATION.3", 2417),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_HAPPY_EYEBALLS_TIMEOUT_MS.3",
-                    2467
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_HAPPY_EYEBALLS_TIMEOUT_MS.3", 2467),
                 ("curl/docs/libcurl/opts/CURLOPT_HAPROXYPROTOCOL.3", 2178),
                 ("curl/docs/libcurl/opts/CURLOPT_HEADER.3", 2617),
                 ("curl/docs/libcurl/opts/CURLOPT_HEADERDATA.3", 2588),
@@ -1951,19 +2769,10 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLOPT_HTTPHEADER.3", 5484),
                 ("curl/docs/libcurl/opts/CURLOPT_HTTPPOST.3", 3256),
                 ("curl/docs/libcurl/opts/CURLOPT_HTTPPROXYTUNNEL.3", 2905),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_HTTP_CONTENT_DECODING.3",
-                    2182
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_HTTP_TRANSFER_DECODING.3",
-                    2158
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_HTTP_CONTENT_DECODING.3", 2182),
+                ("curl/docs/libcurl/opts/CURLOPT_HTTP_TRANSFER_DECODING.3", 2158),
                 ("curl/docs/libcurl/opts/CURLOPT_HTTP_VERSION.3", 3812),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_IGNORE_CONTENT_LENGTH.3",
-                    2603
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_IGNORE_CONTENT_LENGTH.3", 2603),
                 ("curl/docs/libcurl/opts/CURLOPT_INFILESIZE.3", 2644),
                 ("curl/docs/libcurl/opts/CURLOPT_INFILESIZE_LARGE.3", 2632),
                 ("curl/docs/libcurl/opts/CURLOPT_INTERFACE.3", 2878),
@@ -1973,10 +2782,7 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLOPT_IOCTLFUNCTION.3", 3422),
                 ("curl/docs/libcurl/opts/CURLOPT_IPRESOLVE.3", 2285),
                 ("curl/docs/libcurl/opts/CURLOPT_ISSUERCERT.3", 2910),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_KEEP_SENDING_ON_ERROR.3",
-                    2480
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_KEEP_SENDING_ON_ERROR.3", 2480),
                 ("curl/docs/libcurl/opts/CURLOPT_KEYPASSWD.3", 2510),
                 ("curl/docs/libcurl/opts/CURLOPT_KRBLEVEL.3", 2373),
                 ("curl/docs/libcurl/opts/CURLOPT_LOCALPORT.3", 2216),
@@ -1992,14 +2798,8 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLOPT_MAXFILESIZE.3", 2375),
                 ("curl/docs/libcurl/opts/CURLOPT_MAXFILESIZE_LARGE.3", 2472),
                 ("curl/docs/libcurl/opts/CURLOPT_MAXREDIRS.3", 2327),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_MAX_RECV_SPEED_LARGE.3",
-                    2282
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_MAX_SEND_SPEED_LARGE.3",
-                    2343
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_MAX_RECV_SPEED_LARGE.3", 2282),
+                ("curl/docs/libcurl/opts/CURLOPT_MAX_SEND_SPEED_LARGE.3", 2343),
                 ("curl/docs/libcurl/opts/CURLOPT_MIMEPOST.3", 2033),
                 ("curl/docs/libcurl/opts/CURLOPT_NETRC.3", 3485),
                 ("curl/docs/libcurl/opts/CURLOPT_NETRC_FILE.3", 2333),
@@ -2040,39 +2840,21 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_CAPATH.3", 2745),
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_CRLFILE.3", 3180),
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_KEYPASSWD.3", 2438),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_PROXY_PINNEDPUBLICKEY.3",
-                    4380
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_PROXY_PINNEDPUBLICKEY.3", 4380),
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_SERVICE_NAME.3", 2263),
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_SSLCERT.3", 2989),
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_SSLCERTTYPE.3", 2690),
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_SSLKEY.3", 2736),
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_SSLKEYTYPE.3", 2508),
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_SSLVERSION.3", 3549),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_PROXY_SSL_CIPHER_LIST.3",
-                    3248
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_PROXY_SSL_CIPHER_LIST.3", 3248),
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_SSL_OPTIONS.3", 3022),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_PROXY_SSL_VERIFYHOST.3",
-                    3466
-                ),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_PROXY_SSL_VERIFYPEER.3",
-                    3805
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_PROXY_SSL_VERIFYHOST.3", 3466),
+                ("curl/docs/libcurl/opts/CURLOPT_PROXY_SSL_VERIFYPEER.3", 3805),
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_TLS13_CIPHERS.3", 2792),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_PROXY_TLSAUTH_PASSWORD.3",
-                    2574
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_PROXY_TLSAUTH_PASSWORD.3", 2574),
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_TLSAUTH_TYPE.3", 2811),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_PROXY_TLSAUTH_USERNAME.3",
-                    2588
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_PROXY_TLSAUTH_USERNAME.3", 2588),
                 ("curl/docs/libcurl/opts/CURLOPT_PROXY_TRANSFER_MODE.3", 2442),
                 ("curl/docs/libcurl/opts/CURLOPT_PUT.3", 1828),
                 ("curl/docs/libcurl/opts/CURLOPT_QUOTE.3", 4271),
@@ -2085,10 +2867,7 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLOPT_REQUEST_TARGET.3", 2083),
                 ("curl/docs/libcurl/opts/CURLOPT_RESOLVE.3", 4008),
                 ("curl/docs/libcurl/opts/CURLOPT_RESOLVER_START_DATA.3", 2298),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_RESOLVER_START_FUNCTION.3",
-                    2970
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_RESOLVER_START_FUNCTION.3", 2970),
                 ("curl/docs/libcurl/opts/CURLOPT_RESUME_FROM.3", 2680),
                 ("curl/docs/libcurl/opts/CURLOPT_RESUME_FROM_LARGE.3", 2845),
                 ("curl/docs/libcurl/opts/CURLOPT_RTSP_CLIENT_CSEQ.3", 2064),
@@ -2107,16 +2886,10 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLOPT_SOCKOPTFUNCTION.3", 5019),
                 ("curl/docs/libcurl/opts/CURLOPT_SOCKS5_AUTH.3", 2564),
                 ("curl/docs/libcurl/opts/CURLOPT_SOCKS5_GSSAPI_NEC.3", 2258),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_SOCKS5_GSSAPI_SERVICE.3",
-                    2385
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_SOCKS5_GSSAPI_SERVICE.3", 2385),
                 ("curl/docs/libcurl/opts/CURLOPT_SSH_AUTH_TYPES.3", 2425),
                 ("curl/docs/libcurl/opts/CURLOPT_SSH_COMPRESSION.3", 2178),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_SSH_HOST_PUBLIC_KEY_MD5.3",
-                    2359
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_SSH_HOST_PUBLIC_KEY_MD5.3", 2359),
                 ("curl/docs/libcurl/opts/CURLOPT_SSH_KEYDATA.3", 2444),
                 ("curl/docs/libcurl/opts/CURLOPT_SSH_KEYFUNCTION.3", 4972),
                 ("curl/docs/libcurl/opts/CURLOPT_SSH_KNOWNHOSTS.3", 2499),
@@ -2144,10 +2917,7 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/docs/libcurl/opts/CURLOPT_STREAM_DEPENDS.3", 2743),
                 ("curl/docs/libcurl/opts/CURLOPT_STREAM_DEPENDS_E.3", 2892),
                 ("curl/docs/libcurl/opts/CURLOPT_STREAM_WEIGHT.3", 3156),
-                (
-                    "curl/docs/libcurl/opts/CURLOPT_SUPPRESS_CONNECT_HEADERS.3",
-                    3099
-                ),
+                ("curl/docs/libcurl/opts/CURLOPT_SUPPRESS_CONNECT_HEADERS.3", 3099),
                 ("curl/docs/libcurl/opts/CURLOPT_TCP_FASTOPEN.3", 2106),
                 ("curl/docs/libcurl/opts/CURLOPT_TCP_KEEPALIVE.3", 2377),
                 ("curl/docs/libcurl/opts/CURLOPT_TCP_KEEPIDLE.3", 2275),
@@ -3747,26 +4517,14 @@ fn curl_sys_get_more_info_from_build_script() {
                 ("curl/tests/python_dependencies/impacket/LICENSE", 3585),
                 ("curl/tests/python_dependencies/impacket/__init__.py", 777),
                 ("curl/tests/python_dependencies/impacket/nmb.py", 35940),
-                (
-                    "curl/tests/python_dependencies/impacket/nt_errors.py",
-                    388723
-                ),
+                ("curl/tests/python_dependencies/impacket/nt_errors.py", 388723),
                 ("curl/tests/python_dependencies/impacket/ntlm.py", 41265),
                 ("curl/tests/python_dependencies/impacket/smb.py", 151624),
                 ("curl/tests/python_dependencies/impacket/smb3.py", 71471),
-                (
-                    "curl/tests/python_dependencies/impacket/smb3structs.py",
-                    40682
-                ),
-                (
-                    "curl/tests/python_dependencies/impacket/smbserver.py",
-                    194799
-                ),
+                ("curl/tests/python_dependencies/impacket/smb3structs.py", 40682),
+                ("curl/tests/python_dependencies/impacket/smbserver.py", 194799),
                 ("curl/tests/python_dependencies/impacket/spnego.py", 13898),
-                (
-                    "curl/tests/python_dependencies/impacket/structure.py",
-                    25249
-                ),
+                ("curl/tests/python_dependencies/impacket/structure.py", 25249),
                 ("curl/tests/python_dependencies/impacket/uuid.py", 2636),
                 ("curl/tests/python_dependencies/impacket/version.py", 357),
                 ("curl/tests/rtspserver.pl", 3013),
@@ -3867,11 +4625,7 @@ fn curl_sys_get_more_info_from_build_script() {
 #[test]
 fn threed_ice_sys_build_script_includes() {
     assert_eq!(
-        Report::from_package(
-            "a",
-            "1",
-            tar_package("threed-ice-sys-0.3.0-extract_crate-1.0.0")
-        ),
+        Report::from_package("a", "1", tar_package("threed-ice-sys-0.3.0-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -3905,123 +4659,45 @@ fn threed_ice_sys_build_script_includes() {
                 ("build/source/test/GenerateSystemMatrix.c", 4799),
                 ("build/source/test/Makefile", 12579),
                 ("build/source/test/mc2rm/steady/2dies_background.stk", 1055),
-                (
-                    "build/source/test/mc2rm/steady/2dies_four_elements.stk",
-                    1067
-                ),
+                ("build/source/test/mc2rm/steady/2dies_four_elements.stk", 1067),
                 ("build/source/test/mc2rm/steady/output_background.txt", 22),
-                (
-                    "build/source/test/mc2rm/steady/output_four_elements.txt",
-                    22
-                ),
+                ("build/source/test/mc2rm/steady/output_four_elements.txt", 22),
                 ("build/source/test/mc2rm/steady/system_matrix.txt", 5777000),
-                (
-                    "build/source/test/mc2rm/transient/2dies_background.stk",
-                    1084
-                ),
-                (
-                    "build/source/test/mc2rm/transient/2dies_four_elements.stk",
-                    1096
-                ),
-                (
-                    "build/source/test/mc2rm/transient/output_background.txt",
-                    2640
-                ),
-                (
-                    "build/source/test/mc2rm/transient/output_four_elements.txt",
-                    2640
-                ),
-                (
-                    "build/source/test/mc2rm/transient/system_matrix.txt",
-                    5777000
-                ),
+                ("build/source/test/mc2rm/transient/2dies_background.stk", 1084),
+                ("build/source/test/mc2rm/transient/2dies_four_elements.stk", 1096),
+                ("build/source/test/mc2rm/transient/output_background.txt", 2640),
+                ("build/source/test/mc2rm/transient/output_four_elements.txt", 2640),
+                ("build/source/test/mc2rm/transient/system_matrix.txt", 5777000),
                 ("build/source/test/mc4rm/steady/2dies_background.stk", 1163),
-                (
-                    "build/source/test/mc4rm/steady/2dies_four_elements.stk",
-                    1186
-                ),
+                ("build/source/test/mc4rm/steady/2dies_four_elements.stk", 1186),
                 ("build/source/test/mc4rm/steady/output_background.txt", 22),
-                (
-                    "build/source/test/mc4rm/steady/output_four_elements.txt",
-                    22
-                ),
+                ("build/source/test/mc4rm/steady/output_four_elements.txt", 22),
                 ("build/source/test/mc4rm/steady/system_matrix.txt", 17444420),
-                (
-                    "build/source/test/mc4rm/transient/2dies_background.stk",
-                    1193
-                ),
-                (
-                    "build/source/test/mc4rm/transient/2dies_four_elements.stk",
-                    1215
-                ),
-                (
-                    "build/source/test/mc4rm/transient/output_background.txt",
-                    2640
-                ),
-                (
-                    "build/source/test/mc4rm/transient/output_four_elements.txt",
-                    2640
-                ),
-                (
-                    "build/source/test/mc4rm/transient/system_matrix.txt",
-                    17444420
-                ),
+                ("build/source/test/mc4rm/transient/2dies_background.stk", 1193),
+                ("build/source/test/mc4rm/transient/2dies_four_elements.stk", 1215),
+                ("build/source/test/mc4rm/transient/output_background.txt", 2640),
+                ("build/source/test/mc4rm/transient/output_four_elements.txt", 2640),
+                ("build/source/test/mc4rm/transient/system_matrix.txt", 17444420),
                 ("build/source/test/pf2rm/steady/2dies_background.stk", 964),
-                (
-                    "build/source/test/pf2rm/steady/2dies_four_elements.stk",
-                    976
-                ),
+                ("build/source/test/pf2rm/steady/2dies_four_elements.stk", 976),
                 ("build/source/test/pf2rm/steady/output_background.txt", 22),
-                (
-                    "build/source/test/pf2rm/steady/output_four_elements.txt",
-                    22
-                ),
+                ("build/source/test/pf2rm/steady/output_four_elements.txt", 22),
                 ("build/source/test/pf2rm/steady/system_matrix.txt", 5517300),
-                (
-                    "build/source/test/pf2rm/transient/2dies_background.stk",
-                    993
-                ),
-                (
-                    "build/source/test/pf2rm/transient/2dies_four_elements.stk",
-                    1005
-                ),
-                (
-                    "build/source/test/pf2rm/transient/output_background.txt",
-                    2640
-                ),
-                (
-                    "build/source/test/pf2rm/transient/output_four_elements.txt",
-                    2640
-                ),
-                (
-                    "build/source/test/pf2rm/transient/system_matrix.txt",
-                    5517300
-                ),
+                ("build/source/test/pf2rm/transient/2dies_background.stk", 993),
+                ("build/source/test/pf2rm/transient/2dies_four_elements.stk", 1005),
+                ("build/source/test/pf2rm/transient/output_background.txt", 2640),
+                ("build/source/test/pf2rm/transient/output_four_elements.txt", 2640),
+                ("build/source/test/pf2rm/transient/system_matrix.txt", 5517300),
                 ("build/source/test/solid/steady/1die_background.stk", 811),
                 ("build/source/test/solid/steady/1die_four_elements.stk", 820),
                 ("build/source/test/solid/steady/output_background.txt", 22),
-                (
-                    "build/source/test/solid/steady/output_four_elements.txt",
-                    22
-                ),
+                ("build/source/test/solid/steady/output_four_elements.txt", 22),
                 ("build/source/test/solid/steady/system_matrix.txt", 2363800),
                 ("build/source/test/solid/transient/1die_background.stk", 838),
-                (
-                    "build/source/test/solid/transient/1die_four_elements.stk",
-                    847
-                ),
-                (
-                    "build/source/test/solid/transient/output_background.txt",
-                    2640
-                ),
-                (
-                    "build/source/test/solid/transient/output_four_elements.txt",
-                    2639
-                ),
-                (
-                    "build/source/test/solid/transient/system_matrix.txt",
-                    2363800
-                )
+                ("build/source/test/solid/transient/1die_four_elements.stk", 847),
+                ("build/source/test/solid/transient/output_background.txt", 2640),
+                ("build/source/test/solid/transient/output_four_elements.txt", 2639),
+                ("build/source/test/solid/transient/system_matrix.txt", 2363800)
             ]
             .iter()
             .map(|(p, s)| (p.to_string(), *s))
@@ -4046,11 +4722,7 @@ fn threed_ice_sys_build_script_includes() {
 #[test]
 fn lw_webdriver_with_big_binaries() {
     assert_eq!(
-        Report::from_package(
-            "a",
-            "1",
-            tar_package("lw_webdriver-0.4.1-extract_crate-1.0.0")
-        ),
+        Report::from_package("a", "1", tar_package("lw_webdriver-0.4.1-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -4099,11 +4771,7 @@ fn falcon_raptor_typescript_with_false_positive_potential_waste() {
 #[test]
 fn deno_typescript() {
     assert_eq!(
-        Report::from_package(
-            "a",
-            "1",
-            tar_package("deno_typescript-0.36.0-extract_crate-1.0.0")
-        ),
+        Report::from_package("a", "1", tar_package("deno_typescript-0.36.0-extract_crate-1.0.0")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),
@@ -4118,11 +4786,7 @@ fn deno_typescript() {
 #[test]
 fn cookie_factory() {
     assert_eq!(
-        Report::from_package(
-            "a",
-            "1",
-            tar_package("cookie_factory-0.3.1-extract_crate-0.3.1")
-        ),
+        Report::from_package("a", "1", tar_package("cookie_factory-0.3.1-extract_crate-0.3.1")),
         Report::Version {
             crate_name: "a".into(),
             crate_version: "1".to_string(),

@@ -280,11 +280,7 @@ fn two_versions_of_same_crate() {
             crate_version: "1".into(),
             total_size_in_bytes: 1,
             total_files: 4,
-            wasted_files: vec![
-                ("a.a".into(), 20),
-                ("b/a.b".into(), 20),
-                ("c/a.b".into(), 10)
-            ],
+            wasted_files: vec![("a.a".into(), 20), ("b/a.b".into(), 20), ("c/a.b".into(), 10)],
             suggested_fix: Some(Fix::ImprovedInclude {
                 include: vec![],
                 include_removed: vec![],
@@ -304,11 +300,7 @@ fn two_versions_of_same_crate() {
             crate_version: "2".into(),
             total_size_in_bytes: 2,
             total_files: 5,
-            wasted_files: vec![
-                ("a.a".into(), 40),
-                ("c/a.b".into(), 50),
-                ("d/a.c".into(), 90)
-            ],
+            wasted_files: vec![("a.a".into(), 40), ("c/a.b".into(), 50), ("d/a.c".into(), 90)],
             suggested_fix: Some(Fix::ImprovedInclude {
                 include: vec![],
                 include_removed: vec![],
@@ -358,11 +350,7 @@ fn two_versions_of_different_crate() {
             crate_version: "1".into(),
             total_size_in_bytes: 1,
             total_files: 4,
-            wasted_files: vec![
-                ("a.a".into(), 20),
-                ("b/a.b".into(), 20),
-                ("c/a.b".into(), 10)
-            ],
+            wasted_files: vec![("a.a".into(), 20), ("b/a.b".into(), 20), ("c/a.b".into(), 10)],
             suggested_fix: Some(Fix::ImprovedInclude {
                 include: vec![],
                 include_removed: vec![],
@@ -382,11 +370,7 @@ fn two_versions_of_different_crate() {
             crate_version: "1".into(),
             total_size_in_bytes: 2,
             total_files: 5,
-            wasted_files: vec![
-                ("a.a".into(), 40),
-                ("c/a.b".into(), 50),
-                ("d/a.c".into(), 90)
-            ],
+            wasted_files: vec![("a.a".into(), 40), ("c/a.b".into(), 50), ("d/a.c".into(), 90)],
             suggested_fix: Some(Fix::ImprovedInclude {
                 include: vec![],
                 include_removed: vec![],

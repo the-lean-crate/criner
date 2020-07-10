@@ -91,15 +91,10 @@ impl<'a> SqlConvert for model::TaskResult {
                             entries_meta_data.len() as i64
                         ])?;
                         for entry in entries_meta_data.iter() {
-                            let model::TarHeader {
-                                path,
-                                size,
-                                entry_type,
-                            } = entry;
+                            let model::TarHeader { path, size, entry_type } = entry;
                             insert_crate_entry.execute(params![
                                 id,
-                                std::str::from_utf8(path)
-                                    .expect("utf8 path in crate - lets see how long this is true"),
+                                std::str::from_utf8(path).expect("utf8 path in crate - lets see how long this is true"),
                                 *size as i64,
                                 entry_type,
                                 rusqlite::types::Null
@@ -107,15 +102,10 @@ impl<'a> SqlConvert for model::TaskResult {
                             num_crate_entries += 1;
                         }
                         for (entry, data) in selected_entries.iter() {
-                            let model::TarHeader {
-                                path,
-                                size,
-                                entry_type,
-                            } = entry;
+                            let model::TarHeader { path, size, entry_type } = entry;
                             insert_crate_entry.execute(params![
                                 id,
-                                std::str::from_utf8(path)
-                                    .expect("utf8 path in crate - lets see how long this is true"),
+                                std::str::from_utf8(path).expect("utf8 path in crate - lets see how long this is true"),
                                 *size as i64,
                                 entry_type,
                                 data

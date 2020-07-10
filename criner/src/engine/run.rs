@@ -265,10 +265,7 @@ fn wallclock(since: SystemTime) -> String {
     )
 }
 
-fn context_stream(
-    db: &Db,
-    start_of_computation: SystemTime,
-) -> impl futures_util::stream::Stream<Item = Event> {
+fn context_stream(db: &Db, start_of_computation: SystemTime) -> impl futures_util::stream::Stream<Item = Event> {
     prodash::tui::ticker(Duration::from_secs(1)).map({
         let db = db.clone();
         move |_| {
@@ -280,10 +277,7 @@ fn context_stream(
                     let lines = vec![
                         Line::Text(wallclock(start_of_computation)),
                         Line::Title("Durations".into()),
-                        Line::Text(format!(
-                            "fetch-crate-versions: {:?}",
-                            c.durations.fetch_crate_versions
-                        )),
+                        Line::Text(format!("fetch-crate-versions: {:?}", c.durations.fetch_crate_versions)),
                         Line::Title("Counts".into()),
                         Line::Text(format!("crate-versions: {}", c.counts.crate_versions)),
                         Line::Text(format!("        crates: {}", c.counts.crates)),

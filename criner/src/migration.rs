@@ -20,8 +20,7 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
     {
         log::info!("begin change");
         let transaction = connection.transaction()?;
-        let mut statement =
-            transaction.prepare(&format!("UPDATE {} SET key=?1 WHERE key=?2;", table_name))?;
+        let mut statement = transaction.prepare(&format!("UPDATE {} SET key=?1 WHERE key=?2;", table_name))?;
         for key in keys.into_iter() {
             statement.execute(params![
                 format!(
@@ -64,11 +63,7 @@ fn migrate_iterate_assets_and_update_db(db_path: impl AsRef<Path>) -> crate::Res
         if entry.file_name != std::ffi::OsString::from("download:1.0.0.crate") {
             let new_name = entry.path().parent().unwrap().join("download:1.0.0.crate");
             std::fs::rename(entry.path(), &new_name)?;
-            log::warn!(
-                "Renamed '{}' to '{}'",
-                entry.path().display(),
-                new_name.display()
-            );
+            log::warn!("Renamed '{}' to '{}'", entry.path().display(), new_name.display());
         }
         let file_size = entry.metadata.as_ref().unwrap().as_ref().unwrap().len();
         let mut iter = entry.parent_path().iter().skip(3);

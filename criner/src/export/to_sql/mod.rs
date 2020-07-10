@@ -6,9 +6,7 @@ mod result;
 mod task;
 
 pub fn to_seconds_since_epoch(time: std::time::SystemTime) -> i64 {
-    time.duration_since(std::time::UNIX_EPOCH)
-        .unwrap()
-        .as_secs() as i64
+    time.duration_since(std::time::UNIX_EPOCH).unwrap().as_secs() as i64
 }
 
 pub trait SqlConvert {

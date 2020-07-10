@@ -3,10 +3,7 @@ use crate::model;
 use rusqlite::{Connection, NO_PARAMS};
 use std::path::Path;
 
-pub fn run_blocking(
-    source_db: impl AsRef<Path>,
-    destination_db: impl AsRef<Path>,
-) -> crate::Result<()> {
+pub fn run_blocking(source_db: impl AsRef<Path>, destination_db: impl AsRef<Path>) -> crate::Result<()> {
     if destination_db.as_ref().is_file() {
         return Err(crate::Error::Message(format!(
             "Destination database at '{}' does already exist - this is currently unsupported",
@@ -40,10 +37,7 @@ where
     for<'a> T: SqlConvert + From<&'a [u8]>,
 {
     output.execute_batch(T::init_table_statement())?;
-    let mut istm = input.prepare(&format!(
-        "SELECT key, data FROM '{}'",
-        T::source_table_name()
-    ))?;
+    let mut istm = input.prepare(&format!("SELECT key, data FROM '{}'", T::source_table_name()))?;
     let transaction = output.transaction()?;
     let mut count = 0;
     let start = std::time::SystemTime::now();

@@ -34,8 +34,7 @@ pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
             glob,
         } => criner::run::blocking(
             db_path,
-            repository
-                .unwrap_or_else(|| std::env::temp_dir().join("criner-crates-io-bare-index.git")),
+            repository.unwrap_or_else(|| std::env::temp_dir().join("criner-crates-io-bare-index.git")),
             time_limit.map(|d| std::time::SystemTime::now().add(*d)),
             io_bound_processors,
             cpu_bound_processors,

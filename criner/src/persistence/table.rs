@@ -56,10 +56,7 @@ pub fn new_key_value_insertion<'conn>(
     table_name: &str,
     connection: &'conn rusqlite::Connection,
 ) -> Result<rusqlite::Statement<'conn>> {
-    Ok(connection.prepare(&format!(
-        "REPLACE INTO '{}' (key, data) VALUES (?1, ?2)",
-        table_name
-    ))?)
+    Ok(connection.prepare(&format!("REPLACE INTO '{}' (key, data) VALUES (?1, ?2)", table_name))?)
 }
 
 pub fn new_key_insertion<'conn>(
@@ -77,8 +74,7 @@ where
 {
     Ok(statement
         .query_map(NO_PARAMS, |r| {
-            r.get::<_, Vec<u8>>(0)
-                .map(|v| StorageItem::from(v.as_slice()))
+            r.get::<_, Vec<u8>>(0).map(|v| StorageItem::from(v.as_slice()))
         })?
         .map(|r| r.map_err(Into::into)))
 }
@@ -105,10 +101,7 @@ pub trait TableAccess {
     fn connection(&self) -> &ThreadSafeConnection;
     fn table_name() -> &'static str;
 
-    fn merge(
-        new_item: &Self::InsertItem,
-        _existing_item: Option<Self::StorageItem>,
-    ) -> Self::StorageItem {
+    fn merge(new_item: &Self::InsertItem, _existing_item: Option<Self::StorageItem>) -> Self::StorageItem {
         Self::StorageItem::from(new_item.clone())
     }
 
@@ -141,11 +134,7 @@ pub trait TableAccess {
             .connection()
             .lock()
             .query_row(
-                &format!(
-                    "SELECT data FROM {} WHERE key = '{}'",
-                    Self::table_name(),
-                    key.as_ref()
-                ),
+                &format!("SELECT data FROM {} WHERE key = '{}'", Self::table_name(), key.as_ref()),
                 NO_PARAMS,
                 |r| r.get::<_, Vec<u8>>(0),
             )
@@ -163,28 +152,17 @@ pub trait TableAccess {
     ) -> Result<Self::StorageItem> {
         retry_on_db_busy(progress, || {
             let mut guard = self.connection().lock();
-            let transaction =
-                guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+            let transaction = guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
             let new_value = transaction
                 .query_row(
-                    &format!(
-                        "SELECT data FROM {} WHERE key = '{}'",
-                        Self::table_name(),
-                        key.as_ref()
-                    ),
+                    &format!("SELECT data FROM {} WHERE key = '{}'", Self::table_name(), key.as_ref()),
                     NO_PARAMS,
                     |r| r.get::<_, Vec<u8>>(0),
                 )
                 .optional()?
-                .map_or_else(
-                    || f(Self::StorageItem::default()),
-                    |d| f(d.as_slice().into()),
-                );
+                .map_or_else(|| f(Self::StorageItem::default()), |d| f(d.as_slice().into()));
             transaction.execute(
-                &format!(
-                    "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
-                    Self::table_name()
-                ),
+                &format!("REPLACE INTO {} (key, data) VALUES (?1, ?2)", Self::table_name()),
                 params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
             )?;
             transaction.commit()?;
@@ -202,17 +180,12 @@ pub trait TableAccess {
     ) -> Result<Self::StorageItem> {
         retry_on_db_busy(Some(progress), || {
             let mut guard = self.connection().lock();
-            let transaction =
-                guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+            let transaction = guard.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
 
             let new_value = {
                 let maybe_vec = transaction
                     .query_row(
-                        &format!(
-                            "SELECT data FROM {} WHERE key = '{}'",
-                            Self::table_name(),
-                            key.as_ref()
-                        ),
+                        &format!("SELECT data FROM {} WHERE key = '{}'", Self::table_name(), key.as_ref()),
                         NO_PARAMS,
                         |r| r.get::<_, Vec<u8>>(0),
                     )
@@ -220,10 +193,7 @@ pub trait TableAccess {
                 Self::merge(item, maybe_vec.map(|v| v.as_slice().into()))
             };
             transaction.execute(
-                &format!(
-                    "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
-                    Self::table_name()
-                ),
+                &format!("REPLACE INTO {} (key, data) VALUES (?1, ?2)", Self::table_name()),
                 params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
             )?;
             transaction.commit()?;
@@ -231,18 +201,10 @@ pub trait TableAccess {
         })
     }
 
-    fn insert(
-        &self,
-        progress: &mut prodash::tree::Item,
-        key: impl AsRef<str>,
-        v: &Self::InsertItem,
-    ) -> Result<()> {
+    fn insert(&self, progress: &mut prodash::tree::Item, key: impl AsRef<str>, v: &Self::InsertItem) -> Result<()> {
         retry_on_db_busy(Some(progress), || {
             self.connection().lock().execute(
-                &format!(
-                    "REPLACE INTO {} (key, data) VALUES (?1, ?2)",
-                    Self::table_name()
-                ),
+                &format!("REPLACE INTO {} (key, data) VALUES (?1, ?2)", Self::table_name()),
                 params![key.as_ref(), rmp_serde::to_vec(&Self::merge(v, None))?],
             )?;
             Ok(())
@@ -250,10 +212,7 @@ pub trait TableAccess {
     }
 }
 
-fn retry_on_db_busy<T>(
-    mut progress: Option<&mut prodash::tree::Item>,
-    mut f: impl FnMut() -> Result<T>,
-) -> Result<T> {
+fn retry_on_db_busy<T>(mut progress: Option<&mut prodash::tree::Item>, mut f: impl FnMut() -> Result<T>) -> Result<T> {
     use crate::Error;
     use rusqlite::ffi::Error as SqliteFFIError;
     use rusqlite::ffi::ErrorCode as SqliteFFIErrorCode;
@@ -278,11 +237,7 @@ fn retry_on_db_busy<T>(
                 )),
             ) => {
                 if total_wait_time >= max_wait_ms {
-                    log::warn!(
-                        "Giving up to wait for {:?} after {:?})",
-                        err,
-                        total_wait_time
-                    );
+                    log::warn!("Giving up to wait for {:?} after {:?})", err, total_wait_time);
                     return Err(err);
                 }
                 log::warn!(
@@ -317,16 +272,10 @@ impl TableAccess for TaskTable {
     fn table_name() -> &'static str {
         "task"
     }
-    fn merge(
-        new_task: &Self::InsertItem,
-        existing_task: Option<Self::StorageItem>,
-    ) -> Self::StorageItem {
+    fn merge(new_task: &Self::InsertItem, existing_task: Option<Self::StorageItem>) -> Self::StorageItem {
         Task {
             stored_at: SystemTime::now(),
-            ..existing_task.map_or_else(
-                || new_task.clone(),
-                |existing_task| existing_task.merge(new_task),
-            )
+            ..existing_task.map_or_else(|| new_task.clone(), |existing_task| existing_task.merge(new_task))
         }
     }
 
@@ -345,13 +294,7 @@ impl ReportsTree {
         "report_done"
     }
 
-    pub fn key_buf(
-        crate_name: &str,
-        crate_version: &str,
-        report_name: &str,
-        report_version: &str,
-        buf: &mut String,
-    ) {
+    pub fn key_buf(crate_name: &str, crate_version: &str, report_name: &str, report_version: &str, buf: &mut String) {
         buf.push_str(crate_name);
         buf.push(KEY_SEP_CHAR);
         buf.push_str(crate_version);
@@ -365,11 +308,7 @@ impl ReportsTree {
         self.inner
             .lock()
             .query_row(
-                &format!(
-                    "SELECT key FROM {} where key = '{}'",
-                    Self::table_name(),
-                    key.as_ref()
-                ),
+                &format!("SELECT key FROM {} where key = '{}'", Self::table_name(), key.as_ref()),
                 NO_PARAMS,
                 |_r| Ok(()),
             )
@@ -435,11 +374,9 @@ impl MetaTable {
         Ok(self
             .connection()
             .lock()
-            .query_row(
-                "SELECT key, data FROM meta ORDER BY key DESC limit 1",
-                NO_PARAMS,
-                |r| Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?)),
-            )
+            .query_row("SELECT key, data FROM meta ORDER BY key DESC limit 1", NO_PARAMS, |r| {
+                Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?))
+            })
             .optional()?
             .map(|(k, v)| (k, Context::from(v.as_slice()))))
     }

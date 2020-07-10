@@ -6,28 +6,22 @@ lazy_static! {
     static ref COMPILE_TIME_INCLUDE: regex::bytes::Regex =
         regex::bytes::Regex::new(r##"include_(str|bytes)!\("(?P<include>.+?)"\)"##)
             .expect("valid statically known regex");
-    static ref BUILD_SCRIPT_PATHS: regex::bytes::Regex = regex::bytes::Regex::new(
-        r##""cargo:rerun-if-changed=(?P<path>.+?)"|"(?P<path_like>.+?)""##
-    )
-    .expect("valid statically known regex");
-    static ref STANDARD_EXCLUDES_GLOBSET: globset::GlobSet =
-        globset_from_patterns(standard_exclude_patterns());
-    static ref STANDARD_EXCLUDE_MATCHERS: Vec<(&'static str, globset::GlobMatcher)> =
-        standard_exclude_patterns()
-            .iter()
-            .cloned()
-            .map(|p| (p, make_glob(p).compile_matcher()))
-            .collect();
-    static ref STANDARD_INCLUDE_GLOBS: Vec<globset::Glob> = standard_include_patterns()
+    static ref BUILD_SCRIPT_PATHS: regex::bytes::Regex =
+        regex::bytes::Regex::new(r##""cargo:rerun-if-changed=(?P<path>.+?)"|"(?P<path_like>.+?)""##)
+            .expect("valid statically known regex");
+    static ref STANDARD_EXCLUDES_GLOBSET: globset::GlobSet = globset_from_patterns(standard_exclude_patterns());
+    static ref STANDARD_EXCLUDE_MATCHERS: Vec<(&'static str, globset::GlobMatcher)> = standard_exclude_patterns()
         .iter()
-        .map(|p| make_glob(p))
+        .cloned()
+        .map(|p| (p, make_glob(p).compile_matcher()))
         .collect();
-    static ref STANDARD_INCLUDE_MATCHERS: Vec<(&'static str, globset::GlobMatcher)> =
-        standard_include_patterns()
-            .iter()
-            .cloned()
-            .map(|p| (p, make_glob(p).compile_matcher()))
-            .collect();
+    static ref STANDARD_INCLUDE_GLOBS: Vec<globset::Glob> =
+        standard_include_patterns().iter().map(|p| make_glob(p)).collect();
+    static ref STANDARD_INCLUDE_MATCHERS: Vec<(&'static str, globset::GlobMatcher)> = standard_include_patterns()
+        .iter()
+        .cloned()
+        .map(|p| (p, make_glob(p).compile_matcher()))
+        .collect();
 }
 
 pub fn tar_path_to_utf8_str(mut bytes: &[u8]) -> &str {
@@ -157,16 +151,12 @@ fn standard_include_patterns() -> &'static [&'static str] {
     ]
 }
 
-pub fn globset_from_patterns(
-    patterns: impl IntoIterator<Item = impl AsRef<str>>,
-) -> globset::GlobSet {
+pub fn globset_from_patterns(patterns: impl IntoIterator<Item = impl AsRef<str>>) -> globset::GlobSet {
     let mut builder = globset::GlobSetBuilder::new();
     for pattern in patterns.into_iter() {
         builder.add(make_glob(pattern.as_ref()));
     }
-    builder
-        .build()
-        .expect("multiple globs to always fit into a globset")
+    builder.build().expect("multiple globs to always fit into a globset")
 }
 
 pub fn globset_from_globs_and_patterns(
@@ -180,9 +170,7 @@ pub fn globset_from_globs_and_patterns(
     for pattern in patterns.into_iter() {
         builder.add(make_glob(pattern.as_ref()));
     }
-    builder
-        .build()
-        .expect("multiple globs to always fit into a globset")
+    builder.build().expect("multiple globs to always fit into a globset")
 }
 
 fn split_by_matching_directories(
@@ -198,10 +186,7 @@ fn split_by_matching_directories(
     split_to_matched_and_unmatched(entries, &globs)
 }
 
-fn remove_implicit_includes(
-    include_patterns: &mut Patterns,
-    mut removed_include_patterns: impl AsMut<Patterns>,
-) {
+fn remove_implicit_includes(include_patterns: &mut Patterns, mut removed_include_patterns: impl AsMut<Patterns>) {
     let removed_include_patterns = removed_include_patterns.as_mut();
     let mut current_removed_count = removed_include_patterns.len();
     loop {
@@ -228,10 +213,7 @@ fn remove_implicit_includes(
 /// Note that one could also use negated patterns, so keep the 'pattern to not match', but add a specific negation.
 /// HELP WANTED: This could be done by finding the common ancestors and resolve to patterns that match their children most specifically
 /// See https://github.com/the-lean-crate/criner/issues/2
-fn turn_file_paths_into_patterns(
-    added_include_patterns: Patterns,
-    _pattern_to_not_match: &str,
-) -> Patterns {
+fn turn_file_paths_into_patterns(added_include_patterns: Patterns, _pattern_to_not_match: &str) -> Patterns {
     added_include_patterns
 }
 
@@ -267,11 +249,7 @@ fn find_include_patterns_that_incorporate_exclude_patterns(
     }
 
     remove_implicit_includes(&mut all_include_patterns, &mut removed_include_patterns);
-    (
-        all_include_patterns,
-        added_include_patterns,
-        removed_include_patterns,
-    )
+    (all_include_patterns, added_include_patterns, removed_include_patterns)
 }
 
 fn make_glob(pattern: &str) -> globset::Glob {
@@ -346,10 +324,7 @@ fn matches_in_set_a_but_not_in_set_b(
     let set_a_len = patterns_to_amend.len();
     let all_entries = entries.clone();
     for (pattern_a, glob_a) in set_a {
-        if entries
-            .iter()
-            .any(|e| glob_a.is_match(tar_path_to_utf8_str(&e.path)))
-        {
+        if entries.iter().any(|e| glob_a.is_match(tar_path_to_utf8_str(&e.path))) {
             entries.retain(|e| !glob_a.is_match(tar_path_to_utf8_str(&e.path)));
             if entries.is_empty() {
                 break;
@@ -359,10 +334,7 @@ fn matches_in_set_a_but_not_in_set_b(
                 continue;
             }
 
-            if entries
-                .iter()
-                .any(|e| set_b.is_match(tar_path_to_utf8_str(&e.path)))
-            {
+            if entries.iter().any(|e| set_b.is_match(tar_path_to_utf8_str(&e.path))) {
                 patterns_to_amend.push((*pattern_a).to_string());
             }
         }
@@ -386,10 +358,7 @@ fn matches_in_set_a_but_not_in_set_b(
 /// Takes something like "src/deep/lib.rs" and "../data/foo.bin" and turns it into "src/data/foo.bin", replicating
 /// the way include_str/bytes interprets include paths. Thus it makes these paths relative to the crate, instead of
 /// relative to the source file they are included in.
-fn to_crate_relative_path(
-    source_file_path: impl AsRef<Path>,
-    relative_path: impl AsRef<Path>,
-) -> String {
+fn to_crate_relative_path(source_file_path: impl AsRef<Path>, relative_path: impl AsRef<Path>) -> String {
     use std::path::Component::*;
     let relative_path = relative_path.as_ref();
     let source_path = source_file_path
@@ -437,10 +406,8 @@ fn simplify_standard_excludes_and_match_against_standard_includes(
     compile_time_include: Option<Patterns>,
 ) -> (Vec<TarHeader>, Patterns, Patterns) {
     let compile_time_include = compile_time_include.unwrap_or_default();
-    let include_iter = globset_from_globs_and_patterns(
-        &STANDARD_INCLUDE_GLOBS,
-        compile_time_include.iter().map(|s| s.as_str()),
-    );
+    let include_iter =
+        globset_from_globs_and_patterns(&STANDARD_INCLUDE_GLOBS, compile_time_include.iter().map(|s| s.as_str()));
     matches_in_set_a_but_not_in_set_b(
         existing_exclude,
         &STANDARD_EXCLUDE_MATCHERS,
@@ -506,8 +473,7 @@ fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)
                 v.extend(v.clone().into_iter().map(|p| format!("{}/*", p)));
                 v
             } else {
-                let mut dirs =
-                    optimize_directories(dirs.into_iter().map(|d| format!("{}/*", d)).collect());
+                let mut dirs = optimize_directories(dirs.into_iter().map(|d| format!("{}/*", d)).collect());
                 dirs.extend(v.into_iter().map(|p| format!("{}/*", p)));
                 dirs
             };
@@ -519,16 +485,9 @@ fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)
         .unwrap_or_default()
 }
 
-fn potential_negated_includes(
-    entries: Vec<TarHeader>,
-    patters_to_avoid: globset::GlobSet,
-) -> Option<PotentialWaste> {
-    let (entries_we_would_remove, patterns, _) = matches_in_set_a_but_not_in_set_b(
-        Vec::new(),
-        &STANDARD_EXCLUDE_MATCHERS,
-        &patters_to_avoid,
-        entries,
-    );
+fn potential_negated_includes(entries: Vec<TarHeader>, patters_to_avoid: globset::GlobSet) -> Option<PotentialWaste> {
+    let (entries_we_would_remove, patterns, _) =
+        matches_in_set_a_but_not_in_set_b(Vec::new(), &STANDARD_EXCLUDE_MATCHERS, &patters_to_avoid, entries);
     let negated_patterns: Vec<_> = patterns.into_iter().map(|s| format!("!{}", s)).collect();
     if negated_patterns.is_empty() {
         None
@@ -541,26 +500,13 @@ fn potential_negated_includes(
 }
 
 fn add_to_includes_if_non_default(file_path: &str, include: &mut Patterns) {
-    let recursive_pattern = Path::new(file_path)
-        .parent()
-        .expect("file path as input")
-        .join("**");
-    if !standard_include_patterns()
-        .contains(&recursive_pattern.join("*").to_str().expect("utf8 only"))
-    {
-        include.push(
-            recursive_pattern
-                .join("*.rs")
-                .to_str()
-                .expect("utf 8 only")
-                .to_string(),
-        )
+    let recursive_pattern = Path::new(file_path).parent().expect("file path as input").join("**");
+    if !standard_include_patterns().contains(&recursive_pattern.join("*").to_str().expect("utf8 only")) {
+        include.push(recursive_pattern.join("*.rs").to_str().expect("utf 8 only").to_string())
     }
 }
 
-fn non_greedy_patterns<S: AsRef<str>>(
-    patterns: impl IntoIterator<Item = S>,
-) -> impl Iterator<Item = S> {
+fn non_greedy_patterns<S: AsRef<str>>(patterns: impl IntoIterator<Item = S>) -> impl Iterator<Item = S> {
     patterns
         .into_iter()
         .filter(|p| !p.as_ref().starts_with('*') && p.as_ref().ends_with('*'))
@@ -593,12 +539,9 @@ impl Report {
             }
             None => false,
         };
-        let include_globs = globset_from_globs_and_patterns(
-            &STANDARD_INCLUDE_GLOBS,
-            compile_time_include.iter().map(|s| s.as_str()),
-        );
-        let (included_entries, excluded_entries) =
-            split_to_matched_and_unmatched(entries, &include_globs);
+        let include_globs =
+            globset_from_globs_and_patterns(&STANDARD_INCLUDE_GLOBS, compile_time_include.iter().map(|s| s.as_str()));
+        let (included_entries, excluded_entries) = split_to_matched_and_unmatched(entries, &include_globs);
 
         let compile_time_include_matchers: Vec<_> = compile_time_include
             .iter()
@@ -641,18 +584,16 @@ impl Report {
             split_to_matched_and_unmatched(directories, &exclude_globs);
         let (entries_that_should_be_excluded_by_directory, remaining_entries) =
             split_by_matching_directories(remaining_entries, &directories_that_should_be_excluded);
-        entries_that_should_be_excluded
-            .extend(entries_that_should_be_excluded_by_directory.into_iter());
+        entries_that_should_be_excluded.extend(entries_that_should_be_excluded_by_directory.into_iter());
 
         let fix = if entries_that_should_be_excluded.is_empty() {
             Some(Fix::RemoveExclude)
         } else {
-            let (include, include_added, include_removed) =
-                find_include_patterns_that_incorporate_exclude_patterns(
-                    &entries_that_should_be_excluded,
-                    &remaining_entries,
-                    include,
-                );
+            let (include, include_added, include_removed) = find_include_patterns_that_incorporate_exclude_patterns(
+                &entries_that_should_be_excluded,
+                &remaining_entries,
+                include,
+            );
             if include_added.is_empty() && include_removed.is_empty() {
                 None
             } else {
@@ -680,10 +621,8 @@ impl Report {
             if include_removed.is_empty() {
                 None
             } else {
-                let potential = potential_negated_includes(
-                    entries,
-                    globset_from_patterns(non_greedy_patterns(&include)),
-                );
+                let potential =
+                    potential_negated_includes(entries, globset_from_patterns(non_greedy_patterns(&include)));
                 Some(Fix::ImprovedInclude {
                     include,
                     include_removed,
@@ -701,14 +640,12 @@ impl Report {
         compile_time_include: Option<Patterns>,
         has_build_script: bool,
     ) -> (Option<Fix>, Vec<TarHeader>) {
-        let (potential_waste, _remaining) =
-            split_to_matched_and_unmatched(entries, &STANDARD_EXCLUDES_GLOBSET);
-        let (wasted_files, exclude, exclude_added) =
-            simplify_standard_excludes_and_match_against_standard_includes(
-                potential_waste,
-                exclude,
-                compile_time_include,
-            );
+        let (potential_waste, _remaining) = split_to_matched_and_unmatched(entries, &STANDARD_EXCLUDES_GLOBSET);
+        let (wasted_files, exclude, exclude_added) = simplify_standard_excludes_and_match_against_standard_includes(
+            potential_waste,
+            exclude,
+            compile_time_include,
+        );
         if wasted_files.is_empty() {
             (None, Vec::new())
         } else {
@@ -731,12 +668,7 @@ impl Report {
         config: CargoConfig,
         entries_with_buffer: &[(TarHeader, Vec<u8>)],
         entries: &[TarHeader],
-    ) -> (
-        Option<Patterns>,
-        Option<Patterns>,
-        Option<Patterns>,
-        Option<String>,
-    ) {
+    ) -> (Option<Patterns>, Option<Patterns>, Option<Patterns>, Option<String>) {
         let mut maybe_build_script_path = config.build_script_path().map(|s| s.to_owned());
         let compile_time_includes = {
             let mut includes_parsed_from_files = Vec::new();
@@ -757,8 +689,8 @@ impl Report {
 
             let build_script_name = config.actual_or_expected_build_script_path();
             let maybe_data = find_in_entries(&entries_with_buffer, &entries, build_script_name);
-            maybe_build_script_path = maybe_build_script_path
-                .or_else(|| maybe_data.as_ref().map(|_| build_script_name.to_owned()));
+            maybe_build_script_path =
+                maybe_build_script_path.or_else(|| maybe_data.as_ref().map(|_| build_script_name.to_owned()));
             includes_parsed_from_files.extend(find_paths_mentioned_in_build_script(maybe_data));
 
             if includes_parsed_from_files.is_empty() {

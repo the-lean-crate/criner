@@ -1,9 +1,6 @@
 use crate::model::{db_dump, Context, Crate, CrateVersion, ReportResult, Task, TaskResult};
 
-fn expect<T, E: std::fmt::Display>(
-    r: std::result::Result<T, E>,
-    panic_message: impl FnOnce(E) -> String,
-) -> T {
+fn expect<T, E: std::fmt::Display>(r: std::result::Result<T, E>, panic_message: impl FnOnce(E) -> String) -> T {
     match r {
         Ok(v) => v,
         Err(e) => panic!(panic_message(e)),
@@ -16,11 +13,7 @@ macro_rules! impl_deserialize {
             fn from(b: &[u8]) -> Self {
                 expect(rmp_serde::from_read_ref(b), |e| {
                     format!(
-                        concat!(
-                            "&[u8]: migration should succeed: ",
-                            stringify!($ty),
-                            "{:#?}: {}"
-                        ),
+                        concat!("&[u8]: migration should succeed: ", stringify!($ty), "{:#?}: {}"),
                         rmpv::decode::value::read_value(&mut std::io::Cursor::new(b)).unwrap(),
                         e
                     )

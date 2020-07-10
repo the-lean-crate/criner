@@ -60,11 +60,7 @@ where
     Ok(map)
 }
 
-pub fn vec<T>(
-    rd: impl std::io::Read,
-    name: &'static str,
-    progress: &mut prodash::tree::Item,
-) -> crate::Result<Vec<T>>
+pub fn vec<T>(rd: impl std::io::Read, name: &'static str, progress: &mut prodash::tree::Item) -> crate::Result<Vec<T>>
 where
     T: serde::de::DeserializeOwned,
 {
