@@ -48,3 +48,4 @@ opt-level = 2
 opt-level = 3
 panic = "abort"
 overflow-checks = true
+build-override = { opt-level = 0 }
