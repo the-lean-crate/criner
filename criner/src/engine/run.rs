@@ -68,27 +68,27 @@ pub async fn non_blocking(
     ));
 
     let run = fetch_settings;
-    // let fetch_handle = smol::Task::spawn(repeat_every_s(
-    //     run.every.as_secs() as u32,
-    //     {
-    //         let p = progress.clone();
-    //         move || p.add_child("Fetch Timer")
-    //     },
-    //     deadline,
-    //     run.at_most,
-    //     {
-    //         let db = db.clone();
-    //         let progress = progress.clone();
-    //         move || {
-    //             stage::changes::fetch(
-    //                 crates_io_path.clone(),
-    //                 db.clone(),
-    //                 progress.add_child("crates.io refresh"),
-    //                 deadline,
-    //             )
-    //         }
-    //     },
-    // ));
+    let fetch_handle = smol::Task::spawn(repeat_every_s(
+        run.every.as_secs() as u32,
+        {
+            let p = progress.clone();
+            move || p.add_child("Fetch Timer")
+        },
+        deadline,
+        run.at_most,
+        {
+            let db = db.clone();
+            let progress = progress.clone();
+            move || {
+                stage::changes::fetch(
+                    crates_io_path.clone(),
+                    db.clone(),
+                    progress.add_child("crates.io refresh"),
+                    deadline,
+                )
+            }
+        },
+    ));
 
     let stage = process_settings;
     let processing_handle = smol::Task::spawn(repeat_every_s(
@@ -152,7 +152,7 @@ pub async fn non_blocking(
         },
     ));
 
-    // fetch_handle.await?;
+    fetch_handle.await?;
     db_download_handle.await?;
     report_handle.await?;
     processing_handle.await

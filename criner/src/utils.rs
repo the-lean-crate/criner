@@ -177,17 +177,13 @@ where
     T: Send + 'static,
     F: FnOnce() -> T + Send + 'static,
 {
-    let (tx, rx) = async_channel::bounded(1);
-    let handle = std::thread::spawn(move || drop(futures_lite::future::block_on(tx.send(f()))));
-
+    let unblocked = async move { blocking::Unblock::new(()).with_mut(move |_| f()).await };
     let selector = future::select(
         Timer::new(deadline.duration_since(SystemTime::now()).unwrap_or_default()),
-        rx.recv().boxed_local(),
+        unblocked.boxed(),
     );
-    let res = match selector.await {
+    match selector.await {
         Either::Left((_, _f_as_future)) => Err(Error::DeadlineExceeded(FormatDeadline(deadline))),
-        Either::Right((res, _delay)) => Ok(res.expect("receiving to be working as sender exists")),
-    };
-    handle.join().unwrap();
-    res
+        Either::Right((res, _delay)) => Ok(res),
+    }
 }
