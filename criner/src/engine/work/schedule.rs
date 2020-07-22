@@ -34,8 +34,8 @@ pub async fn tasks(
     krate: &model::CrateVersion,
     mut progress: prodash::tree::Item,
     _mode: Scheduling,
-    perform_io: &piper::Sender<iobound::DownloadRequest>,
-    perform_cpu: &piper::Sender<cpubound::ExtractRequest>,
+    perform_io: &async_channel::Sender<iobound::DownloadRequest>,
+    perform_cpu: &async_channel::Sender<cpubound::ExtractRequest>,
     startup_time: SystemTime,
 ) -> Result<AsyncResult> {
     use SubmitResult::*;
@@ -109,7 +109,7 @@ async fn submit_single<R>(
     startup_time: SystemTime,
     task: model::Task,
     progress: &mut prodash::tree::Item,
-    channel: &piper::Sender<R>,
+    channel: &async_channel::Sender<R>,
     step: u32,
     max_step: u32,
     f: impl FnOnce() -> R,
@@ -125,19 +125,19 @@ async fn submit_single<R>(
         InProgress(_) => {
             if startup_time > task.stored_at {
                 configure();
-                channel.send(f()).await;
+                channel.send(f()).await.unwrap();
             };
             Submitted
         }
         NotStarted => {
             configure();
-            channel.send(f()).await;
+            channel.send(f()).await.unwrap();
             Submitted
         }
         AttemptsWithFailure(ref v) if v.len() < MAX_ATTEMPTS_BEFORE_WE_GIVE_UP => {
             configure();
             progress.info(format!("Retrying task, attempt {}", v.len() + 1));
-            channel.send(f()).await;
+            channel.send(f()).await.unwrap();
             Submitted
         }
         AttemptsWithFailure(_) => PermanentFailure,

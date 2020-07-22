@@ -52,7 +52,7 @@ pub fn select_callback(
 ) {
     match git2::Repository::open(report_dir) {
         Ok(repo) => {
-            let (tx, rx) = piper::chan(processors as usize);
+            let (tx, rx) = async_channel::bounded(processors as usize);
             let is_bare_repo = repo.is_bare();
             let report_dir = report_dir.to_owned();
             let handle = std::thread::spawn(move || -> Result<()> {
@@ -76,7 +76,7 @@ pub fn select_callback(
                         i
                     };
                     let mut req_count = 0u64;
-                    while let Some(WriteRequest { path, content }) = smol::block_on(rx.recv()) {
+                    while let Ok(WriteRequest { path, content }) = futures_lite::future::block_on(rx.recv()) {
                         let path = path.strip_prefix(&report_dir)?;
                         req_count += 1;
                         let entry = file_index_entry(path.to_owned(), content.len());
@@ -166,7 +166,7 @@ pub fn select_callback(
                         .map(|b| b.as_str().expect("valid utf8").to_string())
                         .unwrap_or_else(|_| "origin".into());
 
-                    smol::block_on(enforce_threaded(
+                    futures_lite::future::block_on(enforce_threaded(
                         SystemTime::now() + std::time::Duration::from_secs(60 * 60),
                         {
                             let mut progress = progress.add_child("git push");
@@ -246,7 +246,8 @@ pub fn repo_with_working_dir(req: WriteRequest, send: &WriteCallbackState) -> Bo
         send.as_ref()
             .expect("send to be available if a repo is available")
             .send(req.clone())
-            .await;
+            .await
+            .unwrap();
         Ok(WriteInstruction::DoWrite(req))
     }
     .boxed()
@@ -257,7 +258,8 @@ pub fn repo_bare(req: WriteRequest, send: &WriteCallbackState) -> BoxFuture<Resu
         send.as_ref()
             .expect("send to be available if a repo is available")
             .send(req)
-            .await;
+            .await
+            .unwrap();
         Ok(WriteInstruction::Skip)
     }
     .boxed()

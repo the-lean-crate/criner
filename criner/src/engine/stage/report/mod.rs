@@ -34,17 +34,19 @@ pub async fn generate(
     progress.init(Some(num_crates), Some("crates"));
 
     let (processors, rx_result) = {
-        let (tx_task, rx_task) = piper::chan(1);
-        let (tx_result, rx_result) = piper::chan(cpu_o_bound_processors as usize * 2);
+        let (tx_task, rx_task) = async_channel::bounded(1);
+        let (tx_result, rx_result) = async_channel::bounded(cpu_o_bound_processors as usize * 2);
 
         for _ in 0..cpu_o_bound_processors {
-            smol::Task::blocking({
-                let task = rx_task.clone();
-                let result = tx_result.clone();
-                async move {
-                    while let Some(f) = task.recv().await {
-                        result.send(f.await).await;
-                    }
+            let task = rx_task.clone();
+            let result = tx_result.clone();
+            smol::Task::spawn(async move {
+                blocking::unblock! {
+                    futures_lite::future::block_on(async move {
+                        while let Ok(f) = task.recv().await {
+                            result.send(f.await).await.unwrap();
+                        }
+                    })
                 }
             })
             .detach();
@@ -55,7 +57,7 @@ pub async fn generate(
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
     {
         let dir = waste_report_dir.clone();
-        smol::blocking!(std::fs::create_dir_all(dir))?;
+        blocking::unblock!(std::fs::create_dir_all(dir))?;
     }
     use crate::engine::report::generic::WriteCallback;
     let (cache_dir, (git_handle, git_state, maybe_join_handle)) = match glob.as_ref() {
@@ -64,7 +66,7 @@ pub async fn generate(
             let cd = waste_report_dir.join("__incremental_cache__");
             {
                 let cd = cd.clone();
-                smol::blocking!(std::fs::create_dir_all(cd))?;
+                blocking::unblock!(std::fs::create_dir_all(cd))?;
             }
             (
                 Some(cd),
@@ -127,7 +129,8 @@ pub async fn generate(
                 git_handle,
                 git_state.clone(),
             ))
-            .await;
+            .await
+            .unwrap();
         chunk = Vec::with_capacity(chunk_size as usize);
         if abort_loop {
             break;

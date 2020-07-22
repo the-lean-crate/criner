@@ -19,30 +19,36 @@ pub async fn process(
 ) -> Result<()> {
     processing_progress.set_name("Downloads and Extractors");
     let tx_cpu = {
-        let (tx_cpu, rx) = piper::chan(1);
+        let (tx_cpu, rx) = async_channel::bounded(1);
         for idx in 0..cpu_bound_processors {
             let max_retries_on_timeout = 0;
-            smol::Task::blocking(
-                work::generic::processor(
-                    db.clone(),
-                    processing_progress.add_child(format!("{}:CPU IDLE", idx + 1)),
-                    rx.clone(),
-                    work::cpubound::Agent::new(assets_dir.clone(), &db)?,
-                    max_retries_on_timeout,
-                )
-                .map(|r| {
-                    if let Err(e) = r {
-                        log::warn!("CPU bound processor failed: {}", e);
-                    }
-                }),
-            )
+            smol::Task::spawn({
+                let db = db.clone();
+                let assets_dir = assets_dir.clone();
+                let progress = processing_progress.add_child(format!("{}:CPU IDLE", idx + 1));
+                let rx = rx.clone();
+                async move {
+                    blocking::Unblock::new(())
+                        .with_mut(move |_| -> Result<_> {
+                            let agent = work::cpubound::Agent::new(assets_dir, &db)?;
+                            Ok(futures_lite::future::block_on(
+                                work::generic::processor(db, progress, rx, agent, max_retries_on_timeout).map(|r| {
+                                    if let Err(e) = r {
+                                        log::warn!("CPU bound processor failed: {}", e);
+                                    }
+                                }),
+                            ))
+                        })
+                        .await
+                }
+            })
             .detach();
         }
         tx_cpu
     };
 
     let tx_io = {
-        let (tx_io, rx) = piper::chan(1);
+        let (tx_io, rx) = async_channel::bounded(1);
         for idx in 0..io_bound_processors {
             let max_retries_on_timeout = 40;
             smol::Task::spawn(
@@ -70,7 +76,7 @@ pub async fn process(
         tx_io
     };
 
-    smol::blocking!(
+    blocking::unblock!(
         let versions = db.open_crate_versions()?;
         let num_versions = versions.count();
         progress.init(Some(num_versions as u32), Some("crate versions"));
@@ -105,7 +111,7 @@ pub async fn process(
 
                 progress.set((vid + fetched_versions + 1) as u32);
                 progress.halted("wait for task consumers", None);
-                work::schedule::tasks(
+                futures_lite::future::block_on(work::schedule::tasks(
                     &assets_dir,
                     &tasks,
                     &version,
@@ -114,8 +120,7 @@ pub async fn process(
                     &tx_io,
                     &tx_cpu,
                     startup_time,
-                )
-                .await?;
+                ))?;
             }
 
             // We have too many writers which cause the WAL to get so large that all reads are slowing to a crawl

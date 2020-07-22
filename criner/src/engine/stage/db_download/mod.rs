@@ -193,9 +193,9 @@ pub async fn schedule(
     mut progress: prodash::tree::Item,
     startup_time: std::time::SystemTime,
 ) -> Result<()> {
-    let (tx_result, rx_result) = piper::chan(1);
+    let (tx_result, rx_result) = async_channel::bounded(1);
     let tx_io = {
-        let (tx_io, rx) = piper::chan(1);
+        let (tx_io, rx) = async_channel::bounded(1);
         let max_retries_on_timeout = 80;
         smol::Task::spawn(
             work::generic::processor(
@@ -244,12 +244,13 @@ pub async fn schedule(
                 kind: "tar.gz",
                 url: "https://static.crates.io/db-dump.tar.gz".to_string(),
             })
-            .await;
+            .await
+            .unwrap();
         drop(tx_io);
-        if let Some(db_file_path) = rx_result.recv().await {
+        if let Ok(db_file_path) = rx_result.recv().await {
             {
                 let progress = progress.add_child("ingest");
-                smol::blocking!(extract_and_ingest(db, progress, db_file_path))
+                blocking::unblock!(extract_and_ingest(db, progress, db_file_path))
             }
             .map_err(|err| {
                 progress.fail(format!("ingestion failed: {}", err));
@@ -258,6 +259,6 @@ pub async fn schedule(
         }
     }
 
-    smol::blocking!(cleanup(db_file_path, progress.add_child("removing old db-dumps")))?;
+    blocking::unblock!(cleanup(db_file_path, progress.add_child("removing old db-dumps")))?;
     Ok(())
 }

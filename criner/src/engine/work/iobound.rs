@@ -25,7 +25,7 @@ struct ProcessingState {
 pub struct Agent<Fn, FnResult> {
     client: reqwest::Client,
     results: persistence::TaskResultTable,
-    channel: piper::Sender<FnResult>,
+    channel: async_channel::Sender<FnResult>,
     state: Option<ProcessingState>,
     make_state: Fn,
     next_action_state: Option<FnResult>,
@@ -35,7 +35,11 @@ impl<Fn, FnResult> Agent<Fn, FnResult>
 where
     Fn: FnMut(Option<(String, String)>, &model::Task, &Path) -> Option<FnResult>,
 {
-    pub fn new(db: &persistence::Db, channel: piper::Sender<FnResult>, make_state: Fn) -> Result<Agent<Fn, FnResult>> {
+    pub fn new(
+        db: &persistence::Db,
+        channel: async_channel::Sender<FnResult>,
+        make_state: Fn,
+    ) -> Result<Agent<Fn, FnResult>> {
         let client = reqwest::ClientBuilder::new().gzip(true).build()?;
 
         let results = db.open_results()?;
@@ -131,7 +135,7 @@ where
             // we take the risk of duplicate work for keeping more processors busy.
             // NOTE: We assume there is no risk of double-scheduling, also we assume the consumer is faster
             // then the producer (us), so we are ok with blocking until the task is scheduled.
-            self.channel.send(request).await;
+            self.channel.send(request).await.unwrap();
         }
         Ok(())
     }
@@ -169,13 +173,13 @@ async fn download_file_and_store_result(
 ) -> Result<()> {
     {
         let out_file = out_file.clone();
-        smol::blocking!(std::fs::create_dir_all(&out_file.parent().expect("parent directory")))?;
+        blocking::unblock!(std::fs::create_dir_all(&out_file.parent().expect("parent directory")))?;
     }
 
     // NOTE: We assume that the files we download never change, and we assume the server supports resumption!
     let (start_byte, truncate) = {
         let out_file = out_file.clone();
-        smol::blocking!(std::fs::metadata(&out_file))
+        blocking::unblock!(std::fs::metadata(&out_file))
             .map(|meta| (meta.len(), false))
             .unwrap_or((0, true))
     };
@@ -225,10 +229,10 @@ async fn download_file_and_store_result(
     ));
 
     if remaining_content_length != 0 {
-        let mut out = smol::writer(
+        let mut out = blocking::Unblock::new(
             {
                 let out_file = out_file.clone();
-                smol::blocking!(std::fs::OpenOptions::new()
+                blocking::unblock!(std::fs::OpenOptions::new()
                     .create(truncate)
                     .truncate(truncate)
                     .write(truncate)

@@ -328,7 +328,7 @@ impl crate::engine::report::generic::Aggregate for Report {
     async fn load_previous_top_level_state(out_dir: &Path, progress: &mut prodash::tree::Item) -> Option<Self> {
         let path = path_from_prefix(out_dir, TOP_LEVEL_REPORT_NAME);
         progress.blocked("loading previous top-level waste report from disk", None);
-        smol::blocking!(std::fs::read(path))
+        blocking::unblock!(std::fs::read(path))
             .ok()
             .and_then(|v| rmp_serde::from_read(v.as_slice()).ok())
     }
@@ -336,7 +336,7 @@ impl crate::engine::report::generic::Aggregate for Report {
     async fn load_previous_state(&self, out_dir: &Path, progress: &mut prodash::tree::Item) -> Option<Self> {
         let path = path_to_storage_location(self, out_dir);
         progress.blocked("loading previous waste report from disk", None);
-        smol::blocking!(std::fs::read(path))
+        blocking::unblock!(std::fs::read(path))
             .ok()
             .and_then(|v| rmp_serde::from_read(v.as_slice()).ok())
     }
@@ -344,6 +344,6 @@ impl crate::engine::report::generic::Aggregate for Report {
         let path = path_to_storage_location(self, out_dir);
         progress.blocked("storing current waste report to disk", None);
         let data = rmp_serde::to_vec(self)?;
-        smol::blocking!(std::fs::write(path, data)).map_err(Into::into)
+        blocking::unblock!(std::fs::write(path, data)).map_err(Into::into)
     }
 }

@@ -44,7 +44,7 @@ pub enum WriteInstruction {
     DoWrite(WriteRequest),
 }
 
-pub type WriteCallbackState = Option<piper::Sender<WriteRequest>>;
+pub type WriteCallbackState = Option<async_channel::Sender<WriteRequest>>;
 pub type WriteCallback =
     fn(WriteRequest, &WriteCallbackState) -> futures_util::future::BoxFuture<Result<WriteInstruction>>;
 
@@ -84,13 +84,13 @@ pub trait Generator {
         out_dir: PathBuf,
         cache_dir: Option<PathBuf>,
         mut progress: prodash::tree::Item,
-        reports: piper::Receiver<Result<Option<Self::Report>>>,
+        reports: async_channel::Receiver<Result<Option<Self::Report>>>,
         write: WriteCallback,
         write_state: WriteCallbackState,
     ) -> Result<()> {
         let mut report = None::<Self::Report>;
         let mut count = 0;
-        while let Some(result) = reports.recv().await {
+        while let Ok(result) = reports.recv().await {
             count += 1;
             progress.set(count);
             match result {
@@ -314,17 +314,16 @@ async fn complete_and_write_report(
         WriteInstruction::DoWrite(WriteRequest { path, content }) => {
             {
                 let path = path.clone();
-                smol::blocking!(std::fs::create_dir_all(
+                blocking::unblock!(std::fs::create_dir_all(
                     path.parent().expect("file path with parent directory")
                 ))?;
             }
             progress.halted("writing report to disk", None);
 
-            let content = smol::Task::<std::result::Result<_, std::io::Error>>::blocking(async move {
+            let content = blocking::unblock!({
                 std::fs::write(path, &content)?;
-                Ok(content)
-            })
-            .await?;
+                Ok::<_, std::io::Error>(content)
+            })?;
             Ok(content)
         }
         WriteInstruction::Skip => Ok(Vec::new()),

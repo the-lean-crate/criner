@@ -38,8 +38,11 @@ parking_lot = "0.11.0"
 async-trait = "0.1.24"
 dia-semver = "8.0.1"
 num_cpus = "1.13.0"
-smol = { version = "0.1.5", features = ["tokio02"] }
-piper = "0.1.1"
+smol = { version = "0.2.0", features = ["tokio02"] }
+futures-lite = "0.1.8"
+blocking = "0.5.0"
+async-io = "0.1.5"
+async-channel = "1.1.1"
 # for properly shutting down the GUI when SIGTERM is sent directly
 ctrlc = { version = "3.1.4", features = ["termination"] }
 # For scheduling the cron-like download of the crates.io db using local time declarations

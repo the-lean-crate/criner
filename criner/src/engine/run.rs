@@ -45,11 +45,6 @@ pub async fn non_blocking(
     check(deadline)?;
     let startup_time = SystemTime::now();
 
-    for _ in 0..1 {
-        // A pending future is one that simply yields forever - our workstealing static threadpool
-        std::thread::spawn(|| smol::run(futures_util::future::pending::<()>()));
-    }
-
     let db_download_handle = smol::Task::spawn(repeat_daily_at(
         download_crates_io_database_every_24_hours_starting_at,
         {
@@ -73,27 +68,27 @@ pub async fn non_blocking(
     ));
 
     let run = fetch_settings;
-    let fetch_handle = smol::Task::spawn(repeat_every_s(
-        run.every.as_secs() as u32,
-        {
-            let p = progress.clone();
-            move || p.add_child("Fetch Timer")
-        },
-        deadline,
-        run.at_most,
-        {
-            let db = db.clone();
-            let progress = progress.clone();
-            move || {
-                stage::changes::fetch(
-                    crates_io_path.clone(),
-                    db.clone(),
-                    progress.add_child("crates.io refresh"),
-                    deadline,
-                )
-            }
-        },
-    ));
+    // let fetch_handle = smol::Task::spawn(repeat_every_s(
+    //     run.every.as_secs() as u32,
+    //     {
+    //         let p = progress.clone();
+    //         move || p.add_child("Fetch Timer")
+    //     },
+    //     deadline,
+    //     run.at_most,
+    //     {
+    //         let db = db.clone();
+    //         let progress = progress.clone();
+    //         move || {
+    //             stage::changes::fetch(
+    //                 crates_io_path.clone(),
+    //                 db.clone(),
+    //                 progress.add_child("crates.io refresh"),
+    //                 deadline,
+    //             )
+    //         }
+    //     },
+    // ));
 
     let stage = process_settings;
     let processing_handle = smol::Task::spawn(repeat_every_s(
@@ -140,7 +135,7 @@ pub async fn non_blocking(
                 let interrupt_control = interrupt_control.clone();
                 async move {
                     let ctrl = interrupt_control;
-                    ctrl.send(Interruptible::Deferred).await;
+                    ctrl.send(Interruptible::Deferred).await.unwrap();
                     let res = stage::report::generate(
                         db.clone(),
                         progress.add_child("Reports"),
@@ -150,14 +145,14 @@ pub async fn non_blocking(
                         cpu_o_bound_processors,
                     )
                     .await;
-                    ctrl.send(Interruptible::Instantly).await;
+                    ctrl.send(Interruptible::Instantly).await.unwrap();
                     res
                 }
             }
         },
     ));
 
-    fetch_handle.await?;
+    // fetch_handle.await?;
     db_download_handle.await?;
     report_handle.await?;
     processing_handle.await
@@ -168,7 +163,7 @@ pub enum Interruptible {
     Deferred,
 }
 
-pub type InterruptControlEvents = piper::Sender<Interruptible>;
+pub type InterruptControlEvents = async_channel::Sender<Interruptible>;
 
 impl From<Interruptible> for prodash::tui::Event {
     fn from(v: Interruptible) -> Self {
@@ -198,7 +193,7 @@ pub fn blocking(
     let assets_dir = db.as_ref().join("assets");
     let db = Db::open(db)?;
     std::fs::create_dir_all(&assets_dir)?;
-    let (interrupt_control_sink, interrupt_control_stream) = piper::chan::<Interruptible>(1);
+    let (interrupt_control_sink, interrupt_control_stream) = async_channel::bounded::<Interruptible>(1);
 
     // dropping the work handle will stop (non-blocking) futures
     let work_handle = non_blocking(
@@ -229,13 +224,13 @@ pub fn blocking(
                 ),
             )?);
 
-            let either = smol::run(futures_util::future::select(
+            let either = futures_lite::future::block_on(futures_util::future::select(
                 handle_ctrl_c_and_sigterm(work_handle.boxed_local()).boxed_local(),
                 gui,
             ));
             match either {
                 Either::Left((work_result, gui)) => {
-                    smol::run(gui.cancel());
+                    futures_lite::future::block_on(gui.cancel());
                     if let Err(e) = work_result? {
                         warn!("work processor failed: {}", e);
                     }
@@ -245,7 +240,7 @@ pub fn blocking(
         }
         None => {
             drop(interrupt_control_stream);
-            let work_result = smol::run(handle_ctrl_c_and_sigterm(work_handle.boxed_local()));
+            let work_result = futures_lite::future::block_on(handle_ctrl_c_and_sigterm(work_handle.boxed_local()));
             if let Err(e) = work_result {
                 warn!("work processor failed: {}", e);
             }

@@ -17,13 +17,13 @@ pub trait Processor {
 pub async fn processor<T: Clone>(
     db: persistence::Db,
     mut progress: prodash::tree::Item,
-    r: piper::Receiver<T>,
+    r: async_channel::Receiver<T>,
     mut agent: impl Processor<Item = T> + Send,
     max_retries_on_timeout: usize,
 ) -> Result<()> {
     let tasks = db.open_tasks()?;
 
-    while let Some(request) = r.recv().await {
+    while let Ok(request) = r.recv().await {
         let mut try_count = 0;
         let (task, task_key) = loop {
             let (dummy_task, task_key, progress_name) = agent.set(request.clone(), &mut progress)?;

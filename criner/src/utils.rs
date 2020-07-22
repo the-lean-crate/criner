@@ -1,8 +1,10 @@
 use crate::error::{Error, FormatDeadline, Result};
+use async_io::Timer;
 use dia_semver::Semver;
-use futures_util::future::{self, Either};
-use futures_util::FutureExt;
-use smol::Timer;
+use futures_util::{
+    future::{self, Either},
+    FutureExt,
+};
 use std::{
     convert::TryInto,
     future::Future,
@@ -38,7 +40,7 @@ pub async fn wait_with_progress(
         ));
     }
     for s in 1..=duration_s {
-        Timer::after(Duration::from_secs(1)).await;
+        Timer::new(Duration::from_secs(1)).await;
         check(deadline)?;
         progress.set(s);
     }
@@ -141,7 +143,7 @@ pub async fn handle_ctrl_c_and_sigterm<F, T>(f: F) -> Result<T>
 where
     F: Future<Output = T> + Unpin,
 {
-    let (s, r) = piper::chan(100);
+    let (s, r) = async_channel::bounded(100);
     ctrlc::set_handler(move || {
         s.send(()).now_or_never();
     })
@@ -157,7 +159,7 @@ pub async fn timeout_after<F, T>(duration: Duration, msg: impl Into<String>, f: 
 where
     F: Future<Output = T> + Unpin,
 {
-    let selector = future::select(Timer::after(duration), f);
+    let selector = future::select(Timer::new(duration), f);
     match selector.await {
         Either::Left((_, _f)) => Err(Error::Timeout(duration, msg.into())),
         Either::Right((r, _delay)) => Ok(r),
@@ -175,13 +177,17 @@ where
     T: Send + 'static,
     F: FnOnce() -> T + Send + 'static,
 {
-    let f_as_future = smol::Task::blocking(async move { f() });
+    let (tx, rx) = async_channel::bounded(1);
+    let handle = std::thread::spawn(move || drop(futures_lite::future::block_on(tx.send(f()))));
+
     let selector = future::select(
-        Timer::after(deadline.duration_since(SystemTime::now()).unwrap_or_default()),
-        f_as_future,
+        Timer::new(deadline.duration_since(SystemTime::now()).unwrap_or_default()),
+        rx.recv().boxed_local(),
     );
-    match selector.await {
+    let res = match selector.await {
         Either::Left((_, _f_as_future)) => Err(Error::DeadlineExceeded(FormatDeadline(deadline))),
-        Either::Right((res, _delay)) => Ok(res),
-    }
+        Either::Right((res, _delay)) => Ok(res.expect("receiving to be working as sender exists")),
+    };
+    handle.join().unwrap();
+    res
 }
