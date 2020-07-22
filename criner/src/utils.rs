@@ -177,7 +177,7 @@ where
     T: Send + 'static,
     F: FnOnce() -> T + Send + 'static,
 {
-    let unblocked = async move { blocking::Unblock::new(()).with_mut(move |_| f()).await };
+    let unblocked = async move { blocking::unblock!(f()) };
     let selector = future::select(
         Timer::new(deadline.duration_since(SystemTime::now()).unwrap_or_default()),
         unblocked.boxed(),

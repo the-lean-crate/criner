@@ -22,25 +22,23 @@ pub async fn process(
         let (tx_cpu, rx) = async_channel::bounded(1);
         for idx in 0..cpu_bound_processors {
             let max_retries_on_timeout = 0;
-            smol::Task::spawn({
-                let db = db.clone();
-                let assets_dir = assets_dir.clone();
-                let progress = processing_progress.add_child(format!("{}:CPU IDLE", idx + 1));
-                let rx = rx.clone();
-                async move {
-                    blocking::Unblock::new(())
-                        .with_mut(move |_| -> Result<_> {
-                            let agent = work::cpubound::Agent::new(assets_dir, &db)?;
-                            Ok(futures_lite::future::block_on(
-                                work::generic::processor(db, progress, rx, agent, max_retries_on_timeout).map(|r| {
-                                    if let Err(e) = r {
-                                        log::warn!("CPU bound processor failed: {}", e);
-                                    }
-                                }),
-                            ))
-                        })
-                        .await
-                }
+            let db = db.clone();
+            let assets_dir = assets_dir.clone();
+            let progress = processing_progress.add_child(format!("{}:CPU IDLE", idx + 1));
+            let rx = rx.clone();
+            smol::Task::spawn(async move {
+                blocking::Unblock::new(())
+                    .with_mut(move |_| -> Result<_> {
+                        let agent = work::cpubound::Agent::new(assets_dir, &db)?;
+                        Ok(futures_lite::future::block_on(
+                            work::generic::processor(db, progress, rx, agent, max_retries_on_timeout).map(|r| {
+                                if let Err(e) = r {
+                                    log::warn!("CPU bound processor failed: {}", e);
+                                }
+                            }),
+                        ))
+                    })
+                    .await
             })
             .detach();
         }
