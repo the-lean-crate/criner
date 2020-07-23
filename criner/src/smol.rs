@@ -26,18 +26,20 @@ impl<T> Task<T> {
         T: Send + 'static,
     {
         static EXECUTOR: Lazy<Executor> = Lazy::new(|| {
-            thread::spawn(|| {
-                enter(|| {
-                    let (p, u) = async_io::parking::pair();
-                    let ticker = EXECUTOR.ticker(move || u.unpark());
+            for _ in 0..2 {
+                thread::spawn(|| {
+                    enter(|| {
+                        let (p, u) = async_io::parking::pair();
+                        let ticker = EXECUTOR.ticker(move || u.unpark());
 
-                    loop {
-                        if let Ok(false) = catch_unwind(|| ticker.tick()) {
-                            p.park();
+                        loop {
+                            if let Ok(false) = catch_unwind(|| ticker.tick()) {
+                                p.park();
+                            }
                         }
-                    }
-                })
-            });
+                    })
+                });
+            }
 
             Executor::new()
         });
