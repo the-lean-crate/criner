@@ -26,7 +26,7 @@ pub async fn process(
             let assets_dir = assets_dir.clone();
             let progress = processing_progress.add_child(format!("{}:CPU IDLE", idx + 1));
             let rx = rx.clone();
-            smol::Task::spawn(async move {
+            async_executor::Task::spawn(async move {
                 blocking::Unblock::new(())
                     .with_mut(move |_| -> Result<_> {
                         let agent = work::cpubound::Agent::new(assets_dir, &db)?;
@@ -49,7 +49,7 @@ pub async fn process(
         let (tx_io, rx) = async_channel::bounded(1);
         for idx in 0..io_bound_processors {
             let max_retries_on_timeout = 40;
-            smol::Task::spawn(
+            async_executor::Task::spawn(
                 work::generic::processor(
                     db.clone(),
                     processing_progress.add_child(format!("{}: ↓ IDLE", idx + 1)),

@@ -1,4 +1,5 @@
 use crate::{engine::stage, error::Result, model, persistence::Db, utils::*};
+use async_executor::Executor;
 use futures_util::{
     future::{Either, FutureExt},
     stream::StreamExt,
@@ -45,7 +46,7 @@ pub async fn non_blocking(
     check(deadline)?;
     let startup_time = SystemTime::now();
 
-    let db_download_handle = smol::Task::spawn(repeat_daily_at(
+    let db_download_handle = async_executor::Task::spawn(repeat_daily_at(
         download_crates_io_database_every_24_hours_starting_at,
         {
             let p = progress.clone();
@@ -68,7 +69,7 @@ pub async fn non_blocking(
     ));
 
     let run = fetch_settings;
-    let fetch_handle = smol::Task::spawn(repeat_every_s(
+    let fetch_handle = async_executor::Task::spawn(repeat_every_s(
         run.every.as_secs() as u32,
         {
             let p = progress.clone();
@@ -91,7 +92,7 @@ pub async fn non_blocking(
     ));
 
     let stage = process_settings;
-    let processing_handle = smol::Task::spawn(repeat_every_s(
+    let processing_handle = async_executor::Task::spawn(repeat_every_s(
         stage.every.as_secs() as u32,
         {
             let p = progress.clone();
@@ -118,7 +119,7 @@ pub async fn non_blocking(
     ));
 
     let stage = report_settings;
-    let report_handle = smol::Task::spawn(repeat_every_s(
+    let report_handle = async_executor::Task::spawn(repeat_every_s(
         stage.run.every.as_secs() as u32,
         {
             let p = progress.clone();
@@ -193,6 +194,11 @@ pub fn blocking(
     let assets_dir = db.as_ref().join("assets");
     let db = Db::open(db)?;
     std::fs::create_dir_all(&assets_dir)?;
+
+    for _ in 0..1 {
+        // A pending future is one that simply yields forever - our workstealing static threadpool
+        std::thread::spawn(move || Executor::new().run(futures_util::future::pending::<()>()));
+    }
     let (interrupt_control_sink, interrupt_control_stream) = async_channel::bounded::<Interruptible>(1);
 
     // dropping the work handle will stop (non-blocking) futures
@@ -214,7 +220,7 @@ pub fn blocking(
 
     match gui {
         Some(gui_options) => {
-            let gui = smol::Task::spawn(prodash::tui::render_with_input(
+            let gui = async_executor::Task::spawn(prodash::tui::render_with_input(
                 std::io::stdout(),
                 root,
                 gui_options,

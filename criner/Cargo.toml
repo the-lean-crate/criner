@@ -38,7 +38,7 @@ parking_lot = "0.11.0"
 async-trait = "0.1.24"
 dia-semver = "8.0.1"
 num_cpus = "1.13.0"
-smol = { version = "0.2.0", features = ["tokio02"] }
+async-executor = "0.1.1"
 futures-lite = "0.1.8"
 blocking = "0.5.0"
 async-io = "0.1.5"
