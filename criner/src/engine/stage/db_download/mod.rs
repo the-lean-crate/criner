@@ -197,7 +197,7 @@ pub async fn schedule(
     let tx_io = {
         let (tx_io, rx) = async_channel::bounded(1);
         let max_retries_on_timeout = 80;
-        async_executor::Task::spawn(
+        smol::Task::spawn(
             work::generic::processor(
                 db.clone(),
                 progress.add_child("↓ IDLE"),

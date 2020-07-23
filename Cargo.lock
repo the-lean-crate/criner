@@ -64,20 +64,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "async-executor"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a963e087ca93ab95de899c0095251958ca1c947d7a7a331e255a7cadf3535e3"
-dependencies = [
- "async-io",
- "futures-lite",
- "multitask",
- "parking",
- "scoped-tls",
- "waker-fn",
-]
-
-[[package]]
 name = "async-io"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -152,6 +138,20 @@ name = "bitflags"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
+
+[[package]]
+name = "blocking"
+version = "0.4.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2468ff7bf85066b4a3678fede6fe66db31846d753ff0adfbfab2c6a6e81612b"
+dependencies = [
+ "async-channel",
+ "atomic-waker",
+ "futures-lite",
+ "once_cell",
+ "parking",
+ "waker-fn",
+]
 
 [[package]]
 name = "blocking"
@@ -330,10 +330,9 @@ name = "criner"
 version = "0.2.0"
 dependencies = [
  "async-channel",
- "async-executor",
  "async-io",
  "async-trait",
- "blocking",
+ "blocking 0.5.0",
  "bytesize",
  "common_macros",
  "crates-index-diff",
@@ -364,6 +363,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "smol",
  "tar",
  "time 0.2.16",
  "toml",
@@ -1685,12 +1685,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "scoped-tls"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea6a9290e3c9cf0f18145ef7ffa62d68ee0bf5fcd651017e586dc7fd5da448c2"
-
-[[package]]
 name = "scopeguard"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1791,6 +1785,20 @@ name = "smallvec"
 version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3757cb9d89161a2f24e1cf78efa0c1fcff485d18e3f55e0aa3480824ddaa0f3f"
+
+[[package]]
+name = "smol"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "346a94824d48ed7c5fc7247f3cbbf0317bdfe15fc39d08f9262609cccce61254"
+dependencies = [
+ "async-io",
+ "blocking 0.4.7",
+ "multitask",
+ "num_cpus",
+ "once_cell",
+ "tokio",
+]
 
 [[package]]
 name = "socket2"
@@ -2046,6 +2054,7 @@ dependencies = [
  "lazy_static",
  "memchr",
  "mio",
+ "num_cpus",
  "pin-project-lite",
  "slab",
 ]
@@ -2091,9 +2100,9 @@ checksum = "e987b6bf443f4b5b3b6f38704195592cca41c5bb7aedd3c3693c7081f8289860"
 
 [[package]]
 name = "tracing"
-version = "0.1.17"
+version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dbdf4ccd1652592b01286a5dbe1e2a77d78afaa34beadd9872a5f7396f92aaa9"
+checksum = "c2e2a2de6b0d5cbb13fc21193a2296888eaab62b6044479aafb3c54c01c29fcd"
 dependencies = [
  "cfg-if",
  "log",
