@@ -1,9 +1,8 @@
-use crate::persistence::new_key_value_query_old_to_new_filtered;
 use crate::{
     engine::report,
-    error::Result,
-    persistence::{self, TableAccess},
+    persistence::{self, new_key_value_query_old_to_new_filtered, TableAccess},
     utils::check,
+    {Error, Result},
 };
 use futures_util::FutureExt;
 use rusqlite::NO_PARAMS;
@@ -44,8 +43,9 @@ pub async fn generate(
                 blocking::unblock! {
                     futures_lite::future::block_on(async move {
                         while let Ok(f) = task.recv().await {
-                            result.send(f.await).await.unwrap();
+                            result.send(f.await).await.map_err(Error::send_msg("send CPU result"))?;
                         }
+                        Ok::<_, Error>(())
                     })
                 }
             })
@@ -130,7 +130,7 @@ pub async fn generate(
                 git_state.clone(),
             ))
             .await
-            .unwrap();
+            .map_err(Error::send_msg("Chunk of files to write"))?;
         chunk = Vec::with_capacity(chunk_size as usize);
         if abort_loop {
             break;

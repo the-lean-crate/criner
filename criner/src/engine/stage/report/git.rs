@@ -1,7 +1,7 @@
 use crate::utils::enforce_threaded;
 use crate::{
     engine::report::generic::{WriteCallback, WriteCallbackState, WriteInstruction, WriteRequest},
-    Result,
+    {Error, Result},
 };
 use crates_index_diff::git2;
 use futures_util::{future::BoxFuture, FutureExt};
@@ -247,7 +247,7 @@ pub fn repo_with_working_dir(req: WriteRequest, send: &WriteCallbackState) -> Bo
             .expect("send to be available if a repo is available")
             .send(req.clone())
             .await
-            .unwrap();
+            .map_err(Error::send_msg("Git Write Request"))?;
         Ok(WriteInstruction::DoWrite(req))
     }
     .boxed()
@@ -259,7 +259,7 @@ pub fn repo_bare(req: WriteRequest, send: &WriteCallbackState) -> BoxFuture<Resu
             .expect("send to be available if a repo is available")
             .send(req)
             .await
-            .unwrap();
+            .map_err(Error::send_msg("Git Write Request"))?;
         Ok(WriteInstruction::Skip)
     }
     .boxed()

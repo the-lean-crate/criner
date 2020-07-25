@@ -245,7 +245,7 @@ pub async fn schedule(
                 url: "https://static.crates.io/db-dump.tar.gz".to_string(),
             })
             .await
-            .unwrap();
+            .map_err(Error::send_msg("Download Request"))?;
         drop(tx_io);
         if let Ok(db_file_path) = rx_result.recv().await {
             {

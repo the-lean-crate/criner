@@ -100,5 +100,14 @@ quick_error! {
             from()
             cause(err)
         }
+        ChannelSendMessage(msg: &'static str) {
+            display("{}: Sending into a closed channel", msg)
+        }
+    }
+}
+
+impl Error {
+    pub fn send_msg<T>(msg: &'static str) -> impl FnOnce(async_channel::SendError<T>) -> Error {
+        move |_err| Error::ChannelSendMessage(msg)
     }
 }

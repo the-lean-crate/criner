@@ -1,4 +1,10 @@
-use crate::{engine::stage, error::Result, model, persistence::Db, utils::*};
+use crate::{
+    engine::stage,
+    error::{Error, Result},
+    model,
+    persistence::Db,
+    utils::*,
+};
 use futures_util::{
     future::{Either, FutureExt},
     stream::StreamExt,
@@ -135,7 +141,9 @@ pub async fn non_blocking(
                 let interrupt_control = interrupt_control.clone();
                 async move {
                     let ctrl = interrupt_control;
-                    ctrl.send(Interruptible::Deferred).await.unwrap();
+                    ctrl.send(Interruptible::Deferred)
+                        .await
+                        .map_err(Error::send_msg("Defer TUI interrupt"))?;
                     let res = stage::report::generate(
                         db.clone(),
                         progress.add_child("Reports"),
@@ -145,7 +153,9 @@ pub async fn non_blocking(
                         cpu_o_bound_processors,
                     )
                     .await;
-                    ctrl.send(Interruptible::Instantly).await.unwrap();
+                    ctrl.send(Interruptible::Instantly)
+                        .await
+                        .map_err(Error::send_msg("Instant TUI interrupt"))?;
                     res
                 }
             }

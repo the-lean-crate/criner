@@ -135,7 +135,10 @@ where
             // we take the risk of duplicate work for keeping more processors busy.
             // NOTE: We assume there is no risk of double-scheduling, also we assume the consumer is faster
             // then the producer (us), so we are ok with blocking until the task is scheduled.
-            self.channel.send(request).await.unwrap();
+            self.channel
+                .send(request)
+                .await
+                .map_err(Error::send_msg("IO Bound: Schedule next task"))?;
         }
         Ok(())
     }
