@@ -1,5 +1,9 @@
 ##### What's new in…
 
+###### Version 0.1.4 (2020-07-25)
+
+* fix https://github.com/the-lean-crate/cargo-diet/issues/6
+
 ###### Version 0.1.3 (2020-05-30)
 
 * back to the state of 0.1.1 - serde is actually required
