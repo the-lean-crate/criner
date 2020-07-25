@@ -141,9 +141,7 @@ pub async fn non_blocking(
                 let interrupt_control = interrupt_control.clone();
                 async move {
                     let ctrl = interrupt_control;
-                    ctrl.send(Interruptible::Deferred)
-                        .await
-                        .map_err(Error::send_msg("Defer TUI interrupt"))?;
+                    ctrl.send(Interruptible::Deferred).await.ok(); // there might be no TUI
                     let res = stage::report::generate(
                         db.clone(),
                         progress.add_child("Reports"),
@@ -153,9 +151,7 @@ pub async fn non_blocking(
                         cpu_o_bound_processors,
                     )
                     .await;
-                    ctrl.send(Interruptible::Instantly)
-                        .await
-                        .map_err(Error::send_msg("Instant TUI interrupt"))?;
+                    ctrl.send(Interruptible::Instantly).await.ok(); // there might be no TUI
                     res
                 }
             }
