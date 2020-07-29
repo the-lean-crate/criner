@@ -1,6 +1,6 @@
 use crate::{
     engine::stage,
-    error::{Error, Result},
+    error::Result,
     model,
     persistence::Db,
     utils::*,
