@@ -41,9 +41,9 @@ dependencies = [
 
 [[package]]
 name = "async-channel"
-version = "1.2.0"
+version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "958a8af017616083a7c739a9c4da4b757a6816593734b4b6145adbe1421526a5"
+checksum = "e164690d07eca7d0cb5921ee86b3276cd7d561ae7d613abd2ac1ce54fb2fc0a8"
 dependencies = [
  "concurrent-queue",
  "event-listener",
@@ -65,9 +65,9 @@ dependencies = [
 
 [[package]]
 name = "async-io"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bcac7b02b375f30c4e338cdd715131cb47f52eda9cffec3a8499725f51c9986b"
+checksum = "ebcd87dcd83e016eeda9d68c54d339668a87689f435e1c5784f9f3e308065d6b"
 dependencies = [
  "cfg-if",
  "concurrent-queue",
