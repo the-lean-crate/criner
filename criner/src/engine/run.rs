@@ -1,10 +1,4 @@
-use crate::{
-    engine::stage,
-    error::Result,
-    model,
-    persistence::Db,
-    utils::*,
-};
+use crate::{engine::stage, error::Result, model, persistence::Db, utils::*};
 use futures_util::{
     future::{Either, FutureExt},
     stream::StreamExt,

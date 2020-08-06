@@ -4,7 +4,7 @@ mod args;
 pub mod error;
 pub use args::*;
 
-pub fn run_blocking(args: Parsed) -> criner::error::Result<()> {
+pub fn run_blocking(args: Args) -> criner::error::Result<()> {
     use SubCommands::*;
     let cmd = args.sub.unwrap_or_default();
     match cmd {

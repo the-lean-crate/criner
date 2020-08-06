@@ -22,8 +22,7 @@ migration = ["criner/migration"]
 doctest = false
 
 [dependencies]
-clap = {version = "2", features = ["color"]}
-structopt = "0.3.9"
+clap = { version = "3.0.0-beta.1", features = ["color"] }
 humantime = "2.0.0"
 time = "0.2.9"
 criner = { version = "0.2.0", path = "./criner" }
