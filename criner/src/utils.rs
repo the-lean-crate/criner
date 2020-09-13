@@ -40,7 +40,7 @@ pub async fn wait_with_progress(
         ));
     }
     for s in 1..=duration_s {
-        Timer::new(Duration::from_secs(1)).await;
+        Timer::after(Duration::from_secs(1)).await;
         check(deadline)?;
         progress.set(s);
     }
@@ -159,7 +159,7 @@ pub async fn timeout_after<F, T>(duration: Duration, msg: impl Into<String>, f: 
 where
     F: Future<Output = T> + Unpin,
 {
-    let selector = future::select(Timer::new(duration), f);
+    let selector = future::select(Timer::after(duration), f);
     match selector.await {
         Either::Left((_, _f)) => Err(Error::Timeout(duration, msg.into())),
         Either::Right((r, _delay)) => Ok(r),
@@ -179,7 +179,7 @@ where
 {
     let unblocked = blocking::unblock(f);
     let selector = future::select(
-        Timer::new(deadline.duration_since(SystemTime::now()).unwrap_or_default()),
+        Timer::after(deadline.duration_since(SystemTime::now()).unwrap_or_default()),
         unblocked.boxed(),
     );
     match selector.await {
