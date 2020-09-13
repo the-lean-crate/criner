@@ -53,10 +53,11 @@ pub async fn generate(
     };
 
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
-    {
+    blocking::unblock({
         let dir = waste_report_dir.clone();
-        blocking::unblock(move || std::fs::create_dir_all(dir)).await?;
-    }
+        move || std::fs::create_dir_all(dir)
+    })
+    .await?;
     use crate::engine::report::generic::WriteCallback;
     let (cache_dir, (git_handle, git_state, maybe_join_handle)) = match glob.as_ref() {
         Some(_) => (None, (git::not_available as WriteCallback, None, None)),

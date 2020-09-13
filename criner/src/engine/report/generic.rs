@@ -312,20 +312,14 @@ async fn complete_and_write_report(
     .await?
     {
         WriteInstruction::DoWrite(WriteRequest { path, content }) => {
-            {
+            blocking::unblock({
                 let path = path.clone();
-                blocking::unblock(move || {
-                    std::fs::create_dir_all(path.parent().expect("file path with parent directory"))
-                })
-                .await?;
-            }
-            progress.halted("writing report to disk", None);
-
-            let content = blocking::unblock(move || {
-                std::fs::write(path, &content)?;
-                Ok::<_, std::io::Error>(content)
+                move || std::fs::create_dir_all(path.parent().expect("file path with parent directory"))
             })
             .await?;
+            progress.halted("writing report to disk", None);
+
+            let content = blocking::unblock(move || std::fs::write(path, &content).map(|_| content)).await?;
             Ok(content)
         }
         WriteInstruction::Skip => Ok(Vec::new()),

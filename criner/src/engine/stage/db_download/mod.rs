@@ -248,10 +248,10 @@ pub async fn schedule(
             .map_err(Error::send_msg("Download Request"))?;
         drop(tx_io);
         if let Ok(db_file_path) = rx_result.recv().await {
-            {
+            blocking::unblock({
                 let progress = progress.add_child("ingest");
-                blocking::unblock(move || extract_and_ingest(db, progress, db_file_path))
-            }
+                move || extract_and_ingest(db, progress, db_file_path)
+            })
             .await
             .map_err(|err| {
                 progress.fail(format!("ingestion failed: {}", err));

@@ -174,19 +174,20 @@ async fn download_file_and_store_result(
     url: &str,
     out_file: PathBuf,
 ) -> Result<()> {
-    {
+    blocking::unblock({
         let out_file = out_file.clone();
-        blocking::unblock(move || std::fs::create_dir_all(&out_file.parent().expect("parent directory"))).await?;
-    }
+        move || std::fs::create_dir_all(&out_file.parent().expect("parent directory"))
+    })
+    .await?;
 
     // NOTE: We assume that the files we download never change, and we assume the server supports resumption!
-    let (start_byte, truncate) = {
+    let (start_byte, truncate) = blocking::unblock({
         let out_file = out_file.clone();
-        blocking::unblock(move || std::fs::metadata(&out_file))
-            .await
-            .map(|meta| (meta.len(), false))
-            .unwrap_or((0, true))
-    };
+        move || std::fs::metadata(&out_file)
+    })
+    .await
+    .map(|meta| (meta.len(), false))
+    .unwrap_or((0, true));
 
     progress.blocked("fetch HEAD", None);
     let mut response = timeout_after(

@@ -26,20 +26,16 @@ pub async fn process(
             let assets_dir = assets_dir.clone();
             let progress = processing_progress.add_child(format!("{}:CPU IDLE", idx + 1));
             let rx = rx.clone();
-            crate::smol::Task::spawn(async move {
-                blocking::Unblock::new(())
-                    .with_mut(move |_| -> Result<_> {
-                        let agent = work::cpubound::Agent::new(assets_dir, &db)?;
-                        Ok(futures_lite::future::block_on(
-                            work::generic::processor(db, progress, rx, agent, max_retries_on_timeout).map(|r| {
-                                if let Err(e) = r {
-                                    log::warn!("CPU bound processor failed: {}", e);
-                                }
-                            }),
-                        ))
-                    })
-                    .await
-            })
+            crate::smol::Task::spawn(blocking::unblock(move || -> Result<_> {
+                let agent = work::cpubound::Agent::new(assets_dir, &db)?;
+                Ok(futures_lite::future::block_on(
+                    work::generic::processor(db, progress, rx, agent, max_retries_on_timeout).map(|r| {
+                        if let Err(e) = r {
+                            log::warn!("CPU bound processor failed: {}", e);
+                        }
+                    }),
+                ))
+            }))
             .detach();
         }
         tx_cpu
