@@ -17,7 +17,7 @@ migration = ["jwalk"]
 doctest = false
 
 [dependencies]
-quick-error = "1.2.3"
+quick-error = "2.0.0"
 futures-util = { version = "0.3.5", default-features = false, features = ["io", "sink"]}
 crates-index-diff = "7.0.0"
 prodash = { version = "7.0.0", default-features = false, features = ["tui-renderer", "tui-renderer-termion", "log-renderer", "localtime"] }

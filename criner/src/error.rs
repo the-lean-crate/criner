@@ -46,59 +46,59 @@ quick_error! {
         }
         RmpSerdeEncode(err: rmp_serde::encode::Error) {
             from()
-            cause(err)
+            source(err)
         }
         Git2(err: git2::Error) {
             from()
-            cause(err)
+            source(err)
         }
         Io(err: std::io::Error) {
             from()
-            cause(err)
+            source(err)
         }
         FromUtf8(err: std::string::FromUtf8Error) {
             from()
-            cause(err)
+            source(err)
         }
         Reqwest(err: reqwest::Error) {
             from()
-            cause(err)
+            source(err)
         }
         ParseInt(err: std::num::ParseIntError) {
             from()
-            cause(err)
+            source(err)
         }
         Rusqlite(err: rusqlite::Error) {
             from()
-            cause(err)
+            source(err)
         }
         GlobSet(err: globset::Error) {
             from()
-            cause(err)
+            source(err)
         }
         Horrorshow(err: horrorshow::Error) {
             from()
-            cause(err)
+            source(err)
         }
         SystemTime(err: std::time::SystemTimeError) {
             from()
-            cause(err)
+            source(err)
         }
         StripPrefixError(err: std::path::StripPrefixError) {
             from()
-            cause(err)
+            source(err)
         }
         Csv(err: csv::Error) {
             from()
-            cause(err)
+            source(err)
         }
         GlobPattern(err: glob::PatternError) {
             from()
-            cause(err)
+            source(err)
         }
         Glob(err: glob::GlobError) {
             from()
-            cause(err)
+            source(err)
         }
         ChannelSendMessage(msg: &'static str) {
             display("{}: Sending into a closed channel", msg)
