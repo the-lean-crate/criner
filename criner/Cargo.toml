@@ -33,7 +33,7 @@ tar = "0.4.26"
 libflate = "1.0.0"
 bytesize = "1.0.0"
 rmpv = "0.4.4"
-rusqlite = { version = "0.23.0", features = ["bundled", "unlock_notify"] }
+rusqlite = { version = "0.24.0", features = ["bundled", "unlock_notify"] }
 parking_lot = "0.11.0"
 async-trait = "0.1.24"
 dia-semver = "8.0.1"
