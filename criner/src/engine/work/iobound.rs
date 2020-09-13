@@ -176,13 +176,14 @@ async fn download_file_and_store_result(
 ) -> Result<()> {
     {
         let out_file = out_file.clone();
-        blocking::unblock!(std::fs::create_dir_all(&out_file.parent().expect("parent directory")))?;
+        blocking::unblock(move || std::fs::create_dir_all(&out_file.parent().expect("parent directory"))).await?;
     }
 
     // NOTE: We assume that the files we download never change, and we assume the server supports resumption!
     let (start_byte, truncate) = {
         let out_file = out_file.clone();
-        blocking::unblock!(std::fs::metadata(&out_file))
+        blocking::unblock(move || std::fs::metadata(&out_file))
+            .await
             .map(|meta| (meta.len(), false))
             .unwrap_or((0, true))
     };
@@ -233,15 +234,18 @@ async fn download_file_and_store_result(
 
     if remaining_content_length != 0 {
         let mut out = blocking::Unblock::new(
-            {
+            blocking::unblock({
                 let out_file = out_file.clone();
-                blocking::unblock!(std::fs::OpenOptions::new()
-                    .create(truncate)
-                    .truncate(truncate)
-                    .write(truncate)
-                    .append(!truncate)
-                    .open(out_file))
-            }
+                move || {
+                    std::fs::OpenOptions::new()
+                        .create(truncate)
+                        .truncate(truncate)
+                        .write(truncate)
+                        .append(!truncate)
+                        .open(out_file)
+                }
+            })
+            .await
             .map_err(|err| crate::Error::Message(format!("Failed to open '{}': {}", out_file.display(), err)))?,
         );
 

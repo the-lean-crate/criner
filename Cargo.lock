@@ -62,7 +62,7 @@ checksum = "3ae22a338d28c75b53702b66f77979062cb29675db376d99e451af4fa79dedb3"
 dependencies = [
  "cfg-if",
  "concurrent-queue",
- "futures-lite",
+ "futures-lite 0.1.11",
  "libc",
  "once_cell",
  "parking",
@@ -133,13 +133,14 @@ checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
 
 [[package]]
 name = "blocking"
-version = "0.5.2"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea5800d29218fea137b0880387e5948694a23c93fcdde157006966693a865c7c"
+checksum = "2640778f8053e72c11f621b0a5175a0560a269282aa98ed85107773ab8e2a556"
 dependencies = [
  "async-channel",
  "atomic-waker",
- "futures-lite",
+ "fastrand",
+ "futures-lite 1.4.0",
  "once_cell",
  "waker-fn",
 ]
@@ -341,7 +342,7 @@ dependencies = [
  "csv",
  "ctrlc",
  "dia-semver",
- "futures-lite",
+ "futures-lite 1.4.0",
  "futures-util",
  "glob",
  "globset",
@@ -482,7 +483,7 @@ dependencies = [
  "futures-channel",
  "futures-core",
  "futures-executor",
- "futures-lite",
+ "futures-lite 0.1.11",
  "futures-util",
  "termion",
  "tui",
@@ -700,6 +701,21 @@ name = "futures-lite"
 version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97999970129b808f0ccba93211201d431fcc12d7e1ffae03a61b5cedd1a7ced2"
+dependencies = [
+ "fastrand",
+ "futures-core",
+ "futures-io",
+ "memchr",
+ "parking",
+ "pin-project-lite",
+ "waker-fn",
+]
+
+[[package]]
+name = "futures-lite"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba659a67bd5ac00896b31e1f4095174134a31e448893d73256f1d51b81abbd62"
 dependencies = [
  "fastrand",
  "futures-core",
@@ -1451,7 +1467,7 @@ dependencies = [
  "crosstermion",
  "dashmap",
  "futures-core",
- "futures-lite",
+ "futures-lite 0.1.11",
  "futures-util",
  "humantime 2.0.1",
  "log",

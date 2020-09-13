@@ -39,16 +39,14 @@ pub async fn generate(
         for _ in 0..cpu_o_bound_processors {
             let task = rx_task.clone();
             let result = tx_result.clone();
-            crate::smol::Task::spawn(async move {
-                blocking::unblock! {
-                    futures_lite::future::block_on(async move {
-                        while let Ok(f) = task.recv().await {
-                            result.send(f.await).await.map_err(Error::send_msg("send CPU result"))?;
-                        }
-                        Ok::<_, Error>(())
-                    })
-                }
-            })
+            crate::smol::Task::spawn(blocking::unblock(move || {
+                futures_lite::future::block_on(async move {
+                    while let Ok(f) = task.recv().await {
+                        result.send(f.await).await.map_err(Error::send_msg("send CPU result"))?;
+                    }
+                    Ok::<_, Error>(())
+                })
+            }))
             .detach();
         }
         (tx_task, rx_result)
@@ -57,17 +55,18 @@ pub async fn generate(
     let waste_report_dir = output_dir.join(report::waste::Generator::name());
     {
         let dir = waste_report_dir.clone();
-        blocking::unblock!(std::fs::create_dir_all(dir))?;
+        blocking::unblock(move || std::fs::create_dir_all(dir)).await?;
     }
     use crate::engine::report::generic::WriteCallback;
     let (cache_dir, (git_handle, git_state, maybe_join_handle)) = match glob.as_ref() {
         Some(_) => (None, (git::not_available as WriteCallback, None, None)),
         None => {
             let cd = waste_report_dir.join("__incremental_cache__");
-            {
+            blocking::unblock({
                 let cd = cd.clone();
-                blocking::unblock!(std::fs::create_dir_all(cd))?;
-            }
+                move || std::fs::create_dir_all(cd)
+            })
+            .await?;
             (
                 Some(cd),
                 git::select_callback(cpu_o_bound_processors, &waste_report_dir, progress.add_child("git")),
