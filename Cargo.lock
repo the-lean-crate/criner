@@ -367,7 +367,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "tar",
- "time 0.2.18",
+ "time 0.2.19",
  "tokio",
  "toml",
 ]
@@ -380,7 +380,7 @@ dependencies = [
  "criner",
  "env_logger",
  "humantime 2.0.1",
- "time 0.2.18",
+ "time 0.2.19",
 ]
 
 [[package]]
@@ -1456,7 +1456,7 @@ dependencies = [
  "humantime 2.0.1",
  "log",
  "parking_lot",
- "time 0.2.18",
+ "time 0.2.19",
  "tui",
  "tui-react",
  "unicode-segmentation",
@@ -1987,9 +1987,9 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.2.18"
+version = "0.2.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12785163ae8a1cbb52a5db39af4a5baabd3fe49f07f76f952f89d7e89e5ce531"
+checksum = "80c1a1fd93112fc50b11c43a1def21f926be3c18884fad676ea879572da070a1"
 dependencies = [
  "const_fn",
  "libc",
