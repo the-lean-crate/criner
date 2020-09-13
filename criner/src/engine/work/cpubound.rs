@@ -38,7 +38,7 @@ impl crate::engine::work::generic::Processor for Agent {
         request: Self::Item,
         progress: &mut prodash::tree::Item,
     ) -> Result<(model::Task, String, String)> {
-        progress.init(None, Some("files extracted"));
+        progress.init(None, Some("files extracted".into()));
         match request {
             ExtractRequest {
                 download_task,
@@ -116,8 +116,8 @@ fn extract_crate(
     let mut buf = Vec::new();
     let mut interesting_paths = vec!["Cargo.toml".to_string(), "Cargo.lock".into()];
     let mut files = Vec::new();
-    for (eid, e) in archive.entries()?.enumerate() {
-        progress.set(eid as u32);
+    for e in archive.entries()? {
+        progress.inc();
         let mut e: tar::Entry<_> = e?;
         if tar_path_to_utf8_str(e.path_bytes().as_ref()) == "Cargo.toml" {
             e.read_to_end(&mut buf)?;

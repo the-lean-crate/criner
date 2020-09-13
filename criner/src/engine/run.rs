@@ -4,7 +4,7 @@ use futures_util::{
     stream::StreamExt,
 };
 use log::{info, warn};
-use prodash::tui::{Event, Line};
+use prodash::render::tui::{Event, Line};
 use std::{
     path::{Path, PathBuf},
     time::{Duration, SystemTime},
@@ -69,7 +69,7 @@ pub async fn non_blocking(
 
     let run = fetch_settings;
     let fetch_handle = crate::smol::Task::spawn(repeat_every_s(
-        run.every.as_secs() as u32,
+        run.every.as_secs() as usize,
         {
             let p = progress.clone();
             move || p.add_child("Fetch Timer")
@@ -92,7 +92,7 @@ pub async fn non_blocking(
 
     let stage = process_settings;
     let processing_handle = crate::smol::Task::spawn(repeat_every_s(
-        stage.every.as_secs() as u32,
+        stage.every.as_secs() as usize,
         {
             let p = progress.clone();
             move || p.add_child("Processing Timer")
@@ -119,7 +119,7 @@ pub async fn non_blocking(
 
     let stage = report_settings;
     let report_handle = crate::smol::Task::spawn(repeat_every_s(
-        stage.run.every.as_secs() as u32,
+        stage.run.every.as_secs() as usize,
         {
             let p = progress.clone();
             move || p.add_child("Reporting Timer")
@@ -165,11 +165,11 @@ pub enum Interruptible {
 
 pub type InterruptControlEvents = async_channel::Sender<Interruptible>;
 
-impl From<Interruptible> for prodash::tui::Event {
+impl From<Interruptible> for prodash::render::tui::Event {
     fn from(v: Interruptible) -> Self {
         match v {
-            Interruptible::Instantly => Event::SetInterruptMode(prodash::tui::Interrupt::Instantly),
-            Interruptible::Deferred => Event::SetInterruptMode(prodash::tui::Interrupt::Deferred),
+            Interruptible::Instantly => Event::SetInterruptMode(prodash::render::tui::Interrupt::Instantly),
+            Interruptible::Deferred => Event::SetInterruptMode(prodash::render::tui::Interrupt::Deferred),
         }
     }
 }
@@ -187,7 +187,7 @@ pub fn blocking(
     report_settings: GlobStageRunSettings,
     download_crates_io_database_every_24_hours_starting_at: Option<time::Time>,
     root: prodash::Tree,
-    gui: Option<prodash::tui::Options>,
+    gui: Option<prodash::render::tui::Options>,
 ) -> Result<()> {
     let start_of_computation = SystemTime::now();
     let assets_dir = db.as_ref().join("assets");
@@ -214,7 +214,7 @@ pub fn blocking(
 
     match gui {
         Some(gui_options) => {
-            let gui = crate::smol::Task::spawn(prodash::tui::render_with_input(
+            let gui = crate::smol::Task::spawn(prodash::render::tui::render_with_input(
                 std::io::stdout(),
                 root,
                 gui_options,
@@ -261,7 +261,7 @@ fn wallclock(since: SystemTime) -> String {
 }
 
 fn context_stream(db: &Db, start_of_computation: SystemTime) -> impl futures_util::stream::Stream<Item = Event> {
-    prodash::tui::ticker(Duration::from_secs(1)).map({
+    prodash::render::tui::ticker(Duration::from_secs(1)).map({
         let db = db.clone();
         move |_| {
             db.open_context()

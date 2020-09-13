@@ -15,13 +15,13 @@ mod from_csv;
 fn store(db: Db, crates: Vec<db_dump::Crate>, mut progress: prodash::tree::Item) -> Result<()> {
     let now = std::time::SystemTime::now();
     let crates_len = crates.len();
-    progress.init(Some(crates_len as u32), Some("crates stored"));
+    progress.init(Some(crates_len), Some("crates stored".into()));
     let mut connection = db.open_connection_no_async_with_busy_wait()?;
     let transaction = connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
     {
         let mut insert = new_key_value_insertion("crates.io-crate", &transaction)?;
-        for (idx, mut krate) in crates.into_iter().enumerate() {
-            progress.set((idx + 1) as u32);
+        for mut krate in crates.into_iter() {
+            progress.inc();
             krate.stored_at = now;
             let data = rmp_serde::to_vec(&krate)?;
             insert.execute(params![krate.name, data])?;
@@ -33,7 +33,7 @@ fn store(db: Db, crates: Vec<db_dump::Crate>, mut progress: prodash::tree::Item)
 }
 
 fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: PathBuf) -> Result<()> {
-    progress.init(None, Some("csv files"));
+    progress.init(None, Some("csv files".into()));
     let mut archive = tar::Archive::new(libflate::gzip::Decoder::new(BufReader::new(File::open(db_file_path)?))?);
     let whitelist_names = [
         "crates",
@@ -63,7 +63,7 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
 
     for (eid, entry) in archive.entries()?.enumerate() {
         num_files_seen = eid + 1;
-        progress.set(eid as u32);
+        progress.set(eid);
 
         let entry = entry?;
         let entry_size = entry.header().size()?;
@@ -133,7 +133,7 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
         crates_categories.ok_or_else(|| Error::Bug("expected crates_categories.csv in crates-io db dump"))?;
     let crate_owners = crate_owners.ok_or_else(|| Error::Bug("expected crate_owners.csv in crates-io db dump"))?;
 
-    progress.init(Some(4), Some("conversion steps"));
+    progress.init(Some(4), Some("conversion steps".into()));
     progress.set_name("transform actors");
     progress.set(1);
     let actors_by_id = convert::into_actors_by_id(users, teams, progress.add_child("actors"));

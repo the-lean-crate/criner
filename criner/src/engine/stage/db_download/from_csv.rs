@@ -35,9 +35,9 @@ where
         .has_headers(true)
         .flexible(true)
         .from_reader(csv);
-    for (idx, item) in rd.deserialize().enumerate() {
+    for item in rd.deserialize() {
         cb(item?);
-        progress.set((idx + 1) as u32);
+        progress.inc();
     }
     Ok(())
 }
@@ -51,7 +51,7 @@ where
     T: serde::de::DeserializeOwned + AsId,
 {
     let mut decode = progress.add_child("decoding");
-    decode.init(None, Some(name));
+    decode.init(None, Some(name.into()));
     let mut map = BTreeMap::new();
     records(rd, &mut decode, |v: T| {
         map.insert(v.as_id(), v);
@@ -65,7 +65,7 @@ where
     T: serde::de::DeserializeOwned,
 {
     let mut decode = progress.add_child("decoding");
-    decode.init(None, Some(name));
+    decode.init(None, Some(name.into()));
     let mut vec = Vec::new();
     records(rd, &mut decode, |v: T| {
         vec.push(v);

@@ -73,7 +73,7 @@ pub async fn process(
     blocking::unblock(move || {
         let versions = db.open_crate_versions()?;
         let num_versions = versions.count();
-        progress.init(Some(num_versions as u32), Some("crate versions"));
+        progress.init(Some(num_versions as usize), Some("crate versions".into()));
 
         let auto_checkpoint_every = 10000;
         let checkpoint_connection = db.open_connection_with_busy_wait()?;
@@ -103,7 +103,7 @@ pub async fn process(
             for (vid, version) in versions.drain(..).enumerate() {
                 let version = version?;
 
-                progress.set((vid + fetched_versions + 1) as u32);
+                progress.set(vid + fetched_versions + 1);
                 progress.halted("wait for task consumers", None);
                 futures_lite::future::block_on(work::schedule::tasks(
                     &assets_dir,

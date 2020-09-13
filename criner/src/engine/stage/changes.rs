@@ -44,8 +44,8 @@ pub async fn fetch(
                         "Fetching crates index ({} received)",
                         bytesize::ByteSize(p.received_bytes() as u64)
                     ));
-                    subprogress.init(Some((p.total_deltas() + p.total_objects()) as u32), Some("objects"));
-                    subprogress.set((p.indexed_deltas() + p.received_objects()) as u32);
+                    subprogress.init(Some(p.total_deltas() + p.total_objects()), Some("objects".into()));
+                    subprogress.set(p.indexed_deltas() + p.received_objects());
                     true
                 });
                 let mut opts = crates_index_diff::git2::FetchOptions::new();
@@ -61,7 +61,7 @@ pub async fn fetch(
     progress.done(format!("Fetched {} changed crates", crate_versions.len()));
 
     let mut store_progress = progress.add_child("processing new crates");
-    store_progress.init(Some(crate_versions.len() as u32), Some("crate versions"));
+    store_progress.init(Some(crate_versions.len()), Some("crate versions".into()));
 
     let without_time_limit_unless_one_is_set =
         deadline.unwrap_or_else(|| SystemTime::now().add(Duration::from_secs(24 * 60 * 60)));
@@ -87,8 +87,7 @@ pub async fn fetch(
             let transaction = connection.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
             {
                 let mut statement = new_key_value_insertion(CrateVersionTable::table_name(), &transaction)?;
-                for (versions_stored, version) in crate_versions.into_iter().map(model::CrateVersion::from).enumerate()
-                {
+                for version in crate_versions.into_iter().map(model::CrateVersion::from) {
                     key_buf.clear();
                     version.key_buf(&mut key_buf);
                     statement.execute(params![&key_buf, rmp_serde::to_vec(&version)?])?;
@@ -107,7 +106,7 @@ pub async fn fetch(
                         new_crates += 1;
                     }
 
-                    store_progress.set((versions_stored + 1) as u32);
+                    store_progress.inc();
                 }
             }
 
@@ -122,10 +121,10 @@ pub async fn fetch(
             };
             {
                 let mut statement = new_key_value_insertion(CrateTable::table_name(), &transaction)?;
-                store_progress.init(Some(crates_lut.len() as u32), Some("crates"));
-                for (cid, (key, value)) in crates_lut.into_iter().enumerate() {
+                store_progress.init(Some(crates_lut.len()), Some("crates".into()));
+                for (key, value) in crates_lut.into_iter() {
                     statement.execute(params![key, rmp_serde::to_vec(&value)?])?;
-                    store_progress.set((cid + 1) as u32);
+                    store_progress.inc();
                 }
             }
             store_progress.blocked("commit crates", None);

@@ -110,14 +110,14 @@ async fn submit_single<R>(
     task: model::Task,
     progress: &mut prodash::tree::Item,
     channel: &async_channel::Sender<R>,
-    step: u32,
-    max_step: u32,
+    step: usize,
+    max_step: usize,
     f: impl FnOnce() -> R,
 ) -> SubmitResult {
     use model::TaskState::*;
     use SubmitResult::*;
     let mut configure = || {
-        progress.init(Some(step), Some("task"));
+        progress.init(Some(step), Some("task".into()));
         progress.set(max_step);
         progress.blocked("wait for consumer", None);
     };

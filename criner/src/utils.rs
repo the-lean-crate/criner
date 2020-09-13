@@ -26,12 +26,12 @@ pub fn parse_semver(version: &str) -> Semver {
 }
 
 pub async fn wait_with_progress(
-    duration_s: u32,
+    duration_s: usize,
     mut progress: prodash::tree::Item,
     deadline: Option<SystemTime>,
     time: Option<time::Time>,
 ) -> Result<()> {
-    progress.init(Some(duration_s), Some("s"));
+    progress.init(Some(duration_s), Some("s".into()));
     if let Some(time) = time {
         progress.set_name(format!(
             "{} scheduled at {}",
@@ -86,7 +86,7 @@ where
             ))
         }
         wait_with_progress(
-            duration_until(Some(time)).as_secs() as u32,
+            duration_until(Some(time)).as_secs() as usize,
             make_progress(),
             deadline,
             Some(time),
@@ -96,7 +96,7 @@ where
 }
 
 pub async fn repeat_every_s<MakeFut, MakeProgress, Fut, T>(
-    interval_s: u32,
+    interval_s: usize,
     mut make_progress: MakeProgress,
     deadline: Option<SystemTime>,
     at_most: Option<usize>,

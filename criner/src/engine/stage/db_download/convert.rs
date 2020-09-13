@@ -182,7 +182,7 @@ pub fn into_actors_by_id(
     teams: BTreeMap<csv_model::Id, csv_model::Team>,
     mut progress: prodash::tree::Item,
 ) -> BTreeMap<(db_dump::Id, db_dump::ActorKind), db_dump::Actor> {
-    progress.init(Some((users.len() + teams.len()) as u32), Some("users and teams"));
+    progress.init(Some(users.len() + teams.len()), Some("users and teams".into()));
     let mut map = BTreeMap::new();
 
     let mut count = 0;
@@ -209,13 +209,13 @@ pub fn into_versions_by_crate_id(
     actors: &BTreeMap<(db_dump::Id, db_dump::ActorKind), db_dump::Actor>,
     mut progress: prodash::tree::Item,
 ) -> BTreeMap<db_dump::Id, Vec<db_dump::CrateVersion>> {
-    progress.init(Some(versions.len() as u32), Some("versions converted"));
+    progress.init(Some(versions.len()), Some("versions converted".into()));
     versions.sort_by_key(|v| v.id);
     let versions_len = versions.len();
 
     let mut version_by_id = BTreeMap::new();
-    for (vid, version) in versions.into_iter().enumerate() {
-        progress.set((vid + 1) as u32);
+    for version in versions.into_iter() {
+        progress.inc();
         let crate_id = version.crate_id;
         let published_by = version.published_by;
         let version_id = version.id;
@@ -230,9 +230,9 @@ pub fn into_versions_by_crate_id(
     ));
 
     let version_authors_len = version_authors.len();
-    progress.init(Some(version_authors_len as u32), Some("version authors assigned"));
-    for (vid, csv_model::VersionAuthor { name, version_id }) in version_authors.into_iter().enumerate() {
-        progress.set((vid + 1) as u32);
+    progress.init(Some(version_authors_len), Some("version authors assigned".into()));
+    for csv_model::VersionAuthor { name, version_id } in version_authors.into_iter() {
+        progress.inc();
         version_by_id
             .get_mut(&version_id)
             .expect("to have a version for a given id")
@@ -244,11 +244,11 @@ pub fn into_versions_by_crate_id(
 
     let mut map = BTreeMap::new();
     progress.init(
-        Some(version_by_id.len() as u32),
-        Some("version-crate associations made"),
+        Some(version_by_id.len()),
+        Some("version-crate associations made".into()),
     );
-    for (vid, (_, (crate_id, version))) in version_by_id.into_iter().enumerate() {
-        progress.set((vid + 1) as u32);
+    for (_, (crate_id, version)) in version_by_id.into_iter() {
+        progress.inc();
         map.entry(crate_id).or_insert_with(Vec::new).push(version);
     }
     progress.done(format!(
@@ -272,9 +272,9 @@ pub fn into_crates(
     mut progress: prodash::tree::Item,
 ) -> Vec<db_dump::Crate> {
     let mut crate_by_id = BTreeMap::new();
-    progress.init(Some(crates.len() as u32), Some("crates converted"));
-    for (kid, krate) in crates.into_iter().enumerate() {
-        progress.set((kid + 1) as u32);
+    progress.init(Some(crates.len()), Some("crates converted".into()));
+    for krate in crates.into_iter() {
+        progress.inc();
         let crate_id = krate.id;
         let mut krate: db_dump::Crate = krate.into();
         let mut versions: Vec<_> = std::mem::replace(
@@ -293,10 +293,10 @@ pub fn into_crates(
         crate_by_id.len()
     ));
 
-    progress.init(Some(crates_keywords.len() as u32), Some("crates keywords"));
+    progress.init(Some(crates_keywords.len()), Some("crates keywords".into()));
     let crates_keywords_len = crates_keywords.len();
-    for (idx, csv_model::CratesKeyword { keyword_id, crate_id }) in crates_keywords.into_iter().enumerate() {
-        progress.set((idx + 1) as u32);
+    for csv_model::CratesKeyword { keyword_id, crate_id } in crates_keywords.into_iter() {
+        progress.inc();
         crate_by_id
             .get_mut(&crate_id)
             .expect("matching crate for keyword")
@@ -311,10 +311,10 @@ pub fn into_crates(
     }
     progress.done(format!("assigned {} keywords", crates_keywords_len));
 
-    progress.init(Some(crates_categories.len() as u32), Some("crates categories"));
+    progress.init(Some(crates_categories.len()), Some("crates categories".into()));
     let crates_categories_len = crates_categories.len();
-    for (idx, csv_model::CratesCategory { category_id, crate_id }) in crates_categories.into_iter().enumerate() {
-        progress.set((idx + 1) as u32);
+    for csv_model::CratesCategory { category_id, crate_id } in crates_categories.into_iter() {
+        progress.inc();
         crate_by_id
             .get_mut(&crate_id)
             .expect("matching crate for category")
@@ -330,18 +330,15 @@ pub fn into_crates(
     progress.done(format!("assigned {} categories", crates_categories_len));
 
     let crate_owners_len = crate_owners.len();
-    progress.init(Some(crate_owners_len as u32), Some("crates owners"));
-    for (
-        idx,
-        csv_model::CrateOwner {
-            crate_id,
-            created_by,
-            owner_id,
-            owner_kind,
-        },
-    ) in crate_owners.into_iter().enumerate()
+    progress.init(Some(crate_owners_len), Some("crates owners".into()));
+    for csv_model::CrateOwner {
+        crate_id,
+        created_by,
+        owner_id,
+        owner_kind,
+    } in crate_owners.into_iter()
     {
-        progress.set((idx + 1) as u32);
+        progress.inc();
         let owner = actors_by_id
             .get(&(owner_id, owner_kind.into()))
             .expect("owner to exist for owner-id & kind combination")

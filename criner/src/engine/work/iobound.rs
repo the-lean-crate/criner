@@ -224,13 +224,13 @@ async fn download_file_and_store_result(
         .content_length()
         .ok_or(Error::InvalidHeader("expected content-length"))?;
 
-    let content_length = (start_byte + remaining_content_length) as u32;
-    progress.init(Some(content_length / 1024), Some("Kb"));
+    let content_length = (start_byte + remaining_content_length) as usize;
+    progress.init(Some(content_length / 1024), Some("Kb".into()));
     progress.done(format!(
         "HEAD{}:{}: content-length = {}",
         if start_byte != 0 { "(resumable)" } else { "" },
         url,
-        ByteSize(content_length.into())
+        ByteSize(content_length as u64)
     ));
 
     if remaining_content_length != 0 {
@@ -256,7 +256,7 @@ async fn download_file_and_store_result(
             format!(
                 "fetched {} of {}",
                 ByteSize(bytes_received as u64),
-                ByteSize(content_length.into())
+                ByteSize(content_length as u64)
             ),
             response.chunk().boxed(),
         )
@@ -264,7 +264,7 @@ async fn download_file_and_store_result(
         {
             out.write_all(&chunk).await?;
             bytes_received += chunk.len();
-            progress.set((bytes_received / 1024) as u32);
+            progress.set(bytes_received / 1024);
         }
         progress.done(format!(
             "GET{}:{}: body-size = {}",
@@ -281,7 +281,7 @@ async fn download_file_and_store_result(
         let task_result = model::TaskResult::Download {
             kind: kind.to_owned(),
             url: url.to_owned(),
-            content_length,
+            content_length: content_length as u32,
             content_type: response
                 .headers()
                 .get(http::header::CONTENT_TYPE)

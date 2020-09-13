@@ -20,7 +20,7 @@ doctest = false
 quick-error = "2.0.0"
 futures-util = { version = "0.3.5", default-features = false, features = ["io", "sink"]}
 crates-index-diff = "7.0.0"
-prodash = { version = "7.0.0", default-features = false, features = ["tui-renderer", "tui-renderer-termion", "log-renderer", "localtime"] }
+prodash = { version = "10.0.1", default-features = false, features = ["render-tui", "render-tui-termion", "localtime", "progress-tree", "progress-tree-log"] }
 rmp-serde = "0.14.0"
 serde_derive = "1.0.104"
 serde = "1.0.104"

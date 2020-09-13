@@ -56,25 +56,6 @@ dependencies = [
 
 [[package]]
 name = "async-io"
-version = "0.1.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ae22a338d28c75b53702b66f77979062cb29675db376d99e451af4fa79dedb3"
-dependencies = [
- "cfg-if",
- "concurrent-queue",
- "futures-lite 0.1.11",
- "libc",
- "once_cell",
- "parking",
- "polling 0.1.9",
- "socket2",
- "vec-arena 0.5.2",
- "wepoll-sys-stjepang",
- "winapi 0.3.9",
-]
-
-[[package]]
-name = "async-io"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c59a2cdfa8ad60643ec249f7cdbd6a9b0163c07cbd3f2b79e07d2c267ac81a70"
@@ -87,9 +68,9 @@ dependencies = [
  "log",
  "once_cell",
  "parking",
- "polling 1.0.1",
+ "polling",
  "socket2",
- "vec-arena 1.0.0",
+ "vec-arena",
  "waker-fn",
  "wepoll-sys-stjepang",
  "winapi 0.3.9",
@@ -354,7 +335,7 @@ name = "criner"
 version = "0.2.0"
 dependencies = [
  "async-channel",
- "async-io 1.0.2",
+ "async-io",
  "async-trait",
  "blocking",
  "bytesize",
@@ -1422,19 +1403,6 @@ checksum = "d36492546b6af1463394d46f0c834346f31548646f6ba10849802c9c9a27ac33"
 
 [[package]]
 name = "polling"
-version = "0.1.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8fffa183f6bd5f1a8a3e1f60ce2f8d5621e350eed84a62d6daaa5b9d1aaf6fbd"
-dependencies = [
- "cfg-if",
- "libc",
- "log",
- "wepoll-sys-stjepang",
- "winapi 0.3.9",
-]
-
-[[package]]
-name = "polling"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0835fa5f9af34c170eb38638ae6bc88e1b11ecdd0b968c9d9de8e343450385eb"
@@ -1495,15 +1463,15 @@ dependencies = [
 
 [[package]]
 name = "prodash"
-version = "7.1.1"
+version = "10.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b161a23f30b7c034ecbf4a9c683e1ceff4d891dd9d215e909a48e333aa8b3758"
+checksum = "3012b03d6fa569e37a4d27912705d29a45f7834fbb4e1d961987278ade3e53d1"
 dependencies = [
- "async-io 0.1.11",
+ "async-io",
  "crosstermion",
  "dashmap",
  "futures-core",
- "futures-lite 0.1.11",
+ "futures-lite 1.4.0",
  "futures-util",
  "humantime 2.0.1",
  "log",
@@ -2255,12 +2223,6 @@ name = "vcpkg"
 version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6454029bf181f092ad1b853286f23e2c507d8e8194d01d92da4a55c274a5508c"
-
-[[package]]
-name = "vec-arena"
-version = "0.5.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8cb18268690309760d59ee1a9b21132c126ba384f374c59a94db4bc03adeb561"
 
 [[package]]
 name = "vec-arena"

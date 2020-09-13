@@ -25,12 +25,12 @@ pub async fn generate(
         .expect("assets directory to be in criner.db")
         .join("reports");
     let glob_str = glob.as_deref();
-    let num_crates = krates.count_filtered(glob_str.clone()) as u32;
+    let num_crates = krates.count_filtered(glob_str.clone()) as usize;
     let chunk_size = 500.min(num_crates);
     if chunk_size == 0 {
         return Ok(());
     }
-    progress.init(Some(num_crates), Some("crates"));
+    progress.init(Some(num_crates), Some("crates".into()));
 
     let (processors, rx_result) = {
         let (tx_task, rx_task) = async_channel::bounded(1);
@@ -76,7 +76,7 @@ pub async fn generate(
     };
     let merge_reports = crate::smol::Task::spawn({
         let mut merge_progress = progress.add_child("report aggregator");
-        merge_progress.init(Some(num_crates / chunk_size), Some("Reports"));
+        merge_progress.init(Some(num_crates / chunk_size), Some("Reports".into()));
         report::waste::Generator::merge_reports(
             waste_report_dir.clone(),
             cache_dir.clone(),
@@ -117,7 +117,7 @@ pub async fn generate(
         cid += 1;
         check(deadline)?;
 
-        progress.set((cid * chunk_size) as u32);
+        progress.set(cid * chunk_size);
         progress.halted("write crate report", None);
         processors
             .send(report::waste::Generator::write_files(

@@ -63,12 +63,11 @@ pub fn run_blocking(args: Args) -> criner::error::Result<()> {
             if no_gui {
                 None
             } else {
-                Some(criner::prodash::tui::Options {
+                Some(criner::prodash::render::tui::Options {
                     title: "Criner".into(),
                     frames_per_second: fps,
                     recompute_column_width_every_nth_frame: Option::from(fps as usize),
-                    redraw_only_on_state_change: true,
-                    ..criner::prodash::tui::Options::default()
+                    ..criner::prodash::render::tui::Options::default()
                 })
             },
         ),

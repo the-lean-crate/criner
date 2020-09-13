@@ -164,22 +164,17 @@ pub trait Generator {
             for (name, krate) in krates.into_iter() {
                 let c: model::Crate = krate.as_slice().into();
                 let crate_dir = crate_dir(&out_dir, &name);
-                progress.init(Some(c.versions.len() as u32), Some("versions"));
+                progress.init(Some(c.versions.len()), Some("versions".into()));
                 progress.set_name(&name);
 
                 let mut crate_report = None::<Self::Report>;
-                for (vid, version) in c
-                    .versions
-                    .iter()
-                    .take(all_but_recently_yanked(
-                        &name,
-                        &c.versions,
-                        &crate_versions,
-                        &mut key_buf,
-                    )?)
-                    .enumerate()
-                {
-                    progress.set((vid + 1) as u32);
+                for version in c.versions.iter().take(all_but_recently_yanked(
+                    &name,
+                    &c.versions,
+                    &crate_versions,
+                    &mut key_buf,
+                )?) {
+                    progress.inc();
 
                     key_buf.clear();
                     Self::fq_report_key(&name, &version, &mut key_buf);
@@ -264,14 +259,14 @@ pub trait Generator {
             progress.blocked("wait for write lock", None);
             let transaction = connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
             progress.init(
-                Some(reports_to_mark_done.len() as u32),
-                Some("report done markers written"),
+                Some(reports_to_mark_done.len()),
+                Some("report done markers written".into()),
             );
             {
                 let mut statement = new_key_insertion(ReportsTree::table_name(), &transaction)?;
-                for (kid, key) in reports_to_mark_done.iter().enumerate() {
+                for key in reports_to_mark_done.iter() {
                     statement.execute(params![key])?;
-                    progress.set((kid + 1) as u32);
+                    progress.inc();
                 }
             }
             transaction.commit()?;

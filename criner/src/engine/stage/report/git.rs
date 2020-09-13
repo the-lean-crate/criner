@@ -57,7 +57,7 @@ pub fn select_callback(
             let report_dir = report_dir.to_owned();
             let handle = std::thread::spawn(move || -> Result<()> {
                 let res = (|| {
-                    progress.init(None, Some("files stored in index"));
+                    progress.init(None, Some("files stored in index".into()));
                     let mut index = {
                         let mut i = repo.index()?;
                         if is_bare_repo {
@@ -81,10 +81,10 @@ pub fn select_callback(
                         req_count += 1;
                         let entry = file_index_entry(path.to_owned(), content.len());
                         index.add_frombuffer(&entry, &content)?;
-                        progress.set(req_count as u32);
+                        progress.set(req_count as usize);
                     }
 
-                    progress.init(Some(5), Some("steps"));
+                    progress.init(Some(5), Some("steps".into()));
                     let tree_oid = {
                         progress.set(1);
                         progress.blocked("writing tree", None);
@@ -184,11 +184,11 @@ pub fn select_callback(
                                                 bytesize::ByteSize(p.received_bytes() as u64)
                                             ));
                                             progress.init(
-                                                Some((p.total_deltas() + p.total_objects()) as u32),
-                                                Some("objects"),
+                                                Some(p.total_deltas() + p.total_objects()),
+                                                Some("objects".into()),
                                             );
                                             progress
-                                                .set((p.indexed_deltas() + p.received_objects()) as u32);
+                                                .set(p.indexed_deltas() + p.received_objects() );
                                             true
                                         })
                                         .sideband_progress(move |line| {
