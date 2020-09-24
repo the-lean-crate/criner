@@ -29,7 +29,7 @@ pub enum SubCommands {
         fps: f32,
 
         /// The amount of progress messages to keep in a ring buffer.
-        #[clap(short = "s", long, default_value = "100")]
+        #[clap(short = 's', long, default_value = "100")]
         progress_message_scrollback_buffer_size: usize,
 
         /// The amount of IO-bound processors to run concurrently.
@@ -59,35 +59,35 @@ pub enum SubCommands {
         cpu_bound_processors: u32,
 
         /// Path to the possibly existing crates.io repository clone. If unset, it will be cloned to a temporary spot.
-        #[clap(short = "c", long, name = "REPO")]
+        #[clap(short = 'c', long, name = "REPO")]
         repository: Option<PathBuf>,
 
         /// The amount of time we can take for the computation. Specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
-        #[clap(long, short = "t")]
+        #[clap(long, short = 't')]
         time_limit: Option<humantime::Duration>,
 
         /// The time between each fetch operation, specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
-        #[clap(long, short = "f", default_value = "5min")]
+        #[clap(long, short = 'f', default_value = "5min")]
         fetch_every: humantime::Duration,
 
         /// If set, the amount of times the fetch stage will run. If set to 0, it will never run.
-        #[clap(long, short = "F")]
+        #[clap(long, short = 'F')]
         fetch_at_most: Option<usize>,
 
         /// The time between each processing run, specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
-        #[clap(long, short = "p", default_value = "5min")]
+        #[clap(long, short = 'p', default_value = "5min")]
         process_every: humantime::Duration,
 
         /// If set, the amount of times the process stage will run. If set to 0, they will never run.
-        #[clap(long, short = "P")]
+        #[clap(long, short = 'P')]
         process_at_most: Option<usize>,
 
         /// The time between each reporting and processing run, specified in humantime, like 10s, 5min, or 2h, or '3h 2min 2s'
-        #[clap(long, short = "r", default_value = "5min")]
+        #[clap(long, short = 'r', default_value = "5min")]
         report_every: humantime::Duration,
 
         /// If set, the amount of times the reporting stage will run. If set to 0, they will never run.
-        #[clap(long, short = "R")]
+        #[clap(long, short = 'R')]
         report_at_most: Option<usize>,
 
         /// If set, declare at which local time to download the crates.io database and digest it.
@@ -95,13 +95,13 @@ pub enum SubCommands {
         /// This job runs every 24h, as the database is updated that often.
         /// If unset, the job starts right away.
         /// Format is HH:MM, e.g. '14:30' for 2:30 pm or 03:15 for quarter past 3 in the morning.
-        #[clap(long, short = "d", parse(try_from_str = parse_local_time))]
+        #[clap(long, short = 'd', parse(try_from_str = parse_local_time))]
         download_crates_io_database_every_24_hours_starting_at: Option<time::Time>,
 
         /// If set, the reporting stage will only iterate over crates that match the given standard unix glob.
         ///
         /// moz* would match only crates starting with 'moz' for example.
-        #[clap(long, short = "g")]
+        #[clap(long, short = 'g')]
         glob: Option<String>,
 
         /// Path to the possibly existing database. It's used to persist all mining results.
