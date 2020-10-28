@@ -339,18 +339,16 @@ pub fn into_crates(
     } in crate_owners.into_iter()
     {
         progress.inc();
-        let owner = actors_by_id
-            .get(&(owner_id, owner_kind.into()))
-            .expect("owner to exist for owner-id & kind combination")
-            .to_owned();
-        let created_by = created_by.and_then(|id| actors_by_id.get(&(id, db_dump::ActorKind::User)).cloned());
-        let krate = crate_by_id
-            .get_mut(&crate_id)
-            .expect("crate id to match crate for owner assignment");
-        if krate.created_by.is_none() {
-            krate.created_by = created_by;
+        if let Some(owner) = actors_by_id.get(&(owner_id, owner_kind.into())).map(ToOwned::to_owned) {
+            let created_by = created_by.and_then(|id| actors_by_id.get(&(id, db_dump::ActorKind::User)).cloned());
+            let krate = crate_by_id
+                .get_mut(&crate_id)
+                .expect("crate id to match crate for owner assignment");
+            if krate.created_by.is_none() {
+                krate.created_by = created_by;
+            }
+            krate.owners.push(owner);
         }
-        krate.owners.push(owner);
     }
 
     progress.done(format!("assigned {} owners", crate_owners_len));
