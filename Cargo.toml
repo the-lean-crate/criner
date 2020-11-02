@@ -25,7 +25,7 @@ doctest = false
 clap = { version = "=3.0.0-beta.2", features = ["color"] }
 humantime = "2.0.0"
 time = "0.2.9"
-criner = { version = "0.2.0", path = "./criner" }
+criner = { version = "0.3.0", path = "./criner" }
 env_logger = { version = "0.7.1", default-features = false, features = ["termcolor", "atty", "humantime"] }
 
 [workspace]
