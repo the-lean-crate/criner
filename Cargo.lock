@@ -542,9 +542,9 @@ dependencies = [
 
 [[package]]
 name = "crosstermion"
-version = "0.3.2"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "893b2cce6bdffad38cace7e10ada7661a4bcf5f7440bc3bafc403eccdb710eff"
+checksum = "4e8d2d94a8a9afe9773520e636e906dfb4a7dedb2f0f2eb4ad3080dca39892dc"
 dependencies = [
  "async-channel",
  "futures-channel",
@@ -1557,9 +1557,9 @@ dependencies = [
 
 [[package]]
 name = "prodash"
-version = "10.0.2"
+version = "11.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52a590b3646de456b895a026d483127875f4fb181da4e58c311dfee9d67d035e"
+checksum = "9fd0233a8e15f5ae27e5a9253f2557878a231132ad21d225ded02ce1a0188b23"
 dependencies = [
  "async-io",
  "crosstermion",
@@ -2230,9 +2230,9 @@ checksum = "59547bce71d9c38b83d9c0e92b6066c4253371f15005def0c30d9657f50c7642"
 
 [[package]]
 name = "tui"
-version = "0.10.0"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a977b0bb2e2033a6fef950f218f13622c3c34e59754b704ce3492dedab1dfe95"
+checksum = "5d4e6c82bb967df89f20b875fa8835fab5d5622c6a5efa574a1f0b6d0aa6e8f6"
 dependencies = [
  "bitflags",
  "cassowary",
@@ -2243,9 +2243,9 @@ dependencies = [
 
 [[package]]
 name = "tui-react"
-version = "0.10.1"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a97bea172550957047351f406690772b6fa6244c20b95cbb230228bbb7477c61"
+checksum = "f3ae8540a35c71f98407398eae06d55bab6373de612a3f147540293d4a8f10ef"
 dependencies = [
  "log",
  "tui",
@@ -2282,9 +2282,9 @@ dependencies = [
 
 [[package]]
 name = "unicode-segmentation"
-version = "1.6.0"
+version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e83e153d1053cbb5a118eeff7fd5be06ed99153f00dbcd8ae310c5fb2b22edc0"
+checksum = "db8716a166f290ff49dabc18b44aa407cb7c6dbe1aa0971b44b8a24b0ca35aae"
 
 [[package]]
 name = "unicode-width"
