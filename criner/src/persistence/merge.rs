@@ -16,7 +16,7 @@ impl Merge<model::Task> for model::Task {
 
 impl Merge<model::TaskState> for model::TaskState {
     fn merge(mut self, other: &model::TaskState) -> Self {
-        fn merge_vec(mut existing: Vec<String>, new: &Vec<String>) -> Vec<String> {
+        fn merge_vec(mut existing: Vec<String>, new: &[String]) -> Vec<String> {
             existing.extend(new.iter().cloned());
             existing
         }

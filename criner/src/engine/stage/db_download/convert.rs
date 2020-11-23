@@ -260,6 +260,7 @@ pub fn into_versions_by_crate_id(
     map
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn into_crates(
     crates: Vec<csv_model::Crate>,
     mut keywords_by_id: BTreeMap<csv_model::Id, csv_model::Keyword>,

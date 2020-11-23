@@ -51,6 +51,7 @@ fn split_to_matched_and_unmatched(
     globset: &globset::GlobSet,
 ) -> (Vec<TarHeader>, Vec<TarHeader>) {
     let mut unmatched = Vec::new();
+    #[allow(clippy::unnecessary_filter_map)] // we need to keep the unmatched element
     let matched = entries
         .into_iter()
         .filter_map(|e| {
@@ -367,21 +368,12 @@ fn to_crate_relative_path(source_file_path: impl AsRef<Path>, relative_path: imp
         .expect("directory containing the file");
     let leading_parent_path_components = relative_path
         .components()
-        .take_while(|c| match c {
-            ParentDir | CurDir => true,
-            _ => false,
-        })
-        .filter(|c| match c {
-            ParentDir => true,
-            _ => false,
-        })
+        .take_while(|c| matches!(c, ParentDir | CurDir))
+        .filter(|c| matches!(c, ParentDir))
         .count();
     let components_to_take_from_relative_path = relative_path
         .components()
-        .filter(|c| match c {
-            CurDir => false,
-            _ => true,
-        })
+        .filter(|c| !matches!(c, CurDir))
         .skip(leading_parent_path_components);
     let components_to_take = source_path
         .components()

@@ -28,6 +28,7 @@ pub enum AsyncResult {
     Done,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub async fn tasks(
     assets_dir: &Path,
     tasks: &persistence::TaskTable,

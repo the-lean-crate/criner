@@ -25,7 +25,7 @@ pub async fn generate(
         .expect("assets directory to be in criner.db")
         .join("reports");
     let glob_str = glob.as_deref();
-    let num_crates = krates.count_filtered(glob_str.clone()) as usize;
+    let num_crates = krates.count_filtered(glob_str) as usize;
     let chunk_size = 500.min(num_crates);
     if chunk_size == 0 {
         return Ok(());

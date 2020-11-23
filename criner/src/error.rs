@@ -1,6 +1,4 @@
 use crates_index_diff::git2;
-use humantime;
-use rmp_serde;
 use std::{fmt, time};
 
 #[derive(Debug)]

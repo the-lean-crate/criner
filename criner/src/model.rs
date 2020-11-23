@@ -150,14 +150,10 @@ pub enum TaskState {
 
 impl TaskState {
     pub fn is_complete(&self) -> bool {
-        if let TaskState::Complete = self {
-            true
-        } else {
-            false
-        }
+        matches!(self, TaskState::Complete)
     }
     pub fn merge_with(&mut self, other: &TaskState) {
-        fn merge_vec(mut existing: Vec<String>, new: &Vec<String>) -> Vec<String> {
+        fn merge_vec(mut existing: Vec<String>, new: &[String]) -> Vec<String> {
             existing.extend(new.iter().cloned());
             existing
         }

@@ -23,6 +23,7 @@ pub struct GlobStageRunSettings {
     pub run: StageRunSettings,
 }
 
+#[allow(clippy::too_many_arguments)]
 /// Runs the statistics and mining engine.
 /// May run for a long time unless a deadline is specified.
 /// Even though timeouts can be achieved from outside of the future, knowing the deadline may be used
@@ -174,6 +175,7 @@ impl From<Interruptible> for prodash::render::tui::Event {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 /// For convenience, run the engine and block until done.
 pub fn blocking(
     db: impl AsRef<Path>,
@@ -220,7 +222,7 @@ pub fn blocking(
                 gui_options,
                 futures_util::stream::select(
                     context_stream(&db, start_of_computation),
-                    interrupt_control_stream.map(|v| Event::from(v)),
+                    interrupt_control_stream.map(Event::from),
                 ),
             )?);
 

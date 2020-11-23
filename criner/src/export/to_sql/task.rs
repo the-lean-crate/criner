@@ -69,7 +69,7 @@ impl SqlConvert for model::Task {
         ])?;
         match state {
             InProgress(Some(errors)) | AttemptsWithFailure(errors) => {
-                let sstm = sstm.ok_or_else(|| crate::Error::Bug("need secondary statement"))?;
+                let sstm = sstm.ok_or(crate::Error::Bug("need secondary statement"))?;
                 for error in errors.iter() {
                     sstm.execute(params![uid, error])?;
                 }

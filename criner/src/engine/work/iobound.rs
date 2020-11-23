@@ -68,40 +68,36 @@ where
         progress: &mut prodash::tree::Item,
     ) -> Result<(model::Task, String, String)> {
         progress.init(None, None);
-        match request {
-            DownloadRequest {
-                output_file_path,
-                progress_name,
-                task_key,
-                crate_name_and_version,
-                kind,
-                url,
-            } => {
-                let dummy_task = default_persisted_download_task();
-                let progress_name = format!("↓ {}", progress_name);
+        let DownloadRequest {
+            output_file_path,
+            progress_name,
+            task_key,
+            crate_name_and_version,
+            kind,
+            url,
+        } = request;
+        let dummy_task = default_persisted_download_task();
+        let progress_name = format!("↓ {}", progress_name);
 
-                let task_result = model::TaskResult::Download {
-                    kind: kind.to_owned(),
-                    url: String::new(),
-                    content_length: 0,
-                    content_type: None,
-                };
+        let task_result = model::TaskResult::Download {
+            kind: kind.to_owned(),
+            url: String::new(),
+            content_length: 0,
+            content_type: None,
+        };
 
-                self.next_action_state =
-                    (self.make_state)(crate_name_and_version.clone(), &dummy_task, &output_file_path);
-                self.state = Some(ProcessingState {
-                    url,
-                    kind,
-                    output_file_path,
-                    result_key: crate_name_and_version.as_ref().map(|(crate_name, crate_version)| {
-                        let mut result_key = String::with_capacity(task_key.len() * 2);
-                        task_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut result_key);
-                        result_key
-                    }),
-                });
-                Ok((dummy_task, task_key, progress_name))
-            }
-        }
+        self.next_action_state = (self.make_state)(crate_name_and_version.clone(), &dummy_task, &output_file_path);
+        self.state = Some(ProcessingState {
+            url,
+            kind,
+            output_file_path,
+            result_key: crate_name_and_version.as_ref().map(|(crate_name, crate_version)| {
+                let mut result_key = String::with_capacity(task_key.len() * 2);
+                task_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut result_key);
+                result_key
+            }),
+        });
+        Ok((dummy_task, task_key, progress_name))
     }
 
     fn idle_message(&self) -> String {

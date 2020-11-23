@@ -10,7 +10,7 @@ impl<'a> fmt::Display for WithCauses<'a> {
             write!(f, "\ncaused by: \n{}", err)?;
             cursor = err;
         }
-        write!(f, "\n")
+        writeln!(f)
     }
 }
 

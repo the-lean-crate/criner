@@ -119,19 +119,17 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
         ByteSize(num_bytes_seen)
     ));
 
-    let users = users.ok_or_else(|| Error::Bug("expected users.csv in crates-io db dump"))?;
-    let teams = teams.ok_or_else(|| Error::Bug("expected teams.csv in crates-io db dump"))?;
-    let versions = versions.ok_or_else(|| Error::Bug("expected versions.csv in crates-io db dump"))?;
-    let version_authors =
-        version_authors.ok_or_else(|| Error::Bug("expected version_authors.csv in crates-io db dump"))?;
-    let crates = crates.ok_or_else(|| Error::Bug("expected crates.csv in crates-io db dump"))?;
-    let keywords = keywords.ok_or_else(|| Error::Bug("expected keywords.csv in crates-io db dump"))?;
-    let crates_keywords =
-        crates_keywords.ok_or_else(|| Error::Bug("expected crates_keywords.csv in crates-io db dump"))?;
-    let categories = categories.ok_or_else(|| Error::Bug("expected categories.csv in crates-io db dump"))?;
+    let users = users.ok_or(Error::Bug("expected users.csv in crates-io db dump"))?;
+    let teams = teams.ok_or(Error::Bug("expected teams.csv in crates-io db dump"))?;
+    let versions = versions.ok_or(Error::Bug("expected versions.csv in crates-io db dump"))?;
+    let version_authors = version_authors.ok_or(Error::Bug("expected version_authors.csv in crates-io db dump"))?;
+    let crates = crates.ok_or(Error::Bug("expected crates.csv in crates-io db dump"))?;
+    let keywords = keywords.ok_or(Error::Bug("expected keywords.csv in crates-io db dump"))?;
+    let crates_keywords = crates_keywords.ok_or(Error::Bug("expected crates_keywords.csv in crates-io db dump"))?;
+    let categories = categories.ok_or(Error::Bug("expected categories.csv in crates-io db dump"))?;
     let crates_categories =
-        crates_categories.ok_or_else(|| Error::Bug("expected crates_categories.csv in crates-io db dump"))?;
-    let crate_owners = crate_owners.ok_or_else(|| Error::Bug("expected crate_owners.csv in crates-io db dump"))?;
+        crates_categories.ok_or(Error::Bug("expected crates_categories.csv in crates-io db dump"))?;
+    let crate_owners = crate_owners.ok_or(Error::Bug("expected crate_owners.csv in crates-io db dump"))?;
 
     progress.init(Some(4), Some("conversion steps".into()));
     progress.set_name("transform actors");
@@ -217,7 +215,9 @@ pub async fn schedule(
         tx_io
     };
 
-    let today_yyyy_mm_dd = time::OffsetDateTime::now_local().format("%F");
+    let today_yyyy_mm_dd = time::OffsetDateTime::try_now_local()
+        .unwrap_or_else(|_| time::OffsetDateTime::now_utc())
+        .format("%F");
     let file_suffix = "db-dump.tar.gz";
     let task_key = format!(
         "{}{}{}",

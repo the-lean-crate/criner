@@ -39,37 +39,35 @@ impl crate::engine::work::generic::Processor for Agent {
         progress: &mut prodash::tree::Item,
     ) -> Result<(model::Task, String, String)> {
         progress.init(None, Some("files extracted".into()));
-        match request {
-            ExtractRequest {
-                download_task,
-                crate_name,
-                crate_version,
-            } => {
-                let progress_info = format!("CPU UNZIP+UNTAR {}:{}", crate_name, crate_version);
-                let dummy_task = default_persisted_extraction_task();
-                let mut task_key = String::new();
-                dummy_task.fq_key(&crate_name, &crate_version, &mut task_key);
+        let ExtractRequest {
+            download_task,
+            crate_name,
+            crate_version,
+        } = request;
 
-                let downloaded_crate = super::schedule::download_file_path(
-                    &self.asset_dir,
-                    &crate_name,
-                    &crate_version,
-                    &download_task.process,
-                    &download_task.version,
-                    "crate",
-                );
-                let dummy_result = model::TaskResult::ExplodedCrate {
-                    entries_meta_data: vec![],
-                    selected_entries: vec![],
-                };
+        let progress_info = format!("CPU UNZIP+UNTAR {}:{}", crate_name, crate_version);
+        let dummy_task = default_persisted_extraction_task();
+        let mut task_key = String::new();
+        dummy_task.fq_key(&crate_name, &crate_version, &mut task_key);
 
-                let mut key = String::with_capacity(task_key.len() * 2);
-                dummy_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut key);
+        let downloaded_crate = super::schedule::download_file_path(
+            &self.asset_dir,
+            &crate_name,
+            &crate_version,
+            &download_task.process,
+            &download_task.version,
+            "crate",
+        );
+        let dummy_result = model::TaskResult::ExplodedCrate {
+            entries_meta_data: vec![],
+            selected_entries: vec![],
+        };
 
-                self.state = Some(ProcessingState { downloaded_crate, key });
-                Ok((dummy_task, task_key, progress_info))
-            }
-        }
+        let mut key = String::with_capacity(task_key.len() * 2);
+        dummy_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut key);
+
+        self.state = Some(ProcessingState { downloaded_crate, key });
+        Ok((dummy_task, task_key, progress_info))
     }
 
     fn idle_message(&self) -> String {
@@ -168,7 +166,7 @@ fn extract_crate(
             };
             files.push((
                 meta_data.last().expect("to have pushed one just now").to_owned(),
-                slice.to_owned().into(),
+                slice.to_owned(),
             ));
         }
     }
@@ -178,8 +176,8 @@ fn extract_crate(
     ));
 
     let task_result = model::TaskResult::ExplodedCrate {
-        entries_meta_data: meta_data.into(),
-        selected_entries: files.into(),
+        entries_meta_data: meta_data,
+        selected_entries: files,
     };
     results.insert(progress, &key, &task_result)?;
 
