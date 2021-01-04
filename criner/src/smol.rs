@@ -82,8 +82,7 @@ fn enter<T>(f: impl FnOnce() -> T) -> T {
     NESTING.with(|nesting| {
         let res = if nesting.get() == 0 {
             nesting.replace(1);
-            let _ = RT.enter();
-            f()
+            RT.enter(f)
         } else {
             nesting.replace(nesting.get() + 1);
             f()
