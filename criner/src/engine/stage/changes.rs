@@ -7,8 +7,8 @@ use crate::{
 };
 use crates_index_diff::Index;
 use rusqlite::params;
+use std::collections::BTreeMap;
 use std::{
-    collections::BTreeMap,
     ops::Add,
     path::Path,
     time::{Duration, SystemTime},
@@ -69,14 +69,13 @@ pub async fn fetch(
         let db = db.clone();
         let index_path = crates_io_path.as_ref().to_path_buf();
         move || {
-            use std::iter::FromIterator;
             let mut connection = db.open_connection_no_async_with_busy_wait()?;
-            let mut crates_lut = {
+            let mut crates_lut: BTreeMap<_, _> = {
                 let transaction = connection.transaction()?;
                 store_progress.blocked("caching crates", None);
                 let mut statement = new_key_value_query_old_to_new(CrateTable::table_name(), &transaction)?;
                 let iter = key_value_iter::<model::Crate>(&mut statement)?.flat_map(Result::ok);
-                BTreeMap::from_iter(iter)
+                iter.collect()
             };
 
             let mut key_buf = String::new();

@@ -45,7 +45,7 @@ blocking = "1.0.0"
 async-io = "1.0.0"
 parking = "2.0.0"
 async-channel = "1.1.1"
-tokio = { version = "0.2.22", default-features = false, features = ["rt-threaded"]}
+tokio = { version = "1.0.1", default-features = false, features = ["rt-multi-thread"] }
 # for properly shutting down the GUI when SIGTERM is sent directly
 ctrlc = { version = "3.1.4", features = ["termination"] }
 # For scheduling the cron-like download of the crates.io db using local time declarations
