@@ -19,6 +19,8 @@ pub(crate) mod persistence;
 pub(crate) mod utils;
 
 pub(crate) mod smol;
+mod spawn;
+pub(crate) use spawn::spawn;
 
 mod engine;
 
