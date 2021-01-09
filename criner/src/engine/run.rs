@@ -46,7 +46,7 @@ pub async fn non_blocking(
     check(deadline)?;
     let startup_time = SystemTime::now();
 
-    let db_download_handle = crate::smol::Task::spawn(repeat_daily_at(
+    let db_download_handle = crate::spawn(repeat_daily_at(
         download_crates_io_database_every_24_hours_starting_at,
         {
             let p = progress.clone();
@@ -69,7 +69,7 @@ pub async fn non_blocking(
     ));
 
     let run = fetch_settings;
-    let fetch_handle = crate::smol::Task::spawn(repeat_every_s(
+    let fetch_handle = crate::spawn(repeat_every_s(
         run.every.as_secs() as usize,
         {
             let p = progress.clone();
@@ -92,7 +92,7 @@ pub async fn non_blocking(
     ));
 
     let stage = process_settings;
-    let processing_handle = crate::smol::Task::spawn(repeat_every_s(
+    let processing_handle = crate::spawn(repeat_every_s(
         stage.every.as_secs() as usize,
         {
             let p = progress.clone();
@@ -119,7 +119,7 @@ pub async fn non_blocking(
     ));
 
     let stage = report_settings;
-    let report_handle = crate::smol::Task::spawn(repeat_every_s(
+    let report_handle = crate::spawn(repeat_every_s(
         stage.run.every.as_secs() as usize,
         {
             let p = progress.clone();
@@ -216,7 +216,7 @@ pub fn blocking(
 
     match gui {
         Some(gui_options) => {
-            let gui = crate::smol::Task::spawn(prodash::render::tui::render_with_input(
+            let gui = crate::spawn(prodash::render::tui::render_with_input(
                 std::io::stdout(),
                 root,
                 gui_options,

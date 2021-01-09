@@ -39,7 +39,7 @@ pub async fn generate(
         for _ in 0..cpu_o_bound_processors {
             let task = rx_task.clone();
             let result = tx_result.clone();
-            crate::smol::Task::spawn(blocking::unblock(move || {
+            crate::spawn(blocking::unblock(move || {
                 futures_lite::future::block_on(async move {
                     while let Ok(f) = task.recv().await {
                         result.send(f.await).await.map_err(Error::send_msg("send CPU result"))?;
@@ -74,7 +74,7 @@ pub async fn generate(
             )
         }
     };
-    let merge_reports = crate::smol::Task::spawn({
+    let merge_reports = crate::spawn({
         let mut merge_progress = progress.add_child("report aggregator");
         merge_progress.init(Some(num_crates / chunk_size), Some("Reports".into()));
         report::waste::Generator::merge_reports(

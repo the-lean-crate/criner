@@ -26,7 +26,7 @@ pub async fn process(
             let assets_dir = assets_dir.clone();
             let progress = processing_progress.add_child(format!("{}:CPU IDLE", idx + 1));
             let rx = rx.clone();
-            crate::smol::Task::spawn(blocking::unblock(move || -> Result<_> {
+            crate::spawn(blocking::unblock(move || -> Result<_> {
                 let agent = work::cpubound::Agent::new(assets_dir, &db)?;
                 #[allow(clippy::unit_arg)] // don't know where the unit is supposed to be
                 Ok(futures_lite::future::block_on(
@@ -46,7 +46,7 @@ pub async fn process(
         let (tx_io, rx) = async_channel::bounded(1);
         for idx in 0..io_bound_processors {
             let max_retries_on_timeout = 40;
-            crate::smol::Task::spawn(
+            crate::spawn(
                 work::generic::processor(
                     db.clone(),
                     processing_progress.add_child(format!("{}: ↓ IDLE", idx + 1)),
