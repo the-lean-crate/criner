@@ -70,7 +70,7 @@ version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eb877970c7b440ead138f6321a3b5395d6061183af779340b65e20c0fede9146"
 dependencies = [
- "async-task 4.0.3",
+ "async-task",
  "concurrent-queue",
  "fastrand",
  "futures-lite",
@@ -97,12 +97,6 @@ dependencies = [
  "waker-fn",
  "winapi 0.3.9",
 ]
-
-[[package]]
-name = "async-task"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c17772156ef2829aadc587461c7753af20b7e8db1529bc66855add962a3b35d3"
 
 [[package]]
 name = "async-task"
@@ -169,7 +163,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c5e170dbede1f740736619b776d7251cb1b9095c435c34d8ca9f57fcd2f335e9"
 dependencies = [
  "async-channel",
- "async-task 4.0.3",
+ "async-task",
  "atomic-waker",
  "fastrand",
  "futures-lite",
@@ -363,10 +357,7 @@ dependencies = [
  "lazy_static",
  "libflate",
  "log",
- "multitask",
- "num_cpus",
  "once_cell",
- "parking",
  "parking_lot",
  "prodash",
  "quick-error",
@@ -380,7 +371,6 @@ dependencies = [
  "serde_json",
  "tar",
  "time",
- "tokio",
  "toml",
 ]
 
@@ -1239,17 +1229,6 @@ dependencies = [
  "net2",
  "winapi 0.2.8",
  "ws2_32-sys",
-]
-
-[[package]]
-name = "multitask"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c09c35271e7dcdb5f709779111f2c8e8ab8e06c1b587c1c6a9e179d865aaa5b4"
-dependencies = [
- "async-task 3.0.0",
- "concurrent-queue",
- "fastrand",
 ]
 
 [[package]]
@@ -2117,7 +2096,6 @@ dependencies = [
  "lazy_static",
  "memchr",
  "mio",
- "num_cpus",
  "pin-project-lite 0.1.11",
  "slab",
 ]
