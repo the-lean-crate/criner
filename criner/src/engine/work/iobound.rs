@@ -4,7 +4,7 @@ use crate::{
     Error, Result,
 };
 use bytesize::ByteSize;
-use futures_util::{future::FutureExt, io::AsyncWriteExt};
+use futures_lite::{io::AsyncWriteExt, FutureExt};
 
 use crate::utils::timeout_after;
 use async_trait::async_trait;

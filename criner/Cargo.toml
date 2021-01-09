@@ -47,7 +47,7 @@ async-compat = "0.1.4" # increase this version to get more recent tokio releases
 # for properly shutting down the GUI when SIGTERM is sent directly
 ctrlc = { version = "3.1.4", features = ["termination"] }
 # For scheduling the cron-like download of the crates.io db using local time declarations
-time = "0.2.9"
+time = "=0.2.22"
 
 # for parsing csv files contained in crates-db-download
 csv = "1.1.3"
