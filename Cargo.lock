@@ -39,6 +39,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-compat"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f0bb3019d8e5ffe88594b122ba9ba37280a3bc8d94a742b56c8417457215ae4"
+dependencies = [
+ "futures-core",
+ "futures-io",
+ "once_cell",
+ "pin-project-lite 0.1.11",
+ "tokio",
+]
+
+[[package]]
 name = "async-compression"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -327,6 +340,7 @@ name = "criner"
 version = "0.3.0"
 dependencies = [
  "async-channel",
+ "async-compat",
  "async-executor",
  "async-io",
  "async-trait",

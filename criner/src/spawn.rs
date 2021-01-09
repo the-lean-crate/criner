@@ -10,15 +10,17 @@ use once_cell::sync::Lazy;
 
 pub fn spawn<T: Send + 'static>(future: impl Future<Output = T> + Send + 'static) -> Task<T> {
     static GLOBAL: Lazy<Executor<'_>> = Lazy::new(|| {
-        thread::Builder::new()
-            .name("smol-one".into())
-            .spawn(|| loop {
-                catch_unwind(|| async_io::block_on(GLOBAL.run(future::pending::<()>()))).ok();
-            })
-            .expect("cannot spawn executor thread");
+        for i in 1..=2 {
+            thread::Builder::new()
+                .name(format!("smol-{}", i))
+                .spawn(|| loop {
+                    catch_unwind(|| async_io::block_on(GLOBAL.run(future::pending::<()>()))).ok();
+                })
+                .expect("cannot spawn executor thread");
+        }
 
         Executor::new()
     });
 
-    GLOBAL.spawn(future)
+    GLOBAL.spawn(async_compat::Compat::new(future))
 }
