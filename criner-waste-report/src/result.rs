@@ -1,5 +1,4 @@
 use super::{CargoConfig, Fix, Patterns, PotentialWaste, Report, TarHeader, WastedFile};
-use std::iter::FromIterator;
 use std::{collections::BTreeSet, path::Path, path::PathBuf};
 
 lazy_static! {
@@ -455,12 +454,15 @@ fn find_paths_mentioned_in_build_script(build: Option<(TarHeader, Option<&[u8]>)
                         || p.starts_with('-'))
                 })
                 .collect();
-            let dirs = BTreeSet::from_iter(v.iter().filter_map(|p| {
-                Path::new(p)
-                    .parent()
-                    .filter(|p| p.components().count() > 0)
-                    .and_then(|p| p.to_str().map(|s| s.to_string()))
-            }));
+            let dirs: BTreeSet<_> = v
+                .iter()
+                .filter_map(|p| {
+                    Path::new(p)
+                        .parent()
+                        .filter(|p| p.components().count() > 0)
+                        .and_then(|p| p.to_str().map(|s| s.to_string()))
+                })
+                .collect();
             let possible_patterns = if dirs.is_empty() {
                 v.extend(v.clone().into_iter().map(|p| format!("{}/*", p)));
                 v

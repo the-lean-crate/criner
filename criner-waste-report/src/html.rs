@@ -2,7 +2,7 @@ use super::{AggregateFileInfo, Dict, Fix, Report, VersionInfo};
 use bytesize::ByteSize;
 use dia_semver::Semver;
 use horrorshow::{box_html, helper::doctype, html, Render, RenderBox, RenderOnce, TemplateBuffer};
-use std::{iter::FromIterator, time::SystemTime};
+use std::time::SystemTime;
 
 pub fn fix_to_wasted_files_aggregate(fix: Option<Fix>) -> Option<AggregateFileInfo> {
     match fix.unwrap_or(Fix::RemoveExclude) {
@@ -165,7 +165,7 @@ fn child_items_section(
 ) -> Box<dyn RenderBox> {
     let title = title.into();
     let suffix = suffix.into();
-    let mut sorted: Vec<_> = Vec::from_iter(info_by_child.into_iter());
+    let mut sorted: Vec<_> = info_by_child.into_iter().collect();
     sorted.sort_by(|(ln, le), (rn, re)| match order {
         SortOrder::Semver => parse_semver(ln).cmp(&parse_semver(rn)),
         SortOrder::Waste => match (&le.waste_latest_version, &re.waste_latest_version) {
@@ -193,7 +193,7 @@ fn child_items_section(
 }
 
 fn by_extension_section(wasted_by_extension: Dict<AggregateFileInfo>) -> Box<dyn RenderBox> {
-    let mut sorted: Vec<_> = Vec::from_iter(wasted_by_extension.into_iter());
+    let mut sorted: Vec<_> = wasted_by_extension.into_iter().collect();
     sorted.sort_by_key(|(_, e)| e.total_bytes);
     let top_list = 20;
     let skip_info = if sorted.len() > top_list {
