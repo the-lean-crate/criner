@@ -3,7 +3,7 @@ use crate::model::{db_dump, Context, Crate, CrateVersion, ReportResult, Task, Ta
 fn expect<T, E: std::fmt::Display>(r: std::result::Result<T, E>, panic_message: impl FnOnce(E) -> String) -> T {
     match r {
         Ok(v) => v,
-        Err(e) => panic!(panic_message(e)),
+        Err(e) => std::panic::panic_any(panic_message(e)),
     }
 }
 
