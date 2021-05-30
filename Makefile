@@ -49,7 +49,7 @@ force-report-only: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run the reporting
 mine-nonstop: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run all operations continuously, fully automated
 		ulimit -n 512; $(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --io 10 --cpu 1 --cpu-o 10 -d 3:00 $(DB)
 mine-nonstop-no-report: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run all operations continuously, fully automated
-		ulimit -n 512; $(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --io 10 --cpu 1 --cpu-o 10 -d 3:00 -R $(DB)
+		ulimit -n 512; $(RELEASE_EXECUTABLE) mine -c $(bare_index_path) --io 10 --cpu 1 --cpu-o 10 -d 3:00 -R 0 $(DB)
 mine-nonstop-logonly: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run all operations continuously, fully automated, without gui
 		ulimit -n 512; $(RELEASE_EXECUTABLE) mine --no-gui -c $(bare_index_path) --io 10 --cpu 1 --cpu-o 10 $(DB)
 mine-2min-logonly: $(RELEASE_EXECUTABLE) $(bare_index_path) ## Run all operations continuously, painfully often, and for two minutes only
