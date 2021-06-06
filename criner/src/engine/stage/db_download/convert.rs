@@ -82,7 +82,6 @@ impl From<csv_model::Version> for db_dump::CrateVersion {
             license,
             semver,
             published_by: None,
-            authors: Vec::new(),
             is_yanked,
         }
     }
@@ -205,7 +204,6 @@ pub fn into_actors_by_id(
 
 pub fn into_versions_by_crate_id(
     mut versions: Vec<csv_model::Version>,
-    version_authors: Vec<csv_model::VersionAuthor>,
     actors: &BTreeMap<(db_dump::Id, db_dump::ActorKind), db_dump::Actor>,
     mut progress: prodash::tree::Item,
 ) -> BTreeMap<db_dump::Id, Vec<db_dump::CrateVersion>> {
@@ -228,19 +226,6 @@ pub fn into_versions_by_crate_id(
         "transformed {} crate versions and assigned publishing actor",
         version_by_id.len()
     ));
-
-    let version_authors_len = version_authors.len();
-    progress.init(Some(version_authors_len), Some("version authors assigned".into()));
-    for csv_model::VersionAuthor { name, version_id } in version_authors.into_iter() {
-        progress.inc();
-        version_by_id
-            .get_mut(&version_id)
-            .expect("to have a version for a given id")
-            .1
-            .authors
-            .push(name.into());
-    }
-    progress.done(format!("Assigned {} version authors", version_authors_len));
 
     let mut map = BTreeMap::new();
     progress.init(

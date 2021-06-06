@@ -199,7 +199,7 @@ pub fn select_callback(
                                         git2::Cred::userpass_plaintext(&username, &password)
                                     });
                                 remote.push(
-                                    &["HEAD:refs/heads/main"],
+                                    &["+HEAD:refs/heads/main"],
                                     Some(
                                         git2::PushOptions::new()
                                             .packbuilder_parallelism(0)

@@ -148,12 +148,6 @@ pub struct CrateOwner {
 }
 
 #[derive(Deserialize)]
-pub struct VersionAuthor {
-    pub name: String,
-    pub version_id: Id,
-}
-
-#[derive(Deserialize)]
 pub struct CratesCategory {
     pub category_id: Id,
     pub crate_id: Id,

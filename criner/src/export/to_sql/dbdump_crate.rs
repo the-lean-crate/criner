@@ -25,7 +25,6 @@ impl<'a> SqlConvert for model::db_dump::Crate {
              license                TEXT NOT NULL,
              crate_size             INTEGER,
              published_by           INTEGER,  -- Github user id as index into crates.io-actor table
-             authors                JSON NOT NULL, -- Array of Persons, each with name and email
              is_yanked              INTEGER NOT NULL,  -- is 1 if this version is yanked
              FOREIGN KEY (parent_id) REFERENCES 'crates.io-crate'(_row_id_)
         );
@@ -100,8 +99,8 @@ fn do_it(input_statement: &mut rusqlite::Statement, transaction: &rusqlite::Tran
         .prepare(
             "
             INSERT OR IGNORE INTO 'crates.io-crate_version'
-                     (parent_id, crate_name, semver, created_at, updated_at, downloads, features, license, crate_size, published_by, authors, is_yanked)
-              VALUES (?1       , ?2        , ?3        , ?4        , ?5        , ?6       , ?7      , ?8 , ?9        , ?10         , ?11    , ?12);
+                     (parent_id, crate_name, semver, created_at, updated_at, downloads, features, license, crate_size, published_by, is_yanked)
+              VALUES (?1       , ?2        , ?3        , ?4        , ?5        , ?6       , ?7      , ?8 , ?9        , ?10         , , ?11);
         ",
         )
         .unwrap();
@@ -166,7 +165,6 @@ fn do_it(input_statement: &mut rusqlite::Statement, transaction: &rusqlite::Tran
                 license,
                 semver,
                 published_by,
-                authors,
                 is_yanked,
             } = version;
             insert_crate_version.execute(params![
@@ -180,7 +178,6 @@ fn do_it(input_statement: &mut rusqlite::Statement, transaction: &rusqlite::Tran
                 license,
                 crate_size,
                 published_by.map(|a| a.github_id),
-                serde_json::to_string_pretty(&authors).unwrap(),
                 is_yanked
             ])?;
         }

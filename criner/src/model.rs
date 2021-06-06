@@ -330,8 +330,6 @@ pub mod db_dump {
         pub semver: String,
         /// The actor that published the version
         pub published_by: Option<Actor>,
-        /// The authors of a particular versions
-        pub authors: Vec<Person>,
         /// If true, the version was yanked
         pub is_yanked: bool,
     }

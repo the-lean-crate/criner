@@ -39,7 +39,6 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
         "crates",
         "crate_owners",
         "versions",
-        "version_authors",
         "crates_categories",
         "categories",
         "crates_keywords",
@@ -57,7 +56,6 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
     let mut users = None::<BTreeMap<csv_model::Id, csv_model::User>>;
     let mut crates = None::<Vec<csv_model::Crate>>;
     let mut crate_owners = None::<Vec<csv_model::CrateOwner>>;
-    let mut version_authors = None::<Vec<csv_model::VersionAuthor>>;
     let mut crates_categories = None::<Vec<csv_model::CratesCategory>>;
     let mut crates_keywords = None::<Vec<csv_model::CratesKeyword>>;
 
@@ -99,9 +97,6 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
                 "crate_owners" => {
                     crate_owners = Some(from_csv::vec(entry, "crate_owners", &mut progress)?);
                 }
-                "version_authors" => {
-                    version_authors = Some(from_csv::vec(entry, "version_authors", &mut progress)?);
-                }
                 "crates_categories" => {
                     crates_categories = Some(from_csv::vec(entry, "crates_categories", &mut progress)?);
                 }
@@ -122,7 +117,6 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
     let users = users.ok_or(Error::Bug("expected users.csv in crates-io db dump"))?;
     let teams = teams.ok_or(Error::Bug("expected teams.csv in crates-io db dump"))?;
     let versions = versions.ok_or(Error::Bug("expected versions.csv in crates-io db dump"))?;
-    let version_authors = version_authors.ok_or(Error::Bug("expected version_authors.csv in crates-io db dump"))?;
     let crates = crates.ok_or(Error::Bug("expected crates.csv in crates-io db dump"))?;
     let keywords = keywords.ok_or(Error::Bug("expected keywords.csv in crates-io db dump"))?;
     let crates_keywords = crates_keywords.ok_or(Error::Bug("expected crates_keywords.csv in crates-io db dump"))?;
@@ -139,7 +133,7 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
     progress.set_name("transform versions");
     progress.set(2);
     let versions_by_crate_id =
-        convert::into_versions_by_crate_id(versions, version_authors, &actors_by_id, progress.add_child("versions"));
+        convert::into_versions_by_crate_id(versions, &actors_by_id, progress.add_child("versions"));
 
     progress.set_name("transform crates");
     progress.set(3);
