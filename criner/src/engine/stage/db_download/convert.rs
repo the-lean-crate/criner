@@ -1,6 +1,5 @@
 use super::csv_model;
-use crate::model::db_dump;
-use crate::utils::parse_semver;
+use crate::{model::db_dump, utils::parse_semver};
 use std::collections::BTreeMap;
 use std::time::SystemTime;
 
