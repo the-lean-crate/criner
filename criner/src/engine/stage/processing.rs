@@ -123,7 +123,7 @@ pub async fn process(
             // kick in with too many writers. There is no way to change the autocheckpoint mode to something more suitable… :/
             progress.blocked(
                 "checkpointing database",
-                last_elapsed_for_checkpointing.clone().map(|d| SystemTime::now() + d),
+                last_elapsed_for_checkpointing.map(|d| SystemTime::now() + d),
             );
             let start = SystemTime::now();
             checkpoint_connection

@@ -262,11 +262,10 @@ pub fn into_crates(
         progress.inc();
         let crate_id = krate.id;
         let mut krate: db_dump::Crate = krate.into();
-        let mut versions: Vec<_> = std::mem::replace(
+        let mut versions: Vec<_> = std::mem::take(
             &mut versions_by_crate_id
                 .get_mut(&crate_id)
                 .expect("at least one version per crate"),
-            Vec::new(),
         );
         versions.sort_by_key(|v| parse_semver(&v.semver));
         krate.versions = versions;
