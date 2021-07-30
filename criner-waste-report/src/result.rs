@@ -32,11 +32,11 @@ pub fn tar_path_to_utf8_str(mut bytes: &[u8]) -> &str {
 }
 
 fn tar_path_to_path(bytes: &[u8]) -> &Path {
-    &Path::new(tar_path_to_utf8_str(bytes))
+    Path::new(tar_path_to_utf8_str(bytes))
 }
 
 fn tar_path_to_path_no_strip(bytes: &[u8]) -> &Path {
-    &Path::new(std::str::from_utf8(bytes).expect("valid utf8 paths in crate archive"))
+    Path::new(std::str::from_utf8(bytes).expect("valid utf8 paths in crate archive"))
 }
 
 // NOTE: Actually there only seem to be files in these archives, but let's be safe
@@ -667,22 +667,22 @@ impl Report {
         let compile_time_includes = {
             let mut includes_parsed_from_files = Vec::new();
             includes_parsed_from_files.extend(included_paths_of(find_in_entries(
-                &entries_with_buffer,
-                &entries,
+                entries_with_buffer,
+                entries,
                 config.lib_path(),
             )));
             add_to_includes_if_non_default(config.lib_path(), &mut includes_parsed_from_files);
             for path in config.bin_paths() {
                 includes_parsed_from_files.extend(included_paths_of(find_in_entries(
-                    &entries_with_buffer,
-                    &entries,
+                    entries_with_buffer,
+                    entries,
                     path,
                 )));
                 add_to_includes_if_non_default(path, &mut includes_parsed_from_files);
             }
 
             let build_script_name = config.actual_or_expected_build_script_path();
-            let maybe_data = find_in_entries(&entries_with_buffer, &entries, build_script_name);
+            let maybe_data = find_in_entries(entries_with_buffer, entries, build_script_name);
             maybe_build_script_path =
                 maybe_build_script_path.or_else(|| maybe_data.as_ref().map(|_| build_script_name.to_owned()));
             includes_parsed_from_files.extend(find_paths_mentioned_in_build_script(maybe_data));

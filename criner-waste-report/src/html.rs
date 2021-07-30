@@ -25,7 +25,7 @@ pub const NO_EXT_MARKER: &str = "<NO_EXT>";
 
 fn parse_semver(version: &str) -> Semver {
     use std::str::FromStr;
-    Semver::from_str(&version)
+    Semver::from_str(version)
         .or_else(|_| {
             Semver::from_str(
                 &version[..version

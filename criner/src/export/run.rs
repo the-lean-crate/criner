@@ -1,6 +1,6 @@
 use super::to_sql::SqlConvert;
 use crate::model;
-use rusqlite::{Connection, NO_PARAMS};
+use rusqlite::Connection;
 use std::path::Path;
 
 pub fn run_blocking(source_db: impl AsRef<Path>, destination_db: impl AsRef<Path>) -> crate::Result<()> {
@@ -51,7 +51,7 @@ where
                 None => None,
             };
             for (uid, res) in istm
-                .query_map(NO_PARAMS, |r| {
+                .query_map([], |r| {
                     let key: String = r.get(0)?;
                     let value: Vec<u8> = r.get(1)?;
                     Ok((key, value))
