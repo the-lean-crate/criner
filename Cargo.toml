@@ -44,6 +44,7 @@ opt-level = 2
 # uncomment this when things stabilize - increase build times, but potentially make faster binaries
 #lto = "fat"
 #codegen-units = 1
+incremental = false
 opt-level = 3
 panic = "abort"
 overflow-checks = true
