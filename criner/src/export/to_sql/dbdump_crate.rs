@@ -2,7 +2,7 @@ use crate::{
     export::to_sql::{to_seconds_since_epoch, SqlConvert},
     model,
 };
-use rusqlite::{params, Statement, NO_PARAMS};
+use rusqlite::{params, Statement};
 
 impl<'a> SqlConvert for model::db_dump::Crate {
     fn replace_statement() -> &'static str {
@@ -106,7 +106,7 @@ fn do_it(input_statement: &mut rusqlite::Statement, transaction: &rusqlite::Tran
         .unwrap();
 
     let mut count = 0;
-    for res in input_statement.query_map(NO_PARAMS, |r| {
+    for res in input_statement.query_map([], |r| {
         let key: String = r.get(0)?;
         let value: Vec<u8> = r.get(1)?;
         Ok((key, value))

@@ -1,5 +1,5 @@
 use crate::persistence::{TableAccess, TaskResultTable};
-use rusqlite::{params, NO_PARAMS};
+use rusqlite::params;
 use std::path::Path;
 
 pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
@@ -11,7 +11,7 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
     {
         log::info!("begin iteration");
         let mut statement = connection.prepare(&format!("SELECT key FROM {}", table_name))?;
-        let mut rows = statement.query(NO_PARAMS)?;
+        let mut rows = statement.query([])?;
         while let Some(r) = rows.next()? {
             keys.push(r.get(0)?);
         }

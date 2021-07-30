@@ -1,6 +1,6 @@
 use crate::export::to_sql::SqlConvert;
 use crate::model;
-use rusqlite::{params, Statement, NO_PARAMS};
+use rusqlite::{params, Statement};
 
 impl<'a> SqlConvert for model::TaskResult {
     fn convert_to_sql(
@@ -40,7 +40,7 @@ impl<'a> SqlConvert for model::TaskResult {
                 )
                 .unwrap();
 
-            for res in istm.query_map(NO_PARAMS, |r| {
+            for res in istm.query_map([], |r| {
                 let key: String = r.get(0)?;
                 let value: Vec<u8> = r.get(1)?;
                 Ok((key, value))

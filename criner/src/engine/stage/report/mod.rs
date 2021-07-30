@@ -5,7 +5,6 @@ use crate::{
     {Error, Result},
 };
 use futures_util::FutureExt;
-use rusqlite::NO_PARAMS;
 use std::{path::PathBuf, time::SystemTime};
 
 mod git;
@@ -106,7 +105,7 @@ pub async fn generate(
             chunk.clear();
             chunk.extend(
                 statement
-                    .query_map(NO_PARAMS, |r| Ok((r.get(0)?, r.get(1)?)))?
+                    .query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?
                     .filter_map(|r| r.ok()),
             );
             fetched_crates += chunk.len();

@@ -5,7 +5,7 @@ use crate::{
     persistence::{merge::Merge, Keyed},
     Result,
 };
-use rusqlite::{params, OptionalExtension, NO_PARAMS};
+use rusqlite::{params, OptionalExtension};
 use std::time::{Duration, SystemTime};
 
 /// Required as we send futures to threads. The type system can't statically prove that in fact
@@ -73,9 +73,7 @@ where
     StorageItem: for<'a> From<&'a [u8]>,
 {
     Ok(statement
-        .query_map(NO_PARAMS, |r| {
-            r.get::<_, Vec<u8>>(0).map(|v| StorageItem::from(v.as_slice()))
-        })?
+        .query_map([], |r| r.get::<_, Vec<u8>>(0).map(|v| StorageItem::from(v.as_slice())))?
         .map(|r| r.map_err(Into::into)))
 }
 
@@ -86,7 +84,7 @@ where
     StorageItem: for<'a> From<&'a [u8]>,
 {
     Ok(statement
-        .query_map(NO_PARAMS, |r| {
+        .query_map([], |r| {
             let key = r.get::<_, String>(0)?;
             let data = r.get::<_, Vec<u8>>(1)?;
             Ok((key, StorageItem::from(data.as_slice())))
@@ -123,7 +121,7 @@ pub trait TableAccess {
                         None => "".into(),
                     }
                 ),
-                NO_PARAMS,
+                [],
                 |r| r.get::<_, i64>(0),
             )
             .unwrap_or(0) as u64
@@ -135,7 +133,7 @@ pub trait TableAccess {
             .lock()
             .query_row(
                 &format!("SELECT data FROM {} WHERE key = '{}'", Self::table_name(), key.as_ref()),
-                NO_PARAMS,
+                [],
                 |r| r.get::<_, Vec<u8>>(0),
             )
             .optional()?
@@ -156,7 +154,7 @@ pub trait TableAccess {
             let new_value = transaction
                 .query_row(
                     &format!("SELECT data FROM {} WHERE key = '{}'", Self::table_name(), key.as_ref()),
-                    NO_PARAMS,
+                    [],
                     |r| r.get::<_, Vec<u8>>(0),
                 )
                 .optional()?
@@ -186,7 +184,7 @@ pub trait TableAccess {
                 let maybe_vec = transaction
                     .query_row(
                         &format!("SELECT data FROM {} WHERE key = '{}'", Self::table_name(), key.as_ref()),
-                        NO_PARAMS,
+                        [],
                         |r| r.get::<_, Vec<u8>>(0),
                     )
                     .optional()?;
@@ -309,7 +307,7 @@ impl ReportsTree {
             .lock()
             .query_row(
                 &format!("SELECT key FROM {} where key = '{}'", Self::table_name(), key.as_ref()),
-                NO_PARAMS,
+                [],
                 |_r| Ok(()),
             )
             .optional()
@@ -374,7 +372,7 @@ impl MetaTable {
         Ok(self
             .connection()
             .lock()
-            .query_row("SELECT key, data FROM meta ORDER BY key DESC limit 1", NO_PARAMS, |r| {
+            .query_row("SELECT key, data FROM meta ORDER BY key DESC limit 1", [], |r| {
                 Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?))
             })
             .optional()?
