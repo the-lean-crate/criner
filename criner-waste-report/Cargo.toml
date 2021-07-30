@@ -27,7 +27,7 @@ lazy_static = "1.4.0"
 # for html
 horrorshow = { version = "0.8.1", optional = true }
 bytesize = { version = "1.0.0", optional = true }
-dia-semver = { version = "8.0.1", optional = true }
+dia-semver = { version = "9.0.0", optional = true }
 humantime = { version = "2.0.0", optional = true }
 
 [dev-dependencies]
