@@ -51,7 +51,7 @@ pub async fn tasks(
 
         iobound::DownloadRequest {
             output_file_path: download_file_path(
-                &assets_dir,
+                assets_dir,
                 &krate.name,
                 &krate.version,
                 &dummy_task.process,

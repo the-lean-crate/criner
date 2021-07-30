@@ -45,7 +45,7 @@ impl Merge<model::Context> for model::Context {
 }
 
 fn sort_semver(versions: &mut Vec<String>) {
-    versions.sort_by_key(|v| parse_semver(&v));
+    versions.sort_by_key(|v| parse_semver(v));
 }
 
 impl Merge<model::CrateVersion> for model::Crate {

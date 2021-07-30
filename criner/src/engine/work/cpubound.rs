@@ -154,8 +154,8 @@ fn extract_crate(
         {
             file_count += 1;
 
-            let slice = if tar_path_to_utf8_str(&e.path_bytes().as_ref()) == "Cargo.toml"
-                || tar_path_to_utf8_str(&e.path_bytes().as_ref()) == "Cargo.lock"
+            let slice = if tar_path_to_utf8_str(e.path_bytes().as_ref()) == "Cargo.toml"
+                || tar_path_to_utf8_str(e.path_bytes().as_ref()) == "Cargo.lock"
             {
                 buf.clear();
                 e.read_to_end(&mut buf)?;

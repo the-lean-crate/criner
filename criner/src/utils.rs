@@ -13,7 +13,7 @@ use std::{
 
 pub fn parse_semver(version: &str) -> Semver {
     use std::str::FromStr;
-    Semver::from_str(&version)
+    Semver::from_str(version)
         .or_else(|_| {
             Semver::from_str(
                 &version[..version

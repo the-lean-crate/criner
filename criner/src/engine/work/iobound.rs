@@ -93,7 +93,7 @@ where
             output_file_path,
             result_key: crate_name_and_version.as_ref().map(|(crate_name, crate_version)| {
                 let mut result_key = String::with_capacity(task_key.len() * 2);
-                task_result.fq_key(&crate_name, &crate_version, &dummy_task, &mut result_key);
+                task_result.fq_key(crate_name, crate_version, &dummy_task, &mut result_key);
                 result_key
             }),
         });

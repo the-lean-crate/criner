@@ -17,7 +17,7 @@ fn all_but_recently_yanked(
     let mut num_yanked = 0;
     for version in versions.iter().rev() {
         key_buf.clear();
-        model::CrateVersion::key_from(&crate_name, &version, key_buf);
+        model::CrateVersion::key_from(crate_name, version, key_buf);
 
         let is_yanked = table
             .get(&key_buf)?
@@ -108,9 +108,9 @@ pub trait Generator {
         }
         if let Some(mut report) = report {
             let previous_report = match cache_dir.as_ref() {
-                Some(cd) => match Self::Report::load_previous_top_level_state(&cd, &mut progress).await {
+                Some(cd) => match Self::Report::load_previous_top_level_state(cd, &mut progress).await {
                     Some(r) => Some(r),
-                    None => report.load_previous_state(&cd, &mut progress).await,
+                    None => report.load_previous_state(cd, &mut progress).await,
                 },
                 None => None,
             };
@@ -177,7 +177,7 @@ pub trait Generator {
                     progress.inc();
 
                     key_buf.clear();
-                    Self::fq_report_key(&name, &version, &mut key_buf);
+                    Self::fq_report_key(&name, version, &mut key_buf);
 
                     // If we have no cache, assume we are globbed (yes, I know…sigh), so always produce reports
                     // but don't invalidate data in caches by reading or writing them. Mostly used for testing
@@ -187,15 +187,15 @@ pub trait Generator {
                         let reports_key = key_buf.clone();
                         key_buf.clear();
 
-                        if let Some(result) = Self::get_result(connection.clone(), &name, &version, &mut key_buf)? {
+                        if let Some(result) = Self::get_result(connection.clone(), &name, version, &mut key_buf)? {
                             let mut version_report =
-                                Self::generate_report(&name, &version, result, &mut progress).await?;
+                                Self::generate_report(&name, version, result, &mut progress).await?;
 
                             out_buf = complete_and_write_report(
                                 &mut version_report,
                                 out_buf,
                                 &mut progress,
-                                version_html_path(&crate_dir, &version),
+                                version_html_path(&crate_dir, version),
                                 write,
                                 &write_state,
                             )
@@ -212,7 +212,7 @@ pub trait Generator {
                 }
                 if let Some(mut crate_report) = crate_report {
                     let previous_state = match cache_dir.as_ref() {
-                        Some(cd) => crate_report.load_previous_state(&cd, &mut progress).await,
+                        Some(cd) => crate_report.load_previous_state(cd, &mut progress).await,
                         None => None,
                     };
                     match previous_state {
@@ -228,7 +228,7 @@ pub trait Generator {
                             )
                             .await?;
                             if let Some(cd) = cache_dir.as_ref() {
-                                absolute_state.store_current_state(&cd, &mut progress).await?;
+                                absolute_state.store_current_state(cd, &mut progress).await?;
                             };
                         }
                         None => {
@@ -242,7 +242,7 @@ pub trait Generator {
                             )
                             .await?;
                             if let Some(cd) = cache_dir.as_ref() {
-                                crate_report.store_current_state(&cd, &mut progress).await?;
+                                crate_report.store_current_state(cd, &mut progress).await?;
                             }
                         }
                     }

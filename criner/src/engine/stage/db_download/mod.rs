@@ -160,7 +160,7 @@ fn cleanup(db_file_path: PathBuf, mut progress: prodash::tree::Item) -> Result<(
         .expect("parent directory for db dump")
         .join("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*")
         .with_extension(db_file_path.extension().expect("file extension"));
-    let pattern = glob::Pattern::new(&glob_pattern.to_str().expect("db dump path is valid utf8 string"))?;
+    let pattern = glob::Pattern::new(glob_pattern.to_str().expect("db dump path is valid utf8 string"))?;
     if !pattern.matches_path(&db_file_path) {
         return Err(crate::Error::Message(format!(
             "BUG: Pattern {} did not match the original database path '{}'",

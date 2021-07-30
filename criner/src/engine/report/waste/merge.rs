@@ -97,7 +97,7 @@ pub fn version_to_new_version_map(
                 total_files,
             },
             waste: AggregateFileInfo {
-                total_bytes: byte_count(&wasted_files),
+                total_bytes: byte_count(wasted_files),
                 total_files: wasted_files.len() as u64,
             },
             potential_gains,
