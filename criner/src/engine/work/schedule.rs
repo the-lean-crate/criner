@@ -63,7 +63,7 @@ pub async fn tasks(
             crate_name_and_version: Some((krate.name.clone(), krate.version.clone())),
             kind,
             url: format!(
-                "https://crates.io/api/v1/crates/{name}/{version}/download",
+                "https://static.crates.io/crates/{name}/{name}-{version}.crate",
                 name = krate.name,
                 version = krate.version
             ),
