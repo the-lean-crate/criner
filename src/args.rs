@@ -18,7 +18,7 @@ pub struct Args {
 pub enum SubCommands {
     /// Mine crates.io in an incorruptible and resumable fashion
     #[clap(display_order = 0)]
-    #[clap(setting = clap::AppSettings::DisableVersion)]
+    #[clap(setting = clap::AppSettings::DisableVersionFlag)]
     Mine {
         /// If set, no gui will be presented. Best with RUST_LOG=info to see basic information.
         #[clap(long)]
@@ -116,7 +116,7 @@ pub enum SubCommands {
     /// Use this to get an overview of what's available, and possibly contribute a report generator which implements
     /// a query using raw data and writes it into reports.
     #[clap(display_order = 1)]
-    #[clap(setting = clap::AppSettings::DisableVersion)]
+    #[clap(setting = clap::AppSettings::DisableVersionFlag)]
     Export {
         /// The path to the source database in sqlite format
         input_db_path: PathBuf,
