@@ -26,6 +26,9 @@ $(RELEASE_EXECUTABLE): $(RUST_SRC_FILES)
 
 ##@ Meta
 
+nix-shell-macos: ## Enter a nix-shell able to build on macos
+	nix-shell -p pkg-config openssl libiconv darwin.apple_sdk.frameworks.Security darwin.apple_sdk.frameworks.SystemConfiguration zlib
+
 sloc: ## Count lines of code, without tests
 	tokei -e '*_test*'
 
