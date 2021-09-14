@@ -81,6 +81,7 @@ pub async fn process(
         let mut fetched_versions = 0;
         let mut versions = Vec::with_capacity(auto_checkpoint_every);
         let mut last_elapsed_for_checkpointing = None;
+        let mut child_progress = progress.add_child("TBD");
 
         loop {
             let abort_loop = {
@@ -106,11 +107,13 @@ pub async fn process(
 
                 progress.set(vid + fetched_versions + 1);
                 progress.halted("wait for task consumers", None);
+                child_progress.set_name(format!("schedule {}", version.key()));
+                // TODO: with blocking:: API improvements, remove this block-on as all is async
                 futures_lite::future::block_on(work::schedule::tasks(
                     &assets_dir,
                     &tasks,
                     &version,
-                    progress.add_child(format!("schedule {}", version.key())),
+                    &mut child_progress,
                     work::schedule::Scheduling::AtLeastOne,
                     &tx_io,
                     &tx_cpu,

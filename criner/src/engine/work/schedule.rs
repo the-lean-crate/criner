@@ -33,7 +33,7 @@ pub async fn tasks(
     assets_dir: &Path,
     tasks: &persistence::TaskTable,
     krate: &model::CrateVersion,
-    mut progress: prodash::tree::Item,
+    progress: &mut prodash::tree::Item,
     _mode: Scheduling,
     perform_io: &async_channel::Sender<iobound::DownloadRequest>,
     perform_cpu: &async_channel::Sender<cpubound::ExtractRequest>,
@@ -44,7 +44,7 @@ pub async fn tasks(
     let io_task = task_or_default(tasks, &mut key_buf, krate, iobound::default_persisted_download_task)?;
 
     let kind = "crate";
-    let submit_result = submit_single(startup_time, io_task, &mut progress, perform_io, 1, 1, || {
+    let submit_result = submit_single(startup_time, io_task, progress, perform_io, 1, 1, || {
         let dummy_task = iobound::default_persisted_download_task();
         let mut task_key = String::new();
         dummy_task.fq_key(&krate.name, &krate.version, &mut task_key);
@@ -75,7 +75,7 @@ pub async fn tasks(
         PermanentFailure | Submitted => AsyncResult::Done,
         Done(download_crate_task) => {
             let cpu_task = task_or_default(tasks, &mut key_buf, krate, cpubound::default_persisted_extraction_task)?;
-            submit_single(startup_time, cpu_task, &mut progress, perform_cpu, 2, 2, || {
+            submit_single(startup_time, cpu_task, progress, perform_cpu, 2, 2, || {
                 cpubound::ExtractRequest {
                     download_task: download_crate_task,
                     crate_name: krate.name.clone(),
