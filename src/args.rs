@@ -1,20 +1,17 @@
-use clap::Clap;
 use std::path::PathBuf;
 
 fn parse_local_time(src: &str) -> Result<time::Time, time::ParseError> {
     time::parse(src, "%R")
 }
 
-#[derive(Debug, Clap)]
+#[derive(Debug, clap::Parser)]
 #[clap(about = "Interact with crates.io from the command-line")]
-#[clap(setting = clap::AppSettings::ColoredHelp)]
-#[clap(setting = clap::AppSettings::ColorAuto)]
 pub struct Args {
     #[clap(subcommand)]
     pub sub: Option<SubCommands>,
 }
 
-#[derive(Debug, Clap)]
+#[derive(Debug, clap::Parser)]
 pub enum SubCommands {
     /// Mine crates.io in an incorruptible and resumable fashion
     #[clap(display_order = 0)]

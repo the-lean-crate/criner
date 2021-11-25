@@ -1,4 +1,4 @@
-use clap::Clap;
+use clap::Parser;
 
 fn main() -> criner::error::Result<()> {
     let args = criner_cli::Args::parse();
