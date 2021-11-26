@@ -36,7 +36,8 @@ pub async fn wait_with_progress(
         progress.set_name(format!(
             "{} scheduled at {}",
             progress.name().unwrap_or_else(|| "un-named".into()),
-            time.format("%R %p")
+            time.format(&time::format_description::parse("%R %p").expect("valid"))
+                .expect("always formattable")
         ));
     }
     for s in 1..=duration_s {
@@ -49,21 +50,26 @@ pub async fn wait_with_progress(
 
 fn desired_launch_at(time: Option<time::Time>) -> time::OffsetDateTime {
     let time = time.unwrap_or_else(|| {
-        time::OffsetDateTime::try_now_local()
+        time::OffsetDateTime::now_local()
             .unwrap_or_else(|_| time::OffsetDateTime::now_utc())
             .time()
     });
-    let now = time::OffsetDateTime::try_now_local().unwrap_or_else(|_| time::OffsetDateTime::now_utc());
+    let now = time::OffsetDateTime::now_local().unwrap_or_else(|_| time::OffsetDateTime::now_utc());
     let mut desired = now.date().with_time(time).assume_offset(now.offset());
     if desired < now {
-        desired = desired.date().next_day().with_time(time).assume_offset(now.offset());
+        desired = desired
+            .date()
+            .next_day()
+            .expect("not running in year 9999")
+            .with_time(time)
+            .assume_offset(now.offset());
     }
     desired
 }
 
 fn duration_until(time: Option<time::Time>) -> Duration {
     let desired = desired_launch_at(time);
-    let now_local = time::OffsetDateTime::try_now_local().unwrap_or_else(|_| time::OffsetDateTime::now_utc());
+    let now_local = time::OffsetDateTime::now_local().unwrap_or_else(|_| time::OffsetDateTime::now_utc());
     (desired - now_local)
         .try_into()
         .unwrap_or_else(|_| Duration::from_secs(1))

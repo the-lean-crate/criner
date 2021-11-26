@@ -209,9 +209,10 @@ pub async fn schedule(
         tx_io
     };
 
-    let today_yyyy_mm_dd = time::OffsetDateTime::try_now_local()
+    let today_yyyy_mm_dd = time::OffsetDateTime::now_local()
         .unwrap_or_else(|_| time::OffsetDateTime::now_utc())
-        .format("%F");
+        .format(&time::format_description::parse("%F").expect("valid"))
+        .expect("formattable");
     let file_suffix = "db-dump.tar.gz";
     let task_key = format!(
         "{}{}{}",

@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
-fn parse_local_time(src: &str) -> Result<time::Time, time::ParseError> {
-    time::parse(src, "%R")
+fn parse_local_time(src: &str) -> Result<time::Time, time::error::Parse> {
+    time::Time::parse(src, &time::format_description::parse("%R").expect("valid"))
 }
 
 #[derive(Debug, clap::Parser)]

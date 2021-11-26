@@ -108,7 +108,8 @@ where
     use serde::Deserialize;
     let val = std::borrow::Cow::<'de, str>::deserialize(deserializer)?;
     // 2017-11-30 04:00:19.334919
-    let t: time::PrimitiveDateTime = time::parse(val, "%F %T").map_err(serde::de::Error::custom)?;
+    let t = time::OffsetDateTime::parse(val.as_ref(), &time::format_description::parse("%F %T").expect("valid"))
+        .map_err(serde::de::Error::custom)?;
     Ok(t.into())
 }
 
