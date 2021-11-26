@@ -1,7 +1,10 @@
 use std::path::PathBuf;
 
 fn parse_local_time(src: &str) -> Result<time::Time, time::error::Parse> {
-    time::Time::parse(src, &time::format_description::parse("%R").expect("valid"))
+    time::Time::parse(
+        src,
+        &time::macros::format_description!("[hour repr:24 padding:none]:[minute padding:zero]"),
+    )
 }
 
 #[derive(Debug, clap::Parser)]

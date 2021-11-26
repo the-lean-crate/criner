@@ -24,7 +24,7 @@ doctest = false
 [dependencies]
 clap = { version = "3.0.0-beta.5" }
 humantime = "2.1.0"
-time = { version = "0.3.5", features = ["parsing"] }
+time = { version = "0.3.5", features = ["parsing", "macros" ] }
 criner = { version = "0.3.0", path = "./criner" }
 env_logger = { version = "0.9.0", default-features = false, features = ["termcolor", "atty", "humantime"] }
 

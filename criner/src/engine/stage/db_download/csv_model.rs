@@ -108,9 +108,13 @@ where
     use serde::Deserialize;
     let val = std::borrow::Cow::<'de, str>::deserialize(deserializer)?;
     // 2017-11-30 04:00:19.334919
-    let t = time::OffsetDateTime::parse(val.as_ref(), &time::format_description::parse("%F %T").expect("valid"))
-        .map_err(serde::de::Error::custom)?;
-    Ok(t.into())
+    let t = time::PrimitiveDateTime::parse(
+        val.as_ref(),
+        //                                   2015 -04     - 24    18   :  26    :    11
+        &time::macros::format_description!("[year]-[month]-[day] [hour]:[minute]:[second].[subsecond]"),
+    )
+    .map_err(serde::de::Error::custom)?;
+    Ok(t.assume_offset(time::UtcOffset::UTC).into())
 }
 
 pub struct Feature {

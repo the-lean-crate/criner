@@ -36,7 +36,7 @@ pub async fn wait_with_progress(
         progress.set_name(format!(
             "{} scheduled at {}",
             progress.name().unwrap_or_else(|| "un-named".into()),
-            time.format(&time::format_description::parse("%R %p").expect("valid"))
+            time.format(&time::macros::format_description!("[hour]:[minute]"))
                 .expect("always formattable")
         ));
     }
