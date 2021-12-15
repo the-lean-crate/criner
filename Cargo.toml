@@ -22,7 +22,7 @@ migration = ["criner/migration"]
 doctest = false
 
 [dependencies]
-clap = { version = "3.0.0-beta.5" }
+clap = { version = "3.0.0-rc.4", features = ["derive"] }
 humantime = "2.1.0"
 time = { version = "0.3.5", features = ["parsing", "macros" ] }
 criner = { version = "0.3.0", path = "./criner" }
