@@ -39,6 +39,7 @@ pub async fn processor<T: Clone>(
             try_count += 1;
             progress.blocked("working", None);
             let res = agent.process(&mut progress).await;
+            progress.running();
 
             task.state = match res {
                 Err((err @ Error::Timeout(_, _), _)) if try_count < max_retries_on_timeout => {

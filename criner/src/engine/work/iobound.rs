@@ -201,6 +201,7 @@ async fn download_file_and_store_result(
         416 => {
             // we assume that this means we have fully downloaded the item previously, and that the DB result was written already
             // but not checked
+            progress.running();
             progress.done(format!(
                 "GET{}:{}: body-size = {}",
                 if start_byte != 0 {
