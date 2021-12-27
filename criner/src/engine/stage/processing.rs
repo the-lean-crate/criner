@@ -124,11 +124,11 @@ pub async fn process(
             // We have too many writers which cause the WAL to get so large that all reads are slowing to a crawl
             // Standard SQLITE autocheckpoints are passive, which are not effective in our case as they never
             // kick in with too many writers. There is no way to change the autocheckpoint mode to something more suitable… :/
+            let start = SystemTime::now();
             progress.blocked(
                 "checkpointing database",
-                last_elapsed_for_checkpointing.map(|d| SystemTime::now() + d),
+                last_elapsed_for_checkpointing.map(|d| start + d),
             );
-            let start = SystemTime::now();
             checkpoint_connection
                 .lock()
                 .execute_batch("PRAGMA wal_checkpoint(TRUNCATE)")?;
