@@ -135,6 +135,7 @@ pub async fn process(
             last_elapsed_for_checkpointing = Some(SystemTime::now().duration_since(start)?);
 
             if abort_loop {
+                progress.running();
                 break;
             }
         }
