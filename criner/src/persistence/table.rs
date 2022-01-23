@@ -224,9 +224,7 @@ fn retry_on_db_busy<T>(mut progress: Option<&mut prodash::tree::Item>, mut f: im
         match f() {
             Ok(v) => return Ok(v),
             Err(
-                err
-                @
-                Error::Rusqlite(SqliteError::SqliteFailure(
+                err @ Error::Rusqlite(SqliteError::SqliteFailure(
                     SqliteFFIError {
                         code: SqliteFFIErrorCode::DatabaseBusy,
                         ..
