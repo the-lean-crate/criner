@@ -5,6 +5,7 @@ use futures_util::{
 };
 use log::{info, warn};
 use prodash::render::tui::{Event, Line};
+use std::sync::Arc;
 use std::{
     path::{Path, PathBuf},
     time::{Duration, SystemTime},
@@ -32,7 +33,7 @@ pub async fn non_blocking(
     db: Db,
     crates_io_path: PathBuf,
     deadline: Option<SystemTime>,
-    progress: prodash::Tree,
+    progress: Arc<prodash::Tree>,
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
@@ -188,7 +189,7 @@ pub fn blocking(
     process_settings: StageRunSettings,
     report_settings: GlobStageRunSettings,
     download_crates_io_database_every_24_hours_starting_at: Option<time::Time>,
-    root: prodash::Tree,
+    root: Arc<prodash::Tree>,
     gui: Option<prodash::render::tui::Options>,
 ) -> Result<()> {
     let start_of_computation = SystemTime::now();
@@ -218,7 +219,7 @@ pub fn blocking(
         Some(gui_options) => {
             let gui = crate::spawn(prodash::render::tui::render_with_input(
                 std::io::stdout(),
-                root,
+                Arc::downgrade(&root),
                 gui_options,
                 futures_util::stream::select(
                     context_stream(&db, start_of_computation),
