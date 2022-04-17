@@ -263,7 +263,7 @@ pub fn into_crates(
         let crate_id = krate.id;
         let mut krate: db_dump::Crate = krate.into();
         let mut versions: Vec<_> = std::mem::take(
-            &mut versions_by_crate_id
+            versions_by_crate_id
                 .get_mut(&crate_id)
                 .expect("at least one version per crate"),
         );

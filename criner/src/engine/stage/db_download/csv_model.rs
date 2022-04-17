@@ -109,7 +109,7 @@ where
     let val = std::borrow::Cow::<'de, str>::deserialize(deserializer)?;
     // 2017-11-30 04:00:19.334919
     let t = time::PrimitiveDateTime::parse(
-        val.as_ref().splitn(2, '.').next().unwrap_or_else(|| val.as_ref()),
+        val.as_ref().split('.').next().unwrap_or_else(|| val.as_ref()),
         //                                   2015 -04     - 24    18   :  26    :    11
         &time::macros::format_description!("[year]-[month]-[day] [hour]:[minute]:[second]"),
     )
