@@ -262,11 +262,13 @@ pub fn into_crates(
         progress.inc();
         let crate_id = krate.id;
         let mut krate: db_dump::Crate = krate.into();
-        let mut versions: Vec<_> = std::mem::take(
-            versions_by_crate_id
-                .get_mut(&crate_id)
-                .expect("at least one version per crate"),
-        );
+        let mut versions: Vec<_> = std::mem::take(match versions_by_crate_id.get_mut(&crate_id) {
+            Some(val) => val,
+            None => {
+                progress.fail(format!("Skipped crate {} without any version", crate_id));
+                continue;
+            }
+        });
         versions.sort_by_key(|v| parse_semver(&v.semver));
         krate.versions = versions;
         crate_by_id.insert(crate_id, krate);
@@ -281,17 +283,18 @@ pub fn into_crates(
     let crates_keywords_len = crates_keywords.len();
     for csv_model::CratesKeyword { keyword_id, crate_id } in crates_keywords.into_iter() {
         progress.inc();
-        crate_by_id
-            .get_mut(&crate_id)
-            .expect("matching crate for keyword")
-            .keywords
-            .push(
-                keywords_by_id
-                    .get_mut(&keyword_id)
-                    .expect("keyword for id")
-                    .to_owned()
-                    .into(),
-            )
+        match crate_by_id.get_mut(&crate_id) {
+            Some(val) => val,
+            None => continue,
+        }
+        .keywords
+        .push(
+            keywords_by_id
+                .get_mut(&keyword_id)
+                .expect("keyword for id")
+                .to_owned()
+                .into(),
+        )
     }
     progress.done(format!("assigned {} keywords", crates_keywords_len));
 
@@ -299,17 +302,18 @@ pub fn into_crates(
     let crates_categories_len = crates_categories.len();
     for csv_model::CratesCategory { category_id, crate_id } in crates_categories.into_iter() {
         progress.inc();
-        crate_by_id
-            .get_mut(&crate_id)
-            .expect("matching crate for category")
-            .categories
-            .push(
-                categories_by_id
-                    .get_mut(&category_id)
-                    .expect("category for id")
-                    .to_owned()
-                    .into(),
-            )
+        match crate_by_id.get_mut(&crate_id) {
+            Some(val) => val,
+            None => continue,
+        }
+        .categories
+        .push(
+            categories_by_id
+                .get_mut(&category_id)
+                .expect("category for id")
+                .to_owned()
+                .into(),
+        )
     }
     progress.done(format!("assigned {} categories", crates_categories_len));
 
@@ -325,9 +329,13 @@ pub fn into_crates(
         progress.inc();
         if let Some(owner) = actors_by_id.get(&(owner_id, owner_kind.into())).map(ToOwned::to_owned) {
             let created_by = created_by.and_then(|id| actors_by_id.get(&(id, db_dump::ActorKind::User)).cloned());
-            let krate = crate_by_id
-                .get_mut(&crate_id)
-                .expect("crate id to match crate for owner assignment");
+            let krate = match crate_by_id.get_mut(&crate_id) {
+                Some(val) => val,
+                None => {
+                    progress.fail(format!("Skipped crate {} as it doesn't seem to exist", crate_id));
+                    continue;
+                }
+            };
             if krate.created_by.is_none() {
                 krate.created_by = created_by;
             }
