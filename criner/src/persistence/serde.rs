@@ -11,7 +11,7 @@ macro_rules! impl_deserialize {
     ($ty:ty) => {
         impl From<&[u8]> for $ty {
             fn from(b: &[u8]) -> Self {
-                expect(rmp_serde::from_read_ref(b), |e| {
+                expect(rmp_serde::from_slice(b), |e| {
                     format!(
                         concat!("&[u8]: migration should succeed: ", stringify!($ty), "{:#?}: {}"),
                         rmpv::decode::value::read_value(&mut std::io::Cursor::new(b)).unwrap(),
