@@ -4,7 +4,7 @@ use crate::{
 };
 use rusqlite::{params, Statement};
 
-impl<'a> SqlConvert for model::db_dump::Crate {
+impl SqlConvert for model::db_dump::Crate {
     fn replace_statement() -> &'static str {
         "will not be called"
     }

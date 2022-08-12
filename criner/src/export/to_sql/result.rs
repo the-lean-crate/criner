@@ -2,7 +2,7 @@ use crate::export::to_sql::SqlConvert;
 use crate::model;
 use rusqlite::{params, Statement};
 
-impl<'a> SqlConvert for model::TaskResult {
+impl SqlConvert for model::TaskResult {
     fn convert_to_sql(
         istm: &mut rusqlite::Statement,
         transaction: &rusqlite::Transaction,

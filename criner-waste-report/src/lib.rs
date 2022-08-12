@@ -151,7 +151,7 @@ impl PackageSection {
 
 pub type WastedFile = (String, u64);
 
-#[derive(Default, Debug, PartialEq, Clone, Deserialize, Serialize)]
+#[derive(Default, Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
 pub struct AggregateFileInfo {
     pub total_bytes: u64,
     pub total_files: u64,
@@ -212,7 +212,7 @@ pub fn add_optional_aggregate(
     })
 }
 
-#[derive(Default, Debug, PartialEq, Clone, Deserialize, Serialize)]
+#[derive(Default, Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
 pub struct VersionInfo {
     pub all: AggregateFileInfo,
     pub waste: AggregateFileInfo,
@@ -224,7 +224,7 @@ pub type AggregateVersionInfo = VersionInfo;
 
 pub type Dict<T> = BTreeMap<String, T>;
 
-#[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
 pub enum Report {
     Version {
         crate_name: String,
