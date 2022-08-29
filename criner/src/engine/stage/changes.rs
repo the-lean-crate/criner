@@ -1,12 +1,13 @@
-use crate::persistence::{key_value_iter, new_key_value_query_old_to_new, CrateTable};
+use crate::persistence::{key_value_iter, new_key_value_query_old_to_new, CrateTable, Keyed};
 use crate::{
     error::{Error, Result},
     model,
-    persistence::{self, new_key_value_insertion, CrateVersionTable, Keyed, TableAccess},
+    persistence::{self, new_key_value_insertion, CrateVersionTable, TableAccess},
     utils::enforce_threaded,
 };
 use crates_index_diff::Index;
 use rusqlite::params;
+use std::convert::TryFrom;
 use std::{
     collections::BTreeMap,
     ops::Add,
@@ -86,7 +87,10 @@ pub async fn fetch(
             let transaction = connection.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
             {
                 let mut statement = new_key_value_insertion(CrateVersionTable::table_name(), &transaction)?;
-                for version in crate_versions.into_iter().map(model::CrateVersion::from) {
+                for version in crate_versions
+                    .into_iter()
+                    .filter_map(|v| model::CrateVersion::try_from(v).ok())
+                {
                     key_buf.clear();
                     version.key_buf(&mut key_buf);
                     statement.execute(params![&key_buf, rmp_serde::to_vec(&version)?])?;

@@ -1,5 +1,6 @@
 pub use crate::engine::report::waste::TarHeader;
 use serde_derive::{Deserialize, Serialize};
+use std::convert::TryFrom;
 use std::{collections::HashMap, ops::Add, time::Duration, time::SystemTime};
 
 /// Represents a top-level crate and associated information
@@ -106,6 +107,56 @@ impl From<crates_index_diff::Dependency> for Dependency {
     }
 }
 
+/// Identify a kind of change that occurred to a crate
+#[derive(Clone, Copy, Ord, PartialOrd, Eq, PartialEq, Debug)]
+pub enum ChangeKind {
+    /// A crate version was added
+    Added,
+    /// A crate version was added or it was unyanked.
+    Yanked,
+}
+
+impl Default for ChangeKind {
+    fn default() -> Self {
+        ChangeKind::Added
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ChangeKind {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct Visitor;
+        impl<'de> ::serde::de::Visitor<'de> for Visitor {
+            type Value = ChangeKind;
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("boolean")
+            }
+            fn visit_bool<E>(self, value: bool) -> Result<ChangeKind, E>
+            where
+                E: ::serde::de::Error,
+            {
+                if value {
+                    Ok(ChangeKind::Yanked)
+                } else {
+                    Ok(ChangeKind::Added)
+                }
+            }
+        }
+        deserializer.deserialize_bool(Visitor)
+    }
+}
+
+impl serde::Serialize for ChangeKind {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_bool(self == &ChangeKind::Yanked)
+    }
+}
+
 /// Pack all information we know about a change made to a version of a crate.
 #[derive(Debug, Serialize, Deserialize, Default, Clone)]
 pub struct CrateVersion {
@@ -113,7 +164,7 @@ pub struct CrateVersion {
     pub name: String,
     /// The kind of change.
     #[serde(rename = "yanked")]
-    pub kind: crates_index_diff::ChangeKind,
+    pub kind: ChangeKind,
     /// The semantic version of the crate.
     #[serde(rename = "vers")]
     pub version: String,
@@ -246,24 +297,33 @@ impl Default for TaskResult {
     }
 }
 
-impl From<crates_index_diff::CrateVersion> for CrateVersion {
-    fn from(v: crates_index_diff::CrateVersion) -> Self {
+impl TryFrom<crates_index_diff::Change> for CrateVersion {
+    type Error = ();
+
+    fn try_from(v: crates_index_diff::Change) -> Result<Self, Self::Error> {
+        let v = match v {
+            crates_index_diff::Change::Deleted { .. } => {
+                // ignore for now
+                return Err(());
+            }
+            crates_index_diff::Change::Added(v) | crates_index_diff::Change::Yanked(v) => v,
+        };
         let crates_index_diff::CrateVersion {
             name,
-            kind,
+            yanked,
             version,
             checksum,
             features,
             dependencies,
         } = v;
-        CrateVersion {
+        Ok(CrateVersion {
             name,
-            kind,
+            kind: yanked.then(|| ChangeKind::Yanked).unwrap_or(ChangeKind::Added),
             version,
             checksum,
             features,
             dependencies: dependencies.into_iter().map(Into::into).collect(),
-        }
+        })
     }
 }
 

@@ -62,7 +62,7 @@ impl SqlConvert for model::CrateVersion {
             dependencies,
         } = self;
 
-        use crates_index_diff::ChangeKind::*;
+        use crate::model::ChangeKind::*;
         stm.execute(params![
             uid,
             name,

@@ -21,7 +21,7 @@ fn all_but_recently_yanked(
 
         let is_yanked = table
             .get(&key_buf)?
-            .map(|v| v.kind == crates_index_diff::ChangeKind::Yanked)
+            .map(|v| v.kind == crate::model::ChangeKind::Yanked)
             .unwrap_or(true);
         if is_yanked {
             num_yanked += 1;

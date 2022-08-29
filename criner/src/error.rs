@@ -50,6 +50,14 @@ quick_error! {
             from()
             source(err)
         }
+        IndexDiffInit(err: crates_index_diff::index::init::Error) {
+            from()
+            source(err)
+        }
+        IndexDiffChanges(err: crates_index_diff::index::diff::Error) {
+            from()
+            source(err)
+        }
         Io(err: std::io::Error) {
             from()
             source(err)
