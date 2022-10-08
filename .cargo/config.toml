@@ -1,9 +1,0 @@
-[build]
-rustflags = "-C target-cpu=native"
-
-# [patch."crates-io"]
-# crates-index-diff = { path = "/Users/byron/dev/github.com/Byron/crates-index-diff-rs" }
-# git-repository = { path = "/Users/byron/dev/github.com/Byron/gitoxide/git-repository" }
-
-# [patch."https://github.com/Byron/gitoxide"]
-# git-repository = { path = "/Users/byron/dev/github.com/Byron/gitoxide/git-repository" }

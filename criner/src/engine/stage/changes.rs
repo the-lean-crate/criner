@@ -14,6 +14,7 @@ use std::{
     path::Path,
     time::{Duration, SystemTime},
 };
+use std::sync::atomic::AtomicBool;
 
 pub async fn fetch(
     crates_io_path: impl AsRef<Path>,
@@ -38,23 +39,7 @@ pub async fn fetch(
     let (crate_versions, last_seen_git_object) = enforce_threaded(
         deadline.unwrap_or_else(|| SystemTime::now().add(Duration::from_secs(10 * 60))),
         move || {
-            let mut cbs = crates_index_diff::git2::RemoteCallbacks::new();
-            let mut opts = {
-                cbs.transfer_progress(|p| {
-                    subprogress.set_name(format!(
-                        "Fetching crates index ({} received)",
-                        bytesize::ByteSize(p.received_bytes() as u64)
-                    ));
-                    subprogress.init(Some(p.total_deltas() + p.total_objects()), Some("objects".into()));
-                    subprogress.set(p.indexed_deltas() + p.received_objects());
-                    true
-                });
-                let mut opts = crates_index_diff::git2::FetchOptions::new();
-                opts.remote_callbacks(cbs);
-                opts
-            };
-
-            index.peek_changes_with_options(Some(&mut opts))
+            index.peek_changes_with_options2(subprogress, &AtomicBool::default())
         },
     )
     .await??;
