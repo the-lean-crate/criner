@@ -38,6 +38,7 @@ pub async fn non_blocking(
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
     interrupt_control: InterruptControlEvents,
+    db_download: bool,
     fetch_settings: StageRunSettings,
     process_settings: StageRunSettings,
     report_settings: GlobStageRunSettings,
@@ -47,27 +48,29 @@ pub async fn non_blocking(
     check(deadline)?;
     let startup_time = SystemTime::now();
 
-    let db_download_handle = crate::spawn(repeat_daily_at(
-        download_crates_io_database_every_24_hours_starting_at,
-        {
-            let p = progress.clone();
-            move || p.add_child("Crates.io DB Digest")
-        },
-        deadline,
-        {
-            let db = db.clone();
-            let assets_dir = assets_dir.clone();
-            let progress = progress.clone();
-            move || {
-                stage::db_download::schedule(
-                    db.clone(),
-                    assets_dir.clone(),
-                    progress.add_child("fetching crates-io db"),
-                    startup_time,
-                )
-            }
-        },
-    ));
+    let db_download_handle = db_download.then(|| {
+        crate::spawn(repeat_daily_at(
+            download_crates_io_database_every_24_hours_starting_at,
+            {
+                let p = progress.clone();
+                move || p.add_child("Crates.io DB Digest")
+            },
+            deadline,
+            {
+                let db = db.clone();
+                let assets_dir = assets_dir.clone();
+                let progress = progress.clone();
+                move || {
+                    stage::db_download::schedule(
+                        db.clone(),
+                        assets_dir.clone(),
+                        progress.add_child("fetching crates-io db"),
+                        startup_time,
+                    )
+                }
+            },
+        ))
+    });
 
     let run = fetch_settings;
     let fetch_handle = crate::spawn(repeat_every_s(
@@ -155,7 +158,9 @@ pub async fn non_blocking(
     ));
 
     fetch_handle.await?;
-    db_download_handle.await?;
+    if let Some(handle) = db_download_handle {
+        handle.await?
+    };
     report_handle.await?;
     processing_handle.await
 }
@@ -185,6 +190,7 @@ pub fn blocking(
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
+    db_download: bool,
     fetch_settings: StageRunSettings,
     process_settings: StageRunSettings,
     report_settings: GlobStageRunSettings,
@@ -208,6 +214,7 @@ pub fn blocking(
         cpu_bound_processors,
         cpu_o_bound_processors,
         interrupt_control_sink,
+        db_download,
         fetch_settings,
         process_settings,
         report_settings,

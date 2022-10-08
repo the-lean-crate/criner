@@ -32,6 +32,14 @@ pub enum SubCommands {
         #[clap(short = 's', long, default_value = "100")]
         progress_message_scrollback_buffer_size: usize,
 
+        /// If set, the crates-index database for additional metadata will not be downloaded.
+        ///
+        /// It costs a lot of initial processing time and IO when writing changes back to the database,
+        /// which isn't helpful while on a slow disk - right now it does so unconditionally and doesn't track
+        /// that the work was already done.
+        #[clap(long, short = 'D')]
+        no_db_download: bool,
+
         /// The amount of IO-bound processors to run concurrently.
         ///
         /// A way to choose a value is to see which part of the I/O is actually the bottle neck.
@@ -143,6 +151,7 @@ impl Default for SubCommands {
             time_limit: None,
             fetch_every: std::time::Duration::from_secs(60).into(),
             fetch_at_most: None,
+            no_db_download: false,
             process_every: std::time::Duration::from_secs(60).into(),
             process_at_most: None,
             download_crates_io_database_every_24_hours_starting_at: Some(
