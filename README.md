@@ -14,7 +14,7 @@ This is facilitated by three means:
 
 ## Motivation
 
-I live in China and learned to live with slow and flaky internet connections. Every byte that reaches my computer makes me shed a tear in joy.
+I lived in China and learned to live with slow and flaky internet connections. Every byte that reaches my computer makes me shed a tear in joy.
 
 This initiative was motivated by a [`nushell`][nu] update which took forever and failed multiple times when trying to send me 3MB of 
 images in a 4MB download. The [fix][nu-fix] was trivial, and I wondered how much more there was to gain by simple fixes like that.

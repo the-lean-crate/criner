@@ -23,6 +23,7 @@ pub fn run_blocking(args: Args) -> criner::error::Result<()> {
             cpu_bound_processors,
             cpu_o_bound_processors,
             no_gui,
+            no_db_download,
             progress_message_scrollback_buffer_size,
             fetch_every,
             fetch_at_most,
@@ -39,6 +40,7 @@ pub fn run_blocking(args: Args) -> criner::error::Result<()> {
             io_bound_processors,
             cpu_bound_processors,
             cpu_o_bound_processors,
+            !no_db_download,
             criner::run::StageRunSettings {
                 every: fetch_every.into(),
                 at_most: fetch_at_most,

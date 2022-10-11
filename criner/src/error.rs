@@ -1,4 +1,3 @@
-use crates_index_diff::git2;
 use std::{fmt, time};
 
 #[derive(Debug)]
