@@ -8,13 +8,13 @@ use crate::{
 use crates_index_diff::Index;
 use rusqlite::params;
 use std::convert::TryFrom;
+use std::sync::atomic::AtomicBool;
 use std::{
     collections::BTreeMap,
     ops::Add,
     path::Path,
     time::{Duration, SystemTime},
 };
-use std::sync::atomic::AtomicBool;
 
 pub async fn fetch(
     crates_io_path: impl AsRef<Path>,
@@ -38,9 +38,7 @@ pub async fn fetch(
     .await??;
     let (crate_versions, last_seen_git_object) = enforce_threaded(
         deadline.unwrap_or_else(|| SystemTime::now().add(Duration::from_secs(10 * 60))),
-        move || {
-            index.peek_changes_with_options2(subprogress, &AtomicBool::default())
-        },
+        move || index.peek_changes_with_options(subprogress, &AtomicBool::default()),
     )
     .await??;
 

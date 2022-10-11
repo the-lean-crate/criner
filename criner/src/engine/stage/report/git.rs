@@ -3,7 +3,6 @@ use crate::{
     engine::report::generic::{WriteCallback, WriteCallbackState, WriteInstruction, WriteRequest},
     {Error, Result},
 };
-use crates_index_diff::git2;
 use futures_util::{future::BoxFuture, FutureExt};
 use std::{
     path::{Path, PathBuf},
