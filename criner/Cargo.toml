@@ -21,7 +21,7 @@ quick-error = "2.0.0"
 futures-util = { version = "0.3.5", default-features = false, features = ["io", "sink"]}
 crates-index-diff = "13.0.1"
 git2 = { version = "0.15.0", default-features = false, features = ["https"] }
-prodash = { version = "20.2.0", default-features = false, features = ["render-tui", "render-tui-termion", "local-time", "progress-tree", "progress-tree-log"] }
+prodash = { version = "21.0.0", default-features = false, features = ["render-tui", "render-tui-termion", "local-time", "progress-tree", "progress-tree-log"] }
 rmp-serde = "1.0.0"
 serde_derive = "1.0.104"
 serde = "1.0.104"

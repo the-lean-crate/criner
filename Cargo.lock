@@ -481,7 +481,7 @@ dependencies = [
  "log",
  "once_cell",
  "parking_lot 0.12.1",
- "prodash 20.2.0",
+ "prodash",
  "quick-error",
  "regex",
  "reqwest",
@@ -1100,7 +1100,7 @@ dependencies = [
  "num_cpus",
  "once_cell",
  "parking_lot 0.12.1",
- "prodash 21.0.0",
+ "prodash",
  "quick-error",
  "sha1_smol",
  "walkdir",
@@ -2219,15 +2219,17 @@ dependencies = [
 
 [[package]]
 name = "prodash"
-version = "20.2.0"
+version = "21.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd4e8b029f29b4eb8f95315957fb7ac8a8fd1924405fadf885b0e208fe34ba39"
+checksum = "d27f6a3ef883aaea624a6ad91c88452e5df05430a79fd880c12673a7bc1648d6"
 dependencies = [
  "async-io",
+ "bytesize",
  "crosstermion",
  "dashmap",
  "futures-core",
  "futures-lite",
+ "human_format",
  "humantime",
  "log",
  "parking_lot 0.11.2",
@@ -2236,16 +2238,6 @@ dependencies = [
  "tui-react",
  "unicode-segmentation",
  "unicode-width",
-]
-
-[[package]]
-name = "prodash"
-version = "21.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d27f6a3ef883aaea624a6ad91c88452e5df05430a79fd880c12673a7bc1648d6"
-dependencies = [
- "bytesize",
- "human_format",
 ]
 
 [[package]]
