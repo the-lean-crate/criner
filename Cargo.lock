@@ -729,9 +729,9 @@ dependencies = [
 
 [[package]]
 name = "dia-semver"
-version = "9.0.6"
+version = "11.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23731471155006ac52f49c678b950b2442bf5bad60fbc7dc11fa6c1539433b79"
+checksum = "12bd699dc0cd0813d90f06238fced3a470deefb6af08132f1cb0e30cf8069623"
 
 [[package]]
 name = "dirs"
