@@ -26,7 +26,7 @@ clap = { version = "4.0.22", features = ["derive"] }
 humantime = "2.1.0"
 time = { version = "0.3.5", features = ["parsing", "macros" ] }
 criner = { version = "0.3.0", path = "./criner" }
-env_logger = { version = "0.9.0", default-features = false, features = ["termcolor", "atty", "humantime"] }
+env_logger = { version = "0.10.0", default-features = false, features = ["auto-color", "humantime"] }
 
 [workspace]
 members = ["criner", "criner-waste-report"]
