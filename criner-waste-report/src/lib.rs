@@ -125,9 +125,9 @@ impl CargoConfig {
     }
 }
 
-impl From<&[u8]> for CargoConfig {
-    fn from(v: &[u8]) -> Self {
-        toml::from_slice::<CargoConfig>(v).unwrap_or_default() // you would think all of them parse OK, but that's wrong :D
+impl From<&str> for CargoConfig {
+    fn from(v: &str) -> Self {
+        toml::from_str::<CargoConfig>(v).unwrap_or_default() // you would think all of them parse OK, but that's wrong :D
     }
 }
 

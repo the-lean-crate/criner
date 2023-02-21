@@ -509,7 +509,7 @@ fn non_greedy_patterns<S: AsRef<str>>(patterns: impl IntoIterator<Item = S>) -> 
 impl Report {
     pub(crate) fn cargo_config_from_entries(entries: &[(TarHeader, Vec<u8>)]) -> CargoConfig {
         find_in_entries(entries, &[], "Cargo.toml")
-            .and_then(|(_e, v)| v.map(CargoConfig::from))
+            .and_then(|(_e, v)| v.and_then(|v| std::str::from_utf8(v).ok().map(CargoConfig::from)))
             .unwrap_or_default()
     }
 
