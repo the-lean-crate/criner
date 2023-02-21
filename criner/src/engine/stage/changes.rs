@@ -38,7 +38,7 @@ pub async fn fetch(
     .await??;
     let (crate_versions, last_seen_git_object) = enforce_threaded(
         deadline.unwrap_or_else(|| SystemTime::now().add(Duration::from_secs(10 * 60))),
-        move || index.peek_changes_with_options(subprogress, &AtomicBool::default()),
+        move || index.peek_changes_with_options(subprogress, &AtomicBool::default(), crates_index_diff::index::diff::Order::ImplementationDefined),
     )
     .await??;
 

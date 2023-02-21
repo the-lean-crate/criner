@@ -95,14 +95,18 @@ impl From<crates_index_diff::Dependency> for Dependency {
             package,
         } = v;
         Dependency {
-            name,
-            required_version,
+            name: name.to_string(),
+            required_version: required_version.to_string(),
             features,
             optional,
             default_features,
-            target,
-            kind,
-            package,
+            target: target.map(|t| t.to_string()),
+            kind: kind.map(|k| match k {
+                crates_index_diff::DependencyKind::Normal => {"normal"}
+                crates_index_diff::DependencyKind::Dev => {"dev"}
+                crates_index_diff::DependencyKind::Build => {"build"}
+            }.to_owned()),
+            package: package.map(|p| p.to_string()),
         }
     }
 }
@@ -306,7 +310,7 @@ impl TryFrom<crates_index_diff::Change> for CrateVersion {
                 // ignore for now
                 return Err(());
             }
-            crates_index_diff::Change::Added(v) | crates_index_diff::Change::Yanked(v) => v,
+            crates_index_diff::Change::Unyanked(v) | crates_index_diff::Change::Added(v) | crates_index_diff::Change::AddedAndYanked(v) | crates_index_diff::Change::Yanked(v) => v,
         };
         let crates_index_diff::CrateVersion {
             name,
@@ -317,10 +321,10 @@ impl TryFrom<crates_index_diff::Change> for CrateVersion {
             dependencies,
         } = v;
         Ok(CrateVersion {
-            name,
+            name: name.to_string(),
             kind: yanked.then(|| ChangeKind::Yanked).unwrap_or(ChangeKind::Added),
-            version,
-            checksum,
+            version: version.to_string(),
+            checksum: hex::encode(checksum),
             features,
             dependencies: dependencies.into_iter().map(Into::into).collect(),
         })

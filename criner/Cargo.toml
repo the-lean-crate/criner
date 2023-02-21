@@ -19,9 +19,10 @@ doctest = false
 [dependencies]
 quick-error = "2.0.0"
 futures-util = { version = "0.3.5", default-features = false, features = ["io", "sink"]}
-crates-index-diff = "13.0.1"
-git2 = { version = "0.15.0", default-features = false, features = ["https"] }
-prodash = { version = "21.0.0", default-features = false, features = ["render-tui", "render-tui-termion", "local-time", "progress-tree", "progress-tree-log"] }
+crates-index-diff = "16.0.1"
+git2 = { version = "0.16.1", default-features = false, features = ["https"] }
+prodash = { version = "23.0.0", default-features = false, features = ["render-tui", "render-tui-termion", "local-time", "progress-tree", "progress-tree-log"] }
+hex = "0.4.3"
 rmp-serde = "1.0.0"
 serde_derive = "1.0.104"
 serde = "1.0.104"
@@ -29,7 +30,7 @@ humantime = "2.0.0"
 log = "0.4.8"
 reqwest = { version = "0.11.1", features = ["gzip"] }
 http = { version = "0.2.0", default-features = false }
-jwalk = { version = "0.4.0", optional = true }
+jwalk = { version = "0.8.1", optional = true }
 tar = "0.4.26"
 libflate = "1.0.0"
 bytesize = "1.0.0"

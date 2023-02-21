@@ -57,11 +57,11 @@ pub fn run_blocking(args: Args) -> criner::error::Result<()> {
                 glob,
             },
             download_crates_io_database_every_24_hours_starting_at,
-            criner::prodash::TreeOptions {
+            criner::prodash::tree::root::Options {
                 message_buffer_capacity: progress_message_scrollback_buffer_size,
-                ..criner::prodash::TreeOptions::default()
+                ..criner::prodash::tree::root::Options::default()
             }
-            .create(),
+            .create().into(),
             if no_gui {
                 None
             } else {

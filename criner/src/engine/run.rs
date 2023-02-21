@@ -33,7 +33,7 @@ pub async fn non_blocking(
     db: Db,
     crates_io_path: PathBuf,
     deadline: Option<SystemTime>,
-    progress: Arc<prodash::Tree>,
+    progress: Arc<prodash::tree::Root>,
     io_bound_processors: u32,
     cpu_bound_processors: u32,
     cpu_o_bound_processors: u32,
@@ -195,7 +195,7 @@ pub fn blocking(
     process_settings: StageRunSettings,
     report_settings: GlobStageRunSettings,
     download_crates_io_database_every_24_hours_starting_at: Option<time::Time>,
-    root: Arc<prodash::Tree>,
+    root: Arc<prodash::tree::Root>,
     gui: Option<prodash::render::tui::Options>,
 ) -> Result<()> {
     let start_of_computation = SystemTime::now();
