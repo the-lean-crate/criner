@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.3.1 (2023-03-16)
 
 A maintenance release without user-facing changes.
 
@@ -13,8 +13,8 @@ A maintenance release without user-facing changes.
 
 <csr-read-only-do-not-edit/>
 
- - 57 commits contributed to the release over the course of 828 calendar days.
- - 841 days passed between releases.
+ - 58 commits contributed to the release over the course of 851 calendar days.
+ - 864 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -31,6 +31,7 @@ A maintenance release without user-facing changes.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Update chnagelogs prior to release ([`2faff3e`](https://github.com/the-lean-crate/criner/commit/2faff3e850634f6dcaaef843b041c7129d84b1d7))
     - Upgrade `toml` in `criner-waste-report` ([`7be638b`](https://github.com/the-lean-crate/criner/commit/7be638bab4c6c7d7c2f753470d09d77ac9bc5ed2))
     - Upgrade `toml` ([`a4291f9`](https://github.com/the-lean-crate/criner/commit/a4291f916fb228d53c355e30f2347f685d0c42f2))
     - Cargo fmt ([`94b7095`](https://github.com/the-lean-crate/criner/commit/94b70957b3aa2010a8231fbe56fa6012a84b3818))
@@ -191,6 +192,8 @@ A maintenance release without user-facing changes.
 ## v0.1.3 (2020-05-28)
 
 ## v0.1.2 (2020-04-12)
+
+<csr-id-8fcc628243e06527104e0d717a3f1f4e214f3fc3/>
 
 ### Other
 
@@ -389,6 +392,8 @@ A maintenance release without user-facing changes.
 ## v0.1.1 (2020-03-20)
 
 ## v0.1.0 (2020-03-20)
+
+<csr-id-cdb225a7d5549e4d84cf1dc2e8c9644fbe4203e9/>
 
 ### Other
 

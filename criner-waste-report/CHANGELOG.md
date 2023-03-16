@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.1.5 (2023-03-16)
 
 A maintenance release without user-facing changes.
 
@@ -13,8 +13,8 @@ A maintenance release without user-facing changes.
 
 <csr-read-only-do-not-edit/>
 
- - 11 commits contributed to the release over the course of 820 calendar days.
- - 941 days passed between releases.
+ - 12 commits contributed to the release over the course of 843 calendar days.
+ - 964 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -31,6 +31,7 @@ A maintenance release without user-facing changes.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Update chnagelogs prior to release ([`2faff3e`](https://github.com/the-lean-crate/criner/commit/2faff3e850634f6dcaaef843b041c7129d84b1d7))
     - Upgrade `toml` in `criner-waste-report` ([`7be638b`](https://github.com/the-lean-crate/criner/commit/7be638bab4c6c7d7c2f753470d09d77ac9bc5ed2))
     - Upgrade dia-semver ([`2e3ab36`](https://github.com/the-lean-crate/criner/commit/2e3ab36a2360ecbf50abfae20c6a25ba7889ca52))
     - Thanks clippy ([`459cc26`](https://github.com/the-lean-crate/criner/commit/459cc26ef2bf0da1c74c807dc355db7ac3497a6a))

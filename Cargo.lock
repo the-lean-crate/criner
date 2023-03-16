@@ -391,7 +391,7 @@ dependencies = [
 
 [[package]]
 name = "criner"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "async-channel",
  "async-compat",
@@ -438,7 +438,7 @@ dependencies = [
 
 [[package]]
 name = "criner-cli"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "clap",
  "criner",
@@ -449,7 +449,7 @@ dependencies = [
 
 [[package]]
 name = "criner-waste-report"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "bytesize",
  "dia-semver",
