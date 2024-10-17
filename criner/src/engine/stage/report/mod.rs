@@ -74,7 +74,7 @@ pub async fn generate(
         }
     };
     let merge_reports = crate::spawn({
-        let mut merge_progress = progress.add_child("report aggregator");
+        let merge_progress = progress.add_child("report aggregator");
         merge_progress.init(Some(num_crates / chunk_size), Some("Reports".into()));
         report::waste::Generator::merge_reports(
             waste_report_dir.clone(),

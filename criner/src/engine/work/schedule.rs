@@ -117,7 +117,7 @@ async fn submit_single<R>(
 ) -> SubmitResult {
     use model::TaskState::*;
     use SubmitResult::*;
-    let mut configure = || {
+    let configure = || {
         progress.init(Some(step), Some("task".into()));
         progress.set(max_step);
         progress.blocked("wait for consumer", None);
