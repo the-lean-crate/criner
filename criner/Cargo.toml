@@ -19,9 +19,10 @@ doctest = false
 [dependencies]
 quick-error = "2.0.0"
 futures-util = { version = "0.3.5", default-features = false, features = ["io", "sink"]}
-crates-index-diff = "16.0.1"
-git2 = { version = "0.16.1", default-features = false, features = ["https"] }
-prodash = { version = "23.0.0", default-features = false, features = ["render-tui", "render-tui-termion", "local-time", "progress-tree", "progress-tree-log"] }
+crates-index-diff = "25.0.0"
+gix = { version = "0.63.0", features = ["parallel"] }
+git2 = { version = "0.19.0", default-features = false, features = ["https"] }
+prodash = { version = "28.0.0", default-features = false, features = ["render-tui", "render-tui-crossterm", "local-time", "progress-tree", "progress-tree-log"] }
 hex = "0.4.3"
 rmp-serde = "1.0.0"
 serde_derive = "1.0.104"
@@ -35,7 +36,7 @@ tar = "0.4.26"
 libflate = "1.0.0"
 bytesize = "1.0.0"
 rmpv = "1.0.0"
-rusqlite = { version = "0.28.0", features = ["bundled", "unlock_notify"] }
+rusqlite = { version = "0.32.1", features = ["bundled", "unlock_notify"] }
 parking_lot = "0.12.0"
 async-trait = "0.1.24"
 dia-semver = "11.0.0"

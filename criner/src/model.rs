@@ -309,7 +309,7 @@ impl TryFrom<crates_index_diff::Change> for CrateVersion {
 
     fn try_from(v: crates_index_diff::Change) -> Result<Self, Self::Error> {
         let v = match v {
-            crates_index_diff::Change::Deleted { .. } => {
+            crates_index_diff::Change::CrateDeleted { .. } | crates_index_diff::Change::VersionDeleted(_) => {
                 // ignore for now
                 return Err(());
             }

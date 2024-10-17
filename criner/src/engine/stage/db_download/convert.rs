@@ -178,7 +178,7 @@ impl From<csv_model::UserKind> for db_dump::ActorKind {
 pub fn into_actors_by_id(
     users: BTreeMap<csv_model::Id, csv_model::User>,
     teams: BTreeMap<csv_model::Id, csv_model::Team>,
-    mut progress: prodash::tree::Item,
+    progress: prodash::tree::Item,
 ) -> BTreeMap<(db_dump::Id, db_dump::ActorKind), db_dump::Actor> {
     progress.init(Some(users.len() + teams.len()), Some("users and teams".into()));
     let mut map = BTreeMap::new();

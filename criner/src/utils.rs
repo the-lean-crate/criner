@@ -27,7 +27,7 @@ pub fn parse_semver(version: &str) -> Semver {
 
 pub async fn wait_with_progress(
     duration_s: usize,
-    mut progress: prodash::tree::Item,
+    progress: prodash::tree::Item,
     deadline: Option<SystemTime>,
     time: Option<time::Time>,
 ) -> Result<()> {

@@ -23,7 +23,7 @@ pub async fn fetch(
     deadline: Option<SystemTime>,
 ) -> Result<()> {
     let start = SystemTime::now();
-    let mut subprogress = progress.add_child("Fetching changes from crates.io index");
+    let subprogress = progress.add_child("Fetching changes from crates.io index");
     subprogress.blocked("potentially cloning", None);
     let index = enforce_threaded(
         deadline.unwrap_or_else(|| SystemTime::now().add(Duration::from_secs(60 * 60))),

@@ -173,7 +173,7 @@ pub fn select_callback(
                                 let mut remote = repo.find_remote(&remote_name)?;
                                 let mut callbacks = git2::RemoteCallbacks::new();
                                 let mut subprogress = progress.add_child("git credentials");
-                                let mut sideband = progress.add_child("git sideband");
+                                let sideband = progress.add_child("git sideband");
                                 let username = env_var("CRINER_REPORT_PUSH_HTTP_USERNAME")?;
                                 let password = env_var("CRINER_REPORT_PUSH_HTTP_PASSWORD")?;
                                 callbacks

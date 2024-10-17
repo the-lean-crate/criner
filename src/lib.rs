@@ -61,7 +61,8 @@ pub fn run_blocking(args: Args) -> criner::error::Result<()> {
                 message_buffer_capacity: progress_message_scrollback_buffer_size,
                 ..criner::prodash::tree::root::Options::default()
             }
-            .create().into(),
+            .create()
+            .into(),
             if no_gui {
                 None
             } else {
