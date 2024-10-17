@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.4.0 (2024-10-17)
+
+### Chore (BREAKING)
+
+ - <csr-id-081cc14b90e4718ef45190cff1239a9ff5f9a1e7/> upgrade gix-related dependencies
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge branch 'upgrades' ([`cf7fe54`](https://github.com/the-lean-crate/criner/commit/cf7fe541d7a40c21f06c1e256d8f1072439c27d9))
+    - Upgrade gix-related dependencies ([`081cc14`](https://github.com/the-lean-crate/criner/commit/081cc14b90e4718ef45190cff1239a9ff5f9a1e7))
+</details>
+
 ## 0.3.1 (2023-03-16)
 
 A maintenance release without user-facing changes.
@@ -13,8 +38,7 @@ A maintenance release without user-facing changes.
 
 <csr-read-only-do-not-edit/>
 
- - 58 commits contributed to the release over the course of 851 calendar days.
- - 864 days passed between releases.
+ - 59 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -31,6 +55,7 @@ A maintenance release without user-facing changes.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release criner-waste-report v0.1.5, criner v0.3.1, criner-cli v0.3.1 ([`e0cd0e1`](https://github.com/the-lean-crate/criner/commit/e0cd0e1c7937477c466d46e4fd571ddfd15fb4d7))
     - Update chnagelogs prior to release ([`2faff3e`](https://github.com/the-lean-crate/criner/commit/2faff3e850634f6dcaaef843b041c7129d84b1d7))
     - Upgrade `toml` in `criner-waste-report` ([`7be638b`](https://github.com/the-lean-crate/criner/commit/7be638bab4c6c7d7c2f753470d09d77ac9bc5ed2))
     - Upgrade `toml` ([`a4291f9`](https://github.com/the-lean-crate/criner/commit/a4291f916fb228d53c355e30f2347f685d0c42f2))

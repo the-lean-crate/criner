@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.4.0 (2024-10-17)
+
+### Chore (BREAKING)
+
+ - <csr-id-081cc14b90e4718ef45190cff1239a9ff5f9a1e7/> upgrade gix-related dependencies
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge branch 'upgrades' ([`cf7fe54`](https://github.com/the-lean-crate/criner/commit/cf7fe541d7a40c21f06c1e256d8f1072439c27d9))
+    - Upgrade gix-related dependencies ([`081cc14`](https://github.com/the-lean-crate/criner/commit/081cc14b90e4718ef45190cff1239a9ff5f9a1e7))
+</details>
+
 ## 0.3.1 (2023-03-16)
 
 A maintenance release without user-facing changes.
@@ -13,8 +38,7 @@ A maintenance release without user-facing changes.
 
 <csr-read-only-do-not-edit/>
 
- - 10 commits contributed to the release over the course of 843 calendar days.
- - 864 days passed between releases.
+ - 10 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
