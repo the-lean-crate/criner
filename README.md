@@ -69,12 +69,12 @@ There is no need for…
 * …docs
 * …fixtures
 * …anything else that is used for development
-* _(…packagers can use source archives from Github or clone repositories for the data they need to run tests)_
+* _(…packagers can use source archives from GitHub or clone repositories for the data they need to run tests)_
 
 Based on these assumptions and conclusions, _The Criner Waste Report_ computes a suggestions for new `include` or `exclude` directives which prevent
 unnecessary data to be put into the crate archive.
 
-Due to the way Cargo handles these directives, `include` directives are deemed most powerful in the persuit of keeping the amount of patterns small, using
+Due to the way Cargo handles these directives, `include` directives are deemed most powerful in the pursuit of keeping the amount of patterns small, using
 [negative patterns][negative-include] where needed. Thus these will be recommended whenever feasible. 
 
 This part of the initiative is [still under heavy development][criner-todo], but available as _ugly alpha_.
@@ -102,7 +102,7 @@ Apologies, the term was proposed by the marketing department who believed that '
 'The Criner Report of files you do not need to build a crate'.
 
 The author does shame crates that are bigger than they _probably_ have to be, and is happy to help get your crate
-off the index. Some files listed are certainly false positivies due to [limitations], read on in this FAQ to learn how to remove these
+off the index. Some files listed are certainly false positives due to [limitations], read on in this FAQ to learn how to remove these
 false positives.
 
 [limitations]: https://github.com/the-lean-crate/criner#limitations-of-waste-reporting
@@ -115,7 +115,7 @@ be a suggestion, trusting that you set includes exactly the way they are needed.
 
 ### It keeps claiming that my included files are waste !?
 
-It detecs files included via `include_str!(…)` and `include_bytes!(…)`, but only so in in `lib.rs` and `main.rs`, or other binary targets.
+It detects files included via `include_str!(…)` and `include_bytes!(…)`, but only so in in `lib.rs` and `main.rs`, or other binary targets.
 
 ### How can I just make it stop complaining ?
 
@@ -127,7 +127,7 @@ patterns to exclude, for instance, tests and docs.
 The waste report favors include directives, as it will not mark any file as wasted if present, but make recommendations on how to save even more
 by excluding tests, docs and the likes.
 
-When excludes are present, it makes recommendations mandatory, and considers all files that don't are included despites those recommendations to
+When excludes are present, it makes recommendations mandatory, and considers all files that don't are included despite those recommendations to
 be waste. The reason is that whitelists, i.e. include directives, are better supported by cargo due to the presence of negations, so it assumes
 people have better control over the includes they make.
 
@@ -179,7 +179,7 @@ _Criner_ currently operates in three stages when executed with `criner mine`:
   * _[PLANNED]_ **Download the crates.io SQL dump** for more meta-data and download counts
 * **processing**
   * **traverse all crate versions** and **schedule** tasks or re-schedule failed tasks. Tasks will spawn other tasks if task processors are free,
-    to keep all processors busy. A **processor** is a light-weight future which receives tasks by a channnel. Once a task is done, it will not
+    to keep all processors busy. A **processor** is a light-weight future which receives tasks by a channel. Once a task is done, it will not
     be processed again, allowing for incremental processing.
   * **task types**
     * **download** - downloads the crate archive and stores it on disk. This will need 39GB as of 2020-03-18. 
