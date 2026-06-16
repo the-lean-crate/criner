@@ -1,11 +1,11 @@
 use crate::persistence::KEY_SEP_CHAR;
 use crate::{
+    Result,
     model::{Context, Crate, TaskResult},
     model::{CrateVersion, Task},
-    persistence::{merge::Merge, Keyed},
-    Result,
+    persistence::{Keyed, merge::Merge},
 };
-use rusqlite::{params, OptionalExtension};
+use rusqlite::{OptionalExtension, params};
 use std::time::{Duration, SystemTime};
 
 /// Required as we send futures to threads. The type system can't statically prove that in fact
@@ -103,6 +103,7 @@ pub trait TableAccess {
         Self::StorageItem::from(new_item.clone())
     }
 
+    #[expect(dead_code)]
     fn into_connection(self) -> ThreadSafeConnection;
 
     fn count(&self) -> u64 {
@@ -212,9 +213,9 @@ pub trait TableAccess {
 
 fn retry_on_db_busy<T>(mut progress: Option<&mut prodash::tree::Item>, mut f: impl FnMut() -> Result<T>) -> Result<T> {
     use crate::Error;
+    use rusqlite::Error as SqliteError;
     use rusqlite::ffi::Error as SqliteFFIError;
     use rusqlite::ffi::ErrorCode as SqliteFFIErrorCode;
-    use rusqlite::Error as SqliteError;
     use std::ops::Add;
 
     let max_wait_ms = Duration::from_secs(100);
@@ -284,7 +285,6 @@ pub struct ReportsTree {
     pub(crate) inner: ThreadSafeConnection,
 }
 
-#[allow(dead_code)]
 impl ReportsTree {
     pub fn table_name() -> &'static str {
         "report_done"
@@ -311,7 +311,7 @@ impl ReportsTree {
             .optional()
             .ok()
             .unwrap_or_default()
-            .map_or(false, |_: ()| true)
+            .is_some_and(|_: ()| true)
     }
 }
 

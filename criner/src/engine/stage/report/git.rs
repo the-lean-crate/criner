@@ -3,7 +3,7 @@ use crate::{
     engine::report::generic::{WriteCallback, WriteCallbackState, WriteInstruction, WriteRequest},
     {Error, Result},
 };
-use futures_util::{future::BoxFuture, FutureExt};
+use futures_util::{FutureExt, future::BoxFuture};
 use std::{
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
@@ -23,7 +23,7 @@ fn file_index_entry(path: PathBuf, file_size: usize) -> git2::IndexEntry {
         uid: 0,
         gid: 0,
         file_size: file_size as u32,
-        id: git2::Oid::zero(),
+        id: git2::Oid::ZERO_SHA1,
         flags: 0,
         flags_extended: 0,
         path: path.into_os_string().into_vec(),
@@ -59,18 +59,17 @@ pub fn select_callback(
                     progress.init(None, Some("files stored in index".into()));
                     let mut index = {
                         let mut i = repo.index()?;
-                        if is_bare_repo {
-                            if let Ok(tree_oid) = repo
+                        if is_bare_repo
+                            && let Ok(tree_oid) = repo
                                 .head()
                                 .and_then(|h| h.resolve())
                                 .and_then(|h| h.peel_to_tree())
                                 .map(|t| t.id())
-                            {
-                                progress.info(format!("reading latest tree into in-memory index: {}", tree_oid));
-                                progress.blocked("reading tree into in-memory index", None);
-                                i.read_tree(&repo.find_tree(tree_oid).expect("a tree object to exist"))?;
-                                progress.done("read tree into memory index");
-                            }
+                        {
+                            progress.info(format!("reading latest tree into in-memory index: {}", tree_oid));
+                            progress.blocked("reading tree into in-memory index", None);
+                            i.read_tree(&repo.find_tree(tree_oid).expect("a tree object to exist"))?;
+                            progress.done("read tree into memory index");
                         }
                         i
                     };
@@ -115,11 +114,10 @@ pub fn select_callback(
                         .and_then(|h| h.resolve())
                         .and_then(|h| h.peel_to_tree())
                         .map(|t| t.id())
+                        && current_tree == tree_oid
                     {
-                        if current_tree == tree_oid {
-                            progress.info("Skipping git commit as there was no change");
-                            return Ok(());
-                        }
+                        progress.info("Skipping git commit as there was no change");
+                        return Ok(());
                     }
 
                     {
@@ -240,7 +238,7 @@ pub fn select_callback(
     }
 }
 
-pub fn repo_with_working_dir(req: WriteRequest, send: &WriteCallbackState) -> BoxFuture<Result<WriteInstruction>> {
+pub fn repo_with_working_dir(req: WriteRequest, send: &WriteCallbackState) -> BoxFuture<'_, Result<WriteInstruction>> {
     async move {
         send.as_ref()
             .expect("send to be available if a repo is available")
@@ -252,7 +250,7 @@ pub fn repo_with_working_dir(req: WriteRequest, send: &WriteCallbackState) -> Bo
     .boxed()
 }
 
-pub fn repo_bare(req: WriteRequest, send: &WriteCallbackState) -> BoxFuture<Result<WriteInstruction>> {
+pub fn repo_bare(req: WriteRequest, send: &WriteCallbackState) -> BoxFuture<'_, Result<WriteInstruction>> {
     async move {
         send.as_ref()
             .expect("send to be available if a repo is available")
@@ -264,6 +262,6 @@ pub fn repo_bare(req: WriteRequest, send: &WriteCallbackState) -> BoxFuture<Resu
     .boxed()
 }
 
-pub fn not_available(req: WriteRequest, _state: &WriteCallbackState) -> BoxFuture<Result<WriteInstruction>> {
+pub fn not_available(req: WriteRequest, _state: &WriteCallbackState) -> BoxFuture<'_, Result<WriteInstruction>> {
     async move { Ok(WriteInstruction::DoWrite(req)) }.boxed()
 }

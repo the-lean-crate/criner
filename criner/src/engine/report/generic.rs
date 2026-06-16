@@ -2,10 +2,10 @@ use crate::persistence::{CrateVersionTable, TableAccess};
 use crate::{
     error::Result,
     model, persistence,
-    persistence::{new_key_insertion, ReportsTree},
+    persistence::{ReportsTree, new_key_insertion},
 };
 use async_trait::async_trait;
-use rusqlite::{params, TransactionBehavior};
+use rusqlite::{TransactionBehavior, params};
 use std::path::{Path, PathBuf};
 
 fn all_but_recently_yanked(

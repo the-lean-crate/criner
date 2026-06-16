@@ -84,7 +84,7 @@ fn crate_and_crate_of_different_name() {
             total_files: 12,
             info_by_crate: b_tree_map! {
                 "a".into() => VersionInfo {
-                    all: AggregateFileInfo { total_files: 4*2, total_bytes: 1*2},
+                    all: AggregateFileInfo { total_files: 4*2, total_bytes: 2},
                     waste: AggregateFileInfo { total_files: 3*2, total_bytes: 50*2},
                     potential_gains: Some(AggregateFileInfo {
                         total_bytes: 2,
@@ -186,7 +186,7 @@ fn two_crate_collections() {
                 "a".into()  => AggregateFileInfo {total_files: 4*2, total_bytes: 40*2},
                 "b".into()  => AggregateFileInfo {total_files: 4*2, total_bytes: 40*2},
                 "c".into()  => AggregateFileInfo {total_files: 3*2, total_bytes: 30*2},
-                "d".into()  => AggregateFileInfo {total_files: 1*2, total_bytes: 10*2},
+                "d".into()  => AggregateFileInfo {total_files: 2, total_bytes: 10*2},
                 "e".into()  => AggregateFileInfo {total_files: 4, total_bytes: 2},
             },
         }

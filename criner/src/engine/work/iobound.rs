@@ -1,10 +1,9 @@
 use crate::{
-    model,
+    Error, Result, model,
     persistence::{self, TableAccess},
-    Error, Result,
 };
 use bytesize::ByteSize;
-use futures_lite::{io::AsyncWriteExt, FutureExt};
+use futures_lite::{FutureExt, io::AsyncWriteExt};
 
 use crate::utils::timeout_after;
 use async_trait::async_trait;
@@ -172,7 +171,7 @@ async fn download_file_and_store_result(
 ) -> Result<()> {
     blocking::unblock({
         let out_file = out_file.clone();
-        move || std::fs::create_dir_all(&out_file.parent().expect("parent directory"))
+        move || std::fs::create_dir_all(out_file.parent().expect("parent directory"))
     })
     .await?;
 
@@ -210,7 +209,7 @@ async fn download_file_and_store_result(
                     ""
                 },
                 url,
-                ByteSize(start_byte as u64)
+                ByteSize(start_byte)
             ));
             return Ok(());
         }

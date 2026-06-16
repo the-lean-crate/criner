@@ -244,7 +244,7 @@ pub fn into_versions_by_crate_id(
     map
 }
 
-#[allow(clippy::too_many_arguments)]
+#[expect(clippy::too_many_arguments)]
 pub fn into_crates(
     crates: Vec<csv_model::Crate>,
     mut keywords_by_id: BTreeMap<csv_model::Id, csv_model::Keyword>,
@@ -345,5 +345,5 @@ pub fn into_crates(
 
     progress.done(format!("assigned {} owners", crate_owners_len));
 
-    crate_by_id.into_iter().map(|(_, v)| v).collect()
+    crate_by_id.into_values().collect()
 }

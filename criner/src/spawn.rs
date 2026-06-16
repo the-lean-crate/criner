@@ -13,8 +13,10 @@ pub fn spawn<T: Send + 'static>(future: impl Future<Output = T> + Send + 'static
         for i in 1..=2 {
             thread::Builder::new()
                 .name(format!("smol-{}", i))
-                .spawn(|| loop {
-                    catch_unwind(|| async_io::block_on(GLOBAL.run(future::pending::<()>()))).ok();
+                .spawn(|| {
+                    loop {
+                        catch_unwind(|| async_io::block_on(GLOBAL.run(future::pending::<()>()))).ok();
+                    }
                 })
                 .expect("cannot spawn executor thread");
         }

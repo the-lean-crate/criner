@@ -1,8 +1,8 @@
 use crate::{
-    export::to_sql::{to_seconds_since_epoch, SqlConvert},
+    export::to_sql::{SqlConvert, to_seconds_since_epoch},
     model,
 };
-use rusqlite::{params, Statement};
+use rusqlite::{Statement, params};
 
 impl SqlConvert for model::Task {
     fn replace_statement() -> &'static str {

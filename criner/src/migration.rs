@@ -40,7 +40,7 @@ pub fn migrate(db_path: impl AsRef<Path>) -> crate::Result<()> {
     Ok(())
 }
 
-#[allow(dead_code)]
+#[expect(dead_code)]
 fn migrate_iterate_assets_and_update_db(db_path: impl AsRef<Path>) -> crate::Result<()> {
     let assets_dir = db_path.as_ref().join("assets");
     let db = crate::persistence::Db::open(&db_path)?;

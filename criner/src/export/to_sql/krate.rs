@@ -1,5 +1,5 @@
 use crate::{export::to_sql::SqlConvert, model};
-use rusqlite::{params, Statement};
+use rusqlite::{Statement, params};
 
 impl SqlConvert for model::Crate {
     fn replace_statement() -> &'static str {

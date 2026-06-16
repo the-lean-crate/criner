@@ -2,7 +2,7 @@
 name = "criner-cli"
 version = "0.4.0"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
-edition = "2018"
+edition = "2024"
 description = "A command-line interface for the 'Criner' crates mining platform"
 license = "MIT"
 repository = "https://github.com/the-lean-crate/criner"
@@ -22,13 +22,14 @@ migration = ["criner/migration"]
 doctest = false
 
 [dependencies]
-clap = { version = "4.0.22", features = ["derive"] }
-humantime = "2.1.0"
-time = { version = "0.3.5", features = ["parsing", "macros" ] }
+clap = { version = "4.6.1", features = ["derive"] }
+humantime = "2.3.0"
+time = { version = "0.3.49", features = ["parsing", "macros" ] }
 criner = { version = "^0.4.0", path = "./criner" }
-env_logger = { version = "0.10.0", default-features = false, features = ["auto-color", "humantime"] }
+env_logger = { version = "0.11.10", default-features = false, features = ["auto-color", "humantime"] }
 
 [workspace]
+resolver = "3"
 members = ["criner", "criner-waste-report"]
 
 # Turn on when needed to have faster debug builds

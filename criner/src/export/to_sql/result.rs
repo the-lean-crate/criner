@@ -1,6 +1,6 @@
 use crate::export::to_sql::SqlConvert;
 use crate::model;
-use rusqlite::{params, Statement};
+use rusqlite::{Statement, params};
 
 impl SqlConvert for model::TaskResult {
     fn convert_to_sql(

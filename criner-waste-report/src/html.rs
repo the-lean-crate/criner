@@ -1,7 +1,7 @@
 use super::{AggregateFileInfo, Dict, Fix, Report, VersionInfo};
 use bytesize::ByteSize;
 use dia_semver::Semver;
-use horrorshow::{box_html, helper::doctype, html, Render, RenderBox, RenderOnce, TemplateBuffer};
+use horrorshow::{Render, RenderBox, RenderOnce, TemplateBuffer, box_html, helper::doctype, html};
 use std::time::SystemTime;
 
 pub fn fix_to_wasted_files_aggregate(fix: Option<Fix>) -> Option<AggregateFileInfo> {
@@ -45,11 +45,7 @@ fn potential_savings(info_by_crate: &Dict<VersionInfo>) -> Option<AggregateFileI
             s += e.potential_gains.clone().unwrap_or_default();
             s
         });
-    if gains.total_bytes > 0 {
-        Some(gains)
-    } else {
-        None
-    }
+    if gains.total_bytes > 0 { Some(gains) } else { None }
 }
 
 fn total_section(bytes: u64, files: u64) -> Box<dyn Render> {
