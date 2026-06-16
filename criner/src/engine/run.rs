@@ -24,7 +24,7 @@ pub struct GlobStageRunSettings {
     pub run: StageRunSettings,
 }
 
-#[allow(clippy::too_many_arguments)]
+#[expect(clippy::too_many_arguments)]
 /// Runs the statistics and mining engine.
 /// May run for a long time unless a deadline is specified.
 /// Even though timeouts can be achieved from outside of the future, knowing the deadline may be used
@@ -181,7 +181,7 @@ impl From<Interruptible> for prodash::render::tui::Event {
     }
 }
 
-#[allow(clippy::too_many_arguments)]
+#[expect(clippy::too_many_arguments)]
 /// For convenience, run the engine and block until done.
 pub fn blocking(
     db: impl AsRef<Path>,
@@ -229,9 +229,10 @@ pub fn blocking(
                 Arc::downgrade(&root),
                 gui_options,
                 futures_util::stream::select(
-                    context_stream(&db, start_of_computation),
+                    context_stream(db.clone(), start_of_computation),
                     interrupt_control_stream.map(Event::from),
-                ),
+                )
+                .boxed(),
             )?);
 
             let either = futures_lite::future::block_on(futures_util::future::select(
@@ -270,9 +271,8 @@ fn wallclock(since: SystemTime) -> String {
     )
 }
 
-fn context_stream(db: &Db, start_of_computation: SystemTime) -> impl futures_util::stream::Stream<Item = Event> {
+fn context_stream(db: Db, start_of_computation: SystemTime) -> impl futures_util::stream::Stream<Item = Event> {
     prodash::render::tui::ticker(Duration::from_secs(1)).map({
-        let db = db.clone();
         move |_| {
             db.open_context()
                 .ok()
