@@ -1,4 +1,4 @@
-use crate::{model, persistence, persistence::TableAccess, Error, Result};
+use crate::{Error, Result, model, persistence, persistence::TableAccess};
 use async_trait::async_trait;
 
 #[async_trait]
@@ -6,7 +6,7 @@ pub trait Processor {
     type Item;
 
     fn set(&mut self, request: Self::Item, progress: &mut prodash::tree::Item)
-        -> Result<(model::Task, String, String)>;
+    -> Result<(model::Task, String, String)>;
     fn idle_message(&self) -> String;
     async fn process(&mut self, progress: &mut prodash::tree::Item) -> std::result::Result<(), (Error, String)>;
     async fn schedule_next(&mut self, _progress: &mut prodash::tree::Item) -> Result<()> {

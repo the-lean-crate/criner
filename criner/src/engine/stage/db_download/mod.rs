@@ -1,11 +1,11 @@
 use crate::model::db_dump;
 use crate::{
-    engine::work, persistence::new_key_value_insertion, persistence::Db, persistence::TableAccess, Error, Result,
+    Error, Result, engine::work, persistence::Db, persistence::TableAccess, persistence::new_key_value_insertion,
 };
 use bytesize::ByteSize;
 use futures_util::FutureExt;
-use rusqlite::params;
 use rusqlite::TransactionBehavior;
+use rusqlite::params;
 use std::{collections::BTreeMap, fs::File, io::BufReader, path::PathBuf};
 
 mod convert;

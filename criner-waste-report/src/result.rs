@@ -50,7 +50,6 @@ fn split_to_matched_and_unmatched(
     globset: &globset::GlobSet,
 ) -> (Vec<TarHeader>, Vec<TarHeader>) {
     let mut unmatched = Vec::new();
-    #[allow(clippy::unnecessary_filter_map)] // we need to keep the unmatched element
     let matched = entries
         .into_iter()
         .filter_map(|e| {
@@ -68,10 +67,10 @@ fn split_to_matched_and_unmatched(
 fn directories_of(entries: &[TarHeader]) -> Vec<TarHeader> {
     let mut directories = BTreeSet::new();
     for e in entries {
-        if entry_is_file(e.entry_type) {
-            if let Some(parent) = tar_path_to_path_no_strip(&e.path).parent() {
-                directories.insert(parent);
-            }
+        if entry_is_file(e.entry_type)
+            && let Some(parent) = tar_path_to_path_no_strip(&e.path).parent()
+        {
+            directories.insert(parent);
         }
     }
     let tar_directory_entry = b'5';
@@ -241,8 +240,8 @@ fn find_include_patterns_that_incorporate_exclude_patterns(
                 &pattern,
             );
             removed_include_patterns.push(pattern);
-            added_include_patterns.extend(added_includes.clone().into_iter());
-            all_include_patterns.extend(added_includes.into_iter());
+            added_include_patterns.extend(added_includes.clone());
+            all_include_patterns.extend(added_includes);
         } else {
             all_include_patterns.push(pattern);
         }
@@ -578,7 +577,7 @@ impl Report {
             split_to_matched_and_unmatched(directories, &exclude_globs);
         let (entries_that_should_be_excluded_by_directory, remaining_entries) =
             split_by_matching_directories(remaining_entries, &directories_that_should_be_excluded);
-        entries_that_should_be_excluded.extend(entries_that_should_be_excluded_by_directory.into_iter());
+        entries_that_should_be_excluded.extend(entries_that_should_be_excluded_by_directory);
 
         let fix = if entries_that_should_be_excluded.is_empty() {
             Some(Fix::RemoveExclude)

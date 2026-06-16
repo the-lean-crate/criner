@@ -28,7 +28,7 @@ pub enum AsyncResult {
     Done,
 }
 
-#[allow(clippy::too_many_arguments)]
+#[expect(clippy::too_many_arguments)]
 pub async fn tasks(
     assets_dir: &Path,
     tasks: &persistence::TaskTable,
@@ -115,8 +115,8 @@ async fn submit_single<R>(
     max_step: usize,
     f: impl FnOnce() -> R,
 ) -> SubmitResult {
-    use model::TaskState::*;
     use SubmitResult::*;
+    use model::TaskState::*;
     let configure = || {
         progress.init(Some(step), Some("task".into()));
         progress.set(max_step);

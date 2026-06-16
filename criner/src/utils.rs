@@ -2,8 +2,8 @@ use crate::error::{Error, FormatDeadline, Result};
 use async_io::Timer;
 use dia_semver::Semver;
 use futures_util::{
-    future::{self, Either},
     FutureExt,
+    future::{self, Either},
 };
 use std::{
     convert::TryInto,
@@ -118,7 +118,7 @@ where
     MakeFut: FnMut() -> Fut,
     MakeProgress: FnMut() -> prodash::tree::Item,
 {
-    let max_iterations = at_most.unwrap_or(std::usize::MAX);
+    let max_iterations = at_most.unwrap_or(usize::MAX);
     let mut iteration = 0;
     loop {
         if iteration == max_iterations {

@@ -1,8 +1,8 @@
-use crate::persistence::{key_value_iter, new_key_value_query_old_to_new, CrateTable, Keyed};
+use crate::persistence::{CrateTable, Keyed, key_value_iter, new_key_value_query_old_to_new};
 use crate::{
     error::{Error, Result},
     model,
-    persistence::{self, new_key_value_insertion, CrateVersionTable, TableAccess},
+    persistence::{self, CrateVersionTable, TableAccess, new_key_value_insertion},
     utils::enforce_threaded,
 };
 use crates_index_diff::Index;

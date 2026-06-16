@@ -115,18 +115,13 @@ impl From<crates_index_diff::Dependency> for Dependency {
 }
 
 /// Identify a kind of change that occurred to a crate
-#[derive(Clone, Copy, Ord, PartialOrd, Eq, PartialEq, Debug)]
+#[derive(Clone, Copy, Ord, PartialOrd, Eq, PartialEq, Debug, Default)]
 pub enum ChangeKind {
     /// A crate version was added
+    #[default]
     Added,
     /// A crate version was added or it was unyanked.
     Yanked,
-}
-
-impl Default for ChangeKind {
-    fn default() -> Self {
-        ChangeKind::Added
-    }
 }
 
 impl<'de> serde::Deserialize<'de> for ChangeKind {
@@ -186,14 +181,16 @@ pub struct CrateVersion {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+#[expect(dead_code)]
 pub enum ReportResult {
     Done,
     NotStarted,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub enum TaskState {
     /// The task was never started
+    #[default]
     NotStarted,
     /// The task tried to run, but failed N time with errors
     AttemptsWithFailure(Vec<String>),
@@ -229,12 +226,6 @@ impl TaskState {
             }
             (_, other) => other.clone(),
         };
-    }
-}
-
-impl Default for TaskState {
-    fn default() -> Self {
-        TaskState::NotStarted
     }
 }
 
@@ -274,9 +265,10 @@ impl Task {
 }
 
 /// Append-variant-only data structure, otherwise migrations are needed
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub enum TaskResult {
     /// A dummy value just so that we can have a default value
+    #[default]
     None,
     /// Most interesting information about an unpacked crate
     ExplodedCrate {
@@ -296,12 +288,6 @@ pub enum TaskResult {
         /// The content type, it's optional because it might not be set (even though it should)
         content_type: Option<String>,
     },
-}
-
-impl Default for TaskResult {
-    fn default() -> Self {
-        TaskResult::None
-    }
 }
 
 impl TryFrom<crates_index_diff::Change> for CrateVersion {
@@ -328,7 +314,7 @@ impl TryFrom<crates_index_diff::Change> for CrateVersion {
         } = v;
         Ok(CrateVersion {
             name: name.to_string(),
-            kind: yanked.then(|| ChangeKind::Yanked).unwrap_or(ChangeKind::Added),
+            kind: if yanked { ChangeKind::Yanked } else { ChangeKind::Added },
             version: version.to_string(),
             checksum: hex::encode(checksum),
             features,
@@ -376,6 +362,7 @@ pub mod db_dump {
     }
 
     #[derive(Clone, Default, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq, Debug)]
+    #[expect(dead_code)]
     pub struct Person {
         pub name: String,
         pub email: Option<String>,

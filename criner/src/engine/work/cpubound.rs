@@ -1,5 +1,5 @@
-use crate::engine::report::waste::{tar_path_to_utf8_str, CargoConfig};
-use crate::{error::Result, model, persistence, Error};
+use crate::engine::report::waste::{CargoConfig, tar_path_to_utf8_str};
+use crate::{Error, error::Result, model, persistence};
 use async_trait::async_trait;
 use std::io::Seek;
 use std::{fs::File, io::BufReader, io::Read, path::PathBuf, time::SystemTime};
@@ -179,7 +179,7 @@ fn extract_crate(
         entries_meta_data: meta_data,
         selected_entries: files,
     };
-    results.insert(progress, &key, &task_result)?;
+    results.insert(progress, key, &task_result)?;
 
     Ok(())
 }

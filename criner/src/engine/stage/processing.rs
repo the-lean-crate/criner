@@ -1,4 +1,4 @@
-use crate::persistence::{new_value_query_recent_first, value_iter, CrateVersionTable};
+use crate::persistence::{CrateVersionTable, new_value_query_recent_first, value_iter};
 use crate::{
     engine::work,
     error::Result,
@@ -28,7 +28,7 @@ pub async fn process(
             let rx = rx.clone();
             crate::spawn(blocking::unblock(move || -> Result<_> {
                 let agent = work::cpubound::Agent::new(assets_dir, &db)?;
-                #[allow(clippy::unit_arg)] // don't know where the unit is supposed to be
+                #[expect(clippy::unit_arg)] // don't know where the unit is supposed to be
                 Ok(futures_lite::future::block_on(
                     work::generic::processor(db, progress, rx, agent, max_retries_on_timeout).map(|r| {
                         if let Err(e) = r {

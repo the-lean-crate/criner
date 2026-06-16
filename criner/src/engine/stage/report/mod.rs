@@ -1,6 +1,6 @@
 use crate::{
     engine::report,
-    persistence::{self, new_key_value_query_old_to_new_filtered, TableAccess},
+    persistence::{self, TableAccess, new_key_value_query_old_to_new_filtered},
     utils::check,
     {Error, Result},
 };
@@ -89,7 +89,7 @@ pub async fn generate(
     });
 
     let mut fetched_crates = 0;
-    let mut chunk = Vec::<(String, Vec<u8>)>::with_capacity(chunk_size as usize);
+    let mut chunk = Vec::<(String, Vec<u8>)>::with_capacity(chunk_size);
     let mut cid = 0;
     loop {
         let abort_loop = {
@@ -99,7 +99,7 @@ pub async fn generate(
                 persistence::CrateTable::table_name(),
                 glob_str,
                 &connection,
-                Some((fetched_crates, chunk_size as usize)),
+                Some((fetched_crates, chunk_size)),
             )?;
 
             chunk.clear();
@@ -110,7 +110,7 @@ pub async fn generate(
             );
             fetched_crates += chunk.len();
 
-            chunk.len() != chunk_size as usize
+            chunk.len() != chunk_size
         };
 
         cid += 1;
@@ -130,7 +130,7 @@ pub async fn generate(
             ))
             .await
             .map_err(Error::send_msg("Chunk of files to write"))?;
-        chunk = Vec::with_capacity(chunk_size as usize);
+        chunk = Vec::with_capacity(chunk_size);
         if abort_loop {
             break;
         }

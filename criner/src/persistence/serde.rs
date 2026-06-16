@@ -1,4 +1,4 @@
-use crate::model::{db_dump, Context, Crate, CrateVersion, ReportResult, Task, TaskResult};
+use crate::model::{Context, Crate, CrateVersion, ReportResult, Task, TaskResult, db_dump};
 
 fn expect<T, E: std::fmt::Display>(r: std::result::Result<T, E>, panic_message: impl FnOnce(E) -> String) -> T {
     match r {
