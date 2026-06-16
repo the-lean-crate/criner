@@ -20,7 +20,7 @@ doctest = false
 quick-error = "2.0.1"
 futures-util = { version = "0.3.32", default-features = false, features = ["io", "sink"]}
 crates-index-diff = "30.0.0"
-gix = { version = "0.84.0", features = ["parallel"] }
+gix-for-configuration = { package = "gix", version = "0.84.0", features = ["parallel"] }
 git2 = { version = "0.21.0", default-features = false, features = ["https"] }
 prodash = { version = "31.0.0", default-features = false, features = ["render-tui", "render-tui-crossterm", "local-time", "progress-tree", "progress-tree-log"] }
 hex = "0.4.3"
