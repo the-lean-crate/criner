@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release.
+ - 4 commits contributed to the release over the course of 2 calendar days.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Adjusting changelogs prior to release of criner-waste-report v0.1.6, criner v0.4.1, criner-cli v0.4.1 ([`c596a3a`](https://github.com/the-lean-crate/criner/commit/c596a3a7b4d1fd8dfbf1ea0eebd30f8da8dc32ba))
     - Merge pull request #13 from the-lean-crate/updates ([`d6fc9f3`](https://github.com/the-lean-crate/criner/commit/d6fc9f3f2256e0eaf67aacb4cec3c6130b8f5af8))
     - Clean up clippy lints after dependency upgrade ([`653b2b8`](https://github.com/the-lean-crate/criner/commit/653b2b81d5d870839432ff6f3efbf0be58012b77))
     - Upgrade workspace to Rust 2024 and latest deps ([`f5dd04b`](https://github.com/the-lean-crate/criner/commit/f5dd04beba9e38f40b739989b91e353c99fee057))
