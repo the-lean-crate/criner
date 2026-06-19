@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 5 commits contributed to the release over the course of 2 calendar days.
+ - 6 commits contributed to the release over the course of 2 calendar days.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Adjusting changelogs prior to release of criner-waste-report v0.1.6, criner v0.4.1, criner-cli v0.4.1 ([`db54d53`](https://github.com/the-lean-crate/criner/commit/db54d53482352b00e7d91f697747974a72c2c350))
     - Adjusting changelogs prior to release of criner-waste-report v0.1.6, criner v0.4.1, criner-cli v0.4.1 ([`c596a3a`](https://github.com/the-lean-crate/criner/commit/c596a3a7b4d1fd8dfbf1ea0eebd30f8da8dc32ba))
     - Merge pull request #13 from the-lean-crate/updates ([`d6fc9f3`](https://github.com/the-lean-crate/criner/commit/d6fc9f3f2256e0eaf67aacb4cec3c6130b8f5af8))
     - Clarify how the `gix` dependency is currently used. ([`4d8ea78`](https://github.com/the-lean-crate/criner/commit/4d8ea78a4cbf17d8444fece191318ba83bd6f6d2))
