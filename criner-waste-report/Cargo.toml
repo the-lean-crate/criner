@@ -1,6 +1,6 @@
 [package]
 name = "criner-waste-report"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 edition = "2024"
 description = "Determine include directives for Cargo.toml files to slim down a crate"

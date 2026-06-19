@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.4.1 (2026-06-19)
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 4 commits contributed to the release.
+ - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge pull request #13 from the-lean-crate/updates ([`d6fc9f3`](https://github.com/the-lean-crate/criner/commit/d6fc9f3f2256e0eaf67aacb4cec3c6130b8f5af8))
+    - Clarify how the `gix` dependency is currently used. ([`4d8ea78`](https://github.com/the-lean-crate/criner/commit/4d8ea78a4cbf17d8444fece191318ba83bd6f6d2))
+    - Clean up clippy lints after dependency upgrade ([`653b2b8`](https://github.com/the-lean-crate/criner/commit/653b2b81d5d870839432ff6f3efbf0be58012b77))
+    - Upgrade workspace to Rust 2024 and latest deps ([`f5dd04b`](https://github.com/the-lean-crate/criner/commit/f5dd04beba9e38f40b739989b91e353c99fee057))
+</details>
+
 ## 0.4.0 (2024-10-17)
 
 ### Chore (BREAKING)
@@ -15,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 3 commits contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -26,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release criner v0.4.0, criner-cli v0.4.0, safety bump criner-cli v0.4.0 ([`a075e73`](https://github.com/the-lean-crate/criner/commit/a075e734dede8e1de5fe1652ec86f42da0162c41))
     - Merge branch 'upgrades' ([`cf7fe54`](https://github.com/the-lean-crate/criner/commit/cf7fe541d7a40c21f06c1e256d8f1072439c27d9))
     - Upgrade gix-related dependencies ([`081cc14`](https://github.com/the-lean-crate/criner/commit/081cc14b90e4718ef45190cff1239a9ff5f9a1e7))
 </details>
@@ -160,6 +184,8 @@ A maintenance release without user-facing changes.
     - Manually update dependencies, except for jwalk ([`1ca4485`](https://github.com/the-lean-crate/criner/commit/1ca4485da83cb2afa1a5cd844eb8309058b216d1))
 </details>
 
+## v0.1.4 (2020-07-25)
+
 ## v0.2.0 (2020-06-16)
 
 ### Commit Statistics
@@ -212,17 +238,11 @@ A maintenance release without user-facing changes.
     - Make git message more precise ([`dcb79f7`](https://github.com/the-lean-crate/criner/commit/dcb79f7db86852d294518f53a2a570a113c8aac4))
 </details>
 
-## v0.1.4 (2020-07-25)
-
 ## v0.1.3 (2020-05-28)
 
 ## v0.1.2 (2020-04-12)
 
 <csr-id-8fcc628243e06527104e0d717a3f1f4e214f3fc3/>
-
-### Other
-
- - <csr-id-8fcc628243e06527104e0d717a3f1f4e214f3fc3/> try to express push options differently to get progress
 
 ### Commit Statistics
 
@@ -419,12 +439,6 @@ A maintenance release without user-facing changes.
 ## v0.1.0 (2020-03-20)
 
 <csr-id-cdb225a7d5549e4d84cf1dc2e8c9644fbe4203e9/>
-
-### Other
-
- - <csr-id-cdb225a7d5549e4d84cf1dc2e8c9644fbe4203e9/> Try to resolve the permanent database locked issue…
-   …with shared cache and read-uncommitted.
-   No combination works
 
 ### Commit Statistics
 

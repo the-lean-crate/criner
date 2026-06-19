@@ -1,6 +1,6 @@
 [package]
 name = "criner"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
 edition = "2024"
 description = "a platform for resumable mining of crates.io for knowledge and information"
@@ -65,7 +65,7 @@ globset = "0.4.18"
 horrorshow = "0.8.9"
 regex = "1.12.4"
 lazy_static = "1.5.0"
-criner-waste-report = { version = "^0.1.5", path = "../criner-waste-report" }
+criner-waste-report = { version = "^0.1.6", path = "../criner-waste-report" }
 
 [dev-dependencies]
 common_macros = "0.1.1"

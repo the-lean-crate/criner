@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.1.6 (2026-06-19)
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release.
+ - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge pull request #13 from the-lean-crate/updates ([`d6fc9f3`](https://github.com/the-lean-crate/criner/commit/d6fc9f3f2256e0eaf67aacb4cec3c6130b8f5af8))
+    - Clean up clippy lints after dependency upgrade ([`653b2b8`](https://github.com/the-lean-crate/criner/commit/653b2b81d5d870839432ff6f3efbf0be58012b77))
+    - Upgrade workspace to Rust 2024 and latest deps ([`f5dd04b`](https://github.com/the-lean-crate/criner/commit/f5dd04beba9e38f40b739989b91e353c99fee057))
+</details>
+
 ## 0.1.5 (2023-03-16)
 
 A maintenance release without user-facing changes.
@@ -13,8 +35,7 @@ A maintenance release without user-facing changes.
 
 <csr-read-only-do-not-edit/>
 
- - 12 commits contributed to the release over the course of 843 calendar days.
- - 964 days passed between releases.
+ - 13 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -31,6 +52,7 @@ A maintenance release without user-facing changes.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release criner-waste-report v0.1.5, criner v0.3.1, criner-cli v0.3.1 ([`e0cd0e1`](https://github.com/the-lean-crate/criner/commit/e0cd0e1c7937477c466d46e4fd571ddfd15fb4d7))
     - Update chnagelogs prior to release ([`2faff3e`](https://github.com/the-lean-crate/criner/commit/2faff3e850634f6dcaaef843b041c7129d84b1d7))
     - Upgrade `toml` in `criner-waste-report` ([`7be638b`](https://github.com/the-lean-crate/criner/commit/7be638bab4c6c7d7c2f753470d09d77ac9bc5ed2))
     - Upgrade dia-semver ([`2e3ab36`](https://github.com/the-lean-crate/criner/commit/2e3ab36a2360ecbf50abfae20c6a25ba7889ca52))

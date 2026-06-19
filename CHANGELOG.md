@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.4.1 (2026-06-19)
+
 ## 0.4.0 (2024-10-17)
 
 ### Chore (BREAKING)
@@ -86,9 +88,9 @@ A maintenance release without user-facing changes.
     - Upgrade to prodash 7.0 ([`83d8029`](https://github.com/the-lean-crate/criner/commit/83d8029d782e7d3a6780f66d7383c83c95df3c26))
 </details>
 
-## v0.2.0 (2020-06-16)
-
 ## v0.1.4 (2020-07-25)
+
+## v0.2.0 (2020-06-16)
 
 ## v0.1.3 (2020-05-28)
 
