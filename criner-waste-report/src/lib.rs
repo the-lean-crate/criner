@@ -5,6 +5,7 @@ extern crate lazy_static;
 
 #[cfg(feature = "html")]
 pub mod html;
+mod include;
 pub mod result;
 
 #[cfg(test)]
@@ -71,28 +72,31 @@ pub enum Fix {
 }
 
 impl Fix {
-    pub fn merge(self, rhs: Option<PotentialWaste>, mut waste: Vec<TarHeader>) -> (Fix, Vec<TarHeader>) {
+    pub fn merge(self, rhs: Option<PotentialWaste>, all_entries_in_crate: Vec<TarHeader>) -> (Fix, Vec<TarHeader>) {
         match (self, rhs) {
             (
                 Fix::NewInclude {
-                    mut include,
+                    include,
                     has_build_script,
                 },
-                Some(potential),
-            ) => (
-                Fix::NewInclude {
-                    has_build_script,
-                    include: {
-                        include.extend(potential.patterns_to_fix);
-                        include
+                potential,
+            ) => {
+                let include::ResolvedInclude { patterns, waste } = include::resolve(
+                    include
+                        .into_iter()
+                        .chain(potential.into_iter().flat_map(|p| p.patterns_to_fix))
+                        .collect(),
+                    all_entries_in_crate,
+                );
+                (
+                    Fix::NewInclude {
+                        include: patterns,
+                        has_build_script,
                     },
-                },
-                {
-                    waste.extend(potential.potential_waste);
-                    waste
-                },
-            ),
-            (lhs, _) => (lhs, waste),
+                    waste,
+                )
+            }
+            (lhs, _) => (lhs, Vec::new()),
         }
     }
 }
