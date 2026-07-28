@@ -251,7 +251,7 @@ fn find_include_patterns_that_incorporate_exclude_patterns(
     (all_include_patterns, added_include_patterns, removed_include_patterns)
 }
 
-fn make_glob(pattern: &str) -> globset::Glob {
+pub(crate) fn make_glob(pattern: &str) -> globset::Glob {
     globset::GlobBuilder::new(pattern)
         .literal_separator(false)
         .case_insensitive(false)
@@ -547,7 +547,7 @@ impl Report {
             included_entries.clone(),
         );
         let potential = potential_negated_includes(
-            included_entries,
+            included_entries.clone(),
             globset_from_patterns(non_greedy_patterns(&compile_time_include)),
         );
 
@@ -558,7 +558,10 @@ impl Report {
                 include: include_patterns,
                 has_build_script,
             }
-            .merge(potential, excluded_entries);
+            .merge(
+                potential,
+                excluded_entries.into_iter().chain(included_entries).collect(),
+            );
             (Some(fix), waste)
         }
     }
