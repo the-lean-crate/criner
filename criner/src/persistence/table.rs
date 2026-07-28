@@ -129,8 +129,7 @@ pub trait TableAccess {
     }
 
     fn get(&self, key: impl AsRef<str>) -> Result<Option<Self::StorageItem>> {
-        Ok(self
-            .connection()
+        self.connection()
             .lock()
             .query_row(
                 &format!("SELECT data FROM {} WHERE key = '{}'", Self::table_name(), key.as_ref()),
@@ -138,7 +137,8 @@ pub trait TableAccess {
                 |r| r.get::<_, Vec<u8>>(0),
             )
             .optional()?
-            .map(|d| Self::StorageItem::from(d.as_slice())))
+            .map(|d| Ok(Self::StorageItem::from(decompress(&d)?.as_slice())))
+            .transpose()
     }
 
     /// Update an existing item, or create it as default, returning the stored item
@@ -159,10 +159,12 @@ pub trait TableAccess {
                     |r| r.get::<_, Vec<u8>>(0),
                 )
                 .optional()?
+                .map(|d| decompress(&d))
+                .transpose()?
                 .map_or_else(|| f(Self::StorageItem::default()), |d| f(d.as_slice().into()));
             transaction.execute(
                 &format!("REPLACE INTO {} (key, data) VALUES (?1, ?2)", Self::table_name()),
-                params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
+                params![key.as_ref(), gzip(&rmp_serde::to_vec(&new_value)?)?],
             )?;
             transaction.commit()?;
 
@@ -188,12 +190,14 @@ pub trait TableAccess {
                         [],
                         |r| r.get::<_, Vec<u8>>(0),
                     )
-                    .optional()?;
+                    .optional()?
+                    .map(|d| decompress(&d))
+                    .transpose()?;
                 Self::merge(item, maybe_vec.map(|v| v.as_slice().into()))
             };
             transaction.execute(
                 &format!("REPLACE INTO {} (key, data) VALUES (?1, ?2)", Self::table_name()),
-                params![key.as_ref(), rmp_serde::to_vec(&new_value)?],
+                params![key.as_ref(), gzip(&rmp_serde::to_vec(&new_value)?)?],
             )?;
             transaction.commit()?;
             Ok(new_value)
@@ -204,11 +208,23 @@ pub trait TableAccess {
         retry_on_db_busy(Some(progress), || {
             self.connection().lock().execute(
                 &format!("REPLACE INTO {} (key, data) VALUES (?1, ?2)", Self::table_name()),
-                params![key.as_ref(), rmp_serde::to_vec(&Self::merge(v, None))?],
+                params![key.as_ref(), gzip(&rmp_serde::to_vec(&Self::merge(v, None))?)?],
             )?;
             Ok(())
         })
     }
+}
+
+fn decompress(data: &[u8]) -> Result<Vec<u8>> {
+    let mut out = Vec::new();
+    std::io::Read::read_to_end(&mut libflate::gzip::Decoder::new(data)?, &mut out)?;
+    Ok(out)
+}
+
+fn gzip(data: &[u8]) -> Result<Vec<u8>> {
+    let mut encoder = libflate::gzip::Encoder::new(Vec::new())?;
+    std::io::Write::write_all(&mut encoder, data)?;
+    Ok(encoder.finish().into_result()?)
 }
 
 fn retry_on_db_busy<T>(mut progress: Option<&mut prodash::tree::Item>, mut f: impl FnMut() -> Result<T>) -> Result<T> {
@@ -367,14 +383,14 @@ impl MetaTable {
 
     // NOTE: impl iterator is not allowed in traits unfortunately, but one could implement one manually
     pub fn most_recent(&self) -> Result<Option<(String, Context)>> {
-        Ok(self
-            .connection()
+        self.connection()
             .lock()
             .query_row("SELECT key, data FROM meta ORDER BY key DESC limit 1", [], |r| {
                 Ok((r.get::<_, String>(0)?, r.get::<_, Vec<u8>>(1)?))
             })
             .optional()?
-            .map(|(k, v)| (k, Context::from(v.as_slice()))))
+            .map(|(k, v)| Ok((k, Context::from(decompress(&v)?.as_slice()))))
+            .transpose()
     }
 }
 
