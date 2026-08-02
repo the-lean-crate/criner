@@ -20,7 +20,6 @@ impl From<csv_model::User> for db_dump::Actor {
         db_dump::Actor {
             crates_io_id: id,
             kind: db_dump::ActorKind::User,
-            github_avatar_url: String::new(),
             github_id,
             github_login,
             name,
@@ -32,7 +31,6 @@ impl From<csv_model::Team> for db_dump::Actor {
     fn from(
         csv_model::Team {
             id,
-            github_avatar_url,
             github_id,
             github_login,
             name,
@@ -41,7 +39,6 @@ impl From<csv_model::Team> for db_dump::Actor {
         db_dump::Actor {
             crates_io_id: id,
             kind: db_dump::ActorKind::Team,
-            github_avatar_url,
             github_id,
             github_login,
             name,

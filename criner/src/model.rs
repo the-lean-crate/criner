@@ -343,8 +343,6 @@ pub mod db_dump {
         pub crates_io_id: Id,
         /// Whether actor is a user or a team
         pub kind: ActorKind,
-        /// The URL to the GitHub avatar
-        pub github_avatar_url: String,
         /// The ID identifying a user on GitHub
         pub github_id: GitHubId,
         /// The GitHUb login name

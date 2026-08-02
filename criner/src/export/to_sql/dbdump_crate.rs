@@ -32,7 +32,6 @@ impl SqlConvert for model::db_dump::Crate {
              crates_io_id                      INTEGER NOT NULL, -- these IDs are not unique, so we can't use it as unique id
              kind                              TEXT NOT NULL,
              github_id                         INTEGER NOT NULL, -- This is a unique id across teams and users
-             github_avatar_url                 TEXT NOT NULL,
              github_login                      TEXT NOT NULL,
              name                              TEXT,
              PRIMARY KEY (github_id)
@@ -89,8 +88,8 @@ fn do_it(input_statement: &mut rusqlite::Statement, transaction: &rusqlite::Tran
         .prepare(
             "
             INSERT OR IGNORE INTO 'crates.io-actor'
-                     (crates_io_id, kind, github_id, github_avatar_url, github_login, name)
-              VALUES (?1          , ?2  , ?3       , ?4               , ?5          , ?6  );
+                     (crates_io_id, kind, github_id, github_login, name)
+              VALUES (?1          , ?2  , ?3       , ?4          , ?5  );
         ",
         )
         .unwrap();
@@ -193,7 +192,6 @@ fn insert_actor_to_db(insert_actor: &mut Statement, actor: &model::db_dump::Acto
             model::db_dump::ActorKind::Team => "team",
         },
         actor.github_id,
-        actor.github_avatar_url,
         actor.github_login,
         actor.name
     ])

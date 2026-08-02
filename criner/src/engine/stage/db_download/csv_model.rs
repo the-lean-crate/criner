@@ -67,8 +67,6 @@ pub struct User {
 #[derive(Deserialize)]
 pub struct Team {
     pub id: Id,
-    #[serde(rename = "avatar")]
-    pub github_avatar_url: String,
     #[serde(rename = "github_id")]
     pub github_id: GitHubId,
     #[serde(rename = "login")]
