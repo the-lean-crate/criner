@@ -38,10 +38,15 @@ pub struct Crate {
     pub updated_at: SystemTime,
     pub description: Option<String>,
     pub documentation: Option<String>,
-    pub downloads: u64,
     pub homepage: Option<String>,
     pub readme: Option<String>,
     pub repository: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct CrateDownloads {
+    pub crate_id: Id,
+    pub downloads: u64,
 }
 
 pub enum UserKind {
@@ -52,8 +57,6 @@ pub enum UserKind {
 #[derive(Deserialize)]
 pub struct User {
     pub id: Id,
-    #[serde(rename = "gh_avatar")]
-    pub github_avatar_url: String,
     #[serde(rename = "gh_id")]
     pub github_id: GitHubId,
     #[serde(rename = "gh_login")]
@@ -64,8 +67,6 @@ pub struct User {
 #[derive(Deserialize)]
 pub struct Team {
     pub id: Id,
-    #[serde(rename = "avatar")]
-    pub github_avatar_url: String,
     #[serde(rename = "github_id")]
     pub github_id: GitHubId,
     #[serde(rename = "login")]
@@ -107,10 +108,11 @@ where
 {
     use serde::Deserialize;
     let val = std::borrow::Cow::<'de, str>::deserialize(deserializer)?;
-    // 2017-11-30 04:00:19.334919
+    // 2017-11-30 04:00:19.334919+00 (fractional seconds and/or offset may be absent)
+    let trimmed = val.find(['.', '+']).map_or(val.as_ref(), |idx| &val[..idx]);
     let t = time::PrimitiveDateTime::parse(
-        val.as_ref().split('.').next().unwrap_or_else(|| val.as_ref()),
-        //                                   2015 -04     - 24    18   :  26    :    11
+        trimmed,
+        //   2015 -04     - 24    18   :  26    :    11
         &time::macros::format_description!("[year]-[month]-[day] [hour]:[minute]:[second]"),
     )
     .map_err(serde::de::Error::custom)?;
@@ -162,4 +164,36 @@ pub struct CratesCategory {
 pub struct CratesKeyword {
     pub keyword_id: Id,
     pub crate_id: Id,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Deserialize)]
+    struct Row {
+        #[serde(deserialize_with = "deserialize_timestamp")]
+        t: SystemTime,
+    }
+
+    fn parse(value: &str) -> SystemTime {
+        let csv = format!("t\n{}\n", value);
+        let mut rd = csv::ReaderBuilder::new().has_headers(true).from_reader(csv.as_bytes());
+        rd.deserialize::<Row>().next().unwrap().unwrap().t
+    }
+
+    #[test]
+    fn timestamp_with_fractional_seconds_and_offset() {
+        parse("2015-10-21 11:48:14.991765+00");
+    }
+
+    #[test]
+    fn timestamp_with_offset_but_no_fractional_seconds() {
+        parse("2017-10-29 06:27:11+00");
+    }
+
+    #[test]
+    fn timestamp_with_neither_fractional_seconds_nor_offset() {
+        parse("2017-10-29 06:27:11");
+    }
 }
