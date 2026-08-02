@@ -45,6 +45,7 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
         "keywords",
         "users",
         "teams",
+        "crate_downloads",
     ];
 
     let mut num_files_seen = 0;
@@ -58,6 +59,7 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
     let mut crate_owners = None::<Vec<csv_model::CrateOwner>>;
     let mut crates_categories = None::<Vec<csv_model::CratesCategory>>;
     let mut crates_keywords = None::<Vec<csv_model::CratesKeyword>>;
+    let mut crate_downloads = None::<BTreeMap<csv_model::Id, u64>>;
 
     for (eid, entry) in archive.entries()?.enumerate() {
         num_files_seen = eid + 1;
@@ -103,6 +105,10 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
                 "crates_keywords" => {
                     crates_keywords = Some(from_csv::vec(entry, "crates_keywords", &mut progress)?);
                 }
+                "crate_downloads" => {
+                    let rows: Vec<csv_model::CrateDownloads> = from_csv::vec(entry, "crate_downloads", &mut progress)?;
+                    crate_downloads = Some(rows.into_iter().map(|r| (r.crate_id, r.downloads)).collect());
+                }
                 _ => progress.fail(format!("bug or oversight: Could not parse table of type {:?}", name)),
             }
             progress.done(done_msg);
@@ -124,6 +130,7 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
     let crates_categories =
         crates_categories.ok_or(Error::Bug("expected crates_categories.csv in crates-io db dump"))?;
     let crate_owners = crate_owners.ok_or(Error::Bug("expected crate_owners.csv in crates-io db dump"))?;
+    let crate_downloads = crate_downloads.ok_or(Error::Bug("expected crate_downloads.csv in crates-io db dump"))?;
 
     progress.init(Some(4), Some("conversion steps".into()));
     progress.set_name("transform actors");
@@ -146,6 +153,7 @@ fn extract_and_ingest(db: Db, mut progress: prodash::tree::Item, db_file_path: P
         actors_by_id,
         crate_owners,
         versions_by_crate_id,
+        crate_downloads,
         progress.add_child("crates"),
     );
 

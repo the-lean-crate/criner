@@ -12,7 +12,6 @@ impl From<csv_model::User> for db_dump::Actor {
     fn from(
         csv_model::User {
             id,
-            github_avatar_url,
             github_id,
             github_login,
             name,
@@ -21,7 +20,7 @@ impl From<csv_model::User> for db_dump::Actor {
         db_dump::Actor {
             crates_io_id: id,
             kind: db_dump::ActorKind::User,
-            github_avatar_url,
+            github_avatar_url: String::new(),
             github_id,
             github_login,
             name,
@@ -95,7 +94,6 @@ impl From<csv_model::Crate> for db_dump::Crate {
             updated_at,
             description,
             documentation,
-            downloads,
             homepage,
             readme,
             repository,
@@ -113,7 +111,7 @@ impl From<csv_model::Crate> for db_dump::Crate {
             updated_at,
             description,
             documentation,
-            downloads,
+            downloads: 0,
             homepage,
             readme,
             repository,
@@ -254,6 +252,7 @@ pub fn into_crates(
     actors_by_id: BTreeMap<(db_dump::Id, db_dump::ActorKind), db_dump::Actor>,
     crate_owners: Vec<csv_model::CrateOwner>,
     mut versions_by_crate_id: BTreeMap<db_dump::Id, Vec<db_dump::CrateVersion>>,
+    downloads_by_crate_id: BTreeMap<csv_model::Id, u64>,
     mut progress: prodash::tree::Item,
 ) -> Vec<db_dump::Crate> {
     let mut crate_by_id = BTreeMap::new();
@@ -271,6 +270,7 @@ pub fn into_crates(
         });
         versions.sort_by_key(|v| parse_semver(&v.semver));
         krate.versions = versions;
+        krate.downloads = downloads_by_crate_id.get(&crate_id).copied().unwrap_or(0);
         crate_by_id.insert(crate_id, krate);
     }
     drop(versions_by_crate_id);
