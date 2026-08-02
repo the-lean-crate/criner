@@ -19,7 +19,9 @@ jobs:
     steps:
     - uses: actions/checkout@v7
     - uses: Swatinem/rust-cache@v2
+    - run: cargo install cargo-shear --locked
     - run: make clippy
+    - run: make shear
 
   test:
     runs-on: ubuntu-latest

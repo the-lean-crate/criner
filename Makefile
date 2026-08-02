@@ -79,7 +79,10 @@ clippy: ## Run cargo clippy
 fmt: ## Run cargo fmt in check mode
 	cargo fmt --all -- --check
 
-tests: fmt clippy ## Run all tests we have
+shear: ## Check for unused dependencies
+	cargo shear
+
+tests: fmt clippy shear ## Run all tests we have
 	cargo check --all --tests
 	cd criner-waste-report && cargo check --tests && cargo check --tests --no-default-features
 	cargo test --all
