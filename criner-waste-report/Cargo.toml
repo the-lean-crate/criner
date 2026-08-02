@@ -16,6 +16,10 @@ doctest = false
 default = ["html"]
 html = ["horrorshow", "bytesize", "dia-semver", "humantime"]
 
+# needed by serde_derive's generated impls, never referenced directly
+[package.metadata.cargo-shear]
+ignored = ["serde"]
+
 [dependencies]
 serde_derive = "1.0.228"
 serde = "1.0.228"

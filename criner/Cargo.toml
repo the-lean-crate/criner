@@ -16,6 +16,10 @@ migration = ["jwalk"]
 [lib]
 doctest = false
 
+# needed to pin feature set on crates-index-diff's transitive gix (Send bounds)
+[package.metadata.cargo-shear]
+ignored = ["gix-for-configuration"]
+
 [dependencies]
 quick-error = "2.0.1"
 futures-util = { version = "0.3.32", default-features = false, features = ["io", "sink"]}
@@ -58,9 +62,6 @@ glob = "0.3.3"
 
 # For 'export' functionality only (embed json in SQL text for simplicity) and for some fields in crates-io csv download
 serde_json = "1.0.150"
-
-# For waste report computation and html generation
-toml = "1.1.2"
 globset = "0.4.18"
 horrorshow = "0.8.9"
 regex = "1.12.4"
