@@ -1,12 +1,11 @@
 use super::csv_model;
 use crate::{model::db_dump, utils::parse_semver};
 use std::collections::BTreeMap;
+use std::sync::LazyLock;
 use std::time::SystemTime;
 
-lazy_static! {
-    static ref PERSON: regex::Regex =
-        regex::Regex::new("(?P<name>[\\w ]+)(<(?P<email>.*)>)?").expect("valid statically known regex");
-}
+static PERSON: LazyLock<regex::Regex> =
+    LazyLock::new(|| regex::Regex::new("(?P<name>[\\w ]+)(<(?P<email>.*)>)?").expect("valid statically known regex"));
 
 impl From<csv_model::User> for db_dump::Actor {
     fn from(
