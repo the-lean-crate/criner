@@ -1,27 +1,32 @@
 use super::{CargoConfig, Fix, Patterns, PotentialWaste, Report, TarHeader, WastedFile};
+use std::sync::LazyLock;
 use std::{collections::BTreeSet, path::Path, path::PathBuf};
 
-lazy_static! {
-    static ref COMPILE_TIME_INCLUDE: regex::bytes::Regex =
-        regex::bytes::Regex::new(r##"include_(str|bytes)!\("(?P<include>.+?)"\)"##)
-            .expect("valid statically known regex");
-    static ref BUILD_SCRIPT_PATHS: regex::bytes::Regex =
-        regex::bytes::Regex::new(r##""cargo:rerun-if-changed=(?P<path>.+?)"|"(?P<path_like>.+?)""##)
-            .expect("valid statically known regex");
-    static ref STANDARD_EXCLUDES_GLOBSET: globset::GlobSet = globset_from_patterns(standard_exclude_patterns());
-    static ref STANDARD_EXCLUDE_MATCHERS: Vec<(&'static str, globset::GlobMatcher)> = standard_exclude_patterns()
+static COMPILE_TIME_INCLUDE: LazyLock<regex::bytes::Regex> = LazyLock::new(|| {
+    regex::bytes::Regex::new(r##"include_(str|bytes)!\("(?P<include>.+?)"\)"##).expect("valid statically known regex")
+});
+static BUILD_SCRIPT_PATHS: LazyLock<regex::bytes::Regex> = LazyLock::new(|| {
+    regex::bytes::Regex::new(r##""cargo:rerun-if-changed=(?P<path>.+?)"|"(?P<path_like>.+?)""##)
+        .expect("valid statically known regex")
+});
+static STANDARD_EXCLUDES_GLOBSET: LazyLock<globset::GlobSet> =
+    LazyLock::new(|| globset_from_patterns(standard_exclude_patterns()));
+static STANDARD_EXCLUDE_MATCHERS: LazyLock<Vec<(&'static str, globset::GlobMatcher)>> = LazyLock::new(|| {
+    standard_exclude_patterns()
         .iter()
         .cloned()
         .map(|p| (p, make_glob(p).compile_matcher()))
-        .collect();
-    static ref STANDARD_INCLUDE_GLOBS: Vec<globset::Glob> =
-        standard_include_patterns().iter().map(|p| make_glob(p)).collect();
-    static ref STANDARD_INCLUDE_MATCHERS: Vec<(&'static str, globset::GlobMatcher)> = standard_include_patterns()
+        .collect()
+});
+static STANDARD_INCLUDE_GLOBS: LazyLock<Vec<globset::Glob>> =
+    LazyLock::new(|| standard_include_patterns().iter().map(|p| make_glob(p)).collect());
+static STANDARD_INCLUDE_MATCHERS: LazyLock<Vec<(&'static str, globset::GlobMatcher)>> = LazyLock::new(|| {
+    standard_include_patterns()
         .iter()
         .cloned()
         .map(|p| (p, make_glob(p).compile_matcher()))
-        .collect();
-}
+        .collect()
+});
 
 pub fn tar_path_to_utf8_str(mut bytes: &[u8]) -> &str {
     // Tar paths include the parent directory, cut it to crate relative paths

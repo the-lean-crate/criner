@@ -2,9 +2,6 @@
 #![deny(unsafe_code)]
 
 #[macro_use]
-extern crate lazy_static;
-
-#[macro_use]
 extern crate quick_error;
 
 #[cfg(feature = "migration")]

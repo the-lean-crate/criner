@@ -27,7 +27,6 @@ toml = "1.1.2"
 globset = "0.4.18"
 ignore = "0.4"
 regex = "1.12.4"
-lazy_static = "1.5.0"
 
 # for html
 horrorshow = { version = "0.8.9", optional = true }
