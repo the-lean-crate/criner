@@ -6,19 +6,34 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   fmt:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v7
-    - uses: Swatinem/rust-cache@v2
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
+      with:
+        toolchain: stable
+        components: rustfmt
+    - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
     - run: make fmt
 
   clippy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v7
-    - uses: Swatinem/rust-cache@v2
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
+      with:
+        toolchain: stable
+        components: clippy
+    - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
     - run: cargo install cargo-shear --locked
     - run: make clippy
     - run: make shear
@@ -26,8 +41,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v7
-    - uses: Swatinem/rust-cache@v2
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
+      with:
+        toolchain: stable
+    - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
     - run: cargo check --all --tests
     - run: cd criner-waste-report && cargo check --tests && cargo check --tests --no-default-features
     - run: cargo test --all
@@ -35,8 +55,13 @@ jobs:
   package-size:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v7
-    - uses: Swatinem/rust-cache@v2
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
+      with:
+        toolchain: stable
+    - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
     - name: Check crate package size
       run: |
         curl -LSfs https://raw.githubusercontent.com/the-lean-crate/cargo-diet/master/ci/install.sh | \
@@ -45,3 +70,19 @@ jobs:
         cargo diet -n --package-size-limit 15KB
         (cd criner && cargo diet -n --package-size-limit 50KB)
         (cd criner-waste-report && cargo diet -n --package-size-limit 18KB)
+
+  zizmor:
+    name: zizmor
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@70fb788f84895a7701f5643d103d587e460b5c99 # v0.6.3
